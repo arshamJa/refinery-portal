@@ -61,6 +61,7 @@
                                 <h3 class="text-gray-800 font-semibold dark:text-white">
                                     {{$meeting->title}}
                                 </h3>
+                                <h3>some changes in here</h3>
                                 <div
                                     class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
                                     <span>{{__('آقا/خانم')}}
