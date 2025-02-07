@@ -1,0 +1,45 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+
+Route::middleware(['auth','sanitizeInputs'])->group( function () {
+
+    //    Route::get('/meetings', [TaskManagementController::class, 'index'])->name('meetings.index');
+    Route::get('/dashboard/meetings',\App\Livewire\MeetingTable::class)
+        ->name('meetings.index');
+
+    Route::get('/meetings',\App\Livewire\Meetings::class)->name('meetings');
+
+    Route::get('/meetings/list',\App\Livewire\MeetingsList::class)->name('meetingsList');
+
+    Route::get('/dashboard/meeting/invitation',\App\Livewire\MeetingInvitation::class)
+        ->name('meeting.invitation');
+
+
+
+    Route::get('/meetings/create', [\App\Http\Controllers\MeetingController::class, 'create'])
+        ->name('meetings.create');
+
+    Route::post('/meetings', [\App\Http\Controllers\MeetingController::class, 'store'])
+        ->name('meetings.store');
+
+    Route::get('/meetings/{meeting}', [\App\Http\Controllers\MeetingController::class, 'show'])
+        ->name('meetings.show');
+
+    Route::get('/meetings/{meeting}/edit', [\App\Http\Controllers\MeetingController::class, 'edit'])
+        ->name('meetings.edit');
+
+    Route::patch('/meetings/{meeting}', [\App\Http\Controllers\MeetingController::class, 'update'])
+        ->name('meetings.update');
+
+    Route::get('/presentUsers/{meetingId}',\App\Livewire\PresentUsers::class)
+        ->name('presentUsers');
+
+    Route::delete('/meetings/{meeting}', [\App\Http\Controllers\MeetingController::class, 'destroy'])
+        ->name('meetings.destroy');
+
+
+});
+
+

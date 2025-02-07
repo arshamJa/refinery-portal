@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('user_infos', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('department_id')->nullable();
+            $table->string('full_name');
+            $table->string('work_phone');
+            $table->string('house_phone');
+            $table->string('phone');
+            $table->string('n_code');
+            $table->string('position');
+            $table->boolean('is_phoneList_allowed')->default(true);
+            $table->boolean('is_blog_allowed')->default(true);
+            $table->boolean('is_chat_allowed')->default(true);
+            $table->boolean('is_dictionary_allowed')->default(true);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('user_infos');
+    }
+};

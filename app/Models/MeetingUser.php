@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+
+class MeetingUser extends Model
+{
+    use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'user_id',
+        'meeting_id',
+        'is_present',
+        'reason_for_absent'
+    ];
+
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function meeting(): BelongsTo
+    {
+        return $this->belongsTo(Meeting::class);
+    }
+
+    public function invitation()
+    {
+        return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
+    }
+}
