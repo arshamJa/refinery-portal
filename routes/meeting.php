@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth','sanitizeInputs'])->group( function () {
 
+    Route::post('/markNotification/{meetingUserId}',[\App\Http\Controllers\MeetingController::class,'markNotification'])
+        ->name('markNotification');
+
     //    Route::get('/meetings', [TaskManagementController::class, 'index'])->name('meetings.index');
     Route::get('/dashboard/meetings',\App\Livewire\MeetingTable::class)
         ->name('meetings.index');

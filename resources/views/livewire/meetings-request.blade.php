@@ -1,5 +1,6 @@
 <div>
 
+    <x-sessionMessage name="status"/>
     <x-template>
         <nav class="flex justify-between mb-4">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -65,14 +66,19 @@
                                     class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
                                     <span>{{__('آقا/خانم')}}
                                         <span class="font-bold">{{$meetingUser->user->user_info->full_name}}</span>
-                                        {{__('درخواست به جلسه را  ')}}
+                                        <span>{{__('درخواست به جلسه را ')}}</span>
                                         @if($meetingUser->is_present == 1)
                                             <span class="font-bold">{{__('قبول کرد')}}</span>
                                         @else
                                             <span class="font-bold">{{__('رد کرد')}}</span>
+                                            <span class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>
                                         @endif
                                     </span>
-                                    <x-primary-button>{{__('متوجه شدم')}}</x-primary-button>
+                                    <form action="{{route('markNotification',$meetingUser->id)}}" method="post">
+                                        @csrf
+                                        <x-primary-button type="submit">{{__('متوجه شدم')}}</x-primary-button>
+                                    </form>
+
                                 </div>
 
                             </div>

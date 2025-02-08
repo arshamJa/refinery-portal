@@ -12,6 +12,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\UserInfo;
 use Closure;
+use http\Encoding\Stream\Inflate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -166,6 +167,15 @@ class MeetingController extends Controller
         }
         return redirect()->signedRoute('meetings.index')->with('status',' جلسه با موفقیت بروز شد');
     }
+
+    public function markNotification(Request $request, string $id)
+    {
+        $meetingUser = MeetingUser::find($id);
+        $meetingUser->read_at = now();
+        $meetingUser->save();
+        return redirect()->back();
+    }
+
 
     /**
      * Remove the specified resource from storage.

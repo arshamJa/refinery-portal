@@ -19,7 +19,6 @@
                     </li>
                 </ol>
             </nav>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @if(\App\Models\Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
                 <a href="{{route('meetings.request')}}" class="flex justify-between items-center hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
