@@ -36,9 +36,9 @@
                     </span>
                 </li>
             </ol>
-            <a href="{{route('meetings.index')}}">
-                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>
-            </a>
+{{--            <a href="{{route('meetings.index')}}">--}}
+{{--                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>--}}
+{{--            </a>--}}
         </nav>
 
 

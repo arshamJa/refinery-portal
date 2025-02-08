@@ -49,11 +49,6 @@
             </div>
         </div>
         <x-notifications/>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-            <a href="#"
-               class="flex justify-between items-center hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#3D3D3D] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
-            </a>
-        </div>
+
     </x-template>
 </div>

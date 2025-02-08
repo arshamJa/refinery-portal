@@ -22,7 +22,7 @@
                 <li>
                     <a href="{{route('message')}}"
                        class="inline-flex items-center px-2 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                        <span>{{__('لیست پیغام های دریافتی')}}</span>
+                        <span>{{__('پیغام های دریافتی')}}</span>
                     </a>
                 </li>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -37,18 +37,18 @@
                 </li>
             </ol>
 
-{{--            <a href="{{route('meetings.index')}}">--}}
-{{--                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>--}}
-{{--            </a>--}}
+            {{--            <a href="{{route('meetings.index')}}">--}}
+            {{--                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>--}}
+            {{--            </a>--}}
         </nav>
 
 
-            @foreach($this->meetings as $meeting)
-                @foreach($this->meetingUsers as $meetingUser)
-                    <div class="mb-4">
-                        <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
-                            <div class="flex">
-                                <div class="shrink-0">
+        @foreach($this->meetings as $meeting)
+            @foreach($this->meetingUsers as $meetingUser)
+                <div class="mb-4">
+                    <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
+                        <div class="flex">
+                            <div class="shrink-0">
                             <span
                                 class="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">
                                  @if($meetingUser->is_present == 1)
@@ -66,24 +66,29 @@
                                             d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
                                 @endif
                         </span>
-                                </div>
-                                <div class="ms-3 w-full">
-                                    <h3 class="text-gray-800 font-semibold dark:text-white">
-                                        {{$meeting->title}}
-                                    </h3>
-                                    <div
-                                        class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
+                            </div>
+                            <div class="ms-3 w-full">
+                                <h3 class="text-gray-800 font-semibold dark:text-white">
+                                    {{$meeting->title}}
+                                </h3>
+                                <div
+                                    class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
                                     <span>
-                                        {{'این جلسه که در تاریخ'}}{{$meeting->date}}{{__('و در ساعت')}}{{$meeting->time}}
+                                        {{'این جلسه که در تاریخ '}}
+                                        <span class="font-bold">{{$meeting->date}}</span>
+                                        {{__('و در ساعت')}}
+                                        <span class="font-bold">{{$meeting->time}}</span>
                                         @if($meetingUser->is_present == '1')
-                                            {{__('که اینجانب قبول کرد')}}
+                                            {{__('که اینجانب قبول کردید، ')}}
                                         @elseif($meetingUser->is_present == '-1')
-                                            {{__('که اینجانب رد کرد')}}
+                                            {{__('که اینجانب رد کردید، ')}}
                                         @endif
                                         @if($meeting->is_cancelled == '1')
-                                            {{__('لغو شد')}}
+                                            <span class="font-bold">{{__('لغو شد')}}</span>
                                         @elseif($meeting->is_cancelled == '-1')
-                                            {{__('برگزار میشود')}}
+                                            <span class="font-bold">{{__('برگزار میشود')}}</span>
+                                        @elseif($meeting->is_cancelled == '0')
+                                            <span class="font-bold">{{__('در حال بررسی است')}}</span>
                                         @endif
 
                                         {{--                                        <span class="font-bold">{{$meetingUser->user->user_info->full_name}}</span>--}}
@@ -95,106 +100,106 @@
                                         {{--                                                class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>--}}
                                         {{--                                        @endif--}}
                                     </span>
-                                        <form action="{{route('markNotification',$meetingUser->id)}}" method="post">
-                                            @csrf
-                                            <x-primary-button type="submit">{{__('متوجه شدم')}}</x-primary-button>
-                                        </form>
-                                    </div>
+{{--                                    <form action="{{route('markNotification',$meetingUser->id)}}" method="post">--}}
+{{--                                        @csrf--}}
+{{--                                        <x-primary-button type="submit">{{__('متوجه شدم')}}</x-primary-button>--}}
+{{--                                    </form>--}}
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                </div>
             @endforeach
+        @endforeach
 
-{{--                    <div class="p-4 h-auto">--}}
-{{--                        <div class="mx-auto bg-white w-full">--}}
-{{--                            <div class="relative shadow-md sm:rounded-lg overflow-hidden">--}}
-{{--                                <!-- Table Header -->--}}
-{{--                                <div--}}
-{{--                                    class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">--}}
-{{--                                    <!-- Search Bar -->--}}
-{{--                                    <div class="w-full md:w-1/2">--}}
-{{--                                        <form class="flex items-center">--}}
-{{--                                            <label for="simple-search" class="sr-only">Search</label>--}}
-{{--                                            <div class="relative w-full">--}}
-{{--                                                <div--}}
-{{--                                                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">--}}
-{{--                                                    <svg aria-hidden="true" class="w-5 h-5 text-gray-500"--}}
-{{--                                                         fill="currentColor" viewbox="0 0 20 20"--}}
-{{--                                                         xmlns="http://www.w3.org/2000/svg">--}}
-{{--                                                        <path fill-rule="evenodd"--}}
-{{--                                                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"--}}
-{{--                                                              clip-rule="evenodd"/>--}}
-{{--                                                    </svg>--}}
-{{--                                                </div>--}}
-{{--                                                <input type="text" wire:model.live="search" id="simple-search" dir="rtl"--}}
-{{--                                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"--}}
-{{--                                                       placeholder="جست و جو" required="">--}}
-{{--                                            </div>--}}
-{{--                                        </form>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <!-- Table Body -->--}}
-{{--                                <div class="overflow-x-auto" dir="rtl">--}}
-{{--                                    <x-table.table>--}}
-{{--                                        <x-slot name="head">--}}
-{{--                                            <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>--}}
-{{--                                            <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>--}}
-{{--                                            <th class="px-4 py-3">{{__('تاریخ جلسه')}}</th>--}}
-{{--                                            <th class="px-4 py-3">{{__('ساعت جلسه')}}</th>--}}
-{{--                                            <th class="px-4 py-3">{{__('تعداد درخواستی')}}</th>--}}
-{{--                                            <th class="px-2 py-3">{{__('وضعیت')}}</th>--}}
-{{--                                        </x-slot>--}}
-{{--                                        <x-slot name="body">--}}
-{{--                                            @foreach($this->meetings as $meeting)--}}
-{{--                                                <tr class="px-4 py-3 border-b text-center" wire:key="{{$meeting->id}}">--}}
-{{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>--}}
-{{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>--}}
-{{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>--}}
-{{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->time}}</td>--}}
-{{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
-{{--                                                        <a class="flex justify-center"--}}
-{{--                                                           href="{{route('presentUsers',$meeting->id)}}">--}}
-{{--                                                            @if($meeting->is_cancelled == '0')--}}
-{{--                                                                <span class="relative flex size-3">--}}
-{{--                                                                    <span--}}
-{{--                                                                        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>--}}
-{{--                                                                    <span--}}
-{{--                                                                        class="relative inline-flex size-3 rounded-full bg-sky-500"></span>--}}
-{{--                                                                </span>--}}
-{{--                                                            @endif--}}
-{{--                                                            <span--}}
-{{--                                                                class="hover:underline-offset-2 hover:underline ">{{__('مشاهده')}}</span>--}}
-{{--                                                        </a>--}}
-{{--                                                    </td>--}}
-{{--                                                    <td class="px-2 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
-{{--                                                        @if($meeting->is_cancelled == '0')--}}
-{{--                                                            <span class="text-blue-600 font-bold">--}}
-{{--                                                                    {{__('در حال بررسی...')}}--}}
-{{--                                                                </span>--}}
-{{--                                                        @elseif($meeting->is_cancelled == '-1')--}}
-{{--                                                            <span class="text-green-600 font-bold">--}}
-{{--                                                                    {{__('جلسه برگزار میشود')}}--}}
-{{--                                                                </span>--}}
-{{--                                                        @elseif($meeting->is_cancelled == '1')--}}
-{{--                                                            <span class="text-red-600 font-bold">--}}
-{{--                                                                    {{__('جلسه لغو شد')}}--}}
-{{--                                                                </span>--}}
-{{--                                                        @endif--}}
-{{--                                                    </td>--}}
-{{--                                                </tr>--}}
-{{--                                            @endforeach--}}
-{{--                                        </x-slot>--}}
-{{--                                    </x-table.table>--}}
-{{--                                    <nav--}}
-{{--                                        class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">--}}
-{{--                                        {{ $this->meetings->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
-{{--                                    </nav>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
+        {{--                    <div class="p-4 h-auto">--}}
+        {{--                        <div class="mx-auto bg-white w-full">--}}
+        {{--                            <div class="relative shadow-md sm:rounded-lg overflow-hidden">--}}
+        {{--                                <!-- Table Header -->--}}
+        {{--                                <div--}}
+        {{--                                    class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">--}}
+        {{--                                    <!-- Search Bar -->--}}
+        {{--                                    <div class="w-full md:w-1/2">--}}
+        {{--                                        <form class="flex items-center">--}}
+        {{--                                            <label for="simple-search" class="sr-only">Search</label>--}}
+        {{--                                            <div class="relative w-full">--}}
+        {{--                                                <div--}}
+        {{--                                                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">--}}
+        {{--                                                    <svg aria-hidden="true" class="w-5 h-5 text-gray-500"--}}
+        {{--                                                         fill="currentColor" viewbox="0 0 20 20"--}}
+        {{--                                                         xmlns="http://www.w3.org/2000/svg">--}}
+        {{--                                                        <path fill-rule="evenodd"--}}
+        {{--                                                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"--}}
+        {{--                                                              clip-rule="evenodd"/>--}}
+        {{--                                                    </svg>--}}
+        {{--                                                </div>--}}
+        {{--                                                <input type="text" wire:model.live="search" id="simple-search" dir="rtl"--}}
+        {{--                                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"--}}
+        {{--                                                       placeholder="جست و جو" required="">--}}
+        {{--                                            </div>--}}
+        {{--                                        </form>--}}
+        {{--                                    </div>--}}
+        {{--                                </div>--}}
+        {{--                                <!-- Table Body -->--}}
+        {{--                                <div class="overflow-x-auto" dir="rtl">--}}
+        {{--                                    <x-table.table>--}}
+        {{--                                        <x-slot name="head">--}}
+        {{--                                            <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>--}}
+        {{--                                            <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>--}}
+        {{--                                            <th class="px-4 py-3">{{__('تاریخ جلسه')}}</th>--}}
+        {{--                                            <th class="px-4 py-3">{{__('ساعت جلسه')}}</th>--}}
+        {{--                                            <th class="px-4 py-3">{{__('تعداد درخواستی')}}</th>--}}
+        {{--                                            <th class="px-2 py-3">{{__('وضعیت')}}</th>--}}
+        {{--                                        </x-slot>--}}
+        {{--                                        <x-slot name="body">--}}
+        {{--                                            @foreach($this->meetings as $meeting)--}}
+        {{--                                                <tr class="px-4 py-3 border-b text-center" wire:key="{{$meeting->id}}">--}}
+        {{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>--}}
+        {{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>--}}
+        {{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>--}}
+        {{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->time}}</td>--}}
+        {{--                                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+        {{--                                                        <a class="flex justify-center"--}}
+        {{--                                                           href="{{route('presentUsers',$meeting->id)}}">--}}
+        {{--                                                            @if($meeting->is_cancelled == '0')--}}
+        {{--                                                                <span class="relative flex size-3">--}}
+        {{--                                                                    <span--}}
+        {{--                                                                        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>--}}
+        {{--                                                                    <span--}}
+        {{--                                                                        class="relative inline-flex size-3 rounded-full bg-sky-500"></span>--}}
+        {{--                                                                </span>--}}
+        {{--                                                            @endif--}}
+        {{--                                                            <span--}}
+        {{--                                                                class="hover:underline-offset-2 hover:underline ">{{__('مشاهده')}}</span>--}}
+        {{--                                                        </a>--}}
+        {{--                                                    </td>--}}
+        {{--                                                    <td class="px-2 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+        {{--                                                        @if($meeting->is_cancelled == '0')--}}
+        {{--                                                            <span class="text-blue-600 font-bold">--}}
+        {{--                                                                    {{__('در حال بررسی...')}}--}}
+        {{--                                                                </span>--}}
+        {{--                                                        @elseif($meeting->is_cancelled == '-1')--}}
+        {{--                                                            <span class="text-green-600 font-bold">--}}
+        {{--                                                                    {{__('جلسه برگزار میشود')}}--}}
+        {{--                                                                </span>--}}
+        {{--                                                        @elseif($meeting->is_cancelled == '1')--}}
+        {{--                                                            <span class="text-red-600 font-bold">--}}
+        {{--                                                                    {{__('جلسه لغو شد')}}--}}
+        {{--                                                                </span>--}}
+        {{--                                                        @endif--}}
+        {{--                                                    </td>--}}
+        {{--                                                </tr>--}}
+        {{--                                            @endforeach--}}
+        {{--                                        </x-slot>--}}
+        {{--                                    </x-table.table>--}}
+        {{--                                    <nav--}}
+        {{--                                        class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">--}}
+        {{--                                        {{ $this->meetings->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
+        {{--                                    </nav>--}}
+        {{--                                </div>--}}
+        {{--                            </div>--}}
+        {{--                        </div>--}}
+        {{--                    </div>--}}
     </x-template>
 
 

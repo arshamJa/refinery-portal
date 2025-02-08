@@ -26,9 +26,18 @@ class MeetingsList extends Component
         return view('livewire.meetings-list');
     }
 
+    #[Computed]
+    public function meetings()
+    {
+        return Meeting::with('meetingUsers')
+            ->where('title', 'like', '%'.$this->search.'%')
+            ->where('scriptorium',auth()->user()->user_info->full_name)
+            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
+            ->paginate(3);
+    }
+
 
     public ?string $search = '';
-
     #[Computed]
     public function meetingUsers()
     {

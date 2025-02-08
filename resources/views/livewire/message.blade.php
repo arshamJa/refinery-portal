@@ -28,11 +28,7 @@
 {{--            @endif--}}
             <a href="{{route('meeting.notification')}}" class="flex justify-between items-center gap-x-4 bg-transparent text-black hover:bg-[#9DDE8B] hover:text-[#FFFAEC] border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                 <h3 class="text-sm font-semibold"> {{__('نتیجه نهایی برگزاری/لغو جلسات')}}</h3>
-                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">2</span>
-            </a>
-            <a href="#" class="flex justify-between items-center gap-x-4 hover:bg-[#CD5555] hover:text-[#FFFAEC] text-black border border-[#CD5555] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>
-                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">4</span>
+                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{\App\Models\Meeting::where('is_cancelled','!=','0')->where('scriptorium','!=',auth()->user()->user_info->full_name)->count()}}</span>
             </a>
         </div>
 

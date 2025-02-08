@@ -121,7 +121,7 @@
                     </div>
                 </section>
             </div>
-            <a href="{{route('meetings.request')}}">
+            <a href="{{route('meetingsList')}}">
                 <x-secondary-button>
                     {{__('بازگشت')}}
                 </x-secondary-button>

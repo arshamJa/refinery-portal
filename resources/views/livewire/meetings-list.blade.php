@@ -51,9 +51,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                 </svg>
                 <li>
-                        <span class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                            {{__('لیست دعوتنامه')}}
-                        </span>
+                <span class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                    {{__('جدول جلسات')}}
+                </span>
                 </li>
             </ol>
         </nav>
@@ -100,56 +100,44 @@
                 </tr>
                 </thead>
                 <tbody>
-                @forelse($this->meetingUsers as $meetingUser)
+                @forelse($this->meetings as $meeting)
                     <tr class="hover:bg-gray-100 relative text-center border-b dark:border-gray-700">
                         <th scope="row"
                             class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            <a href="{{Illuminate\Support\Facades\URL::signedRoute('meetings.show',$meetingUser->meeting->id)}}"
+                            <a href="{{Illuminate\Support\Facades\URL::signedRoute('meetings.show',$meeting->id)}}"
                                class="p-2 mb-2 hover:underline underline-offset-2 w-full transition ease-in-out">
-                                {{$meetingUser->meeting->title}}
+                                {{$meeting->title}}
                             </a>
-                            @if($meetingUser->meeting->tasks->where('request_task',!null)->value('request_task'))
+                            @if($meeting->tasks->where('request_task',!null)->value('request_task'))
                                 <span class="absolute right-2 top-1/2 -translate-y-1/2 flex h-3 w-3"><span
                                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span
                                         class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span></span>
                             @endif
                         </th>
                         <td class="px-6 py-4">
-                            {{$meetingUser->meeting->scriptorium}}
+                            {{$meeting->scriptorium}}
                         </td>
                         <td class="px-6 py-4">
-                            {{$meetingUser->meeting->date}}
+                            {{$meeting->date}}
                         </td>
                         <td class="px-6 py-4">
-                            {{$meetingUser->meeting->time}}
+                            {{$meeting->time}}
                         </td>
                         <td class="px-6 py-4">
-                            {{$meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('is_present','1')->count()}}
+                            {{$meeting->meetingUsers->where('meeting_id',$meeting->id)->where('is_present','1')->count()}}
                         </td>
                         <td class="px-6 py-4">
-                            @if($meetingUser->meeting->is_cancelled == '0')
+                            @if($meeting->is_cancelled == '0')
                                 {{__('درحال بررسی...')}}
-                            @elseif($meetingUser->meeting->is_cancelled == '1')
+                            @elseif($meeting->is_cancelled == '1')
                                 {{__('جلسه لغو شد')}}
-                            @elseif($meetingUser->meeting->is_cancelled == '-1')
+                            @elseif($meeting->is_cancelled == '-1')
                                 {{__('جلسه تشکیل میشود')}}
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '1')
-                                {{__('شما دعوت به این جلسه را پذیرفتید')}}
-                            @elseif($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '-1')
-                                {{__('شما دعوت به این جلسه را نپذیرفتید')}}
-                            @else
-                                <button wire:click="accept({{$meetingUser->id}})"
-                                        class="px-3 py-1.5 mb-2 bg-gray-800 border border-transparent rounded-md text-sm text-white">
-                                    {{('قبول')}}
-                                </button>
-                                <button wire:click="openModalDeny({{$meetingUser->id}})"
-                                        class="px-3 py-1.5 mb-2 bg-red-600 border border-transparent rounded-md text-sm text-white">
-                                    {{('رد')}}
-                                </button>
-                            @endif
+
+                            <a href="{{route('presentUsers',$meeting->id)}}"> {{__('مشاهده')}}</a>
                         </td>
                     </tr>
                 @empty
@@ -164,7 +152,7 @@
             </table>
             <nav
                 class="flex flex-col md:flex-row mt-4 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
-                {{ $this->meetingUsers->withQueryString()->links(data:['scrollTo'=>false]) }}
+                {{ $this->meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
             </nav>
         </div>
     </x-template>

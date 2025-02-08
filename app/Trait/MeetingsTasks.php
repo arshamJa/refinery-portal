@@ -12,8 +12,6 @@ use Livewire\Attributes\Computed;
 trait MeetingsTasks
 {
     public ?string $search = '';
-
-
     #[Computed]
     public function meetings()
     {

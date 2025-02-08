@@ -20,7 +20,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
                 </svg>
                 <li class="flex items-center h-full">
-                    <span class="active-breadcrumb">{{__('لیست جلساتی در حال برگزاری')}}</span>
+                    <span class="active-breadcrumb">{{__('لیست جلساتی که تشکیل می شود')}}</span>
                 </li>
             </ol>
         </nav>

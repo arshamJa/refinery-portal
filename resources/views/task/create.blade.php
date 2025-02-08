@@ -114,7 +114,7 @@
                     <x-primary-button type="submit">
                         {{ __('ارسال') }}
                     </x-primary-button>
-                    <a href="{{route('tasks.index')}}">
+                    <a href="{{route('meetings.index')}}">
                         <x-secondary-button>
                             {{__('لغو')}}
                         </x-secondary-button>
