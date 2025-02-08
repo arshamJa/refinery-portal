@@ -52,9 +52,18 @@
                             <span
                                 class="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">
                                  @if($meetingUser->is_present == 1)
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="shrink-0 size-4 text-green-600"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor"
+                                         class="shrink-0 size-4 text-green-600"><path stroke-linecap="round"
+                                                                                      stroke-linejoin="round"
+                                                                                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
                                 @else
-                                    <svg class="shrink-0 size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                                    <svg class="shrink-0 size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12"
+                                                                                                                 cy="12"
+                                                                                                                 r="10"></circle><path
+                                            d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
                                 @endif
                         </span>
                             </div>
@@ -71,25 +80,21 @@
                                             <span class="font-bold">{{__('قبول کرد')}}</span>
                                         @else
                                             <span class="font-bold">{{__('رد کرد')}}</span>
-                                            <span class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>
+                                            <span
+                                                class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>
                                         @endif
                                     </span>
                                     <form action="{{route('markNotification',$meetingUser->id)}}" method="post">
                                         @csrf
                                         <x-primary-button type="submit">{{__('متوجه شدم')}}</x-primary-button>
                                     </form>
-
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
             @endforeach
         @endforeach
-
-
-
 
         {{--            <div class="p-4 h-auto">--}}
         {{--                <div class="mx-auto bg-white w-full">--}}

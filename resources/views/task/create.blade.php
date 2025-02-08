@@ -41,7 +41,6 @@
             {{--                <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">--}}
             <form action="{{route('tasks.store', $meetings->id)}}" method="post" enctype="multipart/form-data">
                 @csrf
-
                 <div class="grid grid-cols-3 gap-4 max-w-full pb-4 border-b border-gray-300">
                     <p>{{__('واحد/کمیته')}} : {{$meetings->unit_held}}</p>
                     <p>{{__('تهیه کننده')}} : {{$meetings->scriptorium}}</p>
