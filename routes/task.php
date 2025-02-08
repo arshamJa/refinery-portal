@@ -12,6 +12,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/tasks/create/{meeting}',[TaskManagementController::class,'create'])
         ->name('tasks.create');
+    Route::post('/tasks/{meetingId}',[TaskManagementController::class,'store'])->name('tasks.store');
 
     Route::post('tasks/{meeting}',[TaskManagementController::class,'store'])->name('tasks.store');
 

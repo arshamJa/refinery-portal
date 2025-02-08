@@ -8,6 +8,10 @@ Route::middleware(['auth','sanitizeInputs'])->group( function () {
     Route::post('/markNotification/{meetingUserId}',[\App\Http\Controllers\MeetingController::class,'markNotification'])
         ->name('markNotification');
 
+    Route::get('/meeting/notification',\App\Livewire\MeetingNotification::class)
+        ->name('meeting.notification');
+
+
     //    Route::get('/meetings', [TaskManagementController::class, 'index'])->name('meetings.index');
     Route::get('/dashboard/meetings',\App\Livewire\MeetingTable::class)
         ->name('meetings.index');
