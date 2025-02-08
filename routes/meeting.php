@@ -11,6 +11,8 @@ Route::middleware(['auth','sanitizeInputs'])->group( function () {
     Route::get('/meeting/notification',\App\Livewire\MeetingNotification::class)
         ->name('meeting.notification');
 
+    Route::get('/meeting/report',\App\Livewire\MeetingDashboardReport::class)->name('meeting.report');
+
 
     //    Route::get('/meetings', [TaskManagementController::class, 'index'])->name('meetings.index');
     Route::get('/dashboard/meetings',\App\Livewire\MeetingTable::class)

@@ -27,14 +27,13 @@
         <h3 class="text-sm font-semibold"> {{__('لیست جلساتی که تشکیل می شود')}}</h3>
 {{--        <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{\App\Models\Meeting::where('scriptorium',auth()->user()->user_info->full_name)->count()}}</span>--}}
     </a>
-{{--    <a href="#" class="flex justify-between items-center gap-x-4 hover:bg-[#CD5555] hover:text-[#FFFAEC] text-black border border-[#CD5555] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">--}}
-{{--        <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>--}}
-{{--        <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">4</span>--}}
-{{--    </a>--}}
-
+    <a href="#" class="flex justify-between items-center gap-x-4 hover:bg-[#CD5555] hover:text-[#FFFAEC] text-black border border-[#CD5555] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+        <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>
+        <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">4</span>
+    </a>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-    <a href="#"
+    <a href="{{route('meeting.report')}}"
        class="flex justify-between items-center hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#3D3D3D] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
         <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
     </a>
