@@ -1,14 +1,14 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4 py-4 border-b">
-    @if($this->invitation)
+
     <a href="{{route('meeting.invitation')}}" class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
         <span class="text-sm font-semibold">{{__('دعوتنامه')}}</span>
-
+        @if($this->invitation)
             <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->invitation}}</span>
+        @endif
     </a>
-    @endif
     <a href="{{route('message')}}" class="flex justify-between items-center gap-x-4 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#3D3D3D] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
         <h3 class="text-sm font-semibold"> {{__('پیغام های دریافتی')}}</h3>
-        <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">6</span>
+        <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->messages}}</span>
     </a>
     <a href="#" class="flex justify-between items-center gap-x-4 hover:bg-[#882042] hover:text-[#FFFAEC] text-black border border-[#882042] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
         <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>

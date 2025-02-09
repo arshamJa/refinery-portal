@@ -24,7 +24,7 @@
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="font-sans antialiased bg-gray-50 overflow-y-auto">
+<body class="font-sans antialiased bg-gray-50">
 
 <livewire:layout.navigation/>
 

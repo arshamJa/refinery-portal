@@ -22,18 +22,18 @@
         </nav>
 
         <div class="grid grid-cols-1 w-1/3 gap-6 mb-4 pb-4">
-            <div class="bg-[#27445D] text-[#FBF5DD] p-4 col-span-1 rounded-lg">
+            <a href="#" class="bg-[#27445D] text-[#FBF5DD] p-4 col-span-1 rounded-lg">
                 <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام شده در مهلت مقرر')}}</h3>
 {{--                <p class="text-lg font-bold"> {{$this->users}}</p>--}}
-            </div>
-            <div class="bg-[#BE3144] text-[#FBF5DD] p-4 col-span-1 rounded-lg">
+            </a>
+            <a href="#" class="bg-[#BE3144] text-[#FBF5DD] p-4 col-span-1 rounded-lg">
                 <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام نشده در مهلت مقرر')}}</h3>
 {{--                <p class="text-lg font-bold">{{$this->organizations->count()}}</p>--}}
-            </div>
-            <div class="bg-[#E17564] text-[#FBF5DD] p-4 col-span-1 rounded-lg">
+            </a>
+            <a href="#" class="bg-[#E17564] text-[#FBF5DD] p-4 col-span-1 rounded-lg">
                 <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام شده خارج از مهلت مقرر')}}</h3>
 {{--                <p class="text-lg font-bold"> {{$this->departments}}</p>--}}
-            </div>
+            </a>
         </div>
     </x-template>
 </div>

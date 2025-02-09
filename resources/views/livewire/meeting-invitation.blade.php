@@ -61,7 +61,7 @@
         </nav>
         <div wire:poll.visible.60s>
             @foreach($this->meetingUsers as $meetingUser)
-            <div class="space-y-5">
+            <div class="space-y-5 mb-4">
                 <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
                     <div class="flex">
                         <div class="shrink-0">

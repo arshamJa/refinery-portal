@@ -43,7 +43,7 @@
         </nav>
 
 
-        @foreach($this->meetings as $meeting)
+{{--        @foreach($this->meetings as $meeting)--}}
             @foreach($this->meetingUsers as $meetingUser)
                 <div class="mb-4">
                     <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
@@ -69,25 +69,25 @@
                             </div>
                             <div class="ms-3 w-full">
                                 <h3 class="text-gray-800 font-semibold dark:text-white">
-                                    {{$meeting->title}}
+                                    {{$meetingUser->meeting->title}}
                                 </h3>
                                 <div
                                     class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
                                     <span>
                                         {{'این جلسه که در تاریخ '}}
-                                        <span class="font-bold">{{$meeting->date}}</span>
+                                        <span class="font-bold">{{$meetingUser->meeting->date}}</span>
                                         {{__('و در ساعت')}}
-                                        <span class="font-bold">{{$meeting->time}}</span>
+                                        <span class="font-bold">{{$meetingUser->meeting->time}}</span>
                                         @if($meetingUser->is_present == '1')
                                             {{__('که اینجانب قبول کردید، ')}}
                                         @elseif($meetingUser->is_present == '-1')
                                             {{__('که اینجانب رد کردید، ')}}
                                         @endif
-                                        @if($meeting->is_cancelled == '1')
+                                        @if($meetingUser->meeting->is_cancelled == '1')
                                             <span class="font-bold">{{__('لغو شد')}}</span>
-                                        @elseif($meeting->is_cancelled == '-1')
+                                        @elseif($meetingUser->meeting->is_cancelled == '-1')
                                             <span class="font-bold">{{__('برگزار میشود')}}</span>
-                                        @elseif($meeting->is_cancelled == '0')
+                                        @elseif($meetingUser->meeting->is_cancelled == '0')
                                             <span class="font-bold">{{__('در حال بررسی است')}}</span>
                                         @endif
 
@@ -110,7 +110,7 @@
                     </div>
                 </div>
             @endforeach
-        @endforeach
+{{--        @endforeach--}}
 
         {{--                    <div class="p-4 h-auto">--}}
         {{--                        <div class="mx-auto bg-white w-full">--}}

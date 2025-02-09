@@ -42,7 +42,7 @@
         </nav>
 
 
-        @foreach($this->meetings as $meeting)
+{{--        @foreach($this->meetings as $meeting)--}}
             @foreach($this->meetingUsers as $meetingUser)
                 <div class="mb-4">
                     <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
@@ -68,7 +68,7 @@
                             </div>
                             <div class="ms-3 w-full">
                                 <h3 class="text-gray-800 font-semibold dark:text-white">
-                                    {{$meeting->title}}
+                                    {{$meetingUser->meeting->title}}
                                 </h3>
                                 <div
                                     class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
@@ -80,7 +80,7 @@
                                         @else
                                             <span class="font-bold">{{__('رد کرد')}}</span>
                                             <span
-                                                class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>
+                                                class="block mt-2">{{__('دلیل رد درخواست : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>
                                         @endif
                                     </span>
                                     <form action="{{route('markNotification',$meetingUser->id)}}" method="post">
@@ -93,7 +93,7 @@
                     </div>
                 </div>
             @endforeach
-        @endforeach
+{{--        @endforeach--}}
 
         {{--            <div class="p-4 h-auto">--}}
         {{--                <div class="mx-auto bg-white w-full">--}}
