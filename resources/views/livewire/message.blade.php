@@ -20,12 +20,12 @@
                 </ol>
             </nav>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-{{--            @if(\App\Models\Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())--}}
+            @if(\App\Models\Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
                 <a href="{{route('meetings.request')}}" class="flex justify-between items-center hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                     <h3 class="text-sm font-semibold"> {{__('پاسخ دعوتنامه')}}</h3>
                     <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{\App\Models\MeetingUser::where('is_present','!=' , '0')->where('read_at',null)->count()}}</span>
                 </a>
-{{--            @endif--}}
+            @endif
             <a href="{{route('meeting.notification')}}" class="flex justify-between items-center gap-x-4 bg-transparent text-black hover:bg-[#9DDE8B] hover:text-[#FFFAEC] border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                 <h3 class="text-sm font-semibold"> {{__('نتیجه نهایی برگزاری/لغو جلسات')}}</h3>
                 <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{\App\Models\Meeting::where('is_cancelled','!=','0')->where('scriptorium','!=',auth()->user()->user_info->full_name)->count()}}</span>
