@@ -23,15 +23,14 @@ class TaskManagementTable extends Component
     public function tasks()
     {
         $user = User::find(auth()->id());
-        return Task::with('meeting','user')->whereBelongsTo($user)->paginate(5);
+        return Task::with('meeting', 'user')->whereBelongsTo($user)->paginate(5);
     }
+
     public function download($taskId)
     {
         $files = DB::table('task_user')
-            ->where('task_id','=',$taskId)
+            ->where('task_id', '=', $taskId)
             ->value('file');
         return response()->download(public_path('storage/'.$files));
     }
-
-
 }

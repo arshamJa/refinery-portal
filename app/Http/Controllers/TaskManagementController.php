@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Task;
+use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class TaskManagementController extends Controller
 {
@@ -24,9 +27,11 @@ class TaskManagementController extends Controller
     {
         $meetings = Meeting::find($meeting);
         $meetingUsers = MeetingUser::where('meeting_id',$meeting)->get();
+        $tasks = Task::with('user')->where('meeting_id',$meeting)->get();
         return view('task.create' , [
             'meetings' => $meetings,
-            'meetingUsers' => $meetingUsers
+            'meetingUsers' => $meetingUsers,
+            'tasks' => $tasks,
         ]);
     }
     /**
@@ -35,7 +40,19 @@ class TaskManagementController extends Controller
     public function store(Request $request,string $meeting)
     {
 
-        dd($meeting);
+        $validated = $request->validate([
+           'initiator' => ['required'],
+            'time_out' => ['required','numeric'],
+            'body' => ['required','string']
+        ]);
+        $body = Str::deduplicate($request->body);
+        $task = Task::create([
+            'meeting_id' => $meeting,
+            'user_id' => $request->initiator,
+            'body' => $body,
+            'time_out' => $request->time_out
+        ]);
+        return to_route('tasks.create',$meeting)->with('status','درج اقدام انجام شد');
     }
     /**
      * Display the specified resource.

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('task_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('task_id')->constrained();
-            $table->string('file');
+            $table->string('file')->nullable();
             $table->timestamps();
         });
     }

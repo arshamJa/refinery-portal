@@ -240,7 +240,9 @@ return [
         'reminder' => 'زمان جهت یادآوری',
         'organization_ids' => 'سامانه',
         'current_password' => 'رمز فعلی',
-        'photo' => 'عکس'
+        'photo' => 'عکس',
+        'initiator' => 'اقدام کننده',
+        'time_out' => 'مهلت اقدام'
     ],
 
 ];

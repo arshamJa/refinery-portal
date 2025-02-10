@@ -6,8 +6,6 @@ use App\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends Model
 {
@@ -17,9 +15,9 @@ class Task extends Model
     protected $fillable = [
         'meeting_id',
         'user_id',
-        'title',
+//        'title',
         'body',
-        'sent_date',
+//        'sent_date',
         'time_out',
         'is_completed',
         'request_task'

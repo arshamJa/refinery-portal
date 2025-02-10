@@ -27,7 +27,6 @@ class MeetingNotification extends Component
             ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
             ->paginate(3);
     }
-
     #[Computed]
     public function meetingUsers()
     {

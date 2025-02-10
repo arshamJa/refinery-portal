@@ -57,9 +57,9 @@
                 </li>
             </ol>
         </nav>
-        <div wire:poll.visible.60s class="px-8 pt-4 sm:px-10 sm:pt-6 border-2">
+        <div wire:poll.visible.60s class="pt-4 sm:px-10 sm:pt-6 border-2">
             <label for="simple-search" class="sr-only">Search</label>
-            <div class="relative w-full">
+            <div class="relative w-1/2">
                 <div
                     class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
@@ -92,6 +92,9 @@
                     </th>
                     <th scope="col" class="px-6 py-3">
                         {{__('حاضرین')}}
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        {{__('مشاهده اعضا')}}
                     </th>
                     <th scope="col" class="px-6 py-3">
                         {{__('وضعیت جلسه')}}
@@ -127,6 +130,9 @@
                             {{$meeting->meetingUsers->where('meeting_id',$meeting->id)->where('is_present','1')->count()}}
                         </td>
                         <td class="px-6 py-4">
+                            <a href="{{route('presentUsers',$meeting->id)}}" class="hover:underline font-bold text-black"> {{__('نمایش')}}</a>
+                        </td>
+                        <td class="px-6 py-4">
                             @if($meeting->is_cancelled == '0')
                                 {{__('درحال بررسی...')}}
                             @elseif($meeting->is_cancelled == '1')
@@ -136,8 +142,13 @@
                             @endif
                         </td>
                         <td class="px-6 py-4">
-
-                            <a href="{{route('presentUsers',$meeting->id)}}"> {{__('مشاهده')}}</a>
+                            @if($meeting->is_cancelled == -1)
+                                <a href="{{route('tasks.create',$meeting->id)}}">
+                                    <x-primary-button>
+                                        {{__('افزودن اقدامات')}}
+                                    </x-primary-button>
+                                </a>
+                            @endif
                         </td>
                     </tr>
                 @empty

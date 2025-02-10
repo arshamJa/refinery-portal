@@ -52,20 +52,10 @@
                      stroke="currentColor" class="w-3 h-3 text-gray-400">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
                 </svg>
-                <li>
-                    <a href="{{route('message')}}"
-                       class="inline-flex items-center px-2 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                        <span>{{__('لیست پیغام های دریافتی')}}</span>
-                    </a>
-                </li>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                     stroke="currentColor" class="w-3 h-3 text-gray-400">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
-                </svg>
                 <li class="flex items-center h-full">
-                    <a href="{{route('meetings.request')}}"
+                    <a href="{{route('meetingsList')}}"
                        class="inline-flex items-center px-2 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                        <span>{{__('لیست جلسات')}}</span>
+                        <span>{{__('جدول جلسات')}}</span>
                     </a>
                 </li>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -121,11 +111,11 @@
                     </div>
                 </section>
             </div>
-            <a href="{{route('meetingsList')}}">
-                <x-secondary-button>
-                    {{__('بازگشت')}}
-                </x-secondary-button>
-            </a>
+{{--            <a href="{{route('meetingsList')}}">--}}
+{{--                <x-secondary-button>--}}
+{{--                    {{__('بازگشت')}}--}}
+{{--                </x-secondary-button>--}}
+{{--            </a>--}}
 
 
             @if($this->meeting == '0')

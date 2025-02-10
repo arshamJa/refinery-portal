@@ -1,5 +1,6 @@
 <div>
 
+
     <x-sessionMessage name="status"/>
     <x-template>
         <nav class="flex justify-between mb-4">

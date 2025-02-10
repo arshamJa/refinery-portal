@@ -1,5 +1,8 @@
 @php use App\Models\UserInfo; @endphp
 <x-app-layout>
+
+
+    <x-sessionMessage name="status"/>
     <x-template>
         <nav class="flex justify-between mb-4">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -19,9 +22,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
                 </svg>
                 <li class="flex items-center h-full">
-                    <a href="{{route('meetings.index')}}"
+                    <a href="{{route('meetingsList')}}"
                        class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                        <span>{{__('لیست جلساتی که برگزار می شود')}}</span>
+                        <span>{{__('جدول جلسات')}}</span>
                     </a>
                 </li>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -64,7 +67,7 @@
                     <div class="mt-4 grid grid-cols-2 gap-x-3">
                         <div class="my-2 col-span-1">
                             <x-input-label class="mb-2" :value="__('اقدام کننده')"/>
-                            <select wire:model="user_id"
+                            <select name="initiator"
                                     class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                                 <option value="">...</option>
                                 @foreach($meetingUsers as $meetingUser)
@@ -72,38 +75,37 @@
                                         value="{{$meetingUser->user_id}}">{{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}</option>
                                 @endforeach
                             </select>
-                            <x-input-error :messages="$errors->get('user_id')" class="my-2"/>
+                            <x-input-error :messages="$errors->get('initiator')" class="my-2"/>
+                        </div>
+                        <div class="my-2 col-span-1">
+                            <x-input-label for="time_out" :value="__('مهلت اقدام')"/>
+                            <x-text-input name="time_out" value="{{old('time_out')}}" id="time_out"
+                                          class="block my-2 w-full" type="text" autofocus/>
+                            <x-input-error :messages="$errors->get('time_out')" class="my-2"/>
                         </div>
 
-                        <div class="my-2 col-span-1">
-                            <x-input-label for="title" :value="__('عنوان')" class="mb-2"/>
-                            <x-text-input wire:model="title" id="title"
-                                          class="block my-2 w-full" type="text" autofocus/>
-                            <x-input-error :messages="$errors->get('title')" class="my-2"/>
-                        </div>
+{{--                        <div class="my-2 col-span-1">--}}
+{{--                            <x-input-label for="title" :value="__('عنوان')" class="mb-2"/>--}}
+{{--                            <x-text-input name="title" id="title"--}}
+{{--                                          class="block my-2 w-full" type="text" autofocus/>--}}
+{{--                            <x-input-error :messages="$errors->get('title')" class="my-2"/>--}}
+{{--                        </div>--}}
 
                         <div class="my-2 col-span-2">
-                        <x-input-label for="body" :value="__('متن')" class="mb-2"/>
-                        <textarea type="text" wire:model="body"
+                        <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" class="mb-2"/>
+                        <textarea type="text" name="body" value="{{old('body')}}"
                                   class="flex w-full h-auto min-h-[80px] px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
                         <x-input-error :messages="$errors->get('body')" class="mt-2"/>
                         </div>
 
-                        <div class="my-2 col-span-1">
-                        <x-input-label for="date" :value="__('تاریخ ارسال شده')" class="my-2"/>
-                        <x-text-input wire:model="date" id="date"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('date')" class="my-2"/>
-                        </div>
-                        <div class="my-2 col-span-1">
-                        <x-input-label for="day" :value="__('مهلت انجام وظیفه')" class="my-2"/>
-                        <x-text-input wire:model="day" id="day"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('day')" class="my-2"/>
-                        </div>
-
+{{--                        <div class="my-2 col-span-1">--}}
+{{--                        <x-input-label for="date" :value="__('تاریخ ارسال شده')" class="my-2"/>--}}
+{{--                        <x-text-input name="date" id="date"--}}
+{{--                                      class="block my-2 w-full" type="text" autofocus/>--}}
+{{--                        <x-input-error :messages="$errors->get('date')" class="my-2"/>--}}
+{{--                        </div>--}}
                         {{--                            <x-input-label for="file" :value="__('فایل')" class="my-2"/>--}}
-                        {{--                            <input wire:model="files" multiple--}}
+                        {{--                            <input name="files" multiple--}}
                         {{--                                   class="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"--}}
                         {{--                                   id="file" type="file">--}}
                         {{--                            <x-input-error :messages="$errors->get('files')" class="my-2"/>--}}
@@ -114,7 +116,7 @@
                     <x-primary-button type="submit">
                         {{ __('ارسال') }}
                     </x-primary-button>
-                    <a href="{{route('meetings.index')}}">
+                    <a href="{{route('meetingsList')}}">
                         <x-secondary-button>
                             {{__('لغو')}}
                         </x-secondary-button>
@@ -124,5 +126,35 @@
             {{--                </div>--}}
             {{--            </div>--}}
         </div>
+
+        <div class="my-6" dir="rtl">
+            <x-table.table>
+                <x-slot name="head">
+                    <th class="px-4 py-3">{{__('ردیف')}}</th>
+                    <th class="px-4 py-3">{{__('خلاصه مذاکرات و تصمیمات اتخاذ شده')}}</th>
+                    <th class="px-4 py-3">{{__('مهلت اقدام')}}</th>
+                    <th class="px-4 py-3">{{__('اقدام کننده')}}</th>
+                    <th class="px-4 text-center">{{__('وضعیت')}}</th>
+                </x-slot>
+                <x-slot name="body">
+                    @foreach($tasks as $task)
+                        <tr class="px-4 py-3 border-b text-center">
+                            <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
+                            <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
+                            <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}{{__(' روز')}}</td>
+                            <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>
+                            <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                               {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}
+                            </td>
+                        </tr>
+                    @endforeach
+                </x-slot>
+            </x-table.table>
+{{--            <nav--}}
+{{--                class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">--}}
+{{--                {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
+{{--            </nav>--}}
+        </div>
+
     </x-template>
 </x-app-layout>
