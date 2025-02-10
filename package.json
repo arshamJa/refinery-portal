@@ -19,9 +19,9 @@
     },
     "dependencies": {
         "chart.js": "^4.4.7",
-        "datatables.net-buttons": "^3.2.0",
+        "datatables.net-buttons": "^3.2.2",
         "jszip": "^3.10.1",
-        "pdfmake": "^0.2.15",
+        "pdfmake": "^0.2.18",
         "preline": "^2.6.0"
     }
 }

@@ -55,6 +55,8 @@ Route::post('/resetPassword/{id}', [ResetPasswordController::class, 'reset'])
     ->name('resetPassword');
 
 
+
+
 require __DIR__.'/department_organization.php';
 require __DIR__.'/otp.php';
 require __DIR__.'/importExport.php';
