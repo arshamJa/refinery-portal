@@ -40,8 +40,6 @@
             </ol>
         </nav>
         <div class="border-2 p-4 bg-gray-100 rounded-md" dir="rtl">
-            {{--            <div class="max-w-7xl sm:px-6 lg:px-8 space-y-6">--}}
-            {{--                <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">--}}
             <form action="{{route('tasks.store', $meetings->id)}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="grid grid-cols-3 gap-4 max-w-full pb-4 border-b border-gray-300">
@@ -123,8 +121,6 @@
                     </a>
                 </div>
             </form>
-            {{--                </div>--}}
-            {{--            </div>--}}
         </div>
 
         <div class="my-6" dir="rtl">

@@ -51,9 +51,15 @@
 {{--                        </span>--}}
 {{--                    @endif--}}
 {{--                </a>--}}
-                <x-link.responsive-link href="{{route('organizations.index')}}"
-                                        :active="request()->is('organizations')">{{__('لیست سامانه')}}
-                </x-link.responsive-link>
+                @if(auth()->user()->role === 'admin')
+                    <x-link.responsive-link href="{{route('organizations.index')}}"
+                                            :active="request()->is('organizations')">{{__('لیست سامانه')}}
+                    </x-link.responsive-link>
+                @else
+                    <x-link.responsive-link href="{{route('employee.organization')}}"
+                                            :active="request()->is('employee/organization')">{{__('لیست سامانه')}}
+                    </x-link.responsive-link>
+                @endif
                 @can('view-user')
                     <x-link.responsive-link href="{{route('newUser.index')}}"
                                             :active="request()->is('users/table')">{{__('جدول کاربران')}}

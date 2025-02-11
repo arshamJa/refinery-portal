@@ -3,9 +3,7 @@
 use App\Http\Controllers\ResetPasswordController;
 use App\Livewire\admin\EmployeeAccess;
 use App\Livewire\LoginPage;
-use App\Livewire\ProfilePage;
 use App\Livewire\TranslatePage;
-use App\Livewire\Users;
 use Illuminate\Support\Facades\Route;
 
 
@@ -22,7 +20,7 @@ Route::middleware('auth')->group(function () {
         ->middleware(['auth', 'verified'])
         ->name('dashboard');
 
-
+Route::get('employee/organization', \App\Livewire\employee\EmployeesOrganization::class)->name('employee.organization');
 
 
 

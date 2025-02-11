@@ -30,93 +30,89 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
                 </svg>
                 <li>
-                    <span class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                    <span
+                        class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
                        {{__('جزئیات جلسه ')}}{{$meetings->title}}
                     </span>
                 </li>
             </ol>
         </nav>
 
-        <div class="bg-gray-100" dir="rtl">
+        <div class="bg-gray-100 border-2 p-4 rounded-md" dir="rtl">
 
-                <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                    <div class="max-w-xl">
-                        <section>
-                            <div>
-                                <p class="mb-2">
-                                    {{__('موضوع جلسه')}} : {{$meetings->title}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('واحد سازمانی')}} : {{$meetings->unit_organization}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('نام دبیر جلسه')}} : {{$meetings->scriptorium}}
-                                </p>
-                                {{__('اعضای جلسه')}} :
-                                <br>
-                                @foreach($userIds as $userId)
-                                    {{UserInfo::where('user_id',$userId->user_id)->value('full_name')}}
-                                    {{--                                    @if(!$meetings->is_cancelled)--}}
-                                    @if($tasks->where('user_id',$userId->user_id)->value('request_task'))
-                                        <a href="{{route('editUserTask',$tasks->where('user_id',$userId->user_id)->value('id'))}}">View
-                                            Edit</a>
-                                        {{--                                        @endif--}}
-                                    @endif
-                                    <br>
-                                @endforeach
-
-                                <p class="mb-2">
-                                    {{__('محل برگزاری جلسه')}} : {{$meetings->location}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('تاریخ جلسه')}} : {{$meetings->date}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('ساعت جلسه')}} : {{$meetings->time}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('کمیته یا واحد برگزار کننده جلسه')}} : {{$meetings->unit_held}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('پذیرایی')}} :
-                                    @if($meetings->treat)
-                                        {{__('دارد')}}
-                                    @else
-                                        {{__('ندارد')}}
-                                    @endif
-                                </p>
-                                <p class="mb-2">
-                                    {{__('مهمان')}} :
-                                    @if($meetings->guest)
-                                        @foreach($meetings->guest as $guest)
-                                            - {{$guest}}
-                                        @endforeach
-                                    @else
-                                        {{__('مهمانی وجود ندارد')}}
-                                    @endif
-                                </p>
-                                <p class="mb-2">
-                                    {{__('نام درخواست دهنده جلسه')}} : {{$meetings->applicant}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('سمت سازمانی')}} : {{$meetings->position_organization}}
-                                </p>
-                                <p class="mb-2">
-                                    {{__('امضا')}} :
-                                    @if($meetings->signature)
-                                        {{__('دارد')}}
-                                    @else
-                                        {{__('ندارد')}}
-                                    @endif
-                                </p>
-                                <p class="mb-6">
-                                    {{__('زمان جهت یادآوری')}} : {{$meetings->reminder}} {{__('دقیقه')}}
-                                </p>
-                            </div>
-                        </section>
-                    </div>
+            <div class="grid grid-cols-3 gap-4 max-w-full">
+                <p class="mb-2">
+                    {{__('موضوع جلسه')}} : {{$meetings->title}}
+                </p>
+                <p class="mb-2">
+                    {{__('واحد سازمانی')}} : {{$meetings->unit_organization}}
+                </p>
+                <p class="mb-2">
+                    {{__('نام دبیر جلسه')}} : {{$meetings->scriptorium}}
+                </p>
+                <div class="col-span-3">
+                    {{__('اعضای جلسه')}} :
+                    @foreach($userIds as $userId)
+                        {{UserInfo::where('user_id',$userId->user_id)->value('full_name')}} -
+                        {{--                                    @if(!$meetings->is_cancelled)--}}
+                        @if($tasks->where('user_id',$userId->user_id)->value('request_task'))
+                            <a href="{{route('editUserTask',$tasks->where('user_id',$userId->user_id)->value('id'))}}">View
+                                Edit</a>
+                            {{-- @endif--}}
+                        @endif
+                    @endforeach
                 </div>
+
+                <p class="mb-2">
+                    {{__('محل برگزاری جلسه')}} : {{$meetings->location}}
+                </p>
+                <p class="mb-2">
+                    {{__('تاریخ جلسه')}} : {{$meetings->date}}
+                </p>
+                <p class="mb-2">
+                    {{__('ساعت جلسه')}} : {{$meetings->time}}
+                </p>
+                <p class="mb-2">
+                    {{__('کمیته یا واحد برگزار کننده جلسه')}} : {{$meetings->unit_held}}
+                </p>
+                <p class="mb-2">
+                    {{__('پذیرایی')}} :
+                    @if($meetings->treat)
+                        {{__('دارد')}}
+                    @else
+                        {{__('ندارد')}}
+                    @endif
+                </p>
+                <p class="mb-2">
+                    {{__('مهمان')}} :
+                    @if($meetings->guest)
+                        @foreach($meetings->guest as $guest)
+                            - {{$guest}}
+                        @endforeach
+                    @else
+                        {{__('مهمانی وجود ندارد')}}
+                    @endif
+                </p>
+                <p class="mb-2">
+                    {{__('نام درخواست دهنده جلسه')}} : {{$meetings->applicant}}
+                </p>
+                <p class="mb-2">
+                    {{__('سمت سازمانی')}} : {{$meetings->position_organization}}
+                </p>
+                <p class="mb-2">
+                    {{__('امضا')}} :
+                    @if($meetings->signature)
+                        {{__('دارد')}}
+                    @else
+                        {{__('ندارد')}}
+                    @endif
+                </p>
+                <p class="mb-6">
+                    {{__('زمان جهت یادآوری')}} : {{$meetings->reminder}} {{__('دقیقه')}}
+                </p>
             </div>
+        </div>
+
     </x-template>
 </x-app-layout>
 
