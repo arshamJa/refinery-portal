@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Meeting;
+use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -13,32 +14,42 @@ class ScriptoriumReport extends Component
 {
     use WithPagination, WithoutUrlPagination;
 
+    public $start_date = '';
+    public $end_date = '';
+    public ?string $search = '';
+
     public function render()
     {
         return view('livewire.scriptorium-report');
     }
 
-    public $start_date;
-    public $end_date;
-
-//    public function filter()
-//    {
-//        return Meeting::where('date', '>', $this->start_date)
-//            ->where('date', '<', $this->end_date)->get();
-//    }
-    public ?string $search = '';
+    public function users()
+    {
+        return UserInfo::where('user_id',$this->meetings()->meetingUsers()->value('user_id'))->value('full_name');
+    }
 
     #[Computed]
     public function meetings()
     {
-        return Meeting::with('meetingUsers')
-            ->where('title', 'like', '%' . $this->search . '%')
-            ->where('scriptorium', '=', auth()->user()->user_info->full_name)
-            ->where('is_cancelled', '=', -1)
-            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled'])
-            ->paginate(3);
+        $startDate = trim($this->start_date);
+        $endDate = trim($this->end_date);
+        if ($startDate && $endDate){
+            $query = Meeting::query();
+                $query->where('date', '>', $startDate)
+                    ->where('date', '<', $endDate);
+            return $query->paginate(3);
+        }else{
+            return Meeting::with('meetingUsers')
+                ->where('title', 'like', '%' . $this->search . '%')
+                ->orWhere('scriptorium', 'like', '%' . $this->search . '%')
+                ->orWhere('location', 'like', '%' . $this->search . '%')
+                ->orWhere('date', 'like', '%' . $this->search . '%')
+                ->where('scriptorium', '=', auth()->user()->user_info->full_name)
+                ->where('is_cancelled', '=', -1)
+                ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled'])
+                ->paginate(3);
+        }
     }
-
 
 }
 

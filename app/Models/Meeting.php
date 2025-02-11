@@ -50,7 +50,6 @@ class Meeting extends Model
     {
         return $this->hasMany(MeetingUser::class)->chaperone();
     }
-
     public function tasks():HasMany
     {
         return $this->hasMany(Task::class)->chaperone();

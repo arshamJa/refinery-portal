@@ -30,69 +30,50 @@
         </nav>
 
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
-            <a href="#" class="bg-[#27445D] text-[#FBF5DD] p-4 w-full  rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام شده در مهلت مقرر')}}</h3>
-                {{--                <p class="text-lg font-bold"> {{$this->users}}</p>--}}
-            </a>
-            <a href="#" class="bg-[#BE3144] text-[#FBF5DD] p-4 w-full rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام نشده در مهلت مقرر')}}</h3>
-                {{--                <p class="text-lg font-bold">{{$this->organizations->count()}}</p>--}}
-            </a>
-            <a href="#" class="bg-[#E17564] text-[#FBF5DD] p-4 w-full  rounded-lg">
-                <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام شده خارج از مهلت مقرر')}}</h3>
-                {{--                <p class="text-lg font-bold"> {{$this->departments}}</p>--}}
-            </a>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold mb-2 " dir="rtl">Large Item with Chart</h2>
-            <canvas id="largeChart"></canvas>
-        </div>
+{{--        <div class="grid grid-cols-2 gap-x-4">--}}
+            <div class="flex items-start p-2 w-full justify-between mb-4">
+                <div class="grid gap-2">
+                    <a href="#" class="bg-[#27445D] text-[#FBF5DD] p-4 w-full  rounded-lg">
+                        <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام شده در مهلت مقرر')}}</h3>
+                        {{--                <p class="text-lg font-bold"> {{$this->users}}</p>--}}
+                    </a>
+                    <a href="#" class="bg-[#BE3144] text-[#FBF5DD] p-4 w-full rounded-lg">
+                        <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام نشده در مهلت مقرر')}}</h3>
+                        {{--                <p class="text-lg font-bold">{{$this->organizations->count()}}</p>--}}
+                    </a>
+                    <a href="#" class="bg-[#E17564] text-[#FBF5DD] p-4 w-full  rounded-lg">
+                        <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام شده خارج از مهلت مقرر')}}</h3>
+                        {{--                <p class="text-lg font-bold"> {{$this->departments}}</p>--}}
+                    </a>
+                </div>
+                <div class="bg-white w-[500px] rounded-lg shadow-md p-6">
+                    <canvas id="largeChart"></canvas>
+                </div>
+            </div>
+
+{{--        </div>--}}
+
+
         <script>
             // Chart.js examples
             const largeChart = new Chart(document.getElementById('largeChart'), {
-                type: 'bar', // Or 'line', 'pie', etc.
+                type: 'pie', // Or 'line', 'pie', etc.
                 data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple'],
+                    labels: ['گزارش اقدامات انجام شده در مهلت مقرر', 'گزارش اقدامات انجام نشده در مهلت مقرر', 'گزارش اقدامات انجام شده خارج از مهلت مقرر'],
                     datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2],
+                        label: 'تعداد',
+                        data: [350, 226, 100],
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)'
+                            'rgb(39,68,93)',
+                            'rgb(190,49,68)',
+                            'rgb(225,117,100)'
                         ],
                         borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)'
+                            'rgba(221,235,157,0.35)',
+                            'rgba(87,143,202,0.35)',
+                            'rgba(249,110,42,0.35)'
                         ],
                         borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-
-            const mediumChart = new Chart(document.getElementById('mediumChart'), {
-                type: 'line', // Or 'bar', 'pie', etc.
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                    datasets: [{
-                        label: 'Sales',
-                        data: [20, 35, 15, 40, 25],
-                        borderColor: 'blue',
-                        fill: false
                     }]
                 },
                 options: {

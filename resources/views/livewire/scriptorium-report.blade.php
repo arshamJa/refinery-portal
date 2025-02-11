@@ -34,37 +34,17 @@
                         class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
                         <!-- Search Bar -->
                         <div class="w-full md:w-1/2">
-
-{{--                            <form wire:submit="filter">--}}
-{{--                                <label for="start_date">Start Date:</label>--}}
-{{--                                <input type="text" wire:model="start_date" id="start_date">--}}
-{{--                                <br>--}}
-{{--                                <label for="end_date">End Date:</label>--}}
-{{--                                <input type="text" wire:model="end_date" id="end_date">--}}
-{{--                                <button type="submit">Filter</button>--}}
-{{--                                <br>--}}
-{{--                            </form>--}}
-{{--                            <a href="{{route('scriptorium.report')}}">Show All</a>--}}
-
-
-                            {{--                            <form class="flex items-center">--}}
-{{--                                <label for="simple-search" class="sr-only">Search</label>--}}
-{{--                                <div class="relative w-full">--}}
-{{--                                    <div--}}
-{{--                                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">--}}
-{{--                                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500"--}}
-{{--                                             fill="currentColor" viewbox="0 0 20 20"--}}
-{{--                                             xmlns="http://www.w3.org/2000/svg">--}}
-{{--                                            <path fill-rule="evenodd"--}}
-{{--                                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"--}}
-{{--                                                  clip-rule="evenodd"/>--}}
-{{--                                        </svg>--}}
-{{--                                    </div>--}}
-{{--                                    <input type="text" wire:model.live="search" id="simple-search" dir="rtl"--}}
-{{--                                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"--}}
-{{--                                           placeholder="جست و جو" required="">--}}
-{{--                                </div>--}}
-{{--                            </form>--}}
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <x-input-label value="{{__('تاریخ شروع')}}" class="mb-2"/>
+                                    <x-text-input wire:model.live="start_date"/>
+                                </div>
+                                <div>
+                                    <x-input-label value="{{__('تاریخ پایان')}}" class="mb-2"/>
+                                    <x-text-input wire:model.live="end_date"/>
+                                </div>
+                            </div>
+                            <x-text-input wire:model.live="search" placeholder="جست و جو" class="mt-4" dir="rtl"/>
                         </div>
                     </div>
                     <!-- Table Body -->
@@ -72,21 +52,26 @@
                         <x-table.table>
                             <x-slot name="head">
                                 <th class="px-4 py-3">{{__('ردیف')}}</th>
-                                <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
-                                <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
-                                <th class="px-4 py-3">{{__('تاریخ جلسه')}}</th>
-                                <th class="px-4 py-3">{{__('ساعت جلسه')}}</th>
-{{--                                <th class="px-4 text-center">{{__('قابلیت')}}</th>--}}
+                                <th class="px-4 py-3">{{__('نام دبیر')}}</th>
+                                <th class="px-4 py-3">{{__('موضوع')}}</th>
+                                <th class="px-4 py-3">{{__('تاریخ برگزاری')}}</th>
+                                <th class="px-4 py-3">{{__('مکان')}}</th>
+                                <th class="px-4 py-3">{{__('اعضای جلسه')}}</th>
                             </x-slot>
                             <x-slot name="body">
                                 @foreach($this->meetings as $meeting)
                                     <tr class="px-4 py-3 border-b text-center" wire:key="{{$meeting->id}}">
                                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
-                                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>
                                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>
+                                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>
                                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>
-                                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->time}}</td>
-{{--                                        <td class="px-4 py-3"></td>--}}
+                                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->location}}</td>
+                                        <td class="px-4 py-4 whitespace-no-wrap text-pretty text-sm leading-5 text-coll-gray-900">
+                                            @foreach($meeting->meetingUsers as $meetingUser)
+                                                {{-- i retrive this one from MeetingUser Models --}}
+                                                {{$meetingUser->holders()}} ,
+                                            @endforeach
+                                        </td>
                                     </tr>
                                 @endforeach
                             </x-slot>
@@ -102,7 +87,6 @@
 
 
     </div>
-
 
 
 </div>

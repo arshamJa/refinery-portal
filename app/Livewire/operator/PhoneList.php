@@ -38,19 +38,15 @@ class PhoneList extends Component
     public function userInfos()
     {
        if (auth()->user()->role === 'admin') {
-
             if ($this->filtered_roles){
                 $users = User::wherein('role', $this->filtered_roles)->get();
-
                 $users_names = [];
                 foreach ($users as $user){
                     $users_names[] = $user->user_info->full_name;
                 }
-
                 $userInfo = UserInfo::with('user')
                     ->select($this->infos)
                     ->wherein('full_name', $users_names);
-
             }else{
                 $userInfo = null;
             }
@@ -63,7 +59,6 @@ class PhoneList extends Component
             }else{
                 $users = User::whereNot('role', 'admin')->get();
             }
-
             //get the operators' names from operators
             $users_names = [];
             foreach ($users as $user){
@@ -88,7 +83,6 @@ class PhoneList extends Component
             //get only the employees from user_infos' table using the employees_names variable
             $userInfo = UserInfo::with('user:id,role','department:id,department_name')->select($this->infos)
                 ->wherein('full_name', $employees_names);
-
         }
 
         if ($userInfo != null){

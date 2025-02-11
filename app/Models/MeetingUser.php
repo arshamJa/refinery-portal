@@ -35,4 +35,9 @@ class MeetingUser extends Model
     {
         return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
     }
+
+    public function holders()
+    {
+        return UserInfo::where('user_id',$this->user_id)->value('full_name');
+    }
 }
