@@ -46,7 +46,8 @@
 
         @foreach($this->meetings as $meeting)
 {{--            @foreach($this->meetingUsers as $meeting)--}}
-                <div class="mb-4">
+            @if(!\App\Models\MeetingUser::where('meeting_id',$meeting->id)->where('user_id',auth()->user()->id)->value('read_by_user'))
+            <div class="mb-4">
                     <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
                         <div class="flex">
                             <div class="shrink-0">
@@ -101,15 +102,13 @@
                                         {{--                                                class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meeting->reason_for_absent ?? null}}</span>--}}
                                         {{--                                        @endif--}}
                                     </span>
-{{--                                    <form action="{{route('markNotification',$meeting->id)}}" method="post">--}}
-{{--                                        @csrf--}}
-{{--                                        <x-primary-button type="submit">{{__('متوجه شدم')}}</x-primary-button>--}}
-{{--                                    </form>--}}
+                                    <x-primary-button wire:click="markNotification({{$meeting->id}} , {{ auth()->user()->id}} )">{{__('متوجه شدم')}}</x-primary-button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            @endif
             @endforeach
 {{--        @endforeach--}}
 

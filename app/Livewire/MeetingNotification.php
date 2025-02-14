@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
@@ -35,5 +36,14 @@ class MeetingNotification extends Component
 //            ->where('read_at',null)
             ->get(['id','meeting_id','user_id','is_present','reason_for_absent']);
     }
+
+    public function markNotification($id, $userId)
+    {
+        MeetingUser::where('meeting_id',$id)->where('user_id',$userId)->update([
+            'read_by_user' => true
+        ]);
+        return redirect()->back();
+    }
+
 
 }
