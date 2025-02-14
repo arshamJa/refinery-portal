@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Events\SetNewMeeting;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -24,13 +25,8 @@ class LoginPage extends Component
     public function login(): void
     {
         $this->validate();
-
         $this->form->authenticate();
-
         Session::regenerate();
-
         $this->redirectIntended(default: route('dashboard', absolute: false));
-
-
     }
 }

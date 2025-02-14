@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Notifications\Invitation;
 use App\Trait\MeetingsTasks;
 use App\Trait\Organizations;
 use Livewire\Attributes\Computed;

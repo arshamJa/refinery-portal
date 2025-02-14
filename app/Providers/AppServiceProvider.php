@@ -39,10 +39,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-//        Event::listen(
-//            SetNewMeeting::class,
-//            SendMeetingInvitation::class
-//        );
 
 //        Model::preventLazyLoading(! $this->app->isProduction());
 //        Model::shouldBeStrict();

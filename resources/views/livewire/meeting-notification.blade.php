@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.visible.60s>
 
 
     <x-sessionMessage name="status"/>
