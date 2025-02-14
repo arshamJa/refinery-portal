@@ -12,15 +12,14 @@ trait MessageReceived
     public function messages()
     {
         // send invitation to participants
-        $invitation = MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
+        $send_invitation = MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
 
+        // invitations result
+        $invitations_result = MeetingUser::where('is_present','!=' , '0')->where('read_by_scriptorium',false)->count();
 
-        $invitations = \App\Models\MeetingUser::where('is_present','!=' , '0')->where('read_by_scriptorium',null)->count();
-
-
-        $meetingsCount = \App\Models\Meeting::where('is_cancelled','!=','0')->where('scriptorium',auth()->user()->user_info->full_name)->count();
+        // meeting_approval
         $meeting_approval = Meeting::where('is_cancelled','!=','0')->where('scriptorium','!=',auth()->user()->user_info->full_name)->count();
 
-        return $invitations + $meetingsCount + $invitation + $meeting_approval;
+        return $send_invitation + $invitations_result + $meeting_approval;
     }
 }

@@ -43,7 +43,6 @@ Route::get('employee/organization', \App\Livewire\employee\EmployeesOrganization
         ->can('view-any');
 
     Route::get('message',\App\Livewire\Message::class)->name('message');
-    Route::get('meetings/request',\App\Livewire\MeetingsRequest::class)->name('meetings.request');
 });
 
 Route::get('/reset/password/{id}', [ResetPasswordController::class, 'index'])

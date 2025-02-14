@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Trait\MeetingsTasks;
+use App\Trait\MessageReceived;
 use App\Trait\Organizations;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -17,7 +18,7 @@ use Livewire\WithPagination;
 class OperatorDashboard extends Component
 {
 
-    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks;
+    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
 
     public $meetingTitle;
     public $meeting_id;

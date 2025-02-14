@@ -16,14 +16,12 @@ use Livewire\WithPagination;
 
 class AdminDashboard extends Component
 {
-    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks,MessageReceived;
+    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
 
     public function render()
     {
         return view('livewire.admin.admin-dashboard');
     }
-
-
     #[Computed]
     public function users()
     {
@@ -34,11 +32,4 @@ class AdminDashboard extends Component
     {
         return Department::all()->count();
     }
-    #[Computed]
-    public function invitation()
-    {
-        return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
-    }
-
-
 }

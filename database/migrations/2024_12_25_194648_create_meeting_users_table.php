@@ -18,6 +18,7 @@ return new class extends Migration
             $table->smallInteger('is_present')->default('0');
             $table->text('reason_for_absent')->nullable();
             $table->boolean('read_by_scriptorium')->default(false);
+            $table->boolean('read_by_user')->default(false);
             $table->timestamps();
         });
     }

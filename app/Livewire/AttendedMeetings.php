@@ -18,7 +18,6 @@ class AttendedMeetings extends Component
 {
     use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks;
 
-    use LazilyRefreshDatabase;
     public ?string $search = '';
 
     public function render()

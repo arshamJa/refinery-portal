@@ -27,8 +27,15 @@ Route::middleware(['auth','sanitizeInputs'])->group( function () {
     Route::get('/meetings/list',\App\Livewire\MeetingsList::class)->name('meetingsList');
 
 
+    // send invitation to participants
     Route::get('meeting/invitation',\App\Livewire\MeetingInvitation::class)
         ->name('meeting.invitation');
+
+
+    // receive invitations result
+    Route::get('invitations/result',\App\Livewire\InvitationsResult::class)
+        ->name('invitations.result');
+
 
 
 
