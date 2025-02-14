@@ -5,9 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth','sanitizeInputs'])->group( function () {
 
-    Route::post('/markNotification/{meetingUserId}',[\App\Http\Controllers\MeetingController::class,'markNotification'])
-        ->name('markNotification');
-
     Route::get('/meeting/notification',\App\Livewire\MeetingNotification::class)
         ->name('meeting.notification');
 
@@ -29,7 +26,8 @@ Route::middleware(['auth','sanitizeInputs'])->group( function () {
 
     Route::get('/meetings/list',\App\Livewire\MeetingsList::class)->name('meetingsList');
 
-    Route::get('/dashboard/meeting/invitation',\App\Livewire\MeetingInvitation::class)
+
+    Route::get('meeting/invitation',\App\Livewire\MeetingInvitation::class)
         ->name('meeting.invitation');
 
 

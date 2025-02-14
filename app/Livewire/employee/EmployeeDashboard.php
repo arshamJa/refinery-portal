@@ -6,6 +6,7 @@ namespace App\Livewire\employee;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Trait\MeetingsTasks;
+use App\Trait\MessageReceived;
 use App\Trait\Organizations;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -15,20 +16,15 @@ use Livewire\WithPagination;
 class EmployeeDashboard extends Component
 {
 
-    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks;
+    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
+
     public $meetingTitle;
     public $meeting_id;
     public function render()
     {
         return view('livewire.employee.employee-dashboard');
     }
-    #[Computed]
-    public function messages()
-    {
-        $invitations = \App\Models\MeetingUser::where('is_present','!=' , '0')->where('read_at',null)->count();
-        $meetingsCount = \App\Models\Meeting::where('is_cancelled','!=','0')->where('scriptorium','==',auth()->user()->user_info->full_name)->count();
-        return $invitations + $meetingsCount;
-    }
+
     #[Computed]
     public function invitation()
     {

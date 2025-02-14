@@ -35,7 +35,7 @@
                 <h3 class="text-sm font-semibold"> {{__('پاسخ دعوتنامه')}}</h3>
                 @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
                 <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">
-                        {{MeetingUser::where('is_present','!=' , '0')->where('read_at',null)->count()}}
+                        {{MeetingUser::where('is_present','!=' , '0')->where('read_by_scriptorium',false)->count()}}
                 </span>
                 @endif
             </a>

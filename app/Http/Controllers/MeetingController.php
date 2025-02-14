@@ -168,16 +168,6 @@ class MeetingController extends Controller
         }
         return redirect()->signedRoute('meetings.index')->with('status',' جلسه با موفقیت بروز شد');
     }
-
-    public function markNotification(Request $request, string $id)
-    {
-        $meetingUser = MeetingUser::find($id);
-        $meetingUser->read_at = now();
-        $meetingUser->save();
-        return redirect()->back();
-    }
-
-
     /**
      * Remove the specified resource from storage.
      */

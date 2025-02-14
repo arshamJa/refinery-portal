@@ -83,7 +83,7 @@
                                                 class="block mt-2">{{__('دلیل رد درخواست : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>
                                         @endif
                                     </span>
-                                    <form action="{{route('markNotification',$meetingUser->id)}}" method="post">
+                                    <form wire:submit="markNotification({{$meetingUser->id}})">
                                         @csrf
                                         <x-primary-button type="submit">{{__('متوجه شدم')}}</x-primary-button>
                                     </form>

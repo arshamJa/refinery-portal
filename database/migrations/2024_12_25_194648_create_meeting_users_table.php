@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained(); // همون اعضای جلسه است
             $table->smallInteger('is_present')->default('0');
             $table->text('reason_for_absent')->nullable();
-            $table->timestamp('read_at')->nullable();
+            $table->boolean('read_by_scriptorium')->default(false);
             $table->timestamps();
         });
     }
