@@ -17,7 +17,7 @@ class Task extends Model
         'user_id',
 //        'title',
         'body',
-//        'sent_date',
+        'sent_date',
         'time_out',
         'is_completed',
         'request_task'

@@ -35,6 +35,7 @@ class MeetingsRequest extends Component
         return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled','user')
             ->where('is_present','!=','0')
             ->where('read_at',null)
+            ->whereRelation('meeting','scriptorium','=',auth()->user()->user_info->full_name)
             ->get(['id','meeting_id','user_id','is_present','reason_for_absent']);
     }
 

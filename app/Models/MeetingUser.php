@@ -40,4 +40,13 @@ class MeetingUser extends Model
     {
         return UserInfo::where('user_id',$this->user_id)->value('full_name');
     }
+    public function deadLineTask()
+    {
+        return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('time_out');
+    }
+    public function sentDate()
+    {
+
+        return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
+    }
 }

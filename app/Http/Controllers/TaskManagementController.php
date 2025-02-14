@@ -6,6 +6,8 @@ use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Task;
 use App\Models\UserInfo;
+use App\Rules\DateRule;
+use App\Rules\farsi_chs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -39,10 +41,9 @@ class TaskManagementController extends Controller
      */
     public function store(Request $request,string $meeting)
     {
-
         $validated = $request->validate([
            'initiator' => ['required'],
-            'time_out' => ['required','numeric'],
+            'time_out' => ['required','date_format:Y/m/d' , new DateRule()],
             'body' => ['required','string']
         ]);
         $body = Str::deduplicate($request->body);

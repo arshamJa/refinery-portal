@@ -31,14 +31,6 @@ class AdminDashboard extends Component
         return $invitations + $meetingsCount;
     }
 
-
-
-
-
-
-
-
-
     #[Computed]
     public function users()
     {

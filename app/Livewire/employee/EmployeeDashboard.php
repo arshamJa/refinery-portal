@@ -26,7 +26,7 @@ class EmployeeDashboard extends Component
     public function messages()
     {
         $invitations = \App\Models\MeetingUser::where('is_present','!=' , '0')->where('read_at',null)->count();
-        $meetingsCount = \App\Models\Meeting::where('is_cancelled','!=','0')->where('scriptorium','!=',auth()->user()->user_info->full_name)->count();
+        $meetingsCount = \App\Models\Meeting::where('is_cancelled','!=','0')->where('scriptorium','==',auth()->user()->user_info->full_name)->count();
         return $invitations + $meetingsCount;
     }
     #[Computed]

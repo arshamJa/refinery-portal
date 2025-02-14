@@ -53,9 +53,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                 </svg>
                 <li>
-                        <span class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                            {{__('لیست دعوتنامه')}}
-                        </span>
+                    <a href="{{route('message')}}" class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
+                        <span>{{__('پیغام های دریافتی')}}</span>
+                    </a>
+                </li>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-gray-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+                <li>
+                    <span class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                        {{__('لیست دعوتنامه')}}
+                    </span>
                 </li>
             </ol>
         </nav>
@@ -87,7 +95,7 @@
                                     </span>
                                 </p>
                             <div class="flex justify-between items-center">
-                                <a href="#" class="hover:underline">{{__('نمایش جزئیات')}}</a>
+{{--                                <a href="#" class="hover:underline">{{__('نمایش جزئیات')}}</a>--}}
                                 <div>
                                     @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '1')
                                         {{__('شما دعوت به این جلسه را پذیرفتید')}}

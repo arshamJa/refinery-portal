@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/task/list/{meeting}',\App\Livewire\TaskList::class)->name('task.list');
+
+
+
     Route::get('/dashboard/tasks', \App\Livewire\TaskManagementTable::class)
         ->name('tasks.index');
 

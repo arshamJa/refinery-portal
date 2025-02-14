@@ -59,8 +59,9 @@ class MeetingController extends Controller
         $g_year = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[0];
         $gregorian_format = $g_month . '/' . $g_day . '/' . $g_year;
 
+
         $oldDate = Meeting::where('date',$request->date)->value('date');
-        if (Meeting::where('date',$oldDate)->value('time') == $request->time ){
+        if (Meeting::where('date',$oldDate)->value('time') == $request->time){
             throw ValidationException::withMessages([
                 'time' => 'در این زمان جلسه ثبت شده است'
             ]);
