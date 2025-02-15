@@ -29,9 +29,8 @@ class DateRule implements ValidationRule
                 jgetdate()['hours'], jgetdate()['minutes'], jgetdate()['seconds'],
                 $month, $day, $year
             );
-
             if (time() > $timestamp) {
-                $fail('تاریخ آزمون باید بعد از الان باشد');
+                $fail('تاریخ  باید بعد از الان باشد');
             }
         }
     }

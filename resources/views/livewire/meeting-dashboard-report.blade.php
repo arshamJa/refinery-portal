@@ -31,18 +31,18 @@
 
 
         <div class="flex items-start p-2 w-full justify-between mb-4">
-            <div class="grid gap-2">
-                <a href="#" class="bg-[#27445D] text-[#FBF5DD] p-4 w-full  rounded-lg">
-                    <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام شده در مهلت مقرر')}}</h3>
-                    {{--                <p class="text-lg font-bold"> {{$this->users}}</p>--}}
+            <div class="grid gap-2 w-auto">
+                <a href="{{route('tasksFinishedOnTime')}}" class="flex justify-between gap-2 items-center hover:bg-[#27445D] border-[#27445D] border hover:drop-shadow-xl transition ease-in-out duration-300 bg-transparent text-black hover:text-[#FBF5DD] p-4 w-full  rounded-lg">
+                    <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام شده در مهلت مقرر')}}</h3>
+                    <p class="text-lg font-bold">{{$this->tasksOnTime}}</p>
                 </a>
-                <a href="#" class="bg-[#BE3144] text-[#FBF5DD] p-4 w-full rounded-lg">
-                    <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات انجام نشده در مهلت مقرر')}}</h3>
-                    {{--                <p class="text-lg font-bold">{{$this->organizations->count()}}</p>--}}
+                <a href="#" class="flex justify-between gap-2 items-center hover:bg-[#BE3144] bg-transparent text-black hover:text-[#FBF5DD] border hover:drop-shadow-xl transition ease-in-out duration-300 p-4 w-full rounded-lg">
+                    <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام نشده در مهلت مقرر')}}</h3>
+                    <p class="text-lg font-bold">{{$this->tasksNotDone}}</p>
                 </a>
-                <a href="#" class="bg-[#E17564] text-[#FBF5DD] p-4 w-full  rounded-lg">
+                <a href="#" class="flex justify-between gap-2 items-center hover:bg-[#E17564] bg-transparent text-black hover:text-[#FBF5DD] border hover:drop-shadow-xl transition ease-in-out duration-300 p-4 w-full  rounded-lg">
                     <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام شده خارج از مهلت مقرر')}}</h3>
-                    {{--                <p class="text-lg font-bold"> {{$this->departments}}</p>--}}
+                    <p class="text-lg font-bold">{{$this->tasksDoneWithDelay}}</p>
                 </a>
             </div>
             <div class="bg-white w-[500px] rounded-lg shadow-md p-6">
@@ -58,7 +58,7 @@
                     labels: ['گزارش اقدامات انجام شده در مهلت مقرر', 'گزارش اقدامات انجام نشده در مهلت مقرر', 'گزارش اقدامات انجام شده خارج از مهلت مقرر'],
                     datasets: [{
                         label: 'تعداد',
-                        data: [350, 226, 100],
+                        data: [{{$this->tasksOnTime}}, {{$this->tasksNotDone}}, {{$this->tasksDoneWithDelay}}],
                         backgroundColor: [
                             'rgb(39,68,93)',
                             'rgb(190,49,68)',

@@ -34,6 +34,12 @@ class AttendedMeetings extends Component
             ->paginate(3);
     }
 
+    #[Computed]
+    public function tasks()
+    {
+        return Task::where('user_id',auth()->user()->id)->get();
+    }
+
 
 
 

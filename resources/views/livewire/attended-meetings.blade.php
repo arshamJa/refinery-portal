@@ -71,23 +71,16 @@
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meetingUser->meeting->title}}</td>
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meetingUser->meeting->scriptorium}}</td>
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meetingUser->meeting->date}}</td>
-                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                                        {{--                                            @foreach(Task::where('meeting_id',$meetingUser->meeting_id)->where('user_id',auth()->user()->id)->get() as $task)--}}
-                                        {{$meetingUser->deadLineTask()}}
-                                        {{--                                            @endforeach--}}
-                                    </td>
-                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                                        @foreach(Task::where('meeting_id',$meetingUser->meeting_id)->where('user_id',auth()->user()->id)->where('is_completed',true)->get() as $task)
-                                            {{$meetingUser->sentDate()}}
-                                            <br>
-                                        @endforeach
-                                    </td>
+                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meetingUser->deadLineTask()}}</td>
+                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meetingUser->sentDate()}}</td>
                                     <td class="px-4 py-3">
-                                        <a href="{{route('task.list',$meetingUser->meeting->id)}}">
-                                            <x-primary-button>
-                                                {{__('نمایش اقدامات')}}
-                                            </x-primary-button>
-                                        </a>
+                                        @if($this->tasks)
+                                            <a href="{{route('task.list',$meetingUser->meeting->id)}}">
+                                                <x-primary-button>
+                                                    {{__('نمایش اقدامات')}}
+                                                </x-primary-button>
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

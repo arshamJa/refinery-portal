@@ -9,7 +9,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/task/list/{meeting}',\App\Livewire\TaskList::class)->name('task.list');
 
-
+Route::get('/tasks/onTime',\App\Livewire\TasksFinishedOnTime::class)->name('tasksFinishedOnTime');
 
     Route::get('/dashboard/tasks', \App\Livewire\TaskManagementTable::class)
         ->name('tasks.index');

@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Task;
+use Carbon\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -26,9 +27,14 @@ class TaskList extends Component
 
     public function finishTask($taskId)
     {
+        $day = now()->day;
+        $month = now()->month;
+        $year = now()->year;
+        $nowTime = gregorian_to_jalali($year,$month,$day,'/');
+
         $task = Task::find($taskId);
         $task->is_completed = true;
-        $task->sent_date = now();
+        $task->sent_date = $nowTime;
         $task->save();
         $this->redirectRoute('attended.meetings');
     }

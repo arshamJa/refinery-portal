@@ -19,7 +19,7 @@ return new class extends Migration
             $table->longText('body');
             $table->string('time_out'); // مهلت ارسال
             $table->boolean('is_completed')->default(false);
-            $table->timestamp('sent_date')->nullable();
+            $table->string('sent_date')->nullable();
             $table->longText('request_task')->nullable();
             $table->timestamps();
         });

@@ -142,7 +142,9 @@
                             <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
                             <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>
                             <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                               {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}
+                               <span class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">
+                                   {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}
+                               </span>
                             </td>
                         </tr>
                     @endforeach
