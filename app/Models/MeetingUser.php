@@ -48,7 +48,6 @@ class MeetingUser extends Model
     }
     public function sentDate()
     {
-
         return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
     }
 }

@@ -139,7 +139,7 @@
                         <tr class="px-4 py-3 border-b text-center">
                             <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
                             <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
-                            <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}{{__(' روز')}}</td>
+                            <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
                             <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>
                             <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
                                {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}
