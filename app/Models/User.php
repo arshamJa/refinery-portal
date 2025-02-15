@@ -74,14 +74,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserInfo::class)->chaperone();
     }
-
     public function full_name()
     {
         return $this->user_info()->where('user_id',auth()->user()->id)->value('full_name');
     }
-
-
-
     public function profilePhoto()
     {
         return url('storage/'.$this->profile_photo_path);
@@ -90,11 +86,6 @@ class User extends Authenticatable
 //    {
 //        return $this->belongsToMany(Meeting::class);
 //    }
-    public function conversations():HasMany
-    {
-        return $this->hasMany(Conversation::class,'sender_id')
-            ->orWhere('receiver_id',$this->id);
-    }
     public function tasks():HasMany
     {
         return $this->hasMany(Task::class)->chaperone();

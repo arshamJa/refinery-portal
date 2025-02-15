@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Reports;
 
 
 use App\Models\Task;
@@ -12,13 +12,14 @@ class MeetingDashboardReport extends Component
 {
     public function render()
     {
-        return view('livewire.meeting-dashboard-report');
+        return view('livewire.reports.meeting-dashboard-report');
     }
 
     #[Computed]
     public function tasksOnTime()
     {
         return Task::with('meeting')
+            ->where('is_completed',true)
             ->whereColumn('sent_date', '<=', 'time_out')
             ->count();
     }
@@ -27,6 +28,7 @@ class MeetingDashboardReport extends Component
     public function tasksNotDone()
     {
         return Task::with('meeting')
+            ->where('is_completed',false)
             ->where('sent_date',null)
             ->count();
     }
@@ -35,6 +37,7 @@ class MeetingDashboardReport extends Component
     public function tasksDoneWithDelay()
     {
         return Task::with('meeting')
+            ->where('is_completed',true)
             ->whereColumn('sent_date', '>', 'time_out')
             ->count();
     }

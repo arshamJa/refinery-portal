@@ -36,11 +36,11 @@
                     <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام شده در مهلت مقرر')}}</h3>
                     <p class="text-lg font-bold">{{$this->tasksOnTime}}</p>
                 </a>
-                <a href="#" class="flex justify-between gap-2 items-center hover:bg-[#BE3144] bg-transparent text-black hover:text-[#FBF5DD] border hover:drop-shadow-xl transition ease-in-out duration-300 p-4 w-full rounded-lg">
+                <a href="{{route('tasksNotFinishedOnTime')}}" class="flex justify-between gap-2 items-center hover:bg-[#BE3144] bg-transparent text-black hover:text-[#FBF5DD] border hover:drop-shadow-xl transition ease-in-out duration-300 p-4 w-full rounded-lg">
                     <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام نشده در مهلت مقرر')}}</h3>
                     <p class="text-lg font-bold">{{$this->tasksNotDone}}</p>
                 </a>
-                <a href="#" class="flex justify-between gap-2 items-center hover:bg-[#E17564] bg-transparent text-black hover:text-[#FBF5DD] border hover:drop-shadow-xl transition ease-in-out duration-300 p-4 w-full  rounded-lg">
+                <a href="{{route('tasksDoneWithDelay')}}" class="flex justify-between gap-2 items-center hover:bg-[#E17564] bg-transparent text-black hover:text-[#FBF5DD] border hover:drop-shadow-xl transition ease-in-out duration-300 p-4 w-full  rounded-lg">
                     <h3 class="text-sm font-semibold">{{__('گزارش اقدامات انجام شده خارج از مهلت مقرر')}}</h3>
                     <p class="text-lg font-bold">{{$this->tasksDoneWithDelay}}</p>
                 </a>
@@ -53,7 +53,7 @@
         <script>
             // Chart.js examples
             const largeChart = new Chart(document.getElementById('largeChart'), {
-                type: 'pie', // Or 'line', 'pie', etc.
+                type: 'pie',
                 data: {
                     labels: ['گزارش اقدامات انجام شده در مهلت مقرر', 'گزارش اقدامات انجام نشده در مهلت مقرر', 'گزارش اقدامات انجام شده خارج از مهلت مقرر'],
                     datasets: [{
