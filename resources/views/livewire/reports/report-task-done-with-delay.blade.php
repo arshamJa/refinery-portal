@@ -46,27 +46,32 @@
                     <div class="w-full md:w-1/2">
                         <x-text-input wire:model.live="search" placeholder="جست و جو" class="mt-4" dir="rtl"/>
                     </div>
+                    @php
+
+                    @endphp
                 </div>
                 <!-- Table Body -->
                 <div class="overflow-x-auto" dir="rtl">
                     <x-table.table>
                         <x-slot name="head">
                             <th class="px-4 py-3">{{__('ردیف')}}</th>
-                            <th class="px-4 py-3">{{__('جلسه')}}</th>
+                            <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
+                            <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
                             <th class="px-4 py-3">{{__('افدام کننده')}}</th>
-                            <th class="px-4 py-3">{{__('تاریخ مهلت اقدام')}}</th>
                             <th class="px-4 py-3">{{__('تاریخ انجام اقدام')}}</th>
-                            <th class="px-4 py-3">{{__('اقدامات')}}</th>
+                            <th class="px-4 py-3">{{__('تاریخ مهلت اقدام')}}</th>
+{{--                            <th class="px-4 py-3">{{__('اقدامات')}}</th>--}}
                         </x-slot>
                         <x-slot name="body">
                             @foreach($this->tasks as $task)
                                 <tr class="px-4 py-3 border-b text-center" wire:key="{{$task->id}}">
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
+                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->full_name()}}</td>
+                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date}}</td>
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
-                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date ?? 'اقدامی انجام نشده'}}</td>
-                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
+{{--                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>--}}
                                 </tr>
                             @endforeach
                         </x-slot>

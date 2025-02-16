@@ -5,9 +5,8 @@
 {{--            <canvas id="myChart"></canvas>--}}
 {{--        </div>--}}
 {{--        <script>--}}
-{{--            const users = {{$this->users}};--}}
-{{--            const departments = {{$this->departments}};--}}
-{{--            const organizations =  {{$this->organizations->count()}};--}}
+{{--            Chart.defaults.font.size = 16;--}}
+{{--            Chart.defaults.font.family = 'sans-serif';--}}
 {{--            const ctx = document.getElementById('myChart');--}}
 {{--            new Chart(ctx, {--}}
 {{--                type: 'doughnut',--}}
@@ -15,7 +14,7 @@
 {{--                    labels: ['کاربر', 'دپارتمان', 'سامانه'],--}}
 {{--                    datasets: [{--}}
 {{--                        label: 'تعداد',--}}
-{{--                        data: [users,departments,organizations],--}}
+{{--                        data: [{{$this->users}}, {{$this->departments}},{{$this->organizations->count()}}],--}}
 {{--                        backgroundColor: [--}}
 {{--                            'rgb(121,71,82)',--}}
 {{--                            'rgb(54, 162, 235)',--}}

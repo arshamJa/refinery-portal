@@ -23,7 +23,6 @@ class MeetingDashboardReport extends Component
             ->whereColumn('sent_date', '<=', 'time_out')
             ->count();
     }
-
     #[Computed]
     public function tasksNotDone()
     {
@@ -32,7 +31,6 @@ class MeetingDashboardReport extends Component
             ->where('sent_date',null)
             ->count();
     }
-
     #[Computed]
     public function tasksDoneWithDelay()
     {

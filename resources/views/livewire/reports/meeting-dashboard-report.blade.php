@@ -45,24 +45,29 @@
                     <p class="text-lg font-bold">{{$this->tasksDoneWithDelay}}</p>
                 </a>
             </div>
-            <div class="bg-white w-[500px] rounded-lg shadow-md p-6">
+            <div wire:ignore class="bg-white w-96 rounded-lg shadow-md p-6">
                 <canvas id="largeChart"></canvas>
             </div>
         </div>
 
         <script>
-            // Chart.js examples
+            {{--const tasks =  {{$this->taskOnTime}};--}}
+            const tasksOnTime = {{$this->tasksOnTime}};
+            const tasksNotDone = {{$this->tasksNotDone}};
+            const tasksDoneWithDelay = {{$this->tasksDoneWithDelay}};
+            Chart.defaults.font.size = 16;
+            Chart.defaults.font.family = 'sans-serif';
             const largeChart = new Chart(document.getElementById('largeChart'), {
                 type: 'pie',
                 data: {
-                    labels: ['گزارش اقدامات انجام شده در مهلت مقرر', 'گزارش اقدامات انجام نشده در مهلت مقرر', 'گزارش اقدامات انجام شده خارج از مهلت مقرر'],
+                    labels: ['اقدامات انجام شده در مهلت مقرر' , 'اقدامات انجام نشده در مهلت مقرر', 'اقدامات انجام شده خارج از مهلت مقرر'],
                     datasets: [{
                         label: 'تعداد',
-                        data: [{{$this->tasksOnTime}}, {{$this->tasksNotDone}}, {{$this->tasksDoneWithDelay}}],
+                        data: [tasksOnTime,tasksNotDone,tasksDoneWithDelay],
                         backgroundColor: [
-                            'rgb(39,68,93)',
-                            'rgb(190,49,68)',
-                            'rgb(225,117,100)'
+                            'rgb(121,71,82)',
+                            'rgb(54, 162, 235',
+                            'rgb(183,231,13)'
                         ],
                         borderColor: [
                             'rgba(221,235,157,0.35)',
@@ -80,7 +85,6 @@
                     }
                 }
             });
-
         </script>
     </x-template>
 </div>
