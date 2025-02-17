@@ -158,7 +158,7 @@
             <form action="{{\route('logout')}}" method="post">
                 @csrf
                 <button type="submit"
-                        class="inline-flex items-center gap-1 w-full text-base font-medium  rounded-md px-4 py-2 text-right text-white  transition ease-in-out duration-200 hover:bg-gray-700">
+                        class="inline-flex items-center gap-1 w-full text-base font-medium rounded-md px-4 py-2 text-right text-white transition ease-in-out duration-200 hover:bg-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">
                         <path stroke-linecap="round" stroke-linejoin="round"

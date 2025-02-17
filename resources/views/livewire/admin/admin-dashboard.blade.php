@@ -31,7 +31,7 @@
 {{--                }--}}
 {{--            });--}}
 {{--        </script>--}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4 pb-4 border-b">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4 mt-14 pb-4 border-b">
             <div class="bg-[#27445D] text-[#FBF5DD] p-4 rounded-lg">
                 <h3 class="text-sm font-semibold"> {{__('تعداد کاربران')}}</h3>
                 <p class="text-lg font-bold"> {{$this->users}}</p>
