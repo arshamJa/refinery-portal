@@ -40,12 +40,12 @@ class ScriptoriumReport extends Component
             return $query->paginate(3);
         }else{
             return Meeting::with('meetingUsers')
-                ->where('title', 'like', '%' . $this->search . '%')
-                ->orWhere('scriptorium', 'like', '%' . $this->search . '%')
-                ->orWhere('location', 'like', '%' . $this->search . '%')
-                ->orWhere('date', 'like', '%' . $this->search . '%')
-                ->where('scriptorium', '=', auth()->user()->user_info->full_name)
-                ->where('is_cancelled', '=', -1)
+                ->where('scriptorium', '=' ,auth()->user()->user_info->full_name)
+                ->where('is_cancelled', '=','-1')
+//                ->where('title', 'like', '%' . $this->search . '%')
+//                ->orWhere('scriptorium', 'like', '%' . $this->search . '%')
+//                ->orWhere('location', 'like', '%' . $this->search . '%')
+//                ->orWhere('date', 'like', '%' . $this->search . '%')
                 ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled'])
                 ->paginate(3);
         }

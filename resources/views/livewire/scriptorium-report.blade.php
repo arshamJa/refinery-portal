@@ -44,7 +44,7 @@
                                     <x-text-input wire:model.live="end_date"/>
                                 </div>
                             </div>
-                            <x-text-input wire:model.live="search" placeholder="جست و جو" class="mt-4" dir="rtl"/>
+{{--                    <x-text-input wire:model.live="search" placeholder="جست و جو" class="mt-4" dir="rtl"/>--}}
                         </div>
                     </div>
                     <!-- Table Body -->
