@@ -242,7 +242,8 @@ return [
         'current_password' => 'رمز فعلی',
         'photo' => 'عکس',
         'initiator' => 'اقدام کننده',
-        'time_out' => 'مهلت اقدام'
+        'time_out' => 'مهلت اقدام',
+        'checkBox' => 'تیک گزینه'
     ],
 
 ];

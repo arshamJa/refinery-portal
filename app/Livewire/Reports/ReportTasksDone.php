@@ -58,8 +58,6 @@ class ReportTasksDone extends Component
             $query = Task::query();
             $query->where('sent_date', '>', $startDate)
                 ->where('sent_date', '<', $endDate);
-            $query->where('time_out', '>', $startDate)
-                ->where('time_out', '<', $endDate);
             return $query->paginate(3);
         } else {
             return $tasks;

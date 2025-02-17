@@ -1,5 +1,4 @@
 <div>
-    <x-sessionMessage name="status"/>
     <x-template>
 {{--        <div wire:ignore class="w-80">--}}
 {{--            <canvas id="myChart"></canvas>--}}

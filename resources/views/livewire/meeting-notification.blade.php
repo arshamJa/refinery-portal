@@ -102,7 +102,7 @@
                                         {{--                                                class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meeting->reason_for_absent ?? null}}</span>--}}
                                         {{--                                        @endif--}}
                                     </span>
-                                    <x-primary-button wire:click="markNotification({{$meeting->id}} , {{ auth()->user()->id}} )">{{__('متوجه شدم')}}</x-primary-button>
+                                    <x-primary-button wire:click="markNotification({{$meeting->id}})">{{__('متوجه شدم')}}</x-primary-button>
                                 </div>
                             </div>
                         </div>

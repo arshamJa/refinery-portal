@@ -37,11 +37,14 @@ class MeetingNotification extends Component
             ->get(['id','meeting_id','user_id','is_present','reason_for_absent']);
     }
 
-    public function markNotification($id, $userId)
+    public function markNotification($id)
     {
-        MeetingUser::where('meeting_id',$id)->where('user_id',$userId)->update([
-            'read_by_user' => true
-        ]);
+        DB::table('meeting_users')
+            ->where('meeting_id',$id)
+            ->where('user_id', auth()->user()->id)
+            ->update([
+                'read_by_user' => true
+            ]);
         return redirect()->back();
     }
 

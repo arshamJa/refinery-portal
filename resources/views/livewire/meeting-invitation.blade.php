@@ -113,6 +113,36 @@
                                     @endif
                                 </div>
                             </div>
+
+                            @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '-1')
+                                <form action="{{route('sendInvitation',$meetingUser->meeting->id)}}" method="post">
+                                    @csrf
+                                    <p>{{__('در صورت انتخاب جانشین :')}}</p>
+                                    <div class="w-full" dir="rtl">
+                                        <input type="checkbox" name="checkBox"  @checked(old('checkBox'))>
+                                        <span>
+                                            {{__('در جلسه نمیتوانم شرکت کنم ولی جانشین این جانب، آقا/خانم')}}
+                                            <x-text-input name="full_name" value="{{old('full_name')}}" placeholder="نام و نام خانوادگی" class="w-60 mx-2"/>
+                                        </span>
+                                        <span>
+                                            {{__('و شماره پرسنلی')}}
+                                            <x-text-input name="p_code" value="{{old('p_code')}}" placeholder="شماره پرسنلی" class="w-40 mx-2"/>
+                                        </span>
+                                        <span>{{__('در جلسه مذکور شرکت می نماید')}}</span>
+                                        <x-primary-button type="submit">{{__('ارسال دعوتنامه به جانشین')}}</x-primary-button>
+                                    </div>
+                                    @if ($errors->any())
+                                        <div class="text-sm text-red-600 dark:text-red-400 space-y-1">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+                                </form>
+                            @endif
+
                         </div>
                     </div>
                 </div>

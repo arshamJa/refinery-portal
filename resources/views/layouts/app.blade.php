@@ -29,6 +29,7 @@
 <livewire:layout.navigation/>
 
 <main>
+    <x-sessionMessage name="status"/>
     {{ $slot }}
 </main>
 

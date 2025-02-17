@@ -44,7 +44,17 @@
                     class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
                     <!-- Search Bar -->
                     <div class="w-full md:w-1/2">
-                        <x-text-input wire:model.live="search" placeholder="جست و جو" class="mt-4" dir="rtl"/>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                {{--                                <x-input-label value="{{__('از')}}" class="mb-2"/>--}}
+                                <x-text-input wire:model.live="start_date" placeholder="از"/>
+                            </div>
+                            <div>
+                                {{--                                <x-input-label value="{{__('تا')}}" class="mb-2"/>--}}
+                                <x-text-input wire:model.live="end_date" placeholder="تا"/>
+                            </div>
+                        </div>
+{{--                        <x-text-input wire:model.live="search" placeholder="جست و جو" class="mt-4" dir="rtl"/>--}}
                     </div>
                 </div>
                 <!-- Table Body -->

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('meeting_users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('meeting_id')->constrained();
-            $table->foreignId('user_id')->constrained(); // همون اعضای جلسه است
+            $table->foreignId('user_id')->constrained(); //همون اعضای جلسه است
             $table->smallInteger('is_present')->default('0');
             $table->text('reason_for_absent')->nullable();
             $table->boolean('read_by_scriptorium')->default(false);

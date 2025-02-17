@@ -15,7 +15,11 @@ trait MessageReceived
         $send_invitation = MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
 
         // invitations result
-        $invitations_result = MeetingUser::where('is_present','!=' , '0')->where('read_by_scriptorium',false)->count();
+        $invitations_result = MeetingUser::with('meeting')
+            ->where('is_present','!=' , '0')
+            ->where('read_by_scriptorium',false)
+            ->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)
+            ->count();
 
         // to send final result of meeting to participants
         $meeting_final_result = MeetingUser::with('meeting')
