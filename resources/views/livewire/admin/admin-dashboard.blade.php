@@ -1,5 +1,5 @@
 <div>
-    <x-template>
+{{--    <x-template>--}}
 {{--        <div wire:ignore class="w-80">--}}
 {{--            <canvas id="myChart"></canvas>--}}
 {{--        </div>--}}
@@ -46,5 +46,5 @@
             </div>
         </div>
         <x-notifications/>
-    </x-template>
+{{--    </x-template>--}}
 </div>
