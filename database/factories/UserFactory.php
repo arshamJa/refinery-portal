@@ -26,7 +26,7 @@ class UserFactory extends Factory
         return [
             'password' => static::$password ??= Hash::make('12345678'),
             'p_code' => fake()->randomNumber(6, true),
-            'role' => fake()->randomKey(['operator'=> 1, 'employee'=> 3, 'admin'=> 4 ]),
+            'role' => fake()->randomKey(['employee'=> 1]),
         ];
     }
     /**

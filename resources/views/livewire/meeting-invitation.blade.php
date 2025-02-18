@@ -209,7 +209,7 @@
     </nav>
     <div wire:poll.visible.60s>
         @foreach($this->meetingUsers as $meetingUser)
-            <div class="space-y-5">
+            <div class="space-y-5 mb-2">
                 <div class="bg-teal-50 rounded-lg p-4 dark:bg-teal-800/30">
                     <div class="flex">
                         <div class="shrink-0">
@@ -369,6 +369,6 @@
 {{--            class="flex flex-col md:flex-row mt-4 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">--}}
 {{--            {{ $this->meetingUsers->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
 {{--        </nav>--}}
-{{--    </div>--}}
+    </div>
     {{--            </x-template>--}}
 </div>
