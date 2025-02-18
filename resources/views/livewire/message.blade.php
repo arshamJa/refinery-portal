@@ -60,7 +60,7 @@
                class="flex justify-between items-center gap-x-4 bg-transparent text-black hover:bg-[#9DDE8B] hover:text-[#FFFAEC] border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                 <h3 class="text-sm font-semibold"> {{__('نتیجه نهایی جلسات')}}</h3>
                 <span
-                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{ $this->read_by_user }}</span>
+                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->read_by_user}}</span>
             </a>
         </div>
 

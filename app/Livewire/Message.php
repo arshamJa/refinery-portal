@@ -26,6 +26,7 @@ class Message extends Component
     {
         return MeetingUser::with('meeting')
             ->where('user_id',auth()->user()->id)
+            ->whereRelation('meeting','is_cancelled','!=','0')
             ->where('read_by_user',false)
             ->count();
     }

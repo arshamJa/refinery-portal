@@ -32,6 +32,7 @@ class MeetingController extends Controller
             ->select('user_infos.id','user_infos.full_name')
             ->whereNull('deleted_at')
             ->where('role','=','employee')
+            ->whereRelation('user_info','full_name','!=',auth()->user()->user_info->full_name)
             ->get();
         return view('meeting.create' , ['users' => $users]);
     }

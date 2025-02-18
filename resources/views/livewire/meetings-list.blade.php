@@ -38,8 +38,8 @@
         @endif
     </x-modal>
 
-    <x-template>
-        <nav class="flex justify-between mb-4">
+{{--    <x-template>--}}
+        <nav class="flex justify-between mb-4 mt-14">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
                     <a href="{{route('dashboard')}}" class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
@@ -166,5 +166,5 @@
                 {{ $this->meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
             </nav>
         </div>
-    </x-template>
+{{--    </x-template>--}}
 </div>

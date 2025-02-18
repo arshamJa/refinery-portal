@@ -140,6 +140,27 @@
                     <x-input-error :messages="$errors->get('body')" class="mt-2"/>
                 </div>
             </div>
+            <div class="bg-lime-300 p-4">
+                <input type="checkbox" wire:model="checkBox" @checked(old('checkBox'))>
+                <span>{{__('در جلسه نمیتوانم شرکت کنم ولی جانشین این جانب، آقا/خانم')}}
+            <input type="text" wire:model="full_name" value="{{old('full_name')}}" placeholder="نام و نام خانوادگی"
+                   class="w-52 mx-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                </span>
+                        <span>{{__('و شماره پرسنلی')}}
+                    <input type="text" wire:model="p_code" value="{{old('p_code')}}" placeholder="شماره پرسنلی"
+                           class="w-40 mr-2 ml-3 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                </span>
+                <span>{{__('در جلسه مذکور شرکت می نماید')}}</span>
+                @if ($errors->any())
+                    <div class="text-sm mt-2 text-red-600 dark:text-red-400 space-y-1">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
             <div class="flex flex-row justify-between px-6 gap-x-3 py-4 bg-gray-100">
                 <x-primary-button wire:click="deny({{$meeting_id}})">
                     {{ __('تایید') }}
@@ -149,26 +170,7 @@
                 </x-secondary-button>
             </div>
         @endif
-        <p>{{__('در صورت انتخاب جانشین فیلد زیر را پر کنید :')}}</p>
-        <input type="checkbox" wire:model="checkBox" @checked(old('checkBox'))>
-        <span>{{__('در جلسه نمیتوانم شرکت کنم ولی جانشین این جانب، آقا/خانم')}}
-            <input type="text" wire:model="full_name" value="{{old('full_name')}}" placeholder="نام و نام خانوادگی"
-                   class="w-60 mx-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-        </span>
-        <span>{{__('و شماره پرسنلی')}}
-            <input type="text" wire:model="p_code" value="{{old('p_code')}}" placeholder="شماره پرسنلی"
-                   class="w-40 mr-2 ml-3 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-        </span>
-        <span>{{__('در جلسه مذکور شرکت می نماید')}}</span>
-        @if ($errors->any())
-            <div class="text-sm mt-2 text-red-600 dark:text-red-400 space-y-1">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+
     </x-modal>
 
     {{--            <x-template>--}}
@@ -200,10 +202,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li>
-                            <span
-                                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                                {{__('لیست دعوتنامه')}}
-                            </span>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                {{__('لیست دعوتنامه')}}
+            </span>
             </li>
         </ol>
     </nav>
@@ -236,8 +238,8 @@
                                                 {{__(' دعوت شده اید ')}}
                                             </span>
                             </p>
-                            <div class="flex justify-between items-center">
-                                <a href="#" class="hover:underline">{{__('نمایش جزئیات')}}</a>
+                            <div class="flex justify-end items-center">
+{{--                                <a href="#" class="hover:underline">{{__('نمایش جزئیات')}}</a>--}}
                                 <div>
                                     @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '1')
                                         <span class="text-green-600">{{__('شما دعوت به این جلسه را پذیرفتید')}}</span>
@@ -260,6 +262,10 @@
                 </div>
             </div>
         @endforeach
+            <div
+                class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
+                {{ $this->meetingUsers->withQueryString()->links(data:['scrollTo'=>false]) }}
+            </div>
 
 {{--        <label for="simple-search" class="sr-only">Search</label>--}}
 {{--        <div class="relative w-full">--}}

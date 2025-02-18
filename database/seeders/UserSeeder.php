@@ -18,16 +18,22 @@ class UserSeeder extends Seeder
            'role' => 'admin',
             'password' => Hash::make('12345678'),
             'p_code' => fake()->randomNumber(6, true),
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table('users')->insert([
             'role' => 'operator_news',
             'password' => Hash::make('12345678'),
             'p_code' => fake()->randomNumber(6, true),
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table('users')->insert([
             'role' => 'operator_phones',
             'password' => Hash::make('12345678'),
             'p_code' => fake()->randomNumber(6, true),
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
     }
 }

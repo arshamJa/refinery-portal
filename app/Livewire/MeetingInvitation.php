@@ -108,8 +108,6 @@ class MeetingInvitation extends Component
                 'full_name' => 'شخص جانشین قبلا دعوت به جلسه شده است'
             ]);
         }
-
-
         $meeting = MeetingUser::find($meetingId);
         $meeting->is_present = '-1';
         $meeting->reason_for_absent = $this->body;
