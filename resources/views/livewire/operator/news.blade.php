@@ -34,8 +34,8 @@
         @endcan
 
 
-    <x-template>
-        <div class="bg-white md:pt-10 pt-16 px-2" dir="rtl">
+{{--    <x-template>--}}
+        <div class="bg-white md:pt-10 pt-16 px-2 mt-10" dir="rtl">
                 <div class="flex justify-between items-end max-w-full gap-x-8">
                     <input wire:model.live.debounce.500ms="search" type="text" dir="rtl"
                            placeholder="عنوان اخبار"
@@ -89,6 +89,6 @@
                     {{$this->blogs->withQueryString()->links(data:['scrollTo'=>false]) }}
                 </nav>
             </div>
-    </x-template>
+{{--    </x-template>--}}
 
 </div>

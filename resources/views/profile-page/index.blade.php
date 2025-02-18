@@ -4,8 +4,8 @@
 
 
 
-    <x-template>
-            <div class="space-y-6">
+{{--    <x-template>--}}
+            <div class="space-y-6 mt-14">
                 <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                     <div class="max-w-xl">
                         {{ __('انتخاب عکس پروفایل') }}
@@ -144,5 +144,5 @@
                     </div>
                 </div>
             </div>
-    </x-template>
+{{--    </x-template>--}}
 </x-app-layout>

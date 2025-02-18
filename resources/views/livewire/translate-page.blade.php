@@ -1,6 +1,6 @@
 <div>
 
-    <x-template>
+{{--    <x-template>--}}
           <div class="container" dir="ltr">
             <div class="card input-wrapper">
                 <div class="from">
@@ -66,7 +66,7 @@
                 <textarea id="output-text" cols="30" rows="10" disabled></textarea>
             </div>
         </div>
-    </x-template>
+{{--    </x-template>--}}
 
 
     <script>

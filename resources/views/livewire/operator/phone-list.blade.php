@@ -44,9 +44,8 @@
         </x-modal>
     @endcan
 
-    <x-template>
-        {{--        <div class="h-auto bg-gray-500">--}}
-            <div class="max-w-screen-2xl">
+{{--    <x-template>--}}
+            <div class="max-w-screen-2xl mt-14">
                 <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
                     <!-- Table Header -->
                     <div
@@ -240,8 +239,7 @@
                     </div>
 
                 </div>
-            </div>
-{{--        </div>--}}
-    </x-template>
+        </div>
+{{--    </x-template>--}}
 
 </div>
