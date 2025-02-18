@@ -27,20 +27,16 @@
 <body class="font-sans antialiased bg-gray-50">
 
 {{--<livewire:layout.navigation/>--}}
-<div x-data="{ open: false }" dir="rtl">
+<div dir="rtl"
+    x-data="{ open: true }"
+>
     <!-- Top Navigation Bar -->
     <x-navigation/>
     <div class="flex flex-1">
         <!-- Sidebar -->
-        <aside :class="{'translate-x-full': !open, 'translate-x-0': open}"
-               x-transition:enter="ease-out duration-300"
-               x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-               x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-               x-transition:leave="ease-in duration-200"
-               x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-               x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-               x-cloak
-               class="fixed pt-20 inset-y-0 right-0 top-0 bottom-0 z-20 min-h-dvh bg-gray-800 text-white w-64 pr-3 transform transition-transform duration-300 md:static md:translate-x-0">
+        <aside
+            :class="{'translate-x-full': open, 'translate-x-0': !open}"
+            class="fixed pt-20 inset-y-0 right-0 top-0 bottom-0 z-20 min-h-dvh bg-gray-800 text-white w-64 pr-3 transform transition-transform duration-300 md:static md:translate-x-0">
             <x-side-bar/>
         </aside>
 
@@ -52,8 +48,6 @@
 
     </div>
 </div>
-
-
 
 
 @livewireScripts

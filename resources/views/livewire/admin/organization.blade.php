@@ -3,7 +3,7 @@
 
     <x-sessionMessage name="status"/>
 
-    <x-template>
+{{--    <x-template>--}}
         <x-organizationDepartmentHeader/>
         <!-- Start coding here -->
         <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
@@ -76,5 +76,5 @@
                 </nav>
             </div>
         </div>
-    </x-template>
+{{--    </x-template>--}}
 </div>

@@ -1,7 +1,7 @@
 <div>
 
     <x-header header="ارتباط سامانه با دپارتمان"/>
-    <x-template>
+{{--    <x-template>--}}
         <div class="py-12" dir="rtl">
             <div class="max-w-7xl sm:px-6 lg:px-8 space-y-6">
                 <form wire:submit="create">
@@ -24,5 +24,5 @@
                 </form>
             </div>
         </div>
-    </x-template>
+{{--    </x-template>--}}
 </div>

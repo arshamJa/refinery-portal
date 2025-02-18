@@ -97,7 +97,7 @@
     @endcan
 
 
-    <x-template>
+{{--    <x-template>--}}
         <x-organizationDepartmentHeader/>
 
 
@@ -216,7 +216,7 @@
             </div>
         </div>
 
-    </x-template>
+{{--    </x-template>--}}
 
 
 </div>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <div>
         <x-sessionMessage name="status"/>
-        <x-template>
+{{--        <x-template>--}}
             <x-organizationDepartmentHeader/>
 {{--            <div class="py-12 bg-gray-100" dir="rtl">--}}
 {{--                <div class="max-w-7xl sm:px-6 lg:px-8 space-y-6">--}}
@@ -144,6 +144,6 @@
 
 {{--                </div>--}}
 {{--            </div>--}}
-        </x-template>
+{{--        </x-template>--}}
     </div>
 </x-app-layout>
