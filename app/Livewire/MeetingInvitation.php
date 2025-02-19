@@ -22,39 +22,23 @@ class MeetingInvitation extends Component
 {
     use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks;
     public $meeting;
-    public $meeting_id;
+    public $meetingId;
     public $body;
+    public $checkBox;
+    public $full_name;
+    public $p_code;
+    public ?string $search = '';
+
     public function render()
     {
         return view('livewire.meeting-invitation');
     }
-    public ?string $search = '';
-
     #[Computed]
     public function meetingUsers()
     {
         return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled')
             ->where('user_id',auth()->user()->id)
-            ->select('id','meeting_id','user_id','is_present')->paginate(3);
-    }
-
-    public function denyMeeting($meetingId)
-    {
-        Meeting::where('id', $meetingId)->update([
-            'is_cancelled' => '-1'
-        ]);
-        $this->close();
-    }
-    public function openModalDelete($meetingId)
-    {
-        $this->meeting = Meeting::where('id',$meetingId)->value('title');
-        $this->meeting_id = $meetingId;
-        $this->dispatch('crud-modal', name: 'delete');
-    }
-    public function close()
-    {
-        $this->dispatch('close-modal');
-        return redirect()->back();
+            ->select('id','meeting_id','user_id','is_present','replacement')->paginate(3);
     }
     public function accept($meetingId)
     {
@@ -62,24 +46,22 @@ class MeetingInvitation extends Component
         $meeting->is_present = '1';
         $meeting->save();
     }
-
-
-    public function openModalDeny($meetingId)
+    public function openModalDeny($meeting_id)
     {
-        $this->meeting = Meeting::where('id',$meetingId)->value('title');
-        $this->meeting_id = $meetingId;
-        $this->dispatch('crud-modal', name: 'delete');
+        $this->meeting = Meeting::where('id',$meeting_id)->value('title');
+        $this->meetingId = $meeting_id;
+        $this->dispatch('crud-modal', name: 'deny');
     }
-
-
-    public $checkBox;
-    public $full_name;
-    public $p_code;
     /**
+     * this one will open modal and U can type your reason for absence and select replacement,
+     * and it will send invitation to the selected person.
      * @throws ValidationException
      */
     public function deny($meetingId)
     {
+        $this->validate([
+            'body' => ['required','string','max:255',new farsi_chs()]
+        ]);
         if ($this->checkBox || $this->full_name || $this->p_code){
             $this->validate([
                 'checkBox' => ['required'],
@@ -87,16 +69,29 @@ class MeetingInvitation extends Component
                 'p_code' => ['required','numeric','digits:6']
             ]);
             $full_name = Str::deduplicate($this->full_name);
-            $userId = UserInfo::where('full_name',$full_name)->value('user_id');
+            $user = UserInfo::where('full_name',$full_name)->value('user_id');
+            $userId = User::where('id',$user)->value('id');
                 if ($this->checkBox){
                     if (UserInfo::where('user_id',$userId)->where('full_name',$full_name)->exists()){
                         if (User::where('p_code',$this->p_code)->exists()){
-                            if (MeetingUser::where('meeting_id',$meetingId)->where('user_id',$userId)->exists()){
+                            if (MeetingUser::where('meeting_id',$meetingId)->value('user_id') == $userId ){
                                 throw ValidationException::withMessages([
                                     'full_name' => 'شخص جانشین قبلا دعوت به جلسه شده است'
                                 ]);
                             }else{
-                                dd('you can send invitation to this person');
+
+                                $meeting = MeetingUser::where('meeting_id',$meetingId)
+                                    ->where('user_id',auth()->user()->id)
+                                    ->update([
+                                        'is_present' => '-1',
+                                        'reason_for_absent' => $this->body,
+                                        'replacement' => $userId
+                                    ]);
+                                $meetingUser = MeetingUser::create([
+                                   'meeting_id' => $meetingId,
+                                    'user_id' => $userId
+                                ]);
+                                $this->close();
                             }
                         }else{
                             throw ValidationException::withMessages([
@@ -121,5 +116,10 @@ class MeetingInvitation extends Component
             $this->close();
         }
 
+    }
+    public function close()
+    {
+        $this->dispatch('close-modal');
+        return redirect()->back();
     }
 }

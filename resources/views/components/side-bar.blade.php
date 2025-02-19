@@ -150,6 +150,13 @@
                 :active="request()->is('employee/access')">{{__('جدول دسترسی کاربران')}}
             </x-link.responsive-link>
         @endcan
+
+        <x-link.responsive-link
+            href="{{route('calender')}}"
+            :active="request()->is('calender')">{{__('تقویم')}}
+        </x-link.responsive-link>
+
+
     </li>
 </ul>
 <div class="absolute bottom-2 left-0 w-full pr-3">

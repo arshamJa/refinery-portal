@@ -57,7 +57,7 @@
                 </li>
             </ol>
         </nav>
-        <div wire:poll.visible.60s class="pt-4 sm:px-10 sm:pt-6 border-2">
+        <div wire:poll.visible.60s class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
             <label for="simple-search" class="sr-only">Search</label>
             <div class="relative w-1/2">
                 <div

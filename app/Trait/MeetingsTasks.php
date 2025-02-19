@@ -26,7 +26,7 @@ trait MeetingsTasks
     {
         return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled')
             ->where('user_id',auth()->user()->id)
-            ->get(['id','meeting_id','user_id','is_present']);
+            ->get(['id','meeting_id','user_id','is_present','replacement']);
     }
     #[Computed]
     public function tasks()

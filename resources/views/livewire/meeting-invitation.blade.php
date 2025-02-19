@@ -114,8 +114,8 @@
     {{--    </div>--}}
 
 
-    <x-modal name="delete">
-        @if($meeting_id)
+    <x-modal name="deny">
+        @if($meetingId)
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
                 <div class="sm:flex sm:items-center mb-4 border-b pb-3">
                     <div
@@ -163,7 +163,7 @@
                 @endif
             </div>
             <div class="flex flex-row justify-between px-6 gap-x-3 py-4 bg-gray-100">
-                <x-primary-button wire:click="deny({{$meeting_id}})">
+                <x-primary-button wire:click="deny({{$meetingId}})">
                     {{ __('تایید') }}
                 </x-primary-button>
                 <x-secondary-button wire:click="close">
@@ -171,9 +171,7 @@
                 </x-secondary-button>
             </div>
         @endif
-
     </x-modal>
-
     {{--            <x-template>--}}
     <nav class="flex justify-between mb-4 mt-14">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -226,7 +224,7 @@
                                 </span>
                         </div>
                         <div class="ms-3 w-full">
-                            <h3 class="text-gray-800 font-semibold dark:text-white">
+                            <h3 class="text-gray-800 dark:text-white">
                                 {{$meetingUser->meeting->title}}
                             </h3>
                             <p class="text-sm text-gray-700 pb-4 dark:text-neutral-400">
@@ -239,19 +237,24 @@
                                                 {{__(' دعوت شده اید ')}}
                                             </span>
                             </p>
-                            <div class="flex justify-end items-center">
+                            <div class="flex items-center">
 {{--                                <a href="#" class="hover:underline">{{__('نمایش جزئیات')}}</a>--}}
                                 <div>
                                     @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '1')
-                                        <span class="text-green-600">{{__('شما دعوت به این جلسه را پذیرفتید')}}</span>
+                                        {{__('شما دعوت به این جلسه را')}}<span class="text-green-700">{{__(' پذیرفتید')}}</span>
                                     @elseif($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '-1')
-                                        <span class="text-red-600">{{__('شما دعوت به این جلسه را نپذیرفتید')}}</span>
+                                        {{__('شما دعوت به این جلسه را')}}<span class="text-red-600 font-bold">{{__(' نپذیرفتید')}}</span>
+                                        @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('replacement'))
+                                            {{__('و آقا/خانم')}}
+                                            <span class="text-green-700">{{$meetingUser?->replacementName()}}</span>
+                                            {{__(' به عنوان جانشین خود انتخاب کردید')}}
+                                        @endif
                                     @else
                                         <button wire:click="accept({{$meetingUser->id}})"
                                                 class="px-3 py-1.5 mb-2 bg-gray-800 border border-transparent rounded-md text-sm text-white">
                                             {{('قبول')}}
                                         </button>
-                                        <button wire:click="openModalDeny({{$meetingUser->id}})"
+                                        <button wire:click="openModalDeny({{$meetingUser->meeting_id}})"
                                                 class="px-3 py-1.5 mb-2 bg-red-600 border border-transparent rounded-md text-sm text-white">
                                             {{('رد')}}
                                         </button>

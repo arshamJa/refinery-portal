@@ -19,7 +19,8 @@ class MeetingUser extends Model
         'is_present',
         'reason_for_absent',
         'read_by_scriptorium',
-        'read_by_user'
+        'read_by_user',
+        'replacement'
     ];
 
 
@@ -49,5 +50,12 @@ class MeetingUser extends Model
     public function sentDate()
     {
         return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
+    }
+
+    public function replacementName()
+    {
+            return UserInfo::with('user')
+                ->whereRelation('user','id','=',$this->replacement)
+                ->value('full_name');
     }
 }

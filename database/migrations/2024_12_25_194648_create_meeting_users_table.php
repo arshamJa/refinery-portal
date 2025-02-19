@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('reason_for_absent')->nullable();
             $table->boolean('read_by_scriptorium')->default(false);
             $table->boolean('read_by_user')->default(false);
+            $table->string('replacement')->nullable();
             $table->timestamps();
         });
     }
