@@ -28,7 +28,7 @@ class TaskManagementController extends Controller
     public function create(string $meeting)
     {
         $meetings = Meeting::find($meeting);
-        $meetingUsers = MeetingUser::where('meeting_id',$meeting)->get();
+        $meetingUsers = MeetingUser::where('meeting_id',$meeting)->where('is_present','=','1')->get();
         $tasks = Task::with('user')->where('meeting_id',$meeting)->get();
         return view('task.create' , [
             'meetings' => $meetings,

@@ -1,28 +1,27 @@
 <div>
-
     <div class="mt-10 shadow rounded-lg p-6">
-            <div class="flex justify-between items-center mb-4">
-                <button id="prev-month" class="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 mr-2">&lt;</button>
-                <h2 class="text-2xl font-bold" id="month-year"></h2>
-                <button id="next-month" class="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300">&gt;</button>
-            </div>
-
-            <table class="w-full">
-                <thead>
-                <tr class="text-gray-500">
-                    <th class="py-2">شنبه</th>
-                    <th class="py-2">یکشنبه</th>
-                    <th class="py-2">دوشنبه</th>
-                    <th class="py-2">سه‌شنبه</th>
-                    <th class="py-2">چهارشنبه</th>
-                    <th class="py-2">پنجشنبه</th>
-                    <th class="py-2">جمعه</th>
-                </tr>
-                </thead>
-                <tbody id="calendar-body">
-                </tbody>
-            </table>
+        <div class="flex justify-between items-center mb-4">
+            <button id="prev-month" class="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 mr-2">&lt;</button>
+            <h2 class="text-2xl font-bold" id="month-year"></h2>
+            <button id="next-month" class="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300">&gt;</button>
         </div>
+
+        <table class="w-full">
+            <thead>
+            <tr class="text-gray-500">
+                <th class="py-2">شنبه</th>
+                <th class="py-2">یکشنبه</th>
+                <th class="py-2">دوشنبه</th>
+                <th class="py-2">سه‌شنبه</th>
+                <th class="py-2">چهارشنبه</th>
+                <th class="py-2">پنجشنبه</th>
+                <th class="py-2">جمعه</th>
+            </tr>
+            </thead>
+            <tbody id="calendar-body">
+            </tbody>
+        </table>
+    </div>
     <script>
         const monthYear = document.getElementById('month-year');
         const calendarBody = document.getElementById('calendar-body');

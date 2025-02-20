@@ -25,7 +25,7 @@ class PresentUsers extends Component
     {
         return MeetingUser::with('user','meeting')
             ->where('meeting_id',$this->meetingId)
-            ->get(['meeting_id','user_id','is_present','reason_for_absent']);
+            ->get(['meeting_id','user_id','is_present','reason_for_absent','replacement']);
     }
 
     #[Computed]

@@ -30,11 +30,20 @@ class TaskList extends Component
         $day = now()->day;
         $month = now()->month;
         $year = now()->year;
-        $nowTime = gregorian_to_jalali($year,$month,$day,'/');
-
+        $now = gregorian_to_jalali($year,$month,$day,'/');
+        $newTime = '';
+        if (preg_match("/^(\d+)\/(\d+)\/(\d+)$/", $now, $matches)) {
+            $year = $matches[1];
+            $month = $matches[2];
+            $day = $matches[3];
+            if ($day >= 1 && $day <= 9) {
+                $newDay = "0" . $day;
+                $newTime = $year.'/'.$month.'/'.$newDay;
+            }
+        }
         $task = Task::find($taskId);
         $task->is_completed = true;
-        $task->sent_date = $nowTime;
+        $task->sent_date = $newTime;
         $task->save();
         $this->redirectRoute('attended.meetings');
     }

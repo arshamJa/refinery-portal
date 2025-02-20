@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Livewire;
-
 use Livewire\Component;
 
 class Calender extends Component
@@ -10,4 +9,6 @@ class Calender extends Component
     {
         return view('livewire.calender');
     }
+
 }
+

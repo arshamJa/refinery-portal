@@ -40,6 +40,4 @@
             <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
         </a>
     </div>
-
-
 </div>

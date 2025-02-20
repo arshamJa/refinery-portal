@@ -41,24 +41,51 @@ class MeetingController extends Controller
      * Store a newly created resource in storage.
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(MeetingStoreRequest $request)
+    public function store(Request $request)
     {
+        $gr_day = now()->day;
+        $gr_month = now()->month;
+        $gr_year = now()->year;
+        $time = gregorian_to_jalali($gr_year,$gr_month,$gr_day,'/');
+        $parts = explode("/", $time);
+        $ja_year = $parts[0];
+        $ja_month = $parts[1];
+        $ja_day = $parts[2];
 
-
+        $date = '';
+        if ($request->year < $ja_year){
+            throw ValidationException::withMessages([
+               'year' => 'سال گذشته نباید باشد'
+            ]);
+        }else{
+            if ($request->year >= $ja_year && $request->month < $ja_month){
+                throw ValidationException::withMessages([
+                   'month' => 'ماه گذشته نباید باشد'
+                ]);
+            }else{
+                if ($request->year >= $ja_year && $request->month >= $ja_month && $request->day < $ja_day){
+                    throw ValidationException::withMessages([
+                       'day' => 'روز گذشته نباید باشد'
+                    ]);
+                }
+                else{
+                    $date = $request->year .'/'. $request->month .'/'. $request->day;
+                }
+            }
+        }
+        dd($date);
         $holders =  Str::of($request->holders)->split('/[\s,]+/');
-
-        $date = $request->date;
-
-        $g_day = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] < 10 ?
-            '0' . jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] :
-            jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2];
-
-        $g_month = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[1] < 10 ?
-            '0' . jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[1]
-            : jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[1];
-
-        $g_year = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[0];
-        $gregorian_format = $g_month . '/' . $g_day . '/' . $g_year;
+//        $date = $request->date;
+//        $g_day = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] < 10 ?
+//            '0' . jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] :
+//            jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2];
+//
+//        $g_month = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[1] < 10 ?
+//            '0' . jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[1]
+//            : jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[1];
+//
+//        $g_year = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[0];
+//        $gregorian_format = $g_month . '/' . $g_day . '/' . $g_year;
 
 
         $oldDate = Meeting::where('date',$request->date)->value('date');
@@ -74,7 +101,7 @@ class MeetingController extends Controller
                 'unit_organization' => $request->unit_organization,
                 'scriptorium' => $request->scriptorium,
                 'location' => $request->location,
-                'date' => $request->date,
+                'date' => $date,
                 'time' => $request->time,
                 'unit_held' => $request->unit_held,
                 'treat' => $request->treat,

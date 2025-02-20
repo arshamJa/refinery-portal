@@ -72,7 +72,7 @@
                 </div>
                 <input type="text" wire:model.live="search" id="simple-search" dir="rtl"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"
-                       placeholder="جست و جو وظایف ..." required="">
+                       placeholder="جست و جو ..." required="">
             </div>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead
