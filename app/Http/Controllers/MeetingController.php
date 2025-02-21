@@ -41,7 +41,7 @@ class MeetingController extends Controller
      * Store a newly created resource in storage.
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request)
+    public function store(MeetingStoreRequest $request)
     {
         $gr_day = now()->day;
         $gr_month = now()->month;
@@ -58,12 +58,12 @@ class MeetingController extends Controller
                'year' => 'سال گذشته نباید باشد'
             ]);
         }else{
-            if ($request->year >= $ja_year && $request->month < $ja_month){
+            if ($request->month < $ja_month){
                 throw ValidationException::withMessages([
                    'month' => 'ماه گذشته نباید باشد'
                 ]);
             }else{
-                if ($request->year >= $ja_year && $request->month >= $ja_month && $request->day < $ja_day){
+                if ($request->day < $ja_day){
                     throw ValidationException::withMessages([
                        'day' => 'روز گذشته نباید باشد'
                     ]);
@@ -73,7 +73,6 @@ class MeetingController extends Controller
                 }
             }
         }
-        dd($date);
         $holders =  Str::of($request->holders)->split('/[\s,]+/');
 //        $date = $request->date;
 //        $g_day = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] < 10 ?

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class TaskManagementController extends Controller
 {
@@ -43,9 +44,42 @@ class TaskManagementController extends Controller
     {
         $validated = $request->validate([
            'initiator' => ['required'],
-            'time_out' => ['required','date_format:Y/m/d' , new DateRule()],
+//            'time_out' => ['required','date_format:Y/m/d' , new DateRule()],
+            'year' => ['required'],
+            'month' => ['required'],
+            'day' => ['required'],
             'body' => ['required','string']
         ]);
+        $gr_day = now()->day;
+        $gr_month = now()->month;
+        $gr_year = now()->year;
+        $time = gregorian_to_jalali($gr_year,$gr_month,$gr_day,'/');
+        $parts = explode("/", $time);
+        $ja_year = $parts[0];
+        $ja_month = $parts[1];
+        $ja_day = $parts[2];
+
+        $date = '';
+        if ($request->year < $ja_year){
+            throw ValidationException::withMessages([
+                'year' => 'سال گذشته نباید باشد'
+            ]);
+        }else{
+            if ($request->month < $ja_month){
+                throw ValidationException::withMessages([
+                    'month' => 'ماه گذشته نباید باشد'
+                ]);
+            }else{
+                if ($request->day < $ja_day){
+                    throw ValidationException::withMessages([
+                        'day' => 'روز گذشته نباید باشد'
+                    ]);
+                }
+                else{
+                    $date = $request->year .'/'. $request->month .'/'. $request->day;
+                }
+            }
+        }
         $body = Str::deduplicate($request->body);
         $task = Task::create([
             'meeting_id' => $meeting,

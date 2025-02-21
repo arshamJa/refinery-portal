@@ -37,7 +37,7 @@ class InvitationsResult extends Component
             ->where('is_present','!=','0')
             ->where('read_by_scriptorium',false)
             ->whereRelation('meeting','scriptorium','=',auth()->user()->user_info->full_name)
-            ->get(['id','meeting_id','user_id','is_present','reason_for_absent']);
+            ->get(['id','meeting_id','user_id','is_present','reason_for_absent','replacement']);
     }
 
     public function markNotification(string $id)

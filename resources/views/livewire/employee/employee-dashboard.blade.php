@@ -1,6 +1,5 @@
+@php use App\Models\MeetingUser; @endphp
 <div>
-
-    @php use App\Models\MeetingUser; @endphp
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-14 lg:grid-cols-4 gap-6 mb-4 py-4 border-b">
         <a href="{{route('message')}}"
            class="flex justify-between items-center gap-x-4 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#3D3D3D] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
