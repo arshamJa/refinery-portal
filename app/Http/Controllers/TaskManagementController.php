@@ -37,8 +37,10 @@ class TaskManagementController extends Controller
             'tasks' => $tasks,
         ]);
     }
+
     /**
      * Store a newly created resource in storage.
+     * @throws ValidationException
      */
     public function store(Request $request,string $meeting)
     {
@@ -85,7 +87,7 @@ class TaskManagementController extends Controller
             'meeting_id' => $meeting,
             'user_id' => $request->initiator,
             'body' => $body,
-            'time_out' => $request->time_out
+            'time_out' => $date
         ]);
         return to_route('tasks.create',$meeting)->with('status','درج اقدام انجام شد');
     }

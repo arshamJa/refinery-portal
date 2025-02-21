@@ -52,27 +52,21 @@ class MeetingController extends Controller
         $ja_month = $parts[1];
         $ja_day = $parts[2];
 
-        $date = '';
-        if ($request->year < $ja_year){
+        // this is for not selecting the past
+        if ($request->year < $ja_year ||
+            ($request->year == $ja_year && $request->month < $ja_month) ||
+            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day))
+        {
             throw ValidationException::withMessages([
-               'year' => 'سال گذشته نباید باشد'
+                'year' => 'تاریخ گذشته نباید باشد'
             ]);
-        }else{
-            if ($request->month < $ja_month){
-                throw ValidationException::withMessages([
-                   'month' => 'ماه گذشته نباید باشد'
-                ]);
-            }else{
-                if ($request->day < $ja_day){
-                    throw ValidationException::withMessages([
-                       'day' => 'روز گذشته نباید باشد'
-                    ]);
-                }
-                else{
-                    $date = $request->year .'/'. $request->month .'/'. $request->day;
-                }
-            }
         }
+        // two lines below will check if the month and day is one digit , which will add 0 before it .
+        $new_month = sprintf("%02d", $request->month);
+        $new_day = sprintf("%02d", $request->day);
+
+        $newTime = $request->year . '/' . $new_month . '/' . $new_day;
+
         $holders =  Str::of($request->holders)->split('/[\s,]+/');
 //        $date = $request->date;
 //        $g_day = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] < 10 ?
@@ -87,8 +81,7 @@ class MeetingController extends Controller
 //        $gregorian_format = $g_month . '/' . $g_day . '/' . $g_year;
 
 
-        $oldDate = Meeting::where('date',$request->date)->value('date');
-        if (Meeting::where('date',$oldDate)->value('time') == $request->time){
+        if (Meeting::where('date', $newTime)->where('time', $request->time)->exists()) {
             throw ValidationException::withMessages([
                 'time' => 'در این زمان جلسه ثبت شده است'
             ]);
@@ -100,7 +93,7 @@ class MeetingController extends Controller
                 'unit_organization' => $request->unit_organization,
                 'scriptorium' => $request->scriptorium,
                 'location' => $request->location,
-                'date' => $date,
+                'date' => $newTime,
                 'time' => $request->time,
                 'unit_held' => $request->unit_held,
                 'treat' => $request->treat,
@@ -154,6 +147,32 @@ class MeetingController extends Controller
     public function update(MeetingStoreRequest $request, string $id)
     {
         $request->validated();
+
+
+        $gr_day = now()->day;
+        $gr_month = now()->month;
+        $gr_year = now()->year;
+        $time = gregorian_to_jalali($gr_year,$gr_month,$gr_day,'/');
+        $parts = explode("/", $time);
+        $ja_year = $parts[0];
+        $ja_month = $parts[1];
+        $ja_day = $parts[2];
+
+        // this is for not selecting the past
+        if ($request->year < $ja_year ||
+            ($request->year == $ja_year && $request->month < $ja_month) ||
+            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day))
+        {
+            throw ValidationException::withMessages([
+                'year' => 'تاریخ گذشته نباید باشد'
+            ]);
+        }
+        // two lines below will check if the month and day is one digit , which will add 0 before it .
+        $new_month = sprintf("%02d", $request->month);
+        $new_day = sprintf("%02d", $request->day);
+
+        $newTime = $request->year . '/' . $new_month . '/' . $new_day;
+
         $meeting = Meeting::find($id);
         $holders =  Str::of($request->holders)->split('/[\s,]+/');
 
@@ -168,7 +187,7 @@ class MeetingController extends Controller
         $meeting->unit_organization = $request->unit_organization;
         $meeting->scriptorium = $request->scriptorium;
         $meeting->location = $request->location;
-        $meeting->date = $request->date;
+        $meeting->date = $newTime;
         $meeting->time = $request->time;
         $meeting->unit_held =  $request->unit_held;
         $meeting->treat = $request->treat;

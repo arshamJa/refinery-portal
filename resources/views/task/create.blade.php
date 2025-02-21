@@ -70,35 +70,38 @@
                                 class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                             <option value="">...</option>
                             @foreach($meetingUsers as $meetingUser)
-                                <option
+                                <option @if (old('initiator') == $meetingUser->user_id) selected @endif
                                     value="{{$meetingUser->user_id}}">{{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}</option>
                             @endforeach
                         </select>
                         <x-input-error :messages="$errors->get('initiator')" class="my-2"/>
                     </div>
                     <div class="my-2 col-span-1">
-                        <x-input-label for="time_out" :value="__('مهلت اقدام')"/>
-                            <div class="flex">
-                                <div class="w-full flex items-center ">
-                                    <label for="month" class="block text-gray-700 text-sm">سال:</label>
-                                    <select name="year" id="year" dir="ltr"
-                                            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">...</option>
-                                        @for($i = 1400; $i <= 1440; $i++)
-                                            <option value="{{$i}}" @if (old('year') == $i) selected @endif>
-                                                {{$i}}
-                                            </option>
-                                        @endfor
-                                    </select>
+                        <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
+                            <div class="flex gap-2">
+                                <div class="w-full">
+                                    <div class="flex items-center gap-1">
+                                        <label for="month" class="block text-gray-700 text-sm">{{__('سال:')}}</label>
+                                        <select name="year" id="year" dir="ltr"
+                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                            <option value="">...</option>
+                                            @for($i = 1400; $i <= 1440; $i++)
+                                                <option value="{{$i}}" @if (old('year') == $i) selected @endif>
+                                                    {{$i}}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
                                     <x-input-error :messages="$errors->get('year')" class="my-2"/>
                                 </div>
-                                <div class="w-full flex items-center">
+                                <div class="w-full">
+                                    <div class="flex items-center gap-1">
                                     @php
                                         $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
                                     @endphp
-                                    <label for="month" class="block text-gray-700 text-sm">ماه:</label>
+                                    <label for="month" class="block text-gray-700 text-sm">{{__('ماه:')}}</label>
                                     <select name="month" id="month" dir="ltr"
-                                            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                                         <option value="">...</option>
                                         @for ($i = 1; $i <= 12; $i++)
                                             <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
@@ -106,12 +109,14 @@
                                             </option>
                                         @endfor
                                     </select>
+                                    </div>
                                     <x-input-error :messages="$errors->get('month')" class="my-2"/>
                                 </div>
-                                <div class="w-full flex items-center">
-                                    <label for="day" class="block text-gray-700 text-sm">روز:</label>
+                                <div class="w-full">
+                                    <div class="flex items-center gap-1">
+                                    <label for="day" class="block text-gray-700 text-sm">{{__('روز:')}}</label>
                                     <select name="day" id="day" dir="ltr"
-                                            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                                         <option value="">...</option>
                                         @for($i = 1; $i <= 31; $i++)
                                             <option value="{{$i}}" @if (old('day') == $i) selected @endif>
@@ -119,6 +124,7 @@
                                             </option>
                                         @endfor
                                     </select>
+                                    </div>
                                     <x-input-error :messages="$errors->get('day')" class="my-2"/>
                                 </div>
                             </div>

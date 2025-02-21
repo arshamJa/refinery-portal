@@ -90,11 +90,50 @@
                             </div>
 
                             <div class="sm:col-span-4">
-                                <x-input-label for="date" :value="__('تاریخ جلسه')"/>
-                                <x-text-input name="date" id="date"
-                                              value="{{$meeting->date}}"
-                                              class="block my-2 w-full" type="text" autofocus/>
-                                <x-input-error :messages="$errors->get('date')" class="my-2"/>
+                                <x-input-label for="date" :value="__('تاریخ جلسه')" class="mb-1.5"/>
+                                <div class="flex items-center">
+                                    <label for="month" class="block text-gray-700 text-sm">سال:</label>
+                                    <select name="year" id="year" dir="ltr"
+                                            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">...</option>
+                                        @for($i = 1400; $i <= 1440; $i++)
+                                            <option value="{{$i}}" @if (old('year') == $i) selected @endif>
+                                                {{$i}}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                    @php
+                                        $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+                                    @endphp
+                                    <label for="month" class="block text-gray-700 text-sm">ماه:</label>
+                                    <select name="month" id="month" dir="ltr"
+                                            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">...</option>
+                                        @for ($i = 1; $i <= 12; $i++)
+                                            <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
+                                                {{ $persian_months[$i - 1] }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                    <label for="day" class="block text-gray-700 text-sm">روز:</label>
+                                    <select name="day" id="day" dir="ltr"
+                                            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">...</option>
+                                        @for($i = 1; $i <= 31; $i++)
+                                            <option value="{{$i}}" @if (old('day') == $i) selected @endif>
+                                                {{$i}}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <x-input-error :messages="$errors->get('year')" class="my-2"/>
+                                <x-input-error :messages="$errors->get('month')" class="my-2"/>
+                                <x-input-error :messages="$errors->get('day')" class="my-2"/>
+                                {{--                    <x-text-input name="date" id="date"--}}
+                                {{--                                  value="{{old('date')}}"--}}
+                                {{--                                  class="block my-2 w-full" type="text"--}}
+                                {{--                                  placeholder="{{__('0000/00/00')}}" autofocus/>--}}
+                                {{--                    <x-input-error :messages="$errors->get('date')" class="my-2"/>--}}
                             </div>
 
                             <div class="sm:col-span-4">
