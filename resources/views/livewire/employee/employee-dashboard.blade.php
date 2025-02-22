@@ -2,7 +2,7 @@
 <div>
     <div class="max-w-full p-4 grid grid-cols-2 gap-x-8 mt-10 ">
         <div class="col-span-1 p-3">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6  border-b py-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-b py-4">
                 <div>
                     <a href="{{route('message')}}"
                        class="flex justify-between items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#3D3D3D] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
@@ -73,32 +73,47 @@
             </div>
         </div>
 
-        <div class="col-span-1 p-3 ">
-            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
-                <div class="flex items-center gap-x-2 mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600 mr-3" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    <h2 class="text-2xl font-semibold text-gray-800">{{__('جلسات')}}</h2>
-                </div>
-
-                <ul class="space-y-6">
-                    @foreach($this->meetingNotifications as $meetingNotification)
-                        <li class="flex flex-col justify-between sm:flex-row items-start border rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
-                            <div>
-                                <div class="text-lg font-medium text-gray-900">{{$meetingNotification->title}}</div>
-                                <div class="text-sm text-gray-700">{{$meetingNotification->location}}</div>
-                            </div>
-                            <div class="flex-shrink-0 mb-2 sm:mb-0 sm:mr-4">
-                                <div class="text-lg font-medium text-indigo-600">{{$meetingNotification->date}}</div>
-                                <div class="text-sm text-gray-500">{{$meetingNotification->time}}</div>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
+{{--        <div class="col-span-1 p-3 ">--}}
+{{--            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">--}}
+{{--                <div class="flex items-center gap-x-2 mb-6">--}}
+{{--                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600 mr-3" fill="none"--}}
+{{--                         viewBox="0 0 24 24" stroke="currentColor">--}}
+{{--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"--}}
+{{--                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>--}}
+{{--                    </svg>--}}
+{{--                    <h2 class="text-2xl font-semibold text-gray-800">{{__('جلساتی که باید شرکت کنم')}}</h2>--}}
+{{--                </div>--}}
+{{--                <ul class="space-y-6">--}}
+{{--                    <p>role = participant</p>--}}
+{{--                    @foreach($this->meetingsSchedule as $schedule)--}}
+{{--                        <li class="flex flex-col justify-between sm:flex-row items-start border rounded-lg p-4 hover:shadow-md transition-shadow duration-300">--}}
+{{--                            <div>--}}
+{{--                                <div class="text-lg font-medium text-gray-900">{{$schedule->title}}</div>--}}
+{{--                                <div class="text-sm text-gray-700">{{$schedule->location}}</div>--}}
+{{--                            </div>--}}
+{{--                            <div class="flex-shrink-0 mb-2 sm:mb-0 sm:mr-4">--}}
+{{--                                <div class="text-lg font-medium text-indigo-600">{{$schedule->date}}</div>--}}
+{{--                                <div class="text-sm text-gray-500">{{$schedule->time}}</div>--}}
+{{--                            </div>--}}
+{{--                        </li>--}}
+{{--                    @endforeach--}}
+{{--                </ul>--}}
+{{--                <ul class="space-y-6">--}}
+{{--                    <p>role = scriptorium</p>--}}
+{{--                    @foreach($this->meetingNotifications as $meetingNotification)--}}
+{{--                        <li class="flex flex-col justify-between sm:flex-row items-start border rounded-lg p-4 hover:shadow-md transition-shadow duration-300">--}}
+{{--                            <div>--}}
+{{--                                <div class="text-lg font-medium text-gray-900">{{$meetingNotification->title}}</div>--}}
+{{--                                <div class="text-sm text-gray-700">{{$meetingNotification->location}}</div>--}}
+{{--                            </div>--}}
+{{--                            <div class="flex-shrink-0 mb-2 sm:mb-0 sm:mr-4">--}}
+{{--                                <div class="text-lg font-medium text-indigo-600">{{$meetingNotification->date}}</div>--}}
+{{--                                <div class="text-sm text-gray-500">{{$meetingNotification->time}}</div>--}}
+{{--                            </div>--}}
+{{--                        </li>--}}
+{{--                    @endforeach--}}
+{{--                </ul>--}}
+{{--            </div>--}}
+{{--        </div>--}}
     </div>
 </div>

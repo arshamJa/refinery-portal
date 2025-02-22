@@ -49,16 +49,16 @@ class ReportTasksDone extends Component
         $tasks = Task::with('meeting')
             ->where('is_completed', true)
             ->whereColumn('sent_date', '<=', 'time_out')
-            ->where('sent_date', 'like', '%'.$this->search.'%')
-            ->paginate(3);
+//            ->where('sent_date', 'like', '%'.$this->search.'%')
+            ->get();
 
         $startDate = trim($this->start_date);
         $endDate = trim($this->end_date);
         if ($startDate && $endDate) {
             $query = Task::query();
-            $query->where('sent_date', '>', $startDate)
-                ->where('sent_date', '<', $endDate);
-            return $query->paginate(3);
+            $query->where('time_out', '>', $startDate)
+                ->where('time_out', '<', $endDate);
+            return $query->get();
         } else {
             return $tasks;
         }

@@ -45,7 +45,7 @@ class MeetingUser extends Model
     }
     public function deadLineTask()
     {
-        $time_out =  Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('time_out');
+        return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('time_out');
 //        if (preg_match("/^(\d+)\/(\d+)\/(\d+)$/", $time_out, $matches)) {
 //            $year = $matches[1];
 //            $month = $matches[2];

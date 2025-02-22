@@ -23,22 +23,17 @@ class ReportTaskNotDoneOnTime extends Component
     #[Computed]
     public function tasks()
     {
-        $tasks = Task::with('meeting')
-            ->where('is_completed',false)
-            ->where('sent_date',null)
-            ->paginate(3);
+        $query = Task::with('meeting')
+            ->where('is_completed', false)
+            ->where('sent_date', null);
 
         $startDate = trim($this->start_date);
         $endDate = trim($this->end_date);
+
         if ($startDate && $endDate) {
-            $query = Task::query();
-            $query->where('sent_date', '>', $startDate)
-                ->where('sent_date', '<', $endDate);
-            $query->where('time_out', '>', $startDate)
-                ->where('time_out', '<', $endDate);
-            return $query->paginate(3);
-        } else {
-            return $tasks;
+            $query->where('time_out', '>=', $startDate)
+                ->where('time_out', '<=', $endDate);
         }
+        return $query->get();
     }
 }

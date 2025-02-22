@@ -5,6 +5,7 @@ namespace App\Livewire\employee;
 
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Models\User;
 use App\Trait\MeetingsTasks;
 use App\Trait\MessageReceived;
 use App\Trait\Organizations;
@@ -12,6 +13,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
+use Nette\Schema\ValidationException;
 
 class EmployeeDashboard extends Component
 {
@@ -33,13 +35,25 @@ class EmployeeDashboard extends Component
             ->count();
     }
 
-    #[Computed]
-    public function meetingNotifications()
-    {
-        return Meeting::where('scriptorium',auth()->user()->user_info->full_name)
-            ->where('is_cancelled','-1')
-            ->get(['title','location','date','time']);
-    }
+
+    /**
+     * this is for scriptoriums only
+     */
+//    #[Computed]
+//    public function meetingNotifications()
+//    {
+//        return Meeting::where('scriptorium',auth()->user()->user_info->full_name)
+//            ->where('is_cancelled','-1')
+//            ->get(['title','location','date','time']);
+//    }
+//    #[Computed]
+//    public function meetingsSchedule()
+//    {
+//        return Meeting::with('meetingUsers')
+//            ->where('is_cancelled','=','-1')
+//            ->whereRelation('meetingUsers','user_id','=',auth()->user()->id)
+//            ->get(['title','location','date','time']);
+//    }
 
     #[Computed]
     public function invitation()

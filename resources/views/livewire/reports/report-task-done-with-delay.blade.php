@@ -46,6 +46,7 @@
                     <!-- Search Bar -->
                     <div class="w-full md:w-1/2">
                         <div class="grid grid-cols-2 gap-3">
+                            <p class="col-span-2" >{{__('فیلتر بر اساس تاریخ مهلت اقدام')}}</p>
                             <div>
                                 {{--                                <x-input-label value="{{__('از')}}" class="mb-2"/>--}}
                                 <x-text-input wire:model.live="start_date" placeholder="از"/>
@@ -91,10 +92,12 @@
                             @endforeach
                         </x-slot>
                     </x-table.table>
-                    <nav
-                        class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
-                        {{ $this->tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
-                    </nav>
+{{--                    @if(!$start_date || !$end_date)--}}
+{{--                    <nav--}}
+{{--                        class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">--}}
+{{--                        {{ $this->tasks->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
+{{--                    </nav>--}}
+{{--                    @endif--}}
                 </div>
             </div>
         </div>
