@@ -184,7 +184,7 @@
                 <th class="px-4 py-3">{{__('خلاصه مذاکرات و تصمیمات اتخاذ شده')}}</th>
                 <th class="px-4 py-3">{{__('مهلت اقدام')}}</th>
                 <th class="px-4 py-3">{{__('اقدام کننده')}}</th>
-                <th class="px-4 text-center">{{__('وضعیت')}}</th>
+{{--                <th class="px-4 text-center">{{__('وضعیت')}}</th>--}}
             </x-slot>
             <x-slot name="body">
                 @foreach($tasks as $task)
@@ -193,12 +193,12 @@
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                               <span
-                                   class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">
-                                   {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}
-                               </span>
-                        </td>
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+{{--                               <span--}}
+{{--                                   class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">--}}
+{{--                                   {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}--}}
+{{--                               </span>--}}
+{{--                        </td>--}}
                     </tr>
                 @endforeach
             </x-slot>

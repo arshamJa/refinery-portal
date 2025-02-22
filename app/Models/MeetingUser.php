@@ -61,6 +61,20 @@ class MeetingUser extends Model
         return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
     }
 
+    public function is_present()
+    {
+        return MeetingUser::where('meeting_id',$this->meeting_id)
+                ->where('user_id',$this->user_id)
+                ->value('is_present') == '1';
+    }
+
+    public function is_absent()
+    {
+        return MeetingUser::where('meeting_id',$this->meeting_id)
+                ->where('user_id',$this->user_id)
+                ->value('is_present') == '-1';
+    }
+
     public function replacementName()
     {
             return UserInfo::with('user')

@@ -240,9 +240,9 @@
                             <div class="flex items-center">
 {{--                                <a href="#" class="hover:underline">{{__('نمایش جزئیات')}}</a>--}}
                                 <div>
-                                    @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '1')
+                                    @if($meetingUser->is_present())
                                         {{__('شما دعوت به این جلسه را')}}<span class="text-green-700">{{__(' پذیرفتید')}}</span>
-                                    @elseif($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('is_present') == '-1')
+                                    @elseif($meetingUser->is_absent())
                                         {{__('شما دعوت به این جلسه را')}}<span class="text-red-600 font-bold">{{__(' نپذیرفتید')}}</span>
                                         @if($meetingUser->where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('replacement'))
                                             {{__('و آقا/خانم')}}
@@ -250,7 +250,7 @@
                                             {{__(' به عنوان جانشین خود انتخاب کردید')}}
                                         @endif
                                     @else
-                                        <button wire:click="accept({{$meetingUser->id}})"
+                                        <button wire:click="accept({{$meetingUser->meeting_id}})"
                                                 class="px-3 py-1.5 mb-2 bg-gray-800 border border-transparent rounded-md text-sm text-white">
                                             {{('قبول')}}
                                         </button>

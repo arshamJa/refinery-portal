@@ -27,7 +27,7 @@ class MeetingNotification extends Component
             ->where('is_cancelled','!=','0')
             ->where('scriptorium','!=',auth()->user()->user_info->full_name)
             ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
-            ->paginate(3);
+            ->get();
     }
     #[Computed]
     public function meetingUsers()
@@ -40,13 +40,12 @@ class MeetingNotification extends Component
 
     public function markNotification($id)
     {
-        DB::table('meeting_users')
-            ->where('meeting_id',$id)
+        MeetingUser::where('meeting_id',$id)
             ->where('user_id', auth()->user()->id)
             ->update([
                 'read_by_user' => true
             ]);
-        return redirect()->back();
+        return to_route('meeting.notification');
     }
 
 

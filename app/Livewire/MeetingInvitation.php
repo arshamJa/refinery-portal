@@ -42,9 +42,11 @@ class MeetingInvitation extends Component
     }
     public function accept($meetingId)
     {
-        $meeting = MeetingUser::find($meetingId);
-        $meeting->is_present = '1';
-        $meeting->save();
+        MeetingUser::where('meeting_id',$meetingId)
+        ->where('user_id',auth()->user()->id)
+        ->update([
+            'is_present' => '1'
+        ]);
     }
     public function openModalDeny($meeting_id)
     {
@@ -62,24 +64,23 @@ class MeetingInvitation extends Component
         $this->validate([
             'body' => ['required','string','max:255',new farsi_chs()]
         ]);
-        if ($this->checkBox && $this->full_name && $this->p_code){
+        if ($this->checkBox || $this->full_name || $this->p_code){
             $this->validate([
                 'checkBox' => ['required'],
                 'full_name' => ['required','string',new farsi_chs()],
                 'p_code' => ['required','numeric','digits:6']
             ]);
             $full_name = Str::deduplicate($this->full_name);
-            $user = UserInfo::where('full_name',$full_name)->value('user_id');
-            $userId = User::where('id',$user)->value('id');
+            $userId = UserInfo::where('full_name',$full_name)->value('user_id');
                 if ($this->checkBox){
                     if (UserInfo::where('user_id',$userId)->where('full_name',$full_name)->exists()){
-                        if (User::where('p_code',$this->p_code)->exists()){
+                        if (User::where('id',$userId)->where('p_code',$this->p_code)->exists()){
                             if (MeetingUser::where('meeting_id',$meetingId)->value('user_id') == $userId ){
                                 throw ValidationException::withMessages([
                                     'full_name' => 'شخص جانشین قبلا دعوت به جلسه شده است'
                                 ]);
                             }else{
-                                $meeting = MeetingUser::where('meeting_id',$meetingId)
+                                MeetingUser::where('meeting_id',$meetingId)
                                     ->where('user_id',auth()->user()->id)
                                     ->update([
                                         'is_present' => '-1',
@@ -108,13 +109,14 @@ class MeetingInvitation extends Component
                     ]);
                 }
         }else{
-            $meeting = MeetingUser::find($meetingId);
-            $meeting->is_present = '-1';
-            $meeting->reason_for_absent = $this->body;
-            $meeting->save();
+            MeetingUser::where('meeting_id',$meetingId)
+                ->where('user_id',auth()->user()->id)
+                ->update([
+                'is_present' => '-1',
+                'reason_for_absent' => $this->body
+            ]);
             $this->close();
         }
-
     }
     public function close()
     {

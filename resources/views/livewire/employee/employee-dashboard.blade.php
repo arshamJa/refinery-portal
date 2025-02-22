@@ -2,7 +2,7 @@
 <div>
     <div class="max-w-full p-4 grid grid-cols-2 gap-x-8 mt-10 ">
         <div class="col-span-1 p-3">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6  border-b py-4">
                 <div>
                     <a href="{{route('message')}}"
                        class="flex justify-between items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#3D3D3D] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
@@ -26,7 +26,7 @@
                     </a>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border-t pt-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-b py-4">
                 <div>
                     <a href="{{route('meetings.create')}}"
                        class="flex items-center gap-x-2 hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
@@ -58,7 +58,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
                 <div>
                     <a href="{{route('meeting.report')}}"
                        class="flex items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#3D3D3D] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
