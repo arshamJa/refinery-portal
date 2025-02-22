@@ -45,7 +45,7 @@ class MeetingController extends Controller
      * Store a newly created resource in storage.
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(MeetingStoreRequest $request)
     {
         $gr_day = now()->day;
         $gr_month = now()->month;
@@ -57,10 +57,16 @@ class MeetingController extends Controller
         $ja_day = $parts[2];
 
         // this is for not selecting the past
-        if ($request->year < $ja_year ||
+//        if ($request->year < $ja_year){
+//            throw ValidationException::withMessages([
+//                'year' => 'تاریخ گذشته نباید باشد'
+//            ]);
+//        }
+        if (
+            ($request->year < $ja_year) ||
             ($request->year == $ja_year && $request->month < $ja_month) ||
-            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day))
-        {
+            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day)
+            ){
             throw ValidationException::withMessages([
                 'year' => 'تاریخ گذشته نباید باشد'
             ]);

@@ -21,7 +21,7 @@ class ScriptoriumReportController extends Controller
         } elseif ($endDate) {
             $query->where('date', '<=', $endDate);
         }
-        $results = $query->paginate(3);
+        $results = $query->paginate(5);
         return view('scriptorium-report.index', ['results' => $results]);
     }
 

@@ -172,7 +172,7 @@
                 <div class="sm:col-span-4">
                     <x-input-label for="treat" :value="__('پذیرایی')"/>
                     <label for="yes">{{__('بلی')}}
-                        <input type="radio" name="treat" value="true">
+                        <input type="radio" name="treat"  value="true">
                     </label>
                     <label for="no" class="mr-3">{{__('خیر')}}
                         <input type="radio" name="treat" value="false">

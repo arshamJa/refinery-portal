@@ -25,6 +25,22 @@ class EmployeeDashboard extends Component
         return view('livewire.employee.employee-dashboard');
     }
 
+
+    #[Computed]
+    public function meetings(){
+        return Meeting::where('scriptorium', '=' ,auth()->user()->user_info->full_name)
+            ->where('is_cancelled', '=','-1')
+            ->count();
+    }
+
+    #[Computed]
+    public function meetingNotifications()
+    {
+        return Meeting::where('scriptorium',auth()->user()->user_info->full_name)
+            ->where('is_cancelled','-1')
+            ->get(['title','location','date','time']);
+    }
+
     #[Computed]
     public function invitation()
     {

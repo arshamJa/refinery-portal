@@ -28,7 +28,8 @@ Route::middleware('auth')->group(function () {
         ->middleware(['auth', 'verified'])
         ->name('dashboard');
 
-Route::get('employee/organization', \App\Livewire\employee\EmployeesOrganization::class)->name('employee.organization');
+Route::get('employee/organization', \App\Livewire\employee\EmployeesOrganization::class)
+    ->name('employee.organization');
 
 
 
