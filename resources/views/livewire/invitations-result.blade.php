@@ -87,10 +87,9 @@
                                             </span>
                                         @endif
                                     </span>
-                                    <form wire:submit="markNotification({{$meetingUser->id}})">
-                                        @csrf
-                                        <x-primary-button type="submit">{{__('متوجه شدم')}}</x-primary-button>
-                                    </form>
+                                    <x-primary-button wire:click="markNotification({{$meetingUser->id}})">
+                                        {{__('متوجه شدم')}}
+                                    </x-primary-button>
                                 </div>
                             </div>
                         </div>

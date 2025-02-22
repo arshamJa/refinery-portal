@@ -47,9 +47,4 @@ class InvitationsResult extends Component
         $meetingUser->save();
         return redirect()->back();
     }
-
-
-
-
-
 }

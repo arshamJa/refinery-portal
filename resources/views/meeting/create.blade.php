@@ -159,8 +159,8 @@
                                 </button>
                             </div>
                             <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                            @foreach($users->where('id','!=',auth()->user()->id) as $user)
-                                <div class="option" data-value="{{$user->id}}">{{$user->full_name}}</div>
+                            @foreach($users->where('user_id','!=',auth()->user()->id) as $user)
+                                <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}}</div>
                             @endforeach
                             <div class="no-result-message" style="display:none;">No result match</div>
                         </div>

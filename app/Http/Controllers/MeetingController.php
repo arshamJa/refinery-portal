@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Models\UserInfo;
 use Closure;
 use http\Encoding\Stream\Inflate;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -27,21 +29,23 @@ class MeetingController extends Controller
     public function create()
     {
 
-        $users = User::query()
-            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
-            ->select('user_infos.id','user_infos.full_name')
-            ->whereNull('deleted_at')
-            ->where('role','=','employee')
-            ->whereRelation('user_info','full_name','!=',auth()->user()->user_info->full_name)
-            ->get();
+//        $users = User::query()
+//            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
+//            ->select('user_infos.id','user_infos.full_name')
+//            ->whereNull('deleted_at')
+//            ->where('role','=','employee')
+//            ->get();
+
+        $users = UserInfo::whereHas('user', fn($query) => $query->where('role', 'employee'))
+            ->get(['id','user_id','full_name']);
         return view('meeting.create' , ['users' => $users]);
     }
 
     /**
      * Store a newly created resource in storage.
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
-    public function store(MeetingStoreRequest $request)
+    public function store(Request $request)
     {
         $gr_day = now()->day;
         $gr_month = now()->month;
@@ -67,7 +71,7 @@ class MeetingController extends Controller
 
         $newTime = $request->year . '/' . $new_month . '/' . $new_day;
 
-        $holders =  Str::of($request->holders)->split('/[\s,]+/');
+        $holders = Str::of($request->holders)->split('/[\s,]+/');
 //        $date = $request->date;
 //        $g_day = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] < 10 ?
 //            '0' . jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[2] :
@@ -79,7 +83,6 @@ class MeetingController extends Controller
 //
 //        $g_year = jalali_to_gregorian(substr($date, 0, 4), substr($date, 5, 2), substr($date, 8, 2))[0];
 //        $gregorian_format = $g_month . '/' . $g_day . '/' . $g_year;
-
 
         if (Meeting::where('date', $newTime)->where('time', $request->time)->exists()) {
             throw ValidationException::withMessages([

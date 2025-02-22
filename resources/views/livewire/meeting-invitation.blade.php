@@ -140,7 +140,7 @@
                     <x-input-error :messages="$errors->get('body')" class="mt-2"/>
                 </div>
             </div>
-            <div class="bg-lime-300 p-4">
+            <div class="border-t p-4">
                 <p>{{__('در صورت انتخاب جانشین فیلد زیر را پر کنید')}}</p>
                 <input type="checkbox" wire:model="checkBox">
                 <span>{{__('در جلسه نمیتوانم شرکت کنم ولی جانشین این جانب، آقا/خانم')}}

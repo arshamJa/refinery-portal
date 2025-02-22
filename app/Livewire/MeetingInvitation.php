@@ -62,7 +62,7 @@ class MeetingInvitation extends Component
         $this->validate([
             'body' => ['required','string','max:255',new farsi_chs()]
         ]);
-        if ($this->checkBox || $this->full_name || $this->p_code){
+        if ($this->checkBox && $this->full_name && $this->p_code){
             $this->validate([
                 'checkBox' => ['required'],
                 'full_name' => ['required','string',new farsi_chs()],
@@ -79,7 +79,6 @@ class MeetingInvitation extends Component
                                     'full_name' => 'شخص جانشین قبلا دعوت به جلسه شده است'
                                 ]);
                             }else{
-
                                 $meeting = MeetingUser::where('meeting_id',$meetingId)
                                     ->where('user_id',auth()->user()->id)
                                     ->update([
