@@ -31,5 +31,17 @@ class Message extends Component
             ->count();
     }
 
+    #[Computed]
+    public function sentTaskCount()
+    {
+        $meetingIds = Meeting::where('scriptorium', auth()->user()->user_info->full_name)
+            ->pluck('id');
+
+        // Count the completed tasks that belong to those meetings
+        return \App\Models\Task::whereIn('meeting_id', $meetingIds)
+            ->where('is_completed', true)
+            ->count();
+    }
+
 
 }
