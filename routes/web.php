@@ -13,9 +13,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
-
-    Route::get('calender',\App\Livewire\Calender::class)->name('calender');
-
     Route::post('sendInvitation/{meetingId}',[\App\Http\Controllers\SendInvitationToReplacementController::class,'__invoke'])
         ->name('sendInvitation');
 

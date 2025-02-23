@@ -46,14 +46,14 @@ class EmployeeDashboard extends Component
 //            ->where('is_cancelled','-1')
 //            ->get(['title','location','date','time']);
 //    }
-//    #[Computed]
-//    public function meetingsSchedule()
-//    {
-//        return Meeting::with('meetingUsers')
-//            ->where('is_cancelled','=','-1')
-//            ->whereRelation('meetingUsers','user_id','=',auth()->user()->id)
-//            ->get(['title','location','date','time']);
-//    }
+    #[Computed]
+    public function meetingsSchedule()
+    {
+        return Meeting::with('meetingUsers')
+            ->where('is_cancelled','=','-1')
+            ->whereRelation('meetingUsers','user_id','=',auth()->user()->id)
+            ->get(['title','location','date','time']);
+    }
 
     #[Computed]
     public function invitation()
