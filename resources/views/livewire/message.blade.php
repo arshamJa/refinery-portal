@@ -41,7 +41,7 @@
                 </span>
                 @endif
             </a>
-            <a href="#" class="flex justify-between items-center hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+            <a href="{{route('task.sent')}}" class="flex justify-between items-center hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                 <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده')}}</h3>
             </a>
         </div>
