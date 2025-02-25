@@ -43,5 +43,17 @@ class Message extends Component
             ->count();
     }
 
+    #[Computed]
+    public function meetingUsers()
+    {
+        return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled','user')
+            ->where('is_present','!=','0')
+            ->where('read_by_scriptorium',false)
+            ->whereRelation('meeting','scriptorium','=',auth()->user()->user_info->full_name)
+            ->limit(2)
+            ->get(['id','meeting_id','user_id','is_present','reason_for_absent','replacement']);
+    }
+
+
 
 }

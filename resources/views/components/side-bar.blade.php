@@ -165,7 +165,7 @@
         @endcan
     </li>
 </ul>
-<div class="absolute bottom-2 left-0 w-full">
+<div class="absolute bottom-2 left-0 w-full pr-2">
     <ul>
         <li>
             <form action="{{\route('logout')}}" method="post">

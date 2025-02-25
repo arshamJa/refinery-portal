@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\LogOutController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\SendInvitationToReplacementController;
 use App\Livewire\admin\EmployeeAccess;
+use App\Livewire\employee\EmployeesOrganization;
 use App\Livewire\LoginPage;
+use App\Livewire\Message;
 use App\Livewire\TranslatePage;
 use Illuminate\Support\Facades\Route;
 
@@ -13,21 +17,19 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
-    Route::post('sendInvitation/{meetingId}',[\App\Http\Controllers\SendInvitationToReplacementController::class,'__invoke'])
+    Route::post('sendInvitation/{meetingId}',
+        [SendInvitationToReplacementController::class, '__invoke'])
         ->name('sendInvitation');
 
-
-
-    Route::post('/logout',[\App\Http\Controllers\LogOutController::class,'logout'])
+    Route::post('/logout', [LogOutController::class, 'logout'])
         ->name('logout');
 
     Route::view('dashboard', 'dashboard')
         ->middleware(['auth', 'verified'])
         ->name('dashboard');
 
-Route::get('employee/organization', \App\Livewire\employee\EmployeesOrganization::class)
-    ->name('employee.organization');
-
+    Route::get('employee/organization', EmployeesOrganization::class)
+        ->name('employee.organization');
 
 
     // Employee-Access-Table Route
@@ -48,7 +50,7 @@ Route::get('employee/organization', \App\Livewire\employee\EmployeesOrganization
         ->name('translate')
         ->can('view-any');
 
-    Route::get('message',\App\Livewire\Message::class)->name('message');
+    Route::get('message', Message::class)->name('message');
 });
 
 Route::get('/reset/password/{id}', [ResetPasswordController::class, 'index'])
@@ -56,8 +58,6 @@ Route::get('/reset/password/{id}', [ResetPasswordController::class, 'index'])
     ->middleware('guest');
 Route::post('/resetPassword/{id}', [ResetPasswordController::class, 'reset'])
     ->name('resetPassword');
-
-
 
 
 require __DIR__.'/department_organization.php';

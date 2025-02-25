@@ -28,27 +28,27 @@
             </li>
         </ol>
     </nav>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <p class="col-span-4">{{__('نقش دبیرجلسه')}}</p>
-        <a href="{{route('invitations.result')}}"
-           class="flex justify-between items-center hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
+        <a href="{{route('invitations.result')}}" class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
             <h3 class="text-sm font-semibold"> {{__('پاسخ دعوتنامه')}}</h3>
             @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
                 <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">
-                        {{MeetingUser::with('meeting')->where('is_present','!=' , '0')->where('read_by_scriptorium',false)->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)->count() }}
+                {{MeetingUser::with('meeting')->where('is_present','!=' , '0')->where('read_by_scriptorium',false)->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)->count() }}
                 </span>
             @endif
         </a>
         <a href="{{route('task.sent')}}"
-           class="flex justify-between items-center hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+           class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
             <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده')}}</h3>
-            <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->sentTaskCount}}</span>
+            <span
+                class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->sentTaskCount}}</span>
         </a>
     </div>
 
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4 border-t-2">
-        <p class="col-span-4">{{__('نقش عضو جلسه')}}</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
         {{--        @if($this->invitation)--}}
         <a href="{{route('meeting.invitation')}}"
            class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
@@ -69,7 +69,6 @@
     {{--            <h5 class="mb-1 font-medium leading-none tracking-tight">{{__('وضعیت نهایی جلسه')}}</h5>--}}
     {{--            <div class="text-sm opacity-80">{{__('این جلسه در این تاریخ و ساعت برگزار می شود')}}</div>--}}
     {{--        </div>--}}
-
 
     {{--    </x-template>--}}
 </div>

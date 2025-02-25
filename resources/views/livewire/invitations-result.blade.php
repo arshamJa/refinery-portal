@@ -1,6 +1,7 @@
 <div>
 
     <x-sessionMessage name="status"/>
+
 {{--    <x-template>--}}
         <nav class="flex justify-between mb-4 mt-14">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -45,7 +46,7 @@
 {{--        @foreach($this->meetings as $meeting)--}}
             @foreach($this->meetingUsers as $meetingUser)
                 <div class="mb-4">
-                    <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
+                    <div class="bg-teal-50 shadow-md rounded-lg p-4 dark:bg-teal-800/30">
                         <div class="flex">
                             <div class="shrink-0">
                             <span

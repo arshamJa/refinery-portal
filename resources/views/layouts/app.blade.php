@@ -37,7 +37,7 @@
         <!-- Sidebar -->
         <aside
             :class="{'translate-x-full': open, 'translate-x-0': !open}"
-            class="fixed pt-14 inset-y-0 right-0 top-0 bottom-0 z-20 min-h-dvh bg-gray-800 text-white w-64 transform transition-transform duration-300 md:static md:translate-x-0">
+            class="fixed pt-14 pr-2 inset-y-0 right-0 top-0 bottom-0 z-20 min-h-dvh bg-gray-800 text-white w-64 transform transition-transform duration-300 md:static md:translate-x-0">
             <x-side-bar/>
         </aside>
 
