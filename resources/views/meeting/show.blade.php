@@ -2,7 +2,7 @@
 <x-app-layout>
 
 {{--    <x-template>--}}
-        <nav class="flex justify-between mb-4 mt-14">
+        <nav class="flex justify-between mb-4 mt-20">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
                     <a href="{{route('dashboard')}}"
