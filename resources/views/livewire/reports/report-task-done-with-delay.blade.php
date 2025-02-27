@@ -84,8 +84,20 @@
                                     @php
                                         $date1 = Carbon::parse($task->sent_date);
                                         $date2 = Carbon::parse($task->time_out);
+                                        $diff = $date1->diff($date2);
+                                        $formattedDiff = '';
+
+                                        if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
+                                        if ($diff->m > 0) {$formattedDiff .= $diff->m . ' ماه';}
+                                        if ($diff->d > 0) {$formattedDiff .= $diff->d . ' روز';}
+                                        if ($diff->h > 0) {$formattedDiff .= $diff->h . ' ساعت';}
+                                        if ($diff->i > 0) {$formattedDiff .= $diff->i . ' دقیقه';}
+                                        if ($diff->s > 0) {$formattedDiff .= $diff->s . ' ثانیه';}
+
+                                        // Remove the trailing comma and space if there's any output.
+                                        $formattedDiff = rtrim($formattedDiff, ', ');
                                     @endphp
-                                    {{$date1->diff($date2)}}
+                                    {{ $formattedDiff }}
                                 </td>
                             </tr>
                         @endforeach

@@ -43,24 +43,43 @@ class ReportTasksDone extends Component
 //    }
 
 
+//    #[Computed]
+//    public function tasks()
+//    {
+//        $tasks = Task::with('meeting')
+//            ->where('is_completed', true)
+//            ->whereColumn('sent_date', '<=', 'time_out')
+////            ->where('sent_date', 'like', '%'.$this->search.'%')
+//            ->get();
+//        $startDate = trim($this->start_date);
+//        $endDate = trim($this->end_date);
+//        if ($startDate && $endDate) {
+//            $query = Task::query();
+//            $query->whereColumn('sent_date', '<=', 'time_out')
+//                ->where('is_completed',true)
+//                ->where('time_out', '>', $startDate)
+//                ->where('time_out', '<', $endDate);
+//            return $query->get();
+//        } else {
+//            return $tasks;
+//        }
+//    }
+
     #[Computed]
     public function tasks()
     {
-        $tasks = Task::with('meeting')
+        $query = Task::with('meeting')
             ->where('is_completed', true)
-            ->whereColumn('sent_date', '<=', 'time_out')
-//            ->where('sent_date', 'like', '%'.$this->search.'%')
-            ->get();
+            ->whereColumn('sent_date', '<=', 'time_out');
 
         $startDate = trim($this->start_date);
         $endDate = trim($this->end_date);
+
         if ($startDate && $endDate) {
-            $query = Task::query();
-            $query->where('time_out', '>', $startDate)
-                ->where('time_out', '<', $endDate);
-            return $query->get();
-        } else {
-            return $tasks;
+            $query->where('time_out', '>=', $startDate)
+                ->where('time_out', '<=', $endDate);
         }
+
+        return $query->get();
     }
 }

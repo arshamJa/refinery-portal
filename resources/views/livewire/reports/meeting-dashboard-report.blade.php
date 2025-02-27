@@ -3,7 +3,7 @@
     {{--    <x-template>--}}
 
 
-    <nav class="flex justify-between mb-4 my-14">
+    <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -29,68 +29,67 @@
         </ol>
     </nav>
 
-    <main class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="grid grid-cols-1 gap-4 h-1/2">
-            <div>
-                <a href="{{route('tasksFinishedOnTime')}}"
-                   class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow duration-300 cursor-pointer flex items-center justify-between">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 ml-2" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span class="font-semibold">اقدامات انجام شده در مهلت مقرر</span>
+    <div class="grid grid-cols-2 place-content-around place-items-center">
+        <div class="w-full">
+            <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>
+                        <a href="{{route('tasksFinishedOnTime')}}"
+                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                            {{__('نمایش')}}
+                        </a>
                     </div>
-                    <div class="flex items-center">
-                        <span class="font-bold text-lg ml-1">{{$this->tasksOnTime}}</span>
-                        <span class="text-sm text-gray-500">({{ $this->tasksOnTimePercentage() }}%)</span>
+                    <div class="flex-1 bg-green-300 rounded-l-md h-8 relative">
+                        <div class="bg-green-600 h-full rounded-l-md"
+                             style="width:{{$this->tasksOnTimePercentage()}}%;"></div>
+                        <span
+                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-green-800">({{$this->tasksOnTimePercentage()}}%)</span>
                     </div>
-                </a>
-            </div>
+                </div>
 
-            <div>
-                <a href="{{route('tasksNotFinishedOnTime')}}"
-                   class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow duration-300 cursor-pointer flex items-center justify-between">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 ml-2" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span class="font-semibold">گزارش اقدامات انجام نشده در مهلت مقرر</span>
+                <div>
+                    <div class="flex justify-between mb-2 mt-2">
+                        <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>
+                        <a href="{{route('tasksDoneWithDelay')}}"
+                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                            {{__('نمایش')}}
+                        </a>
                     </div>
-                    <div class="flex items-center">
-                        <span class="font-bold text-lg ml-1">{{$this->tasksNotDone}}</span>
-                        <span class="text-sm text-gray-500">({{ $this->tasksNotDonePercentage() }}%)</span>
+                    <div class="flex-1 bg-yellow-300 rounded-l-md h-8 relative">
+                        <div class="bg-yellow-600 h-full rounded-l-md"
+                             style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
+                        <span
+                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-yellow-800">({{$this->tasksNotDonePercentage()}}%)</span>
                     </div>
-                </a>
-            </div>
 
-            <div>
-                <a href="{{route('tasksDoneWithDelay')}}"
-                   class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow duration-300 cursor-pointer flex items-center justify-between">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 ml-2" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                        <span class="font-semibold">گزارش اقدامات انجام شده خارج از مهلت مقرر</span>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2 mt-2">
+                        <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>
+                        <a href="{{route('tasksNotFinishedOnTime')}}"
+                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                            {{__('نمایش')}}
+                        </a>
                     </div>
-                    <div class="flex items-center">
-                        <span class="font-bold text-lg ml-1">{{$this->tasksDoneWithDelay}}</span>
-                        <span class="text-sm text-gray-500">({{ $this->tasksDoneWithDelayPercentage() }}%)</span>
+                    <div class="flex-1 bg-red-300 rounded-l-md h-8 relative">
+                        <div class="bg-red-600 h-full rounded-l-md"
+                             style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
+                        <span
+                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-red-800">({{$this->tasksNotDonePercentage()}}%)</span>
                     </div>
-                </a>
+
+                </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow px-10 pt-6 pb-1">
+        <div class="w-2/3">
             <div wire:ignore>
                 <canvas id="largeChart"></canvas>
             </div>
         </div>
-
-    </main>
+    </div>
 
 
     @script
@@ -102,7 +101,7 @@
         Chart.defaults.font.size = 16;
         Chart.defaults.font.family = 'sans-serif';
         const largeChart = new Chart(document.getElementById('largeChart'), {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: ['اقدامات انجام شده در مهلت مقرر', 'اقدامات انجام نشده در مهلت مقرر', 'اقدامات انجام شده خارج از مهلت مقرر'],
                 datasets: [{
@@ -110,7 +109,7 @@
                     data: [tasksOnTime, tasksNotDone, tasksDoneWithDelay],
                     backgroundColor: [
                         'rgb(121,71,82)',
-                        'rgb(54, 162, 235',
+                        'rgb(54, 162, 235)',
                         'rgb(183,231,13)'
                     ],
                     borderColor: [
@@ -125,6 +124,14 @@
                 scales: {
                     y: {
                         beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true, // This enables circular labels
+                            pointStyle: 'circle', // Explicitly sets the style to 'circle' (optional, as it's the default)
+                        }
                     }
                 }
             }

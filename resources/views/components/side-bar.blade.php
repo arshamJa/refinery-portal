@@ -1,12 +1,12 @@
 <div>
-    <button @click="open = !open"
-            class="text-gray-50 hover:bg-gray-50 transition ease-in-out duration-300 rounded-md p-1 hover:text-gray-800 focus:outline-none">
-        <svg :class="open ? 'hidden' : 'block'"
-             x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-             stroke="currentColor" class="size-6 block">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-        </svg>
-    </button>
+{{--    <button @click="open = !open"--}}
+{{--            class="text-gray-50 hover:bg-gray-50 transition ease-in-out duration-300 rounded-md p-1 hover:text-gray-800 focus:outline-none">--}}
+{{--        <svg :class="open ? 'hidden' : 'block'"--}}
+{{--             x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+{{--             stroke="currentColor" class="size-6 block">--}}
+{{--            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>--}}
+{{--        </svg>--}}
+{{--    </button>--}}
     <div class="flex justify-between px-2 items-center">
         <div class="mr-2 text-sm">
             <p class="text-lg font-semibold mb-1 text-right">{{auth()->user()->full_name()}}</p>
@@ -33,31 +33,30 @@
     <hr class="border-gray-700 my-4 mx-1">
 </div>
 <ul class="w-full mt-2">
-    <li class="space-y-2">
-        <x-link.responsive-link href="{{route('dashboard')}}"
-                                :active="request()->is('dashboard')">
-            {{__('داشبورد')}}
-        </x-link.responsive-link>
-        @if(auth()->user()->user_info->is_dictionary_allowed)
-            @can('view-any')
-                <x-link.responsive-link href="{{route('translate')}}"
-                                        :active="request()->is('translate')">
-                    {{__('دیکشنری')}}
-                </x-link.responsive-link>
-            @endcan
-        @endif
-        @if(auth()->user()->user_info->is_blog_allowed)
-            <x-link.responsive-link href="{{route('blogs.index')}}"
-                                    :active="request()->is('blogs')">{{__('اخبار و اطلاعیه')}}
-            </x-link.responsive-link>
-        @endif
-        @if(auth()->user()->user_info->is_phoneList_allowed)
-            <x-link.responsive-link href="{{route('phones.index')}}"
-                                    :active="request()->is('phones')">{{__('دفترچه تلفنی')}}
-            </x-link.responsive-link>
-        @endif
-    </li>
-    <hr class="border-gray-700 my-4 mx-1">
+{{--    <li class="space-y-2">--}}
+{{--        <x-link.responsive-link href="{{route('dashboard')}}"--}}
+{{--                                :active="request()->is('dashboard')">--}}
+{{--            {{__('داشبورد')}}--}}
+{{--        </x-link.responsive-link>--}}
+{{--        @if(auth()->user()->user_info->is_dictionary_allowed)--}}
+{{--            @can('view-any')--}}
+{{--                <x-link.responsive-link href="{{route('translate')}}"--}}
+{{--                                        :active="request()->is('translate')">--}}
+{{--                    {{__('دیکشنری')}}--}}
+{{--                </x-link.responsive-link>--}}
+{{--            @endcan--}}
+{{--        @endif--}}
+{{--        @if(auth()->user()->user_info->is_blog_allowed)--}}
+{{--            <x-link.responsive-link href="{{route('blogs.index')}}"--}}
+{{--                                    :active="request()->is('blogs')">{{__('اخبار و اطلاعیه')}}--}}
+{{--            </x-link.responsive-link>--}}
+{{--        @endif--}}
+{{--        @if(auth()->user()->user_info->is_phoneList_allowed)--}}
+{{--            <x-link.responsive-link href="{{route('phones.index')}}"--}}
+{{--                                    :active="request()->is('phones')">{{__('دفترچه تلفنی')}}--}}
+{{--            </x-link.responsive-link>--}}
+{{--        @endif--}}
+{{--    </li>--}}
     <li class="space-y-2">
         <x-link.responsive-link wire:navigate.hover
                                 href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
