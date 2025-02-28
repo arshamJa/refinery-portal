@@ -59,9 +59,9 @@
                     </div>
                     <div class="flex-1 bg-yellow-300 rounded-l-md h-8 relative">
                         <div class="bg-yellow-600 h-full rounded-l-md"
-                             style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
+                             style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>
                         <span
-                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-yellow-800">({{$this->tasksNotDonePercentage()}}%)</span>
+                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-yellow-800">({{$this->tasksDoneWithDelayPercentage()}}%)</span>
                     </div>
 
                 </div>

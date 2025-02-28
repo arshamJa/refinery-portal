@@ -82,10 +82,12 @@
                                             <span class="font-bold">{{__('رد کرد')}}</span>
                                             <span
                                                 class="block mt-2">{{__('دلیل رد درخواست : ')}}{{$meetingUser->reason_for_absent ?? null}}</span>
-                                            <span class="block mt-1">{{__('و آقا/خانم ')}}
+                                            @if($meetingUser->replacement)
+                                                <span class="block mt-1">{{__('و آقا/خانم ')}}
                                                 <span class="font-bold">{{$meetingUser->replacementName()}}</span>
                                                 {{__(' را به عنوان جانشین خود انتخاب کرد')}}
-                                            </span>
+                                                </span>
+                                            @endif
                                         @endif
                                     </span>
                                     <x-primary-button wire:click="markNotification({{$meetingUser->id}})">

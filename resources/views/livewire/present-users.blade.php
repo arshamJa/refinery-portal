@@ -105,8 +105,11 @@
                         @foreach($this->meetingUsers->where('is_present',-1) as $meetingUser)
                             {{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}
                             :
-                            {{$meetingUser->reason_for_absent}} -
+                            {{$meetingUser->reason_for_absent}}
+                            @if($meetingUser->replacement)
+                                <br>
                             {{__('جانشین اینجانب = ')}}{{$meetingUser->replacementName()}}
+                            @endif
                             <br>
                         @endforeach
                     </div>

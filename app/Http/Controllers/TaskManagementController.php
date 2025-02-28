@@ -61,33 +61,25 @@ class TaskManagementController extends Controller
         $ja_month = $parts[1];
         $ja_day = $parts[2];
 
-        $date = '';
-        if ($request->year < $ja_year){
+        if (
+            ($request->year < $ja_year) ||
+            ($request->year == $ja_year && $request->month < $ja_month) ||
+            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day)
+        ){
             throw ValidationException::withMessages([
-                'year' => 'سال گذشته نباید باشد'
+                'year' => 'تاریخ گذشته نباید باشد'
             ]);
-        }else{
-            if ($request->month < $ja_month){
-                throw ValidationException::withMessages([
-                    'month' => 'ماه گذشته نباید باشد'
-                ]);
-            }else{
-                if ($request->day < $ja_day){
-                    throw ValidationException::withMessages([
-                        'day' => 'روز گذشته نباید باشد'
-                    ]);
-                }
-                else{
-                    $date = $request->year .'/'. $request->month .'/'. $request->day;
-                }
-            }
         }
+        $new_month = sprintf("%02d", $request->month);
+        $new_day = sprintf("%02d", $request->day);
+        $newTime = $request->year . '/' . $new_month . '/' . $new_day;
+
         $body = Str::deduplicate($request->body);
         $task = Task::create([
             'meeting_id' => $meeting,
             'user_id' => $request->initiator,
             'body' => $body,
-            'time_out' => $date
+            'time_out' => $newTime
         ]);
         return to_route('tasks.create',$meeting)->with('status','درج اقدام انجام شد');
     }
