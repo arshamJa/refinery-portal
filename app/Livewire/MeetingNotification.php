@@ -19,22 +19,22 @@ class MeetingNotification extends Component
     {
         return view('livewire.meeting-notification');
     }
-    #[Computed]
-    public function meetings()
-    {
-        return Meeting::with('meetingUsers')
-            ->where('title', 'like', '%'.$this->search.'%')
-            ->where('is_cancelled','!=','0')
-            ->where('scriptorium','!=',auth()->user()->user_info->full_name)
-            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
-            ->get();
-    }
+//    #[Computed]
+//    public function meetings()
+//    {
+//        return Meeting::with('meetingUsers')
+//            ->where('title', 'like', '%'.$this->search.'%')
+//            ->where('is_cancelled','!=','0')
+//            ->where('scriptorium','!=',auth()->user()->user_info->full_name)
+//            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
+//            ->get();
+//    }
     #[Computed]
     public function meetingUsers()
     {
-        return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled','user')
+        return MeetingUser::with('meeting:id,title,unit_organization,location,scriptorium,date,time,is_cancelled','user')
+            ->where('user_id',auth()->user()->id)
             ->where('is_present','!=','0')
-//            ->where('read_at',null)
             ->get(['id','meeting_id','user_id','is_present','reason_for_absent']);
     }
 

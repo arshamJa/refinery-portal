@@ -29,10 +29,32 @@
         </ol>
     </nav>
 
-    <div class="grid grid-cols-2 place-content-around place-items-center">
+    <div class="grid grid-cols-2 place-content-around place-items-center ">
         <div class="w-full">
-            <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 mb-4 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
+                    <div class="flex items-center justify-between z-10">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-lg font-medium text-gray-700">{{__('تعداد جلسات')}}</span>
+                        </div>
+                        <span class="text-3xl font-bold text-blue-600">{{$this->allMeetings}}</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-300 opacity-20"></div>
+                    <div class="flex items-center justify-between z-10">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-lg font-medium text-gray-700">{{__('تعداد اقدامات')}}</span>
+                        </div>
+                        <span class="text-3xl font-bold text-green-600">{{$this->allTasks}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 border rounded-md shadow-md p-4">
+                <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>
                 <div>
                     <div class="flex justify-between mb-2">
                         <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>
@@ -84,11 +106,11 @@
                 </div>
             </div>
         </div>
-        <div class="w-2/3">
-            <div wire:ignore>
+{{--        <div class="">--}}
+            <div wire:ignore class="p-4 shadow-md w-2/3 border rounded-md">
                 <canvas id="largeChart"></canvas>
             </div>
-        </div>
+{{--        </div>--}}
     </div>
 
 

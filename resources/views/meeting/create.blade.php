@@ -59,6 +59,14 @@
                 </div>
 
                 <div class="sm:col-span-4">
+                    <x-input-label for="position_organization" :value="__('سمت سازمانی')"/>
+                    <x-text-input name="position_organization" id="position_organization"
+                                  value="{{old('position_organization')}}"
+                                  class="block my-2 w-full" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('position_organization')" class="my-2"/>
+                </div>
+
+                <div class="sm:col-span-4">
                     <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
                     <x-text-input name="location" id="location"
                                   value="{{old('location')}}"
@@ -130,6 +138,17 @@
                     <x-input-error :messages="$errors->get('unit_held')" class="my-2"/>
                 </div>
 
+                <div class="sm:col-span-4">
+                    <x-input-label for="treat" :value="__('پذیرایی')"/>
+                    <label for="yes">{{__('بلی')}}
+                        <input type="radio" name="treat"  value="true">
+                    </label>
+                    <label for="no" class="mr-3">{{__('خیر')}}
+                        <input type="radio" name="treat" value="false">
+                    </label>
+                    <x-input-error :messages="$errors->get('treat')" class="my-2"/>
+                </div>
+
                 <div class="sm:col-span-8">
                     <x-input-label for="holders" class="mb-2"
                                    :value="__('انتخاب اعضای جلسه یا حاضرین در جلسه')"/>
@@ -166,18 +185,6 @@
                         </div>
                     </div>
                     <x-input-error :messages="$errors->get('holders')" class="my-2"/>
-                </div>
-
-
-                <div class="sm:col-span-4">
-                    <x-input-label for="treat" :value="__('پذیرایی')"/>
-                    <label for="yes">{{__('بلی')}}
-                        <input type="radio" name="treat"  value="true">
-                    </label>
-                    <label for="no" class="mr-3">{{__('خیر')}}
-                        <input type="radio" name="treat" value="false">
-                    </label>
-                    <x-input-error :messages="$errors->get('treat')" class="my-2"/>
                 </div>
                 <div class="sm:col-span-4">
                     <div class="row my-2 py-2" x-data="handler()">
@@ -241,15 +248,6 @@
                                   value="{{old('applicant')}}"
                                   class="block my-2 w-full" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('applicant')" class="my-2"/>
-                </div>
-
-
-                <div class="sm:col-span-4">
-                    <x-input-label for="position_organization" :value="__('سمت سازمانی')"/>
-                    <x-text-input name="position_organization" id="position_organization"
-                                  value="{{old('position_organization')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('position_organization')" class="my-2"/>
                 </div>
 
                 <div class="sm:col-span-4">

@@ -43,7 +43,7 @@
                                     <x-text-input wire:model.live="end_date"/>
                                 </div>
                             </div>
-{{--                    <x-text-input wire:model.live="search" placeholder="جست و جو" class="mt-4" dir="rtl"/>--}}
+                            <input type="text" wire:model.live="search" placeholder="Search...">
                         </div>
                     </div>
                     <!-- Table Body -->

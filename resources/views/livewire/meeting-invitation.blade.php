@@ -203,7 +203,7 @@
             <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                {{__('لیست دعوتنامه')}}
+                {{__('لیست دعوتنامه های دریافت شده')}}
             </span>
             </li>
         </ol>

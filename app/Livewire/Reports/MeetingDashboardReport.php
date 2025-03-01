@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 
+use App\Models\Meeting;
 use App\Models\Task;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -34,8 +35,7 @@ class MeetingDashboardReport extends Component
             ->where('is_completed', true)
             ->whereColumn('sent_date', '<=', 'time_out')
             ->count();
-        $percentage =  ($tasksOnTime / $totalTasks) * 100;
-        return (int) $percentage;
+        return (int) (($tasksOnTime / $totalTasks) * 100);
     }
 
     #[Computed]
@@ -57,8 +57,7 @@ class MeetingDashboardReport extends Component
             ->where('is_completed', false)
             ->where('sent_date', null)
             ->count();
-        $percentage = ($tasksNotDone / $totalTasks) * 100;
-        return (int) $percentage; // Get the integer part of the percentage
+        return (int) (($tasksNotDone / $totalTasks) * 100); // Get the integer part of the percentage
     }
     #[Computed]
     public function tasksDoneWithDelay()
@@ -79,8 +78,19 @@ class MeetingDashboardReport extends Component
             ->where('is_completed', true)
             ->whereColumn('sent_date', '>', 'time_out')
             ->count();
-        $percentage = ($tasksDoneWithDelay / $totalTasks) * 100;
-        return (int) $percentage;
+        return (int) (($tasksDoneWithDelay / $totalTasks) * 100);
+    }
+
+    #[Computed]
+    public function allMeetings()
+    {
+        return Meeting::count();
+    }
+
+    #[Computed]
+    public function allTasks()
+    {
+        return Task::count();
     }
 
 }

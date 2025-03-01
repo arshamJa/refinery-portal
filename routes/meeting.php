@@ -13,9 +13,10 @@ Route::middleware(['auth','sanitizeInputs'])->group( function () {
     Route::get('attended/meetings',\App\Livewire\AttendedMeetings::class)->name('attended.meetings');
 
 
-//    Route::get('/scriptorium/report',[\App\Http\Controllers\ScriptoriumReportController::class,'index'])
-//            ->name('scriptorium.report');
-    Route::get('/scriptorium/report',\App\Livewire\ScriptoriumReport::class)->name('scriptorium.report');
+    Route::get('/scriptorium/report',[\App\Http\Controllers\ScriptoriumReportController::class,'index'])
+            ->name('scriptorium.report');
+//    Route::get('/scriptorium/report',\App\Livewire\ScriptoriumReport::class)
+//        ->name('scriptorium.report');
 
 
     //    Route::get('/meetings', [TaskManagementController::class, 'index'])->name('meetings.index');

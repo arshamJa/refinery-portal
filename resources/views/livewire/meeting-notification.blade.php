@@ -42,18 +42,15 @@
             {{--                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>--}}
             {{--            </a>--}}
         </nav>
-
-
-        @foreach($this->meetings as $meeting)
-{{--            @foreach($this->meetingUsers as $meeting)--}}
-            @if(!\App\Models\MeetingUser::where('meeting_id',$meeting->id)->where('user_id',auth()->user()->id)->value('read_by_user'))
+            @foreach($this->meetingUsers as $meetingUser)
+            @if(!\App\Models\MeetingUser::where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('read_by_user'))
             <div class="mb-4">
-                    <div class="bg-teal-50 border-t-2 border-teal-500 rounded-lg p-4 dark:bg-teal-800/30">
+                    <div class="bg-teal-50 rounded-lg p-4 dark:bg-teal-800/30">
                         <div class="flex">
                             <div class="shrink-0">
                             <span
                                 class="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">
-                                 @if($meeting->is_present == 1)
+                                 @if($meetingUser->meeting->is_present == 1)
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5" stroke="currentColor"
                                          class="shrink-0 size-4 text-green-600"><path stroke-linecap="round"
@@ -71,38 +68,29 @@
                             </div>
                             <div class="ms-3 w-full">
                                 <h3 class="text-gray-800 font-semibold dark:text-white">
-                                    {{$meeting->title}}
+                                    {{$meetingUser->meeting->title}}
                                 </h3>
                                 <div
                                     class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
                                     <span>
                                         {{'این جلسه که در تاریخ '}}
-                                        <span class="font-bold">{{$meeting->date}}</span>
+                                        <span class="font-bold">{{$meetingUser->meeting->date}}</span>
                                         {{__('و در ساعت')}}
-                                        <span class="font-bold">{{$meeting->time}}</span>
-                                        @if($meeting->is_present == '1')
+                                        <span class="font-bold">{{$meetingUser->meeting->time}}</span>
+                                        @if($meetingUser->meeting->is_present == '1')
                                             {{__('که اینجانب قبول کردید، ')}}
-                                        @elseif($meeting->is_present == '-1')
+                                        @elseif($meetingUser->meeting->is_present == '-1')
                                             {{__('که اینجانب رد کردید، ')}}
                                         @endif
-                                        @if($meeting->is_cancelled == '1')
+                                        @if($meetingUser->meeting->is_cancelled == '1')
                                             <span class="font-bold">{{__('لغو شد')}}</span>
-                                        @elseif($meeting->is_cancelled == '-1')
+                                        @elseif($meetingUser->meeting->is_cancelled == '-1')
                                             <span class="font-bold">{{__('برگزار میشود')}}</span>
-                                        @elseif($meeting->is_cancelled == '0')
+                                        @elseif($meetingUser->meeting->is_cancelled == '0')
                                             <span class="font-bold">{{__('در حال بررسی است')}}</span>
                                         @endif
-
-                                        {{--                                        <span class="font-bold">{{$meeting->user->user_info->full_name}}</span>--}}
-                                        {{--                                        @if($meeting->is_present == 1)--}}
-                                        {{--                                            <span class="font-bold">{{__('قبول کرد')}}</span>--}}
-                                        {{--                                        @else--}}
-                                        {{--                                            <span class="font-bold">{{__('رد کرد')}}</span>--}}
-                                        {{--                                            <span--}}
-                                        {{--                                                class="block mt-2">{{__('دلیل رد دعوتنامه : ')}}{{$meeting->reason_for_absent ?? null}}</span>--}}
-                                        {{--                                        @endif--}}
                                     </span>
-                                    <x-primary-button wire:click="markNotification({{$meeting->id}})">{{__('متوجه شدم')}}</x-primary-button>
+                                    <x-primary-button wire:click="markNotification({{$meetingUser->meeting->id}})">{{__('متوجه شدم')}}</x-primary-button>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +98,6 @@
                 </div>
             @endif
             @endforeach
-{{--        @endforeach--}}
 
         {{--                    <div class="p-4 h-auto">--}}
         {{--                        <div class="mx-auto bg-white w-full">--}}

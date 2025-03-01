@@ -31,7 +31,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
         <a href="{{route('invitations.result')}}" class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-            <h3 class="text-sm font-semibold"> {{__('پاسخ دعوتنامه')}}</h3>
+            <h3 class="text-sm font-semibold"> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</h3>
             @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
                 <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">
                 {{MeetingUser::with('meeting')->where('is_present','!=' , '0')->where('read_by_scriptorium',false)->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)->count() }}
@@ -52,7 +52,7 @@
         {{--        @if($this->invitation)--}}
         <a href="{{route('meeting.invitation')}}"
            class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-            <span class="text-sm font-semibold">{{__('دعوتنامه')}}</span>
+            <span class="text-sm font-semibold">{{__('لیست جلساتی که دعوت شده اید')}}</span>
             <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->invitation}}</span>
         </a>
         {{--        @endif--}}

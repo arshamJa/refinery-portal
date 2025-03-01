@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Trait\MessageReceived;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -25,11 +26,12 @@ class Message extends Component
     public function read_by_user()
     {
         return MeetingUser::with('meeting')
+            ->whereRelation('meeting','is_cancelled','!=',0)
             ->where('user_id',auth()->user()->id)
-            ->whereRelation('meeting','is_cancelled','!=','0')
             ->where('read_by_user',false)
             ->count();
     }
+
 
     #[Computed]
     public function sentTaskCount()

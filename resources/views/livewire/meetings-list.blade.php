@@ -52,7 +52,7 @@
                 </svg>
                 <li>
                 <span class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                    {{__('جدول جلسات')}}
+                    {{__('لیست جلسات در حال برگزاری')}}
                 </span>
                 </li>
             </ol>

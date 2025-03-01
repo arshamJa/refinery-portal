@@ -64,18 +64,54 @@
 
             <div class="max-w-full">
                 <div class="mt-4 grid grid-cols-2 gap-x-3">
-                    <div class="my-2 col-span-1">
-                        <x-input-label class="mb-2" :value="__('اقدام کننده')"/>
-                        <select name="initiator"
-                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                            <option value="">...</option>
-                            @foreach($meetingUsers as $meetingUser)
-                                <option @if (old('initiator') == $meetingUser->user_id) selected @endif
-                                    value="{{$meetingUser->user_id}}">{{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('initiator')" class="my-2"/>
+
+
+                    <div class="sm:col-span-1">
+                        <x-input-label for="holders" class="mb-2"
+                                       :value="__('اقدام کننده')"/>
+                        <div class="custom-select">
+                            <div class="select-box">
+                                <input type="text" class="tags_input" multiple name="holders" hidden>
+                                <div class="selected-options"></div>
+                                <div class="arrow">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5"
+                                         stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="options">
+                                <div class="option-search-tags">
+                                    <input type="text" class="search-tags" placeholder="جست و جو ...">
+                                    <button type="button" class="clear">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             stroke-width="1.5"
+                                             stroke="currentColor" class="size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="M6 18 18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
+                                @foreach($meetingUsers as $meetingUser)
+                                    <div class="option" data-value="{{$meetingUser->user_id}}">
+                                        {{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}
+                                    </div>
+                                @endforeach
+                                <div class="no-result-message" style="display:none;">No result match</div>
+                            </div>
+                        </div>
+                        <x-input-error :messages="$errors->get('holders')" class="my-2"/>
                     </div>
+
+
+
+
+
+
+
                     <div class="my-2 col-span-1">
                         <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
                             <div class="flex gap-2">

@@ -33,7 +33,7 @@
                 <li>
                     <span
                         class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                      {{__('پاسخ اعضای جلسه به دعوتنامه')}}
+                      {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}
                     </span>
                 </li>
             </ol>

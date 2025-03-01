@@ -20,15 +20,15 @@ class InvitationsResult extends Component
         return view('livewire.invitations-result');
     }
 
-    #[Computed]
-    public function meetings()
-    {
-        return Meeting::with('meetingUsers')
-            ->where('title', 'like', '%'.$this->search.'%')
-            ->where('scriptorium','==',auth()->user()->user_info->full_name)
-            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
-            ->paginate(3);
-    }
+//    #[Computed]
+//    public function meetings()
+//    {
+//        return Meeting::with('meetingUsers')
+//            ->where('title', 'like', '%'.$this->search.'%')
+//            ->where('scriptorium','==',auth()->user()->user_info->full_name)
+//            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
+//            ->paginate(3);
+//    }
 
     #[Computed]
     public function meetingUsers()
@@ -45,6 +45,6 @@ class InvitationsResult extends Component
         $meetingUser = MeetingUser::find($id);
         $meetingUser->read_by_scriptorium = true;
         $meetingUser->save();
-        return redirect()->back();
+        return to_route('invitations.result');
     }
 }

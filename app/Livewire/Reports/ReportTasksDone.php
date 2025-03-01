@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Models\Meeting;
 use App\Models\Task;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
@@ -79,7 +80,6 @@ class ReportTasksDone extends Component
             $query->where('time_out', '>=', $startDate)
                 ->where('time_out', '<=', $endDate);
         }
-
         return $query->get();
     }
 }
