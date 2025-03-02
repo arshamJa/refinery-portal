@@ -36,93 +36,108 @@
             </li>
         </ol>
     </nav>
-    <div class="mx-auto bg-white w-full">
-        <div class="relative shadow-md sm:rounded-lg overflow-hidden">
-            <!-- Table Header -->
-            <div class="p-2">
-                <!-- Search Bar -->
-                <form method="GET" action="{{route('tasksWithDelay')}}">
-                    @csrf
-                    <div class="w-1/2 gap-4 mb-4 grid grid-cols-2">
-                        <div>
-                            <x-input-label value="{{__('تاریخ شروع')}}" class="mb-2"/>
-                            <x-text-input name="start_date"/>
-                        </div>
-                        <div>
-                            <x-input-label value="{{__('تاریخ پایان')}}" class="mb-2"/>
-                            <x-text-input name="end_date"/>
-                        </div>
+    <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
+        <form method="GET" action="{{route('tasksWithDelay')}}">
+            @csrf
+            <div class="grid grid-cols-2 items-end gap-4">
+                <div class="col-span-1 gap-4 grid grid-cols-2">
+                    <div>
+                        <x-input-label value="{{__('تاریخ شروع')}}" class="mb-2"/>
+                        <x-text-input name="start_date"/>
                     </div>
-                    <div class="w-1/2">
-                        <x-text-input type="text" name="search" placeholder="جست و جو..."/>
+                    <div>
+                        <x-input-label value="{{__('تاریخ پایان')}}" class="mb-2"/>
+                        <x-text-input name="end_date"/>
                     </div>
-                    <div class="w-full flex justify-between items-center pl-4 py-2 mt-1">
-                        <button type="submit"
-                                class="inline-flex gap-1 items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-4">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
-                            </svg>
-                            {{__('فیلتر')}}
-                        </button>
-                        <a href="{{route('tasksWithDelay')}}"
-                           class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                            {{__('نمایش همه')}}
-                        </a>
+                </div>
+                <div class="relative">
+                    <div
+                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
+                             fill="currentColor" viewbox="0 0 20 20"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                  clip-rule="evenodd"/>
+                        </svg>
                     </div>
-                </form>
+                    <x-text-input type="text" name="search" placeholder="جست و جو..."/>
+                </div>
             </div>
-
-            <!-- Table Body -->
-            <div class="overflow-x-auto" dir="rtl">
-                <x-table.table>
-                    <x-slot name="head">
-                        <th class="px-4 py-3">{{__('ردیف')}}</th>
-                        <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
-                        <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
-                        <th class="px-4 py-3">{{__('افدام کننده')}}</th>
-                        <th class="px-4 py-3">{{__('تاریخ انجام اقدام')}}</th>
-                        <th class="px-4 py-3">{{__('تاریخ مهلت اقدام')}}</th>
-                        <th class="px-4 py-3">{{__('مدت زمان تاخیر')}}</th>
-                    </x-slot>
-                    <x-slot name="body">
-                        @foreach($tasks as $task)
-                            <tr class="px-4 py-3 border-b text-center" wire:key="{{$task->id}}">
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->full_name()}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                                    @php
-                                        $date1 = Carbon::parse($task->sent_date);
-                                        $date2 = Carbon::parse($task->time_out);
-                                        $diff = $date1->diff($date2);
-                                        $formattedDiff = '';
-
-                                        if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
-                                        if ($diff->m > 0) {$formattedDiff .= $diff->m . ' ماه';}
-                                        if ($diff->d > 0) {$formattedDiff .= $diff->d . ' روز';}
-                                        if ($diff->h > 0) {$formattedDiff .= $diff->h . ' ساعت';}
-                                        if ($diff->i > 0) {$formattedDiff .= $diff->i . ' دقیقه';}
-                                        if ($diff->s > 0) {$formattedDiff .= $diff->s . ' ثانیه';}
-
-                                        // Remove the trailing comma and space if there's any output.
-                                        $formattedDiff = rtrim($formattedDiff, ', ');
-                                    @endphp
-                                    {{ $formattedDiff }}
-                                </td>
-                            </tr>
-                        @endforeach
-                    </x-slot>
-                </x-table.table>
-                <nav
-                    class="flex flex-col md:flex-row  justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
-                    {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
-                </nav>
+            <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
+                <button type="submit"
+                        class="inline-flex gap-1 items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                    </svg>
+                    {{__('فیلتر')}}
+                </button>
+                <a href="{{route('tasksWithDelay')}}"
+                   class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                    {{__('نمایش همه')}}
+                </a>
             </div>
-        </div>
+        </form>
+
+
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead
+                class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th class="px-4 py-3">{{__('ردیف')}}</th>
+                <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
+                <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
+                <th class="px-4 py-3">{{__('افدام کننده')}}</th>
+                <th class="px-4 py-3">{{__('تاریخ انجام اقدام')}}</th>
+                <th class="px-4 py-3">{{__('تاریخ مهلت اقدام')}}</th>
+                <th class="px-4 py-3">{{__('مدت زمان تاخیر')}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            @forelse($tasks as $task)
+                <tr class="px-4 py-3 border-b text-center" wire:key="{{$task->id}}">
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->full_name()}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                        @php
+                            $date1 = Carbon::parse($task->sent_date);
+                            $date2 = Carbon::parse($task->time_out);
+                            $diff = $date1->diff($date2);
+                            $formattedDiff = '';
+
+                            if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
+                            if ($diff->m > 0) {$formattedDiff .= $diff->m . ' ماه';}
+                            if ($diff->d > 0) {$formattedDiff .= $diff->d . ' روز';}
+                            if ($diff->h > 0) {$formattedDiff .= $diff->h . ' ساعت';}
+                            if ($diff->i > 0) {$formattedDiff .= $diff->i . ' دقیقه';}
+                            if ($diff->s > 0) {$formattedDiff .= $diff->s . ' ثانیه';}
+
+                            // Remove the trailing comma and space if there's any output.
+                            $formattedDiff = rtrim($formattedDiff, ', ');
+                        @endphp
+                        {{ $formattedDiff }}
+                    </td>
+                </tr>
+            @empty
+                <tr class="border-b dark:border-gray-700">
+                    <th colspan="8"
+                        class="text-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {{__('رکوردی یافت نشد ...')}}
+                    </th>
+                </tr>
+            @endforelse
+            </tbody>
+        </table>
+        <nav
+            class="flex flex-col md:flex-row  justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
+            {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
+        </nav>
     </div>
+
 </x-app-layout>

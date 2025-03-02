@@ -40,8 +40,4 @@ class AttendedMeetings extends Component
         return Task::where('user_id',auth()->user()->id)->get();
     }
 
-
-
-
-
 }

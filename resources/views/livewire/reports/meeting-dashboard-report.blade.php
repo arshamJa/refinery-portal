@@ -29,6 +29,9 @@
         </ol>
     </nav>
 
+
+
+
     <div class="grid grid-cols-2 place-content-around place-items-center ">
         <div class="w-full">
             <div class="grid grid-cols-1 mb-4 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
@@ -106,17 +109,15 @@
                 </div>
             </div>
         </div>
-{{--        <div class="">--}}
             <div wire:ignore class="p-4 shadow-md w-2/3 border rounded-md">
                 <canvas id="largeChart"></canvas>
             </div>
-{{--        </div>--}}
+
     </div>
 
 
     @script
     <script>
-        {{--const tasks =  {{$this->taskOnTime}};--}}
         const tasksOnTime = {{$this->tasksOnTime}};
         const tasksNotDone = {{$this->tasksNotDone}};
         const tasksDoneWithDelay = {{$this->tasksDoneWithDelay}};
@@ -153,6 +154,14 @@
                         labels: {
                             usePointStyle: true, // This enables circular labels
                             pointStyle: 'circle', // Explicitly sets the style to 'circle' (optional, as it's the default)
+                        },
+                        onHover: function(e, legendItem, legend) {
+                            // Change cursor to pointer when hovering over legend labels
+                            e.native.target.style.cursor = 'pointer';
+                        },
+                        onLeave: function(e, legendItem, legend) {
+                            // Change cursor back to default when leaving legend labels
+                            e.native.target.style.cursor = 'default';
                         }
                     }
                 }

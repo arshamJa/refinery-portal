@@ -33,8 +33,8 @@ Route::middleware(['auth'])->group(function () {
 //        ->name('tasksNotFinishedOnTime');
 
     // tasks report done with delay
-    Route::get('/tasks/doneWithDelay', \App\Livewire\Reports\ReportTaskDoneWithDelay::class)
-        ->name('tasksDoneWithDelay');
+//    Route::get('/tasks/doneWithDelay', \App\Livewire\Reports\ReportTaskDoneWithDelay::class)
+//        ->name('tasksDoneWithDelay');
 
 
     Route::get('/dashboard/tasks', \App\Livewire\TaskManagementTable::class)

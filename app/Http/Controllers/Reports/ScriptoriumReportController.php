@@ -10,7 +10,7 @@ class ScriptoriumReportController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Meeting::query();
+        $query = Meeting::with('tasks');
         // Date range filter
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $startDate = $request->input('start_date');
