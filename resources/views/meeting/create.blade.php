@@ -29,8 +29,6 @@
             <x-primary-button>{{__('جدول جلسات')}}</x-primary-button>
         </a>
     </nav>
-
-
     <form action="{{route('meetings.store')}}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">

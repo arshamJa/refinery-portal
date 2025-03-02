@@ -1,8 +1,5 @@
 <x-app-layout>
-
-    <x-sessionMessage name="status"/>
-    {{--    <x-template>--}}
-    <nav class="flex justify-between mb-4">
+    <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -24,7 +21,7 @@
             </li>
         </ol>
     </nav>
-    <div class="mx-auto bg-white w-full mt-10">
+    <div class="mx-auto bg-white w-full ">
         <div class="relative shadow-md sm:rounded-lg overflow-hidden">
             <!-- Table Header -->
             <div class="p-2">
@@ -42,7 +39,7 @@
                         </div>
                     </div>
                     <div class="w-1/2">
-                        <x-text-input  type="text" name="search" placeholder="جست و جو..."/>
+                        <x-text-input type="text" name="search" placeholder="جست و جو..."/>
                     </div>
                     <div class="w-full flex justify-between items-center pl-4 py-2 mt-1">
                         <button type="submit"
@@ -54,7 +51,8 @@
                             </svg>
                             {{__('فیلتر')}}
                         </button>
-                        <a href="{{route('scriptorium.report')}}" class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                        <a href="{{route('scriptorium.report')}}"
+                           class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                             {{__('نمایش همه')}}
                         </a>
                     </div>
@@ -87,12 +85,12 @@
                                     @endforeach
                                 </td>
                             </tr>
-                            @empty
-                                <tr class="border-b text-center">
-                                    <td colspan="6" class="py-6">
-                                        {{__('رکوردی یافت نشد...')}}
-                                    </td>
-                                </tr>
+                        @empty
+                            <tr class="border-b text-center">
+                                <td colspan="6" class="py-6">
+                                    {{__('رکوردی یافت نشد...')}}
+                                </td>
+                            </tr>
                         @endforelse
                     </x-slot>
                 </x-table.table>
@@ -104,7 +102,4 @@
             </div>
         </div>
     </div>
-    {{--    </x-template>--}}
-
-
 </x-app-layout>

@@ -15,11 +15,22 @@ Route::middleware(['auth'])->group(function () {
 
 
     // tasks report on time
-    Route::get('/tasks/onTime', \App\Livewire\Reports\ReportTasksDone::class)->name('tasksFinishedOnTime');
+//    Route::get('/tasks/onTime', \App\Livewire\Reports\ReportTasksDone::class)->name('tasksFinishedOnTime');
+    Route::get('completedTasks',[\App\Http\Controllers\Reports\TasksReportController::class,'completedTasks'])
+        ->name('completedTasks');
 
     // tasks report not done on time
-    Route::get('/tasks/notDone/onTime', \App\Livewire\Reports\ReportTaskNotDoneOnTime::class)
-        ->name('tasksNotFinishedOnTime');
+    Route::get('incompleteTasks',[\App\Http\Controllers\Reports\TasksReportController::class,'incompleteTasks'])
+        ->name('incompleteTasks');
+
+    // tasks report done with delay
+    Route::get('tasksWithDelay', [\App\Http\Controllers\Reports\TasksReportController::class,'completedTasksWithDelay'])
+        ->name('tasksWithDelay');
+
+
+    // tasks report not done on time
+//    Route::get('/tasks/notDone/onTime', \App\Livewire\Reports\ReportTaskNotDoneOnTime::class)
+//        ->name('tasksNotFinishedOnTime');
 
     // tasks report done with delay
     Route::get('/tasks/doneWithDelay', \App\Livewire\Reports\ReportTaskDoneWithDelay::class)

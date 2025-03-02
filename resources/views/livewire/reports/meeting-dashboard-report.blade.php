@@ -58,7 +58,7 @@
                 <div>
                     <div class="flex justify-between mb-2">
                         <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>
-                        <a href="{{route('tasksFinishedOnTime')}}"
+                        <a href="{{route('completedTasks')}}"
                            class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
                             {{__('نمایش')}}
                         </a>
@@ -74,7 +74,7 @@
                 <div>
                     <div class="flex justify-between mb-2 mt-2">
                         <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>
-                        <a href="{{route('tasksDoneWithDelay')}}"
+                        <a href="{{route('tasksWithDelay')}}"
                            class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
                             {{__('نمایش')}}
                         </a>
@@ -91,7 +91,7 @@
                 <div>
                     <div class="flex justify-between mb-2 mt-2">
                         <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>
-                        <a href="{{route('tasksNotFinishedOnTime')}}"
+                        <a href="{{route('incompleteTasks')}}"
                            class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
                             {{__('نمایش')}}
                         </a>

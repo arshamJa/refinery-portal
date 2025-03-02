@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Reports;
 
+use App\Http\Controllers\Controller;
 use App\Models\Meeting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ScriptoriumReportController extends Controller
 {
@@ -32,8 +32,8 @@ class ScriptoriumReportController extends Controller
             $query->where('scriptorium', '=', auth()->user()->user_info->full_name);
         }
         $query->where('is_cancelled', '=', '-1');
-        $meetings = $query->paginate(3);
-        return view('scriptorium-report.index', [
+        $meetings = $query->paginate(5);
+        return view('reports.scriptorium-report', [
             'meetings' => $meetings]);
     }
 }

@@ -20,7 +20,7 @@ class ScriptoriumReport extends Component
 
     public function render()
     {
-        return view('livewire.scriptorium-report');
+        return view('livewire.reports');
     }
 
     public function users()
