@@ -1,74 +1,71 @@
 <div>
-
-{{--    <x-template>--}}
-          <div class="container" dir="ltr">
-            <div class="card input-wrapper">
-                <div class="from">
-                    <span class="heading">From :</span>
-                    <div class="dropdown-container" id="input-language">
-                        <div class="dropdown-toggle">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802"/>
-                            </svg>
-                            <span class="selected" data-value="auto">Auto Detect</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                            </svg>
-                        </div>
-                        <ul class="dropdown-menu">
-                            <li class="option active">DropDown Menu Item 1</li>
-                            <li class="option">DropDown Menu Item 2</li>
-                        </ul>
+    <div class="container" dir="ltr">
+        <div class="card input-wrapper">
+            <div class="from">
+                <span class="heading">From :</span>
+                <div class="dropdown-container" id="input-language">
+                    <div class="dropdown-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802"/>
+                        </svg>
+                        <span class="selected" data-value="auto">Auto Detect</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
+                        </svg>
                     </div>
-                </div>
-                <div class="text-area">
-                    <textarea id="input-text" cols="30" rows="10" placeholder="متن مورد نظر را تایپ کنید"></textarea>
+                    <ul class="dropdown-menu">
+                        <li class="option active">DropDown Menu Item 1</li>
+                        <li class="option">DropDown Menu Item 2</li>
+                    </ul>
                 </div>
             </div>
-
-            <div class="center">
-                <div class="swap-position">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="card output-wrapper">
-                <div class="to">
-                    <span class="heading">To :</span>
-                    <div class="dropdown-container" id="output-language">
-                        <div class="dropdown-toggle">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802"/>
-                            </svg>
-                            <span class="selected" data-value="en">Englsih</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                            </svg>
-                        </div>
-                        <ul class="dropdown-menu">
-                            <li class="option active">DropDown Menu Item 1</li>
-                            <li class="option">DropDown Menu Item 2</li>
-                        </ul>
-                    </div>
-                </div>
-                <textarea id="output-text" cols="30" rows="10" disabled></textarea>
+            <div class="text-area">
+                <textarea id="input-text" cols="30" rows="10" placeholder="متن مورد نظر را تایپ کنید"></textarea>
             </div>
         </div>
-{{--    </x-template>--}}
 
+        <div class="center">
+            <div class="swap-position">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>
+                </svg>
+            </div>
+        </div>
 
+        <div class="card output-wrapper">
+            <div class="to">
+                <span class="heading">To :</span>
+                <div class="dropdown-container" id="output-language">
+                    <div class="dropdown-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802"/>
+                        </svg>
+                        <span class="selected" data-value="en">Englsih</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
+                        </svg>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li class="option active">DropDown Menu Item 1</li>
+                        <li class="option">DropDown Menu Item 2</li>
+                    </ul>
+                </div>
+            </div>
+            <textarea id="output-text" cols="30" rows="10" disabled></textarea>
+        </div>
+    </div>
+
+    @script
     <script>
         const languages = [
             {
@@ -239,6 +236,6 @@
             inputChars.innerHTML = inputTextElem.value.length;
         });
     </script>
-
+    @endscript
 
 </div>

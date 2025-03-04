@@ -84,9 +84,8 @@
             @endforelse
             </tbody>
         </table>
-        <nav
-            class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
-            {{ $this->meetingUsers->withQueryString()->links(data:['scrollTo'=>false]) }}
-        </nav>
+        <span class="p-2 mx-2">
+                  {{ $this->meetingUsers->withQueryString()->links(data:['scrollTo'=>false]) }}
+        </span>
     </div>
 </div>

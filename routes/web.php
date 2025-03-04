@@ -34,8 +34,7 @@ Route::middleware('auth')->group(function () {
 
     // Employee-Access-Table Route
     Route::get('employee/access', EmployeeAccess::class)
-        ->name('employeeAccess')
-        ->middleware('signed');
+        ->name('employeeAccess');
 
 
 //    Route::get('/chat', App\Livewire\Chat\Index::class)

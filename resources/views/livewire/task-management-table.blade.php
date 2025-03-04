@@ -26,7 +26,6 @@
         </div>
     </header>
 
-    <x-template>
     <div class="p-4 h-auto">
         <section class="p-3 sm:p-5">
             <div class="mx-auto max-w-screen-xl px-4 lg:px-12">
@@ -57,18 +56,18 @@
                         <div
                             class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
                             <div class="flex items-center justify-center w-full md:w-auto gap-2">
-{{--                                --}}{{--                                @can('create')--}}
-{{--                                <a href="{{Illuminate\Support\Facades\URL::signedRoute('tasks.create')}}">--}}
-{{--                                    <x-primary-button>--}}
-{{--                                        {{__('وظیفه')}}--}}
-{{--                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
-{{--                                             stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">--}}
-{{--                                            <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                                  d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>--}}
-{{--                                        </svg>--}}
-{{--                                    </x-primary-button>--}}
-{{--                                </a>--}}
-{{--                                --}}{{--                                @endcan--}}
+                                {{--                                --}}{{--                                @can('create')--}}
+                                {{--                                <a href="{{Illuminate\Support\Facades\URL::signedRoute('tasks.create')}}">--}}
+                                {{--                                    <x-primary-button>--}}
+                                {{--                                        {{__('وظیفه')}}--}}
+                                {{--                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
+                                {{--                                             stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">--}}
+                                {{--                                            <path stroke-linecap="round" stroke-linejoin="round"--}}
+                                {{--                                                  d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>--}}
+                                {{--                                        </svg>--}}
+                                {{--                                    </x-primary-button>--}}
+                                {{--                                </a>--}}
+                                {{--                                --}}{{--                                @endcan--}}
                             </div>
                         </div>
                     </div>
@@ -98,7 +97,8 @@
 
                                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
                                             @if($task->is_completed)
-                                                <span class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase">
+                                                <span
+                                                    class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase">
                                                     {{__('تمام')}}
                                                 </span>
                                             @else
@@ -121,16 +121,13 @@
                                 @endforelse
                             </x-slot>
                         </x-table.table>
-                        <nav
-                            class="flex flex-col md:flex-row mt-8 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-                            aria-label="Table navigation">
+                        <span class="p-2 mx-2">
                             {{ $this->tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
-                        </nav>
+                        </span>
                     </div>
                 </div>
             </div>
         </section>
     </div>
-    </x-template>
 
 </div>

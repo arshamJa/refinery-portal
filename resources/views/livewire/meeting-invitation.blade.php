@@ -266,10 +266,9 @@
                 </div>
             </div>
         @endforeach
-            <div
-                class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">
+            <span class="p-2 mx-2">
                 {{ $this->meetingUsers->withQueryString()->links(data:['scrollTo'=>false]) }}
-            </div>
+            </span>
 
 {{--        <label for="simple-search" class="sr-only">Search</label>--}}
 {{--        <div class="relative w-full">--}}

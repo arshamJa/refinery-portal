@@ -46,9 +46,6 @@ class EmployeeAccess extends Component
         $userInfo->save();
         $this->redirectRoute('employeeAccess');
     }
-
-
-
     /**
      * @throws AuthorizationException
      */
