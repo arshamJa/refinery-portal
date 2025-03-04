@@ -33,24 +33,7 @@
 >
     <!-- Top Navigation Bar -->
     <x-navigation/>
-{{--    <div class="md:hidden inline-flex bg-red-600">--}}
-{{--        <button @click="open = !open"--}}
-{{--                class="text-gray-50 hover:bg-gray-50 transition ease-in-out duration-300 rounded-md p-1 hover:text-gray-800 focus:outline-none">--}}
-{{--            <!-- Open Button -->--}}
-{{--            <svg :class="open ? 'block' : 'hidden'"--}}
-{{--                 x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-{{--                 stroke="currentColor" class="size-6 block">--}}
-{{--                <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"/>--}}
-{{--            </svg>--}}
-{{--            <!-- Close Button -->--}}
-{{--            <svg :class="open ? 'hidden' : 'block'"--}}
-{{--                 x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-{{--                 stroke="currentColor" class="size-6 block">--}}
-{{--                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>--}}
-{{--            </svg>--}}
-{{--        </button>--}}
-{{--    </div>--}}
+
     <div class="flex flex-1">
         <!-- Sidebar -->
         <aside

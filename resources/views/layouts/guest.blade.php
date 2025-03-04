@@ -18,7 +18,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
-<body class="font-sans text-gray-900 bg-gray-100 antialiased overflow-hidden">
+<body class="font-sans text-gray-900 bg-gray-100 antialiased overflow-auto">
 <div class="flex flex-col sm:justify-center items-center pt-16 sm:pt-12 px-3 dark:bg-gray-900">
     <div>
         <x-application-logo/>

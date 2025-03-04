@@ -50,11 +50,8 @@ class LoginForm extends Form
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
-
         event(new Lockout(request()));
-
         $seconds = RateLimiter::availableIn($this->throttleKey());
-
         throw ValidationException::withMessages([
             'form.p_code' => trans('auth.throttle', [
                 'seconds' => $seconds,

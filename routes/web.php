@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', LoginPage::class)->name('login');
+    Route::get('register',[\App\Http\Controllers\AuthController::class,'registrationPage'])->name('register');
+    Route::post('register',[\App\Http\Controllers\AuthController::class,'register'])->name('register.store');
 });
 
 Route::middleware('auth')->group(function () {

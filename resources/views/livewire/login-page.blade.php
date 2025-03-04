@@ -1,5 +1,4 @@
-<div>
-
+<div class="pt-20">
     <img id="background" class="absolute -z-50 -left-20 top-0 max-w-[877px]" src="https://laravel.com/assets/img/welcome/background.svg" />
 
 {{--    <div--}}
@@ -73,7 +72,6 @@
             <x-text-input wire:model="form.p_code" class="mt-2" maxlength="6" required autofocus/>
             <x-input-error :messages="$errors->get('form.p_code')" class="mt-2" />
         </div>
-
         <!-- Password -->
         <div x-data="{ show: true }">
             <x-input-label for="p_code" class="mt-2" :value="__('رمز')" />
@@ -111,4 +109,5 @@
             </a>
         </div>
     </form>
+    <a href="{{route('register')}}">{{__('ثبت نام')}}</a>
 </div>
