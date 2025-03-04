@@ -31,20 +31,35 @@
 {{--                }--}}
 {{--            });--}}
 {{--        </script>--}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4 mt-14 pb-4 border-b">
-            <div class="bg-[#27445D] text-[#FBF5DD] p-4 rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('تعداد کاربران')}}</h3>
-                <p class="text-lg font-bold"> {{$this->users}}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-20">
+    <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
+        <div class="flex items-center justify-between z-10">
+            <div class="flex items-center space-x-3">
+                <span class="text-lg font-bold  text-gray-700"> {{__('تعداد کاربران')}}</span>
             </div>
-            <div class="bg-[#BE3144] text-[#FBF5DD] p-4 rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('تعداد سامانه')}}</h3>
-                <p class="text-lg font-bold">{{$this->organizations->count()}}</p>
-            </div>
-            <div class="bg-[#E17564] text-[#FBF5DD] p-4 rounded-lg">
-                <h3 class="text-sm font-semibold">{{__('تعداد دپارتمان')}}</h3>
-                <p class="text-lg font-bold"> {{$this->departments}}</p>
-            </div>
+            <span class="text-3xl font-bold text-blue-600">{{$this->users}}</span>
         </div>
+    </div>
+    <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
+        <div class="flex items-center justify-between z-10">
+            <div class="flex items-center space-x-3">
+                <span class="text-lg font-bold  text-gray-700"> {{__('تعداد سامانه')}}</span>
+            </div>
+            <span class="text-3xl font-bold text-blue-600">{{$this->organizations->count()}}</span>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
+        <div class="flex items-center justify-between z-10">
+            <div class="flex items-center space-x-3">
+                <span class="text-lg font-bold  text-gray-700">{{__('تعداد دپارتمان')}}</span>
+            </div>
+            <span class="text-3xl font-bold text-blue-600">{{$this->departments}}</span>
+        </div>
+    </div>
+    </div>
         <x-notifications/>
 {{--    </x-template>--}}
 </div>

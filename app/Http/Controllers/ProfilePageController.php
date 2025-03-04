@@ -30,7 +30,6 @@ class ProfilePageController extends Controller
 
         $users = User::with('user_info')->find(auth()->user()->id);
 
-
         return view('profile-page.index' , [
             'users' => $users,
             'department' => $department

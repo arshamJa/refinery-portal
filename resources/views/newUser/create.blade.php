@@ -106,6 +106,10 @@
                                 </header>
 
                                 <div class="flex gap-x-2 items-center">
+
+                                    <x-input-label for="create_meeting" class="mr-2"/>{{__('ساخت جلسه')}}
+                                    <input type="checkbox" value="create_meeting" name="create_meeting" @checked(old('create_meeting'))  class="w-4 h-4 text-gray-900 focus:ring-gray-700 rounded-xl translate-y-px">
+
                                     <x-input-label for="news" class="mr-2"/>{{__('اخبار و اطلاعیه')}}
                                     <input type="checkbox" value="blog" name="blog" @checked(old('blog'))  class="w-4 h-4 text-gray-900 focus:ring-gray-700 rounded-xl translate-y-px">
 

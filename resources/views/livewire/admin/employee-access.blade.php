@@ -47,6 +47,7 @@
                         <th class="px-4 py-3">{{__('ردیف')}}</th>
                         <th class="px-4 py-3">{{__('نقش')}}</th>
                         <th class="px-4 py-3">{{__('اسم')}}</th>
+                        <th class="px-4 py-3">{{__('ساخت جلسه')}}</th>
                         <th class="px-4 py-3">{{__('دسترسی به اخبار')}}</th>
 {{--                        <th class="px-4 py-3">{{__('دسترسی به چت')}}</th>--}}
                         <th class="px-4 py-3">{{__('دسترسی به دیکشنری')}}</th>
@@ -63,6 +64,62 @@
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900"
                                         dir="ltr">
                                         {{$userInfo->full_name}}
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900"
+                                        dir="ltr">
+                                        @if($userInfo->create_meeting)
+                                            <div x-data="{ switchOn: true }"
+                                                 class="flex items-center justify-center space-x-2">
+                                                <input id="thisId" type="checkbox" name="switch" class="hidden"
+                                                       :checked="switchOn">
+                                                <button
+                                                    wire:click="createMeeting({{$userInfo->id}})"
+                                                    x-ref="switchButton"
+                                                    type="button"
+                                                    @click="switchOn = ! switchOn"
+                                                    :class="switchOn ? 'bg-neutral-900' : 'bg-neutral-200'"
+                                                    class="relative inline-flex h-4 py-0.5 ml-4 rounded-full focus:outline-none w-6"
+                                                    x-cloak>
+                                                            <span
+                                                                :class="switchOn ? 'translate-x-[10px]' : 'translate-x-0.5'"
+                                                                class="w-3 h-3 duration-200 ease-in-out bg-white rounded-full shadow-md"></span>
+                                                </button>
+                                                <label
+                                                    @click="$refs.switchButton.click(); $refs.switchButton.focus()"
+                                                    :id="$id('switch')"
+                                                    :class="{ 'text-neutral-900': switchOn, 'text-gray-400': ! switchOn }"
+                                                    class="text-xs font-medium select-none"
+                                                    x-cloak>
+                                                    {{__('فعال')}}
+                                                </label>
+                                            </div>
+                                        @else
+                                            <div x-data="{ switchOff: false }"
+                                                 class="flex items-center justify-center space-x-2">
+                                                <input id="thisId" type="checkbox" name="switch" class="hidden"
+                                                       :checked="switchOff">
+                                                <button
+                                                    wire:click="createMeeting({{$userInfo->id}})"
+                                                    x-ref="switchButton"
+                                                    type="button"
+                                                    @click="switchOff = ! switchOff"
+                                                    :class="switchOff ? 'bg-neutral-900' : 'bg-neutral-200'"
+                                                    class="relative inline-flex h-4 py-0.5 ml-4 rounded-full focus:outline-none w-6"
+                                                    x-cloak>
+                                                            <span
+                                                                :class="switchOff ? 'translate-x-[10px]' : 'translate-x-0.5'"
+                                                                class="w-3 h-3 duration-200 ease-in-out bg-white rounded-full shadow-md"></span>
+                                                </button>
+                                                <label
+                                                    @click="$refs.switchButton.click(); $refs.switchButton.focus()"
+                                                    :id="$id('switch')"
+                                                    :class="{ 'text-neutral-900': switchOff, 'text-gray-400': ! switchOn }"
+                                                    class="text-xs font-medium select-none"
+                                                    x-cloak>
+                                                    {{__('غیرفعال')}}
+                                                </label>
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900"
                                         dir="ltr">

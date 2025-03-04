@@ -39,7 +39,6 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
     /**
      * Get the attributes that should be cast.
      *
@@ -94,5 +93,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(MeetingUser::class)->chaperone();
     }
-
 }

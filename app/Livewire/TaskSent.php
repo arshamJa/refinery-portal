@@ -20,12 +20,23 @@ class TaskSent extends Component
     #[Computed]
     public function meetings()
     {
-        return Meeting::with('meetingUsers')
-//            ->where('title', 'like', '%'.$this->search.'%')
-            ->where('scriptorium','=',auth()->user()->user_info->full_name)
+//        $meetings = Meeting::with('meetingUsers','tasks')
+//            ->where('scriptorium','=',auth()->user()->user_info->full_name)
 //            ->where('is_cancelled','=',-1)
-            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
+//            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
+//            ->get();
+
+        $meetings = Meeting::with(['meetingUsers', 'tasks' => function ($query) {
+            $query->where('is_completed', 1); // Filter tasks where is_completed is 1
+        }])
+            ->where('scriptorium', '=', auth()->user()->user_info->full_name)
+            ->where('is_cancelled', '=', -1)
+            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled'])
             ->get();
+        // Filter meetings to include only those with tasks
+        return $meetings->filter(function ($meeting){
+           return $meeting->tasks->isNotEmpty();
+        });
     }
     #[Computed]
     public function tasks()

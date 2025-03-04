@@ -39,7 +39,7 @@
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
                     <div class="flex items-center justify-between z-10">
                         <div class="flex items-center space-x-3">
-                            <span class="text-lg font-medium text-gray-700">{{__('تعداد جلسات')}}</span>
+                            <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل جلسات')}}</span>
                         </div>
                         <span class="text-3xl font-bold text-blue-600">{{$this->allMeetings}}</span>
                     </div>
@@ -49,7 +49,7 @@
                     <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-300 opacity-20"></div>
                     <div class="flex items-center justify-between z-10">
                         <div class="flex items-center space-x-3">
-                            <span class="text-lg font-medium text-gray-700">{{__('تعداد اقدامات')}}</span>
+                            <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل اقدامات')}}</span>
                         </div>
                         <span class="text-3xl font-bold text-green-600">{{$this->allTasks}}</span>
                     </div>

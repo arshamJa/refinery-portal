@@ -37,6 +37,18 @@ class EmployeeAccess extends Component
         $userInfo->save();
         $this->redirectRoute('employeeAccess');
     }
+
+
+    public function createMeeting($blogId)
+    {
+        $userInfo = UserInfo::find($blogId);
+        $userInfo->create_meeting = !$userInfo->create_meeting;
+        $userInfo->save();
+        $this->redirectRoute('employeeAccess');
+    }
+
+
+
     /**
      * @throws AuthorizationException
      */

@@ -41,7 +41,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                     <div class="max-w-xl">
                         <header>
@@ -49,13 +48,11 @@
                                 {{ __('اطلاعات شخصی') }}
                             </h2>
                         </header>
-
                         <form action="{{route('updateProfileInformation')}}" method="post" class="mt-6 space-y-6">
                             @csrf
                             <div>
                                 <x-input-label for="role" :value="__('نقش')"/>
                                 <p class="mt-1 block w-full">{{$users->role}}</p>
-
                                 <x-input-label for="department" :value="__('دپارتمان')" class="mt-4"/>
                                 <p class="mt-1 block w-full">{{$department}}</p>
 

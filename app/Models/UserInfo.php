@@ -19,9 +19,9 @@ class UserInfo extends Model
         'n_code',
         'full_name',
         'position',
+        'create_meeting',
         'is_phoneList_allowed',
         'is_blog_allowed',
-        'is_chat_allowed',
         'is_dictionary_allowed',
     ];
 

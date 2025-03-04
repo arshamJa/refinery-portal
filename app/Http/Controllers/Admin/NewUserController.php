@@ -31,6 +31,7 @@ class NewUserController extends Controller
     public function store(StoreNewUserRequest $request)
     {
         Gate::authorize('create-user');
+        $meeting = (bool) $request->create_meeting;
         $phoneList = (bool) $request->phoneList;
         $blog = (bool) $request->blog;
         $chat = (bool) $request->chat;
@@ -51,6 +52,7 @@ class NewUserController extends Controller
             'phone' => $request->phone,
             'n_code' => $request->n_code,
             'position' => $request->position,
+            'create_meeting' => $meeting,
             'is_phoneList_allowed' => $phoneList,
             'is_blog_allowed' => $blog,
             'is_chat_allowed' => $chat,

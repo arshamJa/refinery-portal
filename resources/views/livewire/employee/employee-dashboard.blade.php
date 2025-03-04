@@ -1,6 +1,6 @@
 @php use App\Models\MeetingUser; @endphp
 <div>
-    <div class="grid grid-cols-3 gap-2 mt-20">
+    <div class="grid grid-cols-3 gap-4 mt-20">
 
            <div class="col-span-2 space-y-6">
                <div class="grid grid-cols-3 content-evenly gap-4">
@@ -70,50 +70,40 @@
                </div>
            </div>
 
-
-
-
-
         <div class="col-span-2">
-            <div class="grid xl:grid-cols-2 items-center p-2 gap-x-4">
-                <div class="col-span-1 h-full">
-                    {{--                    this is Boxes    --}}
-
+                {{--   this is Calender --}}
+                <div class="w-full p-4 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-6">
+                        <button id="prev-month" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <h2 class="text-lg font-semibold text-gray-800" id="month-year"></h2>
+                        <button id="next-month" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <table class="w-full text-sm text-center">
+                        <thead>
+                        <tr class="text-gray-500">
+                            <th class="py-2">شنبه</th>
+                            <th class="py-2">یکشنبه</th>
+                            <th class="py-2">دوشنبه</th>
+                            <th class="py-2">سه شنبه</th>
+                            <th class="py-2">چهارشنبه</th>
+                            <th class="py-2">پنجشنبه</th>
+                            <th class="py-2">جمعه</th>
+                        </tr>
+                        </thead>
+                        <tbody id="calendar-body"></tbody>
+                    </table>
                 </div>
-                {{--                this is Calender --}}
-{{--                <div class="w-full p-4 rounded-lg shadow-md">--}}
-{{--                    <div class="flex justify-between items-center mb-6">--}}
-{{--                        <button id="prev-month" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">--}}
-{{--                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none"--}}
-{{--                                 viewBox="0 0 24 24" stroke="currentColor">--}}
-{{--                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>--}}
-{{--                            </svg>--}}
-{{--                        </button>--}}
-{{--                        <h2 class="text-lg font-semibold text-gray-800" id="month-year"></h2>--}}
-{{--                        <button id="next-month" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">--}}
-{{--                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none"--}}
-{{--                                 viewBox="0 0 24 24" stroke="currentColor">--}}
-{{--                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"--}}
-{{--                                      d="M15 19l-7-7 7-7"/>--}}
-{{--                            </svg>--}}
-{{--                        </button>--}}
-{{--                    </div>--}}
-{{--                    <table class="w-full text-sm text-center">--}}
-{{--                        <thead>--}}
-{{--                        <tr class="text-gray-500">--}}
-{{--                            <th class="py-2">شنبه</th>--}}
-{{--                            <th class="py-2">یکشنبه</th>--}}
-{{--                            <th class="py-2">دوشنبه</th>--}}
-{{--                            <th class="py-2">سه شنبه</th>--}}
-{{--                            <th class="py-2">چهارشنبه</th>--}}
-{{--                            <th class="py-2">پنجشنبه</th>--}}
-{{--                            <th class="py-2">جمعه</th>--}}
-{{--                        </tr>--}}
-{{--                        </thead>--}}
-{{--                        <tbody id="calendar-body"></tbody>--}}
-{{--                    </table>--}}
-{{--                </div>--}}
-            </div>
         </div>
 
 {{--        <div class="col-span-2">--}}

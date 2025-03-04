@@ -20,9 +20,11 @@ class EmployeeDashboard extends Component
 {
 
     use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
-
     public $meetingTitle;
     public $meeting_id;
+
+
+
     public function render()
     {
         return view('livewire.employee.employee-dashboard');

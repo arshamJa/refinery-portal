@@ -20,7 +20,7 @@ class UserInfoFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'position' => fake()->name() ,
+            'position' => fake()->name(),
             'department_id' => 1,
             'n_code' => fake()->randomKey(['3490449401'=>1, '6090117854'=>2, '3333333333'=>3, '4444444444'=>4]),
             'work_phone' => fake()->phoneNumber(),

@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('phone');
             $table->string('n_code');
             $table->string('position');
+            $table->boolean('create_meeting')->default(true);
             $table->boolean('is_phoneList_allowed')->default(true);
             $table->boolean('is_blog_allowed')->default(true);
-            $table->boolean('is_chat_allowed')->default(true);
             $table->boolean('is_dictionary_allowed')->default(true);
             $table->timestamps();
         });
