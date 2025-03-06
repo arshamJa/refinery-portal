@@ -5,7 +5,6 @@
 
              <x-notifications/>
 
-
         <div class="col-span-2">
                 {{--   this is Calender --}}
                 <div class="w-full p-4 rounded-lg shadow-md">

@@ -1,6 +1,12 @@
 @php use App\Models\MeetingUser; @endphp
-@if(auth()->user()->user_info->create_meeting)
-    <div class="col-span-2 space-y-6">
+
+<div class="col-span-3 space-y-6">
+    @if(auth()->user()->user_info->create_meeting)
+        <div class="flex justify-center items-center w-full">
+            <div class="border-t border-gray-200 w-1/4"></div>
+            <span class="mx-4 text-sm text-gray-700">first one</span>
+            <div class="border-t border-gray-200 w-1/4"></div>
+        </div>
         <div class="grid grid-cols-3 content-evenly gap-4">
             <a href="{{route('meetings.create')}}"
                class="flex items-center gap-x-2 hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
@@ -32,6 +38,12 @@
                 <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->meetings}}</span>
             </a>
         </div>
+        <div class="flex justify-center items-center w-full">
+            <div class="border-t border-gray-200 w-1/4"></div>
+            <span class="mx-4 text-sm text-gray-700">Admin</span>
+            <div class="border-t border-gray-200 w-1/4"></div>
+        </div>
+    @endif
         <div class="grid grid-cols-3 content-evenly gap-4">
             <a href="{{route('message')}}"
                class="flex justify-between items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
@@ -59,6 +71,11 @@
                     class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{MeetingUser::where('user_id',auth()->user()->id)->where('is_present',1)->count()}}</span>
             </a>
         </div>
+        <div class="flex justify-center items-center w-full">
+            <div class="border-t border-gray-200 w-1/4"></div>
+            <span class="mx-4 text-sm text-gray-700">Admin</span>
+            <div class="border-t border-gray-200 w-1/4"></div>
+        </div>
         <div class="grid grid-cols-3 content-evenly gap-4">
             <a href="{{route('meeting.report')}}"
                class="flex h-full items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
@@ -70,5 +87,5 @@
                 <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
             </a>
         </div>
-    </div>
-@endif
+</div>
+

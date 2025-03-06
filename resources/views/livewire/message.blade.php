@@ -27,24 +27,25 @@
             </li>
         </ol>
     </nav>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
-        <a href="{{route('invitations.result')}}" class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-            <h3 class="text-sm font-semibold"> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</h3>
-            @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
-                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">
+    @if(auth()->user()->user_info->create_meeting)
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
+            <a href="{{route('invitations.result')}}"
+               class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                <h3 class="text-sm font-semibold"> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</h3>
+                @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
+                    <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">
                 {{MeetingUser::with('meeting')->where('is_present','!=' , '0')->where('read_by_scriptorium',false)->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)->count() }}
                 </span>
-            @endif
-        </a>
-        <a href="{{route('task.sent')}}"
-           class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-            <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده')}}</h3>
-            <span
-                class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->sentTaskCount}}</span>
-        </a>
-    </div>
-
+                @endif
+            </a>
+            <a href="{{route('task.sent')}}"
+               class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده')}}</h3>
+                <span
+                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->sentTaskCount}}</span>
+            </a>
+        </div>
+    @endif
 
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
