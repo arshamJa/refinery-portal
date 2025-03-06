@@ -34,7 +34,7 @@ class MeetingNotification extends Component
     {
         return MeetingUser::with('meeting:id,title,unit_organization,location,scriptorium,date,time,is_cancelled','user')
             ->where('user_id',auth()->user()->id)
-            ->where('is_present','!=','0')
+//            ->where('is_present','!=','0')
             ->get(['id','meeting_id','user_id','is_present','reason_for_absent']);
     }
 

@@ -121,6 +121,6 @@ class MeetingInvitation extends Component
     public function close()
     {
         $this->dispatch('close-modal');
-        return redirect()->back();
+        return to_route('meeting.invitation');
     }
 }

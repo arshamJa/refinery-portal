@@ -257,7 +257,7 @@
                 </div>
 
                 <div class="sm:col-span-4">
-                    <x-input-label for="reminder" :value="__('زمان جهت یادآوری')"/>
+                    <x-input-label for="reminder" :value="__('زمان جهت یادآوری (دقیقه)')"/>
                     <x-text-input name="reminder" id="reminder"
                                   value="{{old('reminder')}}" placeholder="{{__('دقیقه')}}"
                                   class="block my-2 w-full" type="text" autofocus/>
