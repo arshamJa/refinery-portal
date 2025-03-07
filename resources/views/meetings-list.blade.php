@@ -87,22 +87,47 @@
             </ol>
         </nav>
         <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
-            <label for="simple-search" class="sr-only">Search</label>
-            <div class="relative w-1/2">
-                <div
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                         fill="currentColor" viewbox="0 0 20 20"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                              clip-rule="evenodd"/>
-                    </svg>
+
+            <form method="GET" action="{{ route('meetingsList') }}">
+                @csrf
+                <div class="grid grid-cols-2 items-end gap-4">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
+                                 fill="currentColor" viewbox="0 0 20 20"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <x-text-input type="text" name="search" placeholder="جست و جو..."/>
+                    </div>
+                    <select name="is_cancelled" class="w-1/3 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option>{{__('وضعیت جلسه')}}</option>
+                        <option value="0">{{__('در حال بررسی ...')}}</option>
+                        <option value="-1">{{__('جلساتی که تشکیل میشود')}}</option>
+                        <option value="1">{{__('جلساتی که لفو شد')}}</option>
+                    </select>
                 </div>
-                <input type="text" wire:model.live="search" id="simple-search" dir="rtl"
-                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"
-                       placeholder="جست و جو ..." required="">
-            </div>
+                <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
+
+                        <button type="submit"
+                                class="inline-flex gap-1 items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="size-4">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                            </svg>
+                            {{__('فیلتر')}}
+                        </button>
+                        <a href="{{route('meetingsList')}}"
+                           class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            {{__('نمایش همه')}}
+                        </a>
+                </div>
+            </form>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead
                     class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -115,6 +140,9 @@
                     </th>
                     <th scope="col" class="px-6 py-3">
                         {{__('تاریخ')}}
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        {{__('مکان')}}
                     </th>
                     <th scope="col" class="px-6 py-3">
                         {{__('ساعت')}}
@@ -153,6 +181,9 @@
                             {{$meeting->date}}
                         </td>
                         <td class="px-6 py-4">
+                            {{$meeting->location}}
+                        </td>
+                        <td class="px-6 py-4">
                             {{$meeting->time}}
                         </td>
                         <td class="px-6 py-4">
@@ -179,33 +210,6 @@
                                     </x-primary-button>
                                 </a>
                             @endif
-
-
-                            {{--                        @php--}}
-                            {{--                            public function areAllTasksAssignedToAllEmployees():bool--}}
-                            {{--                             {--}}
-                            {{--                                 $employees = MeetingUser::where('meeting_id', $meeting->id)--}}
-                            {{--                                     ->where('is_present', 1)--}}
-                            {{--                                     ->pluck('user_id');--}}
-                            {{--                                 $tasks = Task::where('meeting_id', $meeting->id)->get();--}}
-                            {{--                                 if ($employees->isEmpty() || $tasks->isEmpty()) {--}}
-                            {{--                                     return true;--}}
-                            {{--                                 }--}}
-                            {{--                                 foreach ($tasks as $task) {--}}
-                            {{--                                     foreach ($employees as $employeeId) {--}}
-                            {{--                                         if ($task->user_id !== $employeeId) {--}}
-                            {{--                                             return false;--}}
-                            {{--                                         }--}}
-                            {{--                                     }--}}
-                            {{--                                 }--}}
-                            {{--                                 return true;--}}
-                            {{--                             }--}}
-                            {{--                        @endphp--}}
-                            {{--                        @if (!areAllTasksAssignedToAllEmployees())--}}
-                            {{--                            <button wire:click="sendTasksToEmployees">Send Task to Employees</button>--}}
-                            {{--                        @else--}}
-                            {{--                            <p>Task has been sent to all employees.</p>--}}
-                            {{--                        @endif--}}
                         </td>
                     </tr>
                 @empty
@@ -222,6 +226,4 @@
            {{ $meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
        </span>
         </div>
-
-
 </x-app-layout>

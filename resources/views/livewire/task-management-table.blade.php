@@ -2,8 +2,7 @@
     <x-sessionMessage name="status"/>
     <header class="bg-white shadow" dir="rtl">
         <div class="mx-auto max-w-7xl px-2 py-4 sm:px-6 lg:px-2">
-            <nav class="flex justify-between">
-                <ol class="inline-flex items-center mb-3 text-md space-x-1 text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
+            <x-breadcrumb>
                     <li class="flex items-center h-full">
                         <a href="{{route('dashboard')}}"
                            class="inline-flex items-center px-2 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
@@ -20,9 +19,7 @@
                         </svg>
                         <span class="active-breadcrumb">{{__('لیست وظایف')}}</span>
                     </li>
-
-                </ol>
-            </nav>
+            </x-breadcrumb>
         </div>
     </header>
 

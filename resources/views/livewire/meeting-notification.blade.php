@@ -3,8 +3,7 @@
 
 
     <x-sessionMessage name="status"/>
-    <nav class="flex justify-between mb-4 mt-20">
-        <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
+    <x-breadcrumb>
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
@@ -36,12 +35,12 @@
                       {{__('نتیجه نهایی برگزاری/لغو جلسات')}}
                     </span>
             </li>
-        </ol>
+
 
         {{--            <a href="{{route('meetings.index')}}">--}}
         {{--                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>--}}
         {{--            </a>--}}
-    </nav>
+    </x-breadcrumb>
     @foreach($this->meetingUsers as $meetingUser)
         @if(!MeetingUser::where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('read_by_user'))
             <div class="mb-4">

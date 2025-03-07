@@ -1,6 +1,5 @@
 <div>
-        <nav class="flex justify-between mb-4 mt-20">
-            <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
+    <x-breadcrumb>
                 <li class="flex items-center h-full">
                     <a href="{{route('dashboard')}}"
                        class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
@@ -29,8 +28,7 @@
                 <li class="flex items-center h-full">
                     <span class="active-breadcrumb">{{__('اقدامات')}}</span>
                 </li>
-            </ol>
-        </nav>
+    </x-breadcrumb>
         @foreach($this->tasks as $task)
             <div class="space-y-4 p-4 rounded-md mt-2 bg-cyan-100">
                 <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{__('موضوع جلسه : ')}}{{$task->meeting->title}}</h4>

@@ -1,8 +1,4 @@
 <div>
-
-    {{--    <x-template>--}}
-
-
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -28,9 +24,6 @@
             </li>
         </ol>
     </nav>
-
-
-
 
     <div class="grid grid-cols-2 place-content-around place-items-center ">
         <div class="w-full">
@@ -169,5 +162,4 @@
         });
     </script>
     @endscript
-    {{--    </x-template>--}}
 </div>

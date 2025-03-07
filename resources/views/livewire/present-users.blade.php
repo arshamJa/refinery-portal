@@ -31,8 +31,7 @@
             </div>
         @endif
     </x-modal>
-    <nav class="flex justify-between mb-4 mt-20">
-        <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
+    <x-breadcrumb>
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
@@ -64,8 +63,7 @@
                        {{__('اسامی اعضای جلسه')}}
                     </span>
             </li>
-        </ol>
-    </nav>
+    </x-breadcrumb>
 
 
     <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg" dir="rtl">
