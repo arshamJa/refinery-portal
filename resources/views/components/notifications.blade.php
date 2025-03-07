@@ -3,7 +3,7 @@
     @if(auth()->user()->user_info->create_meeting)
         <div class="flex justify-center items-center w-full">
             <div class="border-t border-gray-200 w-1/4"></div>
-            <span class="mx-4 text-sm text-gray-700">first one</span>
+            <span class="mx-4 text-sm text-gray-700">{{__('مراحل جلسات')}}</span>
             <div class="border-t border-gray-200 w-1/4"></div>
         </div>
         <div class="grid grid-cols-3 content-evenly gap-4">
@@ -38,7 +38,7 @@
         </div>
         <div class="flex justify-center items-center w-full">
             <div class="border-t border-gray-200 w-1/4"></div>
-            <span class="mx-4 text-sm text-gray-700">Admin</span>
+            <span class="mx-4 text-sm text-gray-700">{{__('پیام ها و اقدامات')}}</span>
             <div class="border-t border-gray-200 w-1/4"></div>
         </div>
     @endif
@@ -71,7 +71,7 @@
         </div>
         <div class="flex justify-center items-center w-full">
             <div class="border-t border-gray-200 w-1/4"></div>
-            <span class="mx-4 text-sm text-gray-700">Admin</span>
+            <span class="mx-4 text-sm text-gray-700">{{__('گزارش کل جلسات')}}</span>
             <div class="border-t border-gray-200 w-1/4"></div>
         </div>
         <div class="grid grid-cols-3 content-evenly gap-4">

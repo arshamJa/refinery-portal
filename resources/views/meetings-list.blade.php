@@ -211,7 +211,7 @@
                                     {{ __('افزودن اقدامات') }}
                                 </x-primary-button>
                             </a>
-                        @else
+                        @elseif((isset($allUsersHaveTasks[$meeting->id]) && $allUsersHaveTasks[$meeting->id]))
                             <p>{{__('اقدامات برای تمامی اعضا ارسال شد')}}</p>
                         @endif
                     </td>

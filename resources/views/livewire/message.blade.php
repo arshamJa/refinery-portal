@@ -50,7 +50,12 @@
     {{--            </li>--}}
     {{--        </ol>--}}
     {{--    </nav>--}}
-    @if(auth()->user()->user_info->create_meeting)
+
+
+
+
+
+@if(auth()->user()->user_info->create_meeting)
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
             <a href="{{route('invitations.result')}}"
                class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-[#006769] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
