@@ -104,10 +104,8 @@
             @endforelse
             </tbody>
         </table>
-        <nav
-            class="flex flex-col md:flex-row  justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-            aria-label="Table navigation">
+        <span class="p-2 mx-2">
             {{$meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
-        </nav>
+        </span>
     </div>
 </x-app-layout>

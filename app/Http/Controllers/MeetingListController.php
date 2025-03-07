@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meeting;
+use App\Models\MeetingUser;
+use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MeetingListController extends Controller
 {
@@ -25,7 +28,6 @@ class MeetingListController extends Controller
                     ->orWhere('is_cancelled', 'like', '%' . $search . '%');
             });
         }
-
         if ($request->filled('is_cancelled')) {
             $isCancelledFilter = $request->input('is_cancelled');
             if ($isCancelledFilter === '1' || $isCancelledFilter === '-1' || $isCancelledFilter === '0') {
@@ -33,6 +35,26 @@ class MeetingListController extends Controller
             }
         }
         $meetings = $query->paginate(5);
-        return view('meetings-list',['meetings'=>$meetings]);
+
+        $allUsersHaveTasks = []; // Initialize the array outside the loop
+        foreach ($meetings as $meeting) {
+            $meetingUsers = MeetingUser::where('meeting_id', $meeting->id)->pluck('user_id');
+            $hasTasks = true; // Assume all users have tasks initially
+            if ($meetingUsers->isEmpty()) {
+                $hasTasks = false; // No users, so no tasks
+            } else {
+                foreach ($meetingUsers as $userId) {
+                    $taskExists = Task::where('meeting_id', $meeting->id)
+                        ->where('user_id', $userId)
+                        ->exists();
+                    if (!$taskExists) {
+                        $hasTasks = false; // At least one user doesn't have a task
+                        break; // Exit the inner loop
+                    }
+                }
+            }
+            $allUsersHaveTasks[$meeting->id] = $hasTasks; // Store the result
+        }
+        return view('meetings-list',['meetings'=>$meetings ,  'allUsersHaveTasks' => $allUsersHaveTasks]);
     }
 }
