@@ -23,20 +23,48 @@ class TaskManagementController extends Controller
     {
         return view('task.index');
     }
+//    private function areAllTasksAssignedToAllEmployees($tasks, $employees)
+//    {
+//        if ($employees->isEmpty() || $tasks->isEmpty()) {
+//            return true; // No employees or tasks, so consider all assigned.
+//        }
+//        foreach ($tasks as $task) {
+//            foreach ($employees as $employee) {
+//                // Check if the task is assigned to the employee
+//                if (!$this->isTaskAssignedToEmployee($task, $employee)) {
+//                    return false; // If any task is not assigned, return false
+//                }
+//            }
+//        }
+//        return true; // All tasks are assigned to all employees
+//    }
+//    private function isTaskAssignedToEmployee(Task $task, MeetingUser $employee)
+//    {
+//        return DB::table('tasks')
+//            ->where('id', $task->id)
+//            ->where('user_id', $employee->user_id)
+//            ->exists();
+//    }
+
     /**
      * Show the form for creating a new resource.
      */
     public function create(string $meeting)
     {
+
         $meetings = Meeting::find($meeting);
-        $meetingUsers = MeetingUser::where('meeting_id',$meeting)->where('is_present','=','1')->get();
+        $employees = MeetingUser::where('meeting_id',$meeting)->where('is_present','=','1')->get();
         $tasks = Task::with('user')->where('meeting_id',$meeting)->get();
+//        $allEmployeesAssigned = $this->areAllTasksAssignedToAllEmployees($tasks, $employees);
         return view('task.create' , [
             'meetings' => $meetings,
-            'meetingUsers' => $meetingUsers,
+            'employees' => $employees,
             'tasks' => $tasks,
+//            'allEmployeesAssigned' => $allEmployeesAssigned
         ]);
+        // return view('tasks.show', compact('task', 'allEmployeesAssigned'));
     }
+
 
     /**
      * Store a newly created resource in storage.

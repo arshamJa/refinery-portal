@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\meeting;
 
-use App\Rules\DateRule;
 use App\Rules\farsi_chs;
 use App\Rules\Time;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -30,7 +29,6 @@ class MeetingStoreRequest extends FormRequest
             'unit_organization' => ['required','string','min:5','max:30', new farsi_chs()],
             'scriptorium' => ['required','string', new farsi_chs()],
             'location' => ['required','string','min:5','max:30', new farsi_chs()],
-//            'date' => ['required','date_format:Y/m/d' , new DateRule()],
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],

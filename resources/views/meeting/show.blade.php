@@ -1,7 +1,6 @@
 @php use App\Models\UserInfo; @endphp
 <x-app-layout>
 
-{{--    <x-template>--}}
         <nav class="flex justify-between mb-4 mt-20">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
@@ -20,7 +19,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
                 </svg>
                 <li>
-                    <a href="{{route('meetingsList')}}"
+                    <a href="{{route('meeting.table')}}"
                        class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
                         <span>{{__('جدول جلسات')}}</span>
                     </a>
@@ -112,8 +111,6 @@
                 </p>
             </div>
         </div>
-
-{{--    </x-template>--}}
 </x-app-layout>
 
 

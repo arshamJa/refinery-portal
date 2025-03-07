@@ -1,5 +1,4 @@
 @php use App\Models\MeetingUser; @endphp
-
 <div class="col-span-3 space-y-6">
     @if(auth()->user()->user_info->create_meeting)
         <div class="flex justify-center items-center w-full">
@@ -8,7 +7,7 @@
             <div class="border-t border-gray-200 w-1/4"></div>
         </div>
         <div class="grid grid-cols-3 content-evenly gap-4">
-            <a href="{{route('meetings.create')}}"
+            <a href="{{route('meeting.create')}}"
                class="flex items-center gap-x-2 hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
@@ -35,7 +34,6 @@
                 </svg>
                 <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>
                 </span>
-                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->meetings}}</span>
             </a>
         </div>
         <div class="flex justify-center items-center w-full">

@@ -1,6 +1,4 @@
 <x-app-layout>
-
-    {{--    <x-template>--}}
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -25,11 +23,11 @@
                         </span>
             </li>
         </ol>
-        <a href="{{route('meetings')}}">
+        <a href="{{route('meeting.table')}}">
             <x-primary-button>{{__('جدول جلسات')}}</x-primary-button>
         </a>
     </nav>
-    <form action="{{route('meetings.store')}}" method="post" enctype="multipart/form-data">
+    <form action="{{route('meeting.store')}}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
             <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-12">
@@ -274,6 +272,5 @@
             </a>
         </div>
     </form>
-    {{--    </x-template>--}}
 </x-app-layout>
 

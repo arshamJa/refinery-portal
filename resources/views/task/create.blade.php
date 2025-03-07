@@ -55,8 +55,8 @@
                         {{__('موضوع جلسه')}} : {{$meetings->title}}
                     </span>
                 <span>{{__('حاضرین')}} :
-                    @foreach($meetingUsers as $meetingUser)
-                        {{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}} -
+                    @foreach($employees as $employee)
+                        {{UserInfo::where('user_id',$employee->user_id)->value('full_name')}} -
                     @endforeach
                     </span>
             </div>
@@ -95,9 +95,9 @@
                                     </button>
                                 </div>
                                 <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                                @foreach($meetingUsers as $meetingUser)
-                                    <div class="option" data-value="{{$meetingUser->user_id}}">
-                                        {{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}
+                                @foreach($employees as $employee)
+                                    <div class="option" data-value="{{$employee->user_id}}">
+                                        {{UserInfo::where('user_id',$employee->user_id)->value('full_name')}}
                                     </div>
                                 @endforeach
                                 <div class="no-result-message" style="display:none;">No result match</div>
