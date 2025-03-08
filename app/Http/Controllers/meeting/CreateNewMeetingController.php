@@ -24,7 +24,7 @@ class CreateNewMeetingController extends Controller
             ->where('scriptorium','=',auth()->user()->user_info->full_name)
             ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
             ->paginate(3);
-        return view('meeting.index' , [
+        return view('meeting.crud.index' , [
             'meetings' => $meetings
         ]);
     }
@@ -35,7 +35,7 @@ class CreateNewMeetingController extends Controller
     {
         $users = UserInfo::whereHas('user', fn($query) => $query->where('role', 'employee')->orWhere('role','boss'))
             ->get(['id','user_id','full_name']);
-        return view('meeting.create' , ['users' => $users]);
+        return view('meeting.crud.create' , ['users' => $users]);
     }
 
     /**
@@ -105,7 +105,7 @@ class CreateNewMeetingController extends Controller
         $meetings = Meeting::findOrFail($id);
         $userIds = MeetingUser::where('meeting_id',$meetings->id)->get('user_id');
         $tasks = Task::where('meeting_id',$meetings->id)->get();
-        return view('meeting.show',[
+        return view('meeting.crud.show',[
             'meetings' => $meetings ,
             'userIds' => $userIds ,
             'tasks' => $tasks
@@ -123,7 +123,7 @@ class CreateNewMeetingController extends Controller
             ->select('user_infos.id','user_infos.full_name')
             ->whereNull('deleted_at')
             ->get();
-        return view('meeting.edit',['meeting' => $meeting , 'users' => $users]);
+        return view('meeting.crud.edit',['meeting' => $meeting , 'users' => $users]);
     }
 
     /**

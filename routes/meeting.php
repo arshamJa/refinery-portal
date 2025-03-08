@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\meeting\AttendedMeetingsController;
 use App\Http\Controllers\meeting\CreateNewMeetingController;
+use App\Http\Controllers\meeting\MeetingListController;
 use App\Http\Controllers\MeetingController;
-use App\Http\Controllers\MeetingListController;
 use App\Http\Controllers\Reports\ScriptoriumReportController;
 use App\Livewire\AttendedMeetings;
 use App\Livewire\InvitationsResult;
@@ -31,13 +32,17 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
         ->name('meeting.edit');
     Route::patch('/meetings/{meeting}', [CreateNewMeetingController::class, 'update'])
         ->name('meeting.update');
-//    Route::delete('/meetings/{meeting}', [\App\Http\Controllers\meeting\CreateNewMeetingController::class, 'destroy'])
-//        ->name('meeting.destroy');
+    Route::delete('/meetings/{meeting}', [CreateNewMeetingController::class, 'destroy'])
+        ->name('meeting.destroy');
 //    the end of creating new meeting
 
 //    list of meetings that are going to hold
     Route::get('meeting/list', [MeetingListController::class, 'index'])
         ->name('meetingsList');
+
+//    meetings that users participated in
+    Route::get('attended/meetings', [AttendedMeetingsController::class, 'index'])
+        ->name('attended.meetings');
 
 
     Route::get('/meeting/notification', MeetingNotification::class)
@@ -45,7 +50,6 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
 
     Route::get('/meeting/report', MeetingDashboardReport::class)->name('meeting.report');
 
-    Route::get('attended/meetings', AttendedMeetings::class)->name('attended.meetings');
 
     Route::get('/scriptorium/report', [ScriptoriumReportController::class, 'index'])
         ->name('scriptorium.report');

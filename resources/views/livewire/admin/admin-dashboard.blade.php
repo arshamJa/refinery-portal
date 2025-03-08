@@ -254,9 +254,9 @@
 {{--        }--}}
 {{--    </script>--}}
 {{--    @endscript--}}
-    <div class="grid grid-cols-3 gap-4 mt-20">
+    <div class="mt-20">
 
-        <div class="col-span-3 grid grid-cols-1 mb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-3 place-content-center w-full mb-10 gap-6">
             <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
                 <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
                 <div class="flex items-center justify-between z-10">

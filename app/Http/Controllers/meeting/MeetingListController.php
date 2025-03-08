@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\meeting;
 
+use App\Http\Controllers\Controller;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Task;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class MeetingListController extends Controller
 {
@@ -55,6 +55,6 @@ class MeetingListController extends Controller
             }
             $allUsersHaveTasks[$meeting->id] = $hasTasks; // Store the result
         }
-        return view('meetings-list',['meetings'=>$meetings ,  'allUsersHaveTasks' => $allUsersHaveTasks]);
+        return view('meeting.meetings-list',['meetings'=>$meetings ,  'allUsersHaveTasks' => $allUsersHaveTasks]);
     }
 }

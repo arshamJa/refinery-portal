@@ -104,10 +104,13 @@
                                             <x-dropdown-link href="{{route('meeting.edit',$meeting->id)}}">
                                                 {{__('ویرایش')}}
                                             </x-dropdown-link>
-                                            <x-dropdown-link>
-                                                {{__('حذف')}}
-                                            </x-dropdown-link>
-
+                                            <form action="{{route('meeting.destroy',$meeting->id)}}" method="post">
+                                                @csrf
+                                                @method('delete')
+                                                <x-dropdown-link type="submit">
+                                                    {{__('حذف')}}
+                                                </x-dropdown-link>
+                                            </form>
                                         </x-slot>
                                     </x-dropdown>
                                 </td>

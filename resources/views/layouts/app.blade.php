@@ -35,16 +35,16 @@
     <!-- Top Navigation Bar -->
     <x-navigation/>
 
-    <div class="flex flex-1">
+    <div>
         <!-- Sidebar -->
         <aside
             :class="{'translate-x-full': open, 'translate-x-0': !open}"
-            class="fixed pt-14 pr-2 inset-y-0 right-0 top-0 bottom-0 z-20 min-h-dvh bg-gray-800 text-white w-64 transform transition-transform duration-300 md:static md:translate-x-0">
+            class="absolute bg-[#FCF7F8] pt-2 rounded-xl drop-shadow-md pr-2 inset-y-0 right-2 top-16 bottom-2 z-20 w-64 transform transition-transform duration-300 md:translate-x-0">
             <x-side-bar/>
         </aside>
 
         <!-- Main content -->
-        <main  class="flex-1 px-4">
+        <main  class="flex-1 px-4 mr-72">
             <x-sessionMessage name="status"/>
             {{ $slot }}
         </main>

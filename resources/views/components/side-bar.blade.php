@@ -1,16 +1,50 @@
 <div>
-{{--    <button @click="open = !open"--}}
-{{--            class="text-gray-50 hover:bg-gray-50 transition ease-in-out duration-300 rounded-md p-1 hover:text-gray-800 focus:outline-none">--}}
-{{--        <svg :class="open ? 'hidden' : 'block'"--}}
-{{--             x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-{{--             stroke="currentColor" class="size-6 block">--}}
-{{--            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>--}}
-{{--        </svg>--}}
-{{--    </button>--}}
-    <div class="flex justify-between px-2 items-center">
-        <div class="mr-2 text-sm">
-            <p class="text-lg font-semibold mb-1 text-right">{{auth()->user()->full_name()}}</p>
-            <p class="text-sm text-gray-400 text-right"> {{__('نقش')}} :
+{{--    <div class="flex justify-between px-2 items-center">--}}
+{{--        <div class="mr-2 text-sm">--}}
+{{--            <p class="text-lg font-semibold mb-1 text-right">{{auth()->user()->full_name()}}</p>--}}
+{{--            <p class="text-sm  text-right"> {{__('نقش')}} :--}}
+{{--                @if(auth()->user()->role === 'admin')--}}
+{{--                    {{__('ادمین')}}--}}
+{{--                @elseif(auth()->user()->role === 'employee')--}}
+{{--                    {{__('کاربر')}}--}}
+{{--                @elseif(auth()->user()->role === 'operator_news')--}}
+{{--                    {{__('اپراتور اخبار و اطلاعیه')}}--}}
+{{--                @elseif(auth()->user()->role === 'operator_phones')--}}
+{{--                    {{__('اپراتور دفترچه تلفنی')}}--}}
+{{--                @endif--}}
+{{--            </p>--}}
+{{--            <p class="text-sm  text-right">{{__('واحد')}}--}}
+{{--                : {{auth()->user()->user_info->department->department_name}}</p>--}}
+{{--        </div>--}}
+{{--        <div class="flex justify-center">--}}
+{{--            @if(auth()->user()->profile_photo_path)--}}
+{{--                <img class="rounded-full m-2 w-14 h-14 object-cover" src="{{ auth()->user()->profilePhoto() }}" alt="">--}}
+{{--            @else--}}
+{{--                <svg--}}
+{{--                    class="shrink-0 rounded-full m-2 w-14 h-14 bg-gray-100 dark:bg-gray-600"--}}
+{{--                    fill="currentColor"--}}
+{{--                    viewBox="0 0 24 24">--}}
+{{--                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />--}}
+{{--                </svg>--}}
+{{--            @endif--}}
+{{--        </div>--}}
+{{--    </div>--}}
+    <div class="mr-2 text-sm  flex flex-col justify-center items-center mb-4">
+        <div>
+            @if(auth()->user()->profile_photo_path)
+                <img class="rounded-full m-2 w-14 h-14 object-cover" src="{{ auth()->user()->profilePhoto() }}" alt="">
+            @else
+                <svg
+                    class="shrink-0 rounded-full m-2 w-14 h-14 bg-gray-100 text-gray-700"
+                    fill="currentColor"
+                    viewBox="0 0 24 24">
+                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            @endif
+        </div>
+        <div class="text-center">
+            <p class="text-lg font-semibold mb-1">{{auth()->user()->full_name()}}</p>
+            <p class="text-sm"> {{__('نقش')}} :
                 @if(auth()->user()->role === 'admin')
                     {{__('ادمین')}}
                 @elseif(auth()->user()->role === 'employee')
@@ -21,23 +55,12 @@
                     {{__('اپراتور دفترچه تلفنی')}}
                 @endif
             </p>
-            <p class="text-sm text-gray-400 text-right">{{__('واحد')}}
+            <p class="text-sm">{{__('واحد')}}
                 : {{auth()->user()->user_info->department->department_name}}</p>
         </div>
-        <div class="flex justify-center">
-            @if(auth()->user()->profile_photo_path)
-                <img class="rounded-full m-2 w-14 h-14 object-cover" src="{{ auth()->user()->profilePhoto() }}" alt="">
-            @else
-                <svg
-                    class="shrink-0 rounded-full m-2 w-14 h-14 text-gray-300 bg-gray-100 dark:bg-gray-600"
-                    fill="currentColor"
-                    viewBox="0 0 24 24">
-                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-            @endif
-        </div>
+
     </div>
-    <hr class="border-gray-700 my-4 mx-1">
+{{--    <hr class="border-gray-700 my-4 mx-1">--}}
 </div>
 <ul class="w-full mt-2">
 {{--    <li class="space-y-2">--}}
@@ -135,11 +158,11 @@
 </ul>
 <div class="absolute bottom-2 left-0 w-full pr-2">
     <ul>
-        <li>
+        <li class="text-white hover:bg-[#DE0C0C] bg-[#A31621] rounded-md  transition ease-in-out duration-200 ">
             <form action="{{route('logout')}}" method="post">
                 @csrf
                 <button type="submit"
-                        class="inline-flex items-center gap-1 w-full text-base font-medium rounded-md px-4 py-2 text-right text-white transition ease-in-out duration-200 hover:bg-gray-700">
+                        class="inline-flex justify-center items-center gap-1 w-full text-base font-medium rounded-md px-4 py-2 text-right">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">
                         <path stroke-linecap="round" stroke-linejoin="round"

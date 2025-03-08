@@ -102,7 +102,7 @@
                 </div>
             </div>
         </div>
-            <div wire:ignore class="p-4 shadow-md w-2/3 border rounded-md">
+            <div wire:ignore class="p-4 w-2/3 border shadow-md rounded-md">
                 <canvas id="largeChart"></canvas>
             </div>
 
