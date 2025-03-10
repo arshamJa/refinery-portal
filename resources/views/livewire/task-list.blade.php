@@ -40,12 +40,12 @@
 
                 @if(!$task->is_completed)
                     <x-primary-button wire:click="finishTask({{$task->id}})">{{__('اتمام کار و ارسال')}}</x-primary-button>
-                    <div class="p-1 mt-2 border-t-2">
-                        <x-input-label for="body" :value="__('در صورت نیاز به ویرایش اقدامات، در کادر زیر درج کنید')" class="mb-2"/>
-                        <textarea type="text" wire:model="body"
-                                  class="flex w-full h-auto min-h-[80px] px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-                        <x-secondary-button wire:click="editTask({{$task->id}})" class="mt-2">{{__('ارسال به دبیر جلسه')}}</x-secondary-button>
-                    </div>
+{{--                    <div class="p-1 mt-2 border-t-2">--}}
+{{--                        <x-input-label for="body" :value="__('در صورت نیاز به ویرایش اقدامات، در کادر زیر درج کنید')" class="mb-2"/>--}}
+{{--                        <textarea type="text" wire:model="body"--}}
+{{--                                  class="flex w-full h-auto min-h-[80px] px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"></textarea>--}}
+{{--                        <x-secondary-button wire:click="editTask({{$task->id}})" class="mt-2">{{__('ارسال به دبیر جلسه')}}</x-secondary-button>--}}
+{{--                    </div>--}}
                 @else
                     <p class="mt-4">{{__('اقدامات انجام و به دبیر جلسه ارسال شده است')}}</p>
                 @endif

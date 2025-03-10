@@ -1,31 +1,32 @@
 @php use App\Models\MeetingUser; @endphp
-<div class="col-span-3 space-y-6 place-items-center">
+<div class="col-span-3 space-y-10 place-items-center">
     @if(auth()->user()->user_info->create_meeting)
-        <div class="flex justify-center items-center w-full">
-            <div class="border-t border-gray-200 w-1/4"></div>
-            <span class="mx-4 text-sm text-gray-700">{{__('مراحل جلسات')}}</span>
-            <div class="border-t border-gray-200 w-1/4"></div>
-        </div>
-        <div class="grid grid-cols-3 w-full gap-4">
-            <a href="{{route('meeting.create')}}"
-               class="flex items-center gap-x-2 hover:bg-[#40A578] hover:text-[#FFFAEC] border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                </svg>
-                <h3 class="text-sm font-semibold"> {{__('ایجاد جلسه جدید')}}</h3>
-            </a>
-            <a href="{{route('meetingsList')}}"
-               class="flex items-center gap-x-2 bg-transparent text-black hover:bg-[#9DDE8B] hover:text-[#FFFAEC] border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>
-                </svg>
-                <h3 class="text-sm font-semibold"> {{__('لیست جلسات در حال برگزاری')}}</h3>
-            </a>
-            <a href="{{route('scriptorium.report')}}"
-               class="flex justify-between items-center gap-x-4 hover:bg-[#CD5555] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+        <div class="flex flex-col justify-center items-center gap-y-3 mb-4 w-full">
+            <div class="flex justify-center items-center w-full">
+                <div class="border-t border-gray-200 w-1/4"></div>
+                <span class="mx-4 text-sm text-gray-700">{{__('مراحل جلسات')}}</span>
+                <div class="border-t border-gray-200 w-1/4"></div>
+            </div>
+            <div class="grid grid-cols-3 w-full gap-4">
+                <a href="{{route('meeting.create')}}"
+                   class="hover:text-[#0184B1] hover:bg-[#B6F9FF] flex items-center gap-x-2 shadow-md bg-[#FCF7F8] hover:shadow-gray-300 transition duration-300 ease-in-out p-4 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                    </svg>
+                    <h3 class="text-sm font-semibold"> {{__('ایجاد جلسه جدید')}}</h3>
+                </a>
+                <a href="{{route('meetingsList')}}"
+                   class="flex items-center gap-x-2 bg-transparent text-black hover:bg-[#9DDE8B] hover:text-[#FFFAEC] border border-gray-800 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>
+                    </svg>
+                    <h3 class="text-sm font-semibold"> {{__('لیست جلسات در حال برگزاری')}}</h3>
+                </a>
+                <a href="{{route('scriptorium.report')}}"
+                   class="flex justify-between items-center gap-x-4 hover:bg-[#CD5555] hover:text-[#FFFAEC] text-black border border-gray-800 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                 <span class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
@@ -34,17 +35,19 @@
                 </svg>
                 <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>
                 </span>
-            </a>
-        </div>
-        <div class="flex justify-center items-center w-full">
-            <div class="border-t border-gray-200 w-1/4"></div>
-            <span class="mx-4 text-sm text-gray-700">{{__('پیام ها و اقدامات')}}</span>
-            <div class="border-t border-gray-200 w-1/4"></div>
+                </a>
+            </div>
         </div>
     @endif
-        <div class="grid grid-cols-2 w-2/3 gap-4">
-            <a href="{{route('message')}}"
-               class="flex justify-between items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+        <div class="flex flex-col justify-center items-center gap-y-3 mb-4 w-full">
+            <div class="flex justify-center items-center w-full">
+                <div class="border-t border-gray-200 w-1/4"></div>
+                <span class="mx-4 text-sm text-gray-700">{{__('پیام ها و اقدامات')}}</span>
+                <div class="border-t border-gray-200 w-1/4"></div>
+            </div>
+            <div class="grid grid-cols-2 w-2/3 gap-4">
+                <a href="{{route('message')}}"
+                   class="flex justify-between items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-gray-800 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                         <span class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="size-5">
@@ -53,10 +56,10 @@
                         </svg>
                         <span class="text-sm font-semibold">{{__('پیغام های دریافتی')}}</span>
                         </span>
-                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->messages}}</span>
-            </a>
-            <a href="{{route('attended.meetings')}}"
-                   class="flex justify-between items-center gap-x-4 hover:bg-[#882042] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                    <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->messages}}</span>
+                </a>
+                <a href="{{route('attended.meetings')}}"
+                   class="flex justify-between items-center gap-x-4 hover:bg-[#882042] hover:text-[#FFFAEC] text-black border border-gray-800 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
                 <span class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
@@ -65,26 +68,29 @@
                 </svg>
                 <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>
                 </span>
-{{--                <span--}}
-{{--                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{MeetingUser::where('user_id',auth()->user()->id)->where('is_present',1)->count()}}</span>--}}
-            </a>
+                    {{--                <span--}}
+                    {{--                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{MeetingUser::where('user_id',auth()->user()->id)->where('is_present',1)->count()}}</span>--}}
+                </a>
+            </div>
         </div>
 
-        <div class="flex justify-center items-center w-full">
-            <div class="border-t border-gray-200 w-1/4"></div>
-            <span class="mx-4 text-sm text-gray-700">{{__('گزارش کل جلسات')}}</span>
-            <div class="border-t border-gray-200 w-1/4"></div>
-        </div>
-        <div class="grid grid-cols-1 w-1/3 gap-4">
-            <a href="{{route('meeting.report')}}"
-               class="flex h-full items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"/>
-                </svg>
-                <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
-            </a>
-        </div>
+       <div class="flex flex-col justify-center items-center gap-y-3 mb-4 w-full">
+           <div class="flex justify-center items-center w-full">
+               <div class="border-t border-gray-200 w-1/4"></div>
+               <span class="mx-4 text-sm text-gray-700">{{__('گزارش کل جلسات')}}</span>
+               <div class="border-t border-gray-200 w-1/4"></div>
+           </div>
+           <div class="grid grid-cols-1 w-1/3 gap-4">
+               <a href="{{route('meeting.report')}}"
+                  class="flex h-full items-center gap-x-2 hover:bg-[#3D3D3D] hover:text-[#FFFAEC] text-black border border-gray-800 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-5">
+                       <path stroke-linecap="round" stroke-linejoin="round"
+                             d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"/>
+                   </svg>
+                   <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
+               </a>
+           </div>
+       </div>
 
 </div>

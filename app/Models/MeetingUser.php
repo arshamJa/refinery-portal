@@ -43,23 +43,7 @@ class MeetingUser extends Model
     {
         return UserInfo::where('user_id',$this->user_id)->value('full_name');
     }
-    public function deadLineTask()
-    {
-        return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('time_out');
-//        if (preg_match("/^(\d+)\/(\d+)\/(\d+)$/", $time_out, $matches)) {
-//            $year = $matches[1];
-//            $month = $matches[2];
-//            $day = $matches[3];
-//            if ($day >= 1 && $day <= 9) {
-//                $newDay = "0" . $day;
-//                dump($year.'/'.$month.'/'.$newDay);
-//            }
-//        }
-    }
-    public function sentDate()
-    {
-        return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
-    }
+
 
     public function is_present()
     {

@@ -36,39 +36,13 @@ class Task extends Model
     {
         return $this->belongsTo(Meeting::class);
     }
+    public function deadLineTask()
+    {
+        return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('time_out');
+    }
+    public function sentDate()
+    {
+        return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
+    }
 
-//    public function compareDates()
-//    {
-//        // deadline to send task
-//        $first_date = $this->time_out;
-//        $first_year = \Illuminate\Support\Str::of($first_date)->explode('/');
-//        $first_month = \Illuminate\Support\Str::of($first_date)->explode('/');
-//        $first_day = \Illuminate\Support\Str::of($first_date)->explode('/');
-//
-//        // the date that the participant sent the task
-//        $second_date = $this->sent_date;
-//        $second_year = \Illuminate\Support\Str::of($second_date)->explode('/');
-//        $second_month = \Illuminate\Support\Str::of($second_date)->explode('/');
-//        $second_day = \Illuminate\Support\Str::of($second_date)->explode('/');
-//
-//        if ($first_year[0] === $second_year[0]){
-//            if ($first_month[1] === $second_month[1]){
-//                if ($first_day[2] === $second_day[2]){
-//                    'OK'
-//                }elseif($first_day[2] < $second_day[2]){
-//                    'first day is smaller than second day'
-//                }elseif($first_day[2] > $second_day[2]){
-//                    'first day is greater than second day'
-//                }
-//            }elseif($first_month[1] < $second_month[1]){
-//                'first month smaller than second month'
-//            }elseif($first_month[1] > $second_month[1]){
-//                'first month is grater than second month'
-//            }
-//        }elseif($first_year[0] < $second_year[0]){
-//            'first year is smaller than second year'
-//        }else{
-//            'first year is grater thant second year'
-//        }
-//    }
 }

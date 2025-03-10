@@ -59,12 +59,10 @@
                             {{__('نمایش')}}
                         </a>
                     </div>
-                    <div class="flex-1 bg-green-300 rounded-l-md h-8 relative">
-                        <div class="bg-green-600 h-full rounded-l-md"
-                             style="width:{{$this->tasksOnTimePercentage()}}%;"></div>
-                        <span
-                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-green-800">({{$this->tasksOnTimePercentage()}}%)</span>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-[#605C3C] h-2.5 rounded-full" style="width:{{$this->tasksOnTimePercentage()}}%;"></div>
                     </div>
+                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksOnTimePercentage()}}%)</div>
                 </div>
 
                 <div>
@@ -75,13 +73,10 @@
                             {{__('نمایش')}}
                         </a>
                     </div>
-                    <div class="flex-1 bg-yellow-300 rounded-l-md h-8 relative">
-                        <div class="bg-yellow-600 h-full rounded-l-md"
-                             style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>
-                        <span
-                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-yellow-800">({{$this->tasksDoneWithDelayPercentage()}}%)</span>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-[#1f4037] h-2.5 rounded-full" style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>
                     </div>
-
+                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksDoneWithDelayPercentage()}}%)</div>
                 </div>
 
                 <div>
@@ -92,13 +87,10 @@
                             {{__('نمایش')}}
                         </a>
                     </div>
-                    <div class="flex-1 bg-red-300 rounded-l-md h-8 relative">
-                        <div class="bg-red-600 h-full rounded-l-md"
-                             style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
-                        <span
-                            class="absolute top-1/2 left-2 transform -translate-y-1/2 text-sm font-medium text-red-800">({{$this->tasksNotDonePercentage()}}%)</span>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-[#2C5364] h-2.5 rounded-full"  style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
                     </div>
-
+                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksNotDonePercentage()}}%)</div>
                 </div>
             </div>
         </div>
@@ -107,6 +99,8 @@
             </div>
 
     </div>
+
+
 
 
     @script

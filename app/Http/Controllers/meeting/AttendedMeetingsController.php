@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\meeting;
 
 use App\Http\Controllers\Controller;
-use App\Models\MeetingUser;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
@@ -11,11 +10,11 @@ class AttendedMeetingsController extends Controller
 {
     public function index(Request $request)
     {
-        $query = MeetingUser::with('meeting:id,title,scriptorium,date,time')
-            ->where('user_id', auth()->user()->id)
-            ->select(['id', 'meeting_id', 'user_id', 'is_present']);
+//        $query = MeetingUser::with('meeting:id,title,scriptorium,date,time')
+//            ->where('user_id', auth()->user()->id)
+//            ->select(['id', 'meeting_id', 'user_id', 'is_present']);
 
-        $tasks = Task::where('user_id',auth()->user()->id)->get();
+        $query = Task::with('meeting')->where('user_id',auth()->user()->id);
 
         if ($request->filled('search')){
             $search = $request->input('search');
@@ -26,9 +25,10 @@ class AttendedMeetingsController extends Controller
                     ->orWhere('time','like','%'.$search.'%');
             });
         }
-        $meetingUsers = $query->paginate(5);
+        $tasks = $query->paginate(5);
+
         return view('meeting.attended-meetings',[
-            'meetingUsers' => $meetingUsers,
+//            'meetingUsers' => $meetingUsers,
             'tasks' => $tasks
         ]);
     }

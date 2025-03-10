@@ -39,7 +39,7 @@
             </a>
             <a href="{{route('task.sent')}}"
                class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده')}}</h3>
+                <h3 class="text-sm font-semibold"> {{__('اقدامات دریافت شده توسط اعضا')}}</h3>
                 <span
                     class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->sentTaskCount}}</span>
             </a>
@@ -60,6 +60,12 @@
             <h3 class="text-sm font-semibold"> {{__('نتیجه نهایی جلسات')}}</h3>
             <span
                 class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->read_by_user}}</span>
+        </a>
+        <a href="#"
+           class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+            <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده به دبیرجلسه')}}</h3>
+            <span
+                class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5"></span>
         </a>
     </div>
 

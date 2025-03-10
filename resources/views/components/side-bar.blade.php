@@ -1,35 +1,5 @@
 <div>
-{{--    <div class="flex justify-between px-2 items-center">--}}
-{{--        <div class="mr-2 text-sm">--}}
-{{--            <p class="text-lg font-semibold mb-1 text-right">{{auth()->user()->full_name()}}</p>--}}
-{{--            <p class="text-sm  text-right"> {{__('نقش')}} :--}}
-{{--                @if(auth()->user()->role === 'admin')--}}
-{{--                    {{__('ادمین')}}--}}
-{{--                @elseif(auth()->user()->role === 'employee')--}}
-{{--                    {{__('کاربر')}}--}}
-{{--                @elseif(auth()->user()->role === 'operator_news')--}}
-{{--                    {{__('اپراتور اخبار و اطلاعیه')}}--}}
-{{--                @elseif(auth()->user()->role === 'operator_phones')--}}
-{{--                    {{__('اپراتور دفترچه تلفنی')}}--}}
-{{--                @endif--}}
-{{--            </p>--}}
-{{--            <p class="text-sm  text-right">{{__('واحد')}}--}}
-{{--                : {{auth()->user()->user_info->department->department_name}}</p>--}}
-{{--        </div>--}}
-{{--        <div class="flex justify-center">--}}
-{{--            @if(auth()->user()->profile_photo_path)--}}
-{{--                <img class="rounded-full m-2 w-14 h-14 object-cover" src="{{ auth()->user()->profilePhoto() }}" alt="">--}}
-{{--            @else--}}
-{{--                <svg--}}
-{{--                    class="shrink-0 rounded-full m-2 w-14 h-14 bg-gray-100 dark:bg-gray-600"--}}
-{{--                    fill="currentColor"--}}
-{{--                    viewBox="0 0 24 24">--}}
-{{--                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />--}}
-{{--                </svg>--}}
-{{--            @endif--}}
-{{--        </div>--}}
-{{--    </div>--}}
-    <div class="mr-2 text-sm  flex flex-col justify-center items-center mb-4">
+    <div class="mr-2 text-sm flex flex-col justify-center items-center mb-4">
         <div>
             @if(auth()->user()->profile_photo_path)
                 <img class="rounded-full m-2 w-14 h-14 object-cover" src="{{ auth()->user()->profilePhoto() }}" alt="">
@@ -58,35 +28,10 @@
             <p class="text-sm">{{__('واحد')}}
                 : {{auth()->user()->user_info->department->department_name}}</p>
         </div>
-
     </div>
-{{--    <hr class="border-gray-700 my-4 mx-1">--}}
 </div>
 <ul class="w-full mt-2">
-{{--    <li class="space-y-2">--}}
-{{--        <x-link.responsive-link href="{{route('dashboard')}}"--}}
-{{--                                :active="request()->is('dashboard')">--}}
-{{--            {{__('داشبورد')}}--}}
-{{--        </x-link.responsive-link>--}}
-{{--        @if(auth()->user()->user_info->is_dictionary_allowed)--}}
-{{--            @can('view-any')--}}
-{{--                <x-link.responsive-link href="{{route('translate')}}"--}}
-{{--                                        :active="request()->is('translate')">--}}
-{{--                    {{__('دیکشنری')}}--}}
-{{--                </x-link.responsive-link>--}}
-{{--            @endcan--}}
-{{--        @endif--}}
-{{--        @if(auth()->user()->user_info->is_blog_allowed)--}}
-{{--            <x-link.responsive-link href="{{route('blogs.index')}}"--}}
-{{--                                    :active="request()->is('blogs')">{{__('اخبار و اطلاعیه')}}--}}
-{{--            </x-link.responsive-link>--}}
-{{--        @endif--}}
-{{--        @if(auth()->user()->user_info->is_phoneList_allowed)--}}
-{{--            <x-link.responsive-link href="{{route('phones.index')}}"--}}
-{{--                                    :active="request()->is('phones')">{{__('دفترچه تلفنی')}}--}}
-{{--            </x-link.responsive-link>--}}
-{{--        @endif--}}
-{{--    </li>--}}
+
     <li class="space-y-2">
         <x-link.responsive-link wire:navigate.hover
                                 href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
@@ -158,7 +103,7 @@
 </ul>
 <div class="absolute bottom-2 left-0 w-full pr-2">
     <ul>
-        <li class="text-white hover:bg-[#DE0C0C] bg-[#A31621] rounded-md  transition ease-in-out duration-200 ">
+        <li class="hover:text-white bg-transparent border border-[#990302] hover:border-transparent hover:bg-[#990302] rounded-md  transition ease-in-out duration-200 ">
             <form action="{{route('logout')}}" method="post">
                 @csrf
                 <button type="submit"
