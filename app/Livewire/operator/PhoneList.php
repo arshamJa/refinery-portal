@@ -39,7 +39,7 @@ class PhoneList extends Component
     {
        if (auth()->user()->role === 'admin') {
             if ($this->filtered_roles){
-                $users = User::wherein('role', $this->filtered_roles)->get();
+                $users = User::whereIn('role', $this->filtered_roles)->get();
                 $users_names = [];
                 foreach ($users as $user){
                     $users_names[] = $user->user_info->full_name;

@@ -3,7 +3,6 @@
     <x-sessionMessage name="status"/>
 
 
-
     @can('update-phone-list')
         <x-modal name="update">
             @if($userInfoId)
@@ -44,45 +43,45 @@
         </x-modal>
     @endcan
 
-{{--    <x-template>--}}
-            <div class="max-w-screen-2xl mt-14">
-                <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
-                    <!-- Table Header -->
-                    <div
-                        class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
 
-                        <!-- Search Bar -->
-                        <div class="w-full md:w-1/2">
-                            <form class="flex items-center">
-                                <label for="simple-search" class="sr-only">Search</label>
-                                <div class="relative w-full">
-                                    <div
-                                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400"
-                                             fill="currentColor" viewbox="0 0 20 20"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd"
-                                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                                  clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    <input type="text" wire:model.live="search" id="simple-search" dir="rtl"
-                                           class="bg-gray-50  border border-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"
-                                           placeholder="جست و جو" required="">
-                                </div>
-                            </form>
-                        </div>
+    <div class="max-w-screen-2xl mt-16">
+        <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
+            <!-- Table Header -->
+            <div
+                class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
 
-                        <!-- Filter -->
-                        @can('view-phone-list')
+                <!-- Search Bar -->
+                <div class="w-full md:w-1/2">
+                    <form class="flex items-center">
+                        <label for="simple-search" class="sr-only">Search</label>
+                        <div class="relative w-full">
                             <div
-                                class="flex flex-col items-stretch justify-center px-2 flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
-                                <div
-                                    x-data="{ openFilter: false }" @click.outside="openFilter=false"
-                                    class="relative text-sm">
+                                class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400"
+                                     fill="currentColor" viewbox="0 0 20 20"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <input type="text" wire:model.live="search" id="simple-search" dir="rtl"
+                                   class="bg-gray-50  border border-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"
+                                   placeholder="جست و جو" required="">
+                        </div>
+                    </form>
+                </div>
 
-                                    <button @click="openFilter=!openFilter"
-                                            class="bg-white px-4 py-2 flex items-center justify-center w-full md:w-auto border hover:bg-gray-800 hover:text-white border-gray-800 transition rounded-md shadow-sm cursor-pointer">
+                <!-- Filter -->
+                @can('view-phone-list')
+                    <div
+                        class="flex flex-col items-stretch justify-center px-2 flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
+                        <div
+                            x-data="{ openFilter: false }" @click.outside="openFilter=false"
+                            class="relative text-sm">
+
+                            <button @click="openFilter=!openFilter"
+                                    class="bg-white px-4 py-2 flex items-center justify-center w-full md:w-auto border hover:bg-gray-800 hover:text-white border-gray-800 transition rounded-md shadow-sm cursor-pointer">
                                                         <span class="flex justify-between items-center gap-1">
                                                                <svg xmlns="http://www.w3.org/2000/svg"
                                                                     aria-hidden="true"
@@ -94,152 +93,152 @@
                                                         </svg>
                                                         {{ __('فیلتر') }}
                                                     </span>
-                                    </button>
+                            </button>
 
-                                    <!-- Filter Options -->
-                                    <ul x-show="openFilter" dir="rtl"
-                                        class="absolute top-0 right-0 w-48 p-4 mt-10 bg-green-100 z-30 rounded-md shadow-sm"
-                                        x-transition x-cloak>
-                                        @if(auth()->user()->role === 'admin')
-                                            <li class="flex items-center gap-x-1">
-                                                <x-checkbox-input x-on:click="$wire.filter_roles('admin')"
-                                                                  checked
-                                                                  id="admin"
-                                                                  value="admin"/>
-                                                <x-input-label for="admin"/>{{ __('ادمین') }}
-                                            </li>
-                                        @endif
-                                        <li class="flex items-center gap-x-1">
-                                            <x-checkbox-input x-on:click="$wire.filter_roles('operator_phones')"
-                                                              checked
-                                                              id="operator"
-                                                              value="operator"/>
-                                            <x-input-label for="operator"/>{{ __('اپراتور') }}
-                                        </li>
-                                        <li class="flex items-center gap-x-1">
-                                            <x-checkbox-input x-on:click="$wire.filter_roles('employee')"
-                                                              checked
-                                                              id="employee"
-                                                              value="employee"/>
-                                            <x-input-label for="employee"/>{{ __('کارمند') }}
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        @endcan
-                    </div>
-                    <!-- Table Body -->
-                    <div class="overflow-x-auto" dir="ltr">
-                        <!-- Table -->
-                        <x-table.table>
-                            <x-slot name="head">
-                                <th class="py-3"></th>
+                            <!-- Filter Options -->
+                            <ul x-show="openFilter" dir="rtl"
+                                class="absolute top-0 right-0 w-48 p-4 mt-10 bg-green-100 z-30 rounded-md shadow-sm"
+                                x-transition x-cloak>
                                 @if(auth()->user()->role === 'admin')
-                                    @if(in_array('phone', $infos))
-                                        <th class="py-3">{{ __('تلفن همراه') }}</th>
-                                    @endif
-                                    @if(in_array('house_phone', $infos))
-                                        <th class="py-3">{{ __('تلفن منزل') }}</th>
-                                    @endif
+                                    <li class="flex items-center gap-x-1">
+                                        <x-checkbox-input x-on:click="$wire.filter_roles('admin')"
+                                                          checked
+                                                          id="admin"
+                                                          value="admin"/>
+                                        <x-input-label for="admin"/>{{ __('ادمین') }}
+                                    </li>
                                 @endif
-
-                                @if(in_array('work_phone', $infos))
-                                    <th class="py-3">{{ __('تلفن محل کار') }}</th>
-                                @endif
-
-                                @if(in_array('full_name', $infos))
-                                    <th class="py-3">{{ __('نام و نام خانوادگی') }}</th>
-                                @endif
-
-                                @if(in_array('department_id', $infos))
-                                    <th class="py-3">{{ __('دپارتمان') }}</th>
-                                @endif
-
-                                <th class="py-3">{{ __('ردیف') }}</th>
-                            </x-slot>
-                            <x-slot name="body">
-                                @if($this->userInfos != null)
-                                    @forelse($this->userInfos as $userInfo)
-                                        <tr class="py-3 border-b text-center" wire:key="{{$userInfo->id}}">
-                                            <td>
-                                                @can('update-phone-list', $userInfo)
-                                                    <x-primary-button
-                                                        wire:click="openModalEdit({{$userInfo->id}})"
-                                                        class="flex gap-x-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                             viewBox="0 0 24 24"
-                                                             stroke-width="1.5" stroke="currentColor"
-                                                             class="size-4">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
-                                                        </svg>
-                                                        {{__('ویرایش')}}
-                                                    </x-primary-button>
-                                                @endcan
-                                            </td>
-                                            @if(auth()->user()->role === 'admin')
-                                                @if(in_array('phone', $infos))
-                                                    <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                                        {{ $userInfo->phone }}
-                                                    </td>
-                                                @endif
-                                                @if(in_array('house_phone', $infos))
-                                                    <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                                        {{ $userInfo->house_phone }}
-                                                    </td>
-                                                @endif
-                                            @endif
-                                            @if(in_array('work_phone', $infos))
-                                                <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                                    {{ $userInfo->work_phone }}
-                                                </td>
-                                            @endif
-                                            @if(in_array('full_name', $infos))
-                                                <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                                    {{ $userInfo->full_name }}
-                                                </td>
-                                            @endif
-                                            @if(in_array('department_id', $infos))
-                                                <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                                    {{ $userInfo->department->department_name ?? 'بدون واحد'}}
-                                                </td>
-                                            @endif
-                                            <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                                {{ $userInfo->id }}
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr class="py-3 border-b text-center">
-                                            <td colspan="7"
-                                                class="py-4 whitespace-no-wrap text-sm leading-5">
-                                                {{__('... رکوردی یافت نشد')}}
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                @else
-                                    <tr class="py-3 border-b text-center">
-                                        <td colspan="7"
-                                            class="py-4 whitespace-no-wrap text-sm leading-5">
-                                            {{__('... رکوردی یافت نشد')}}
-                                        </td>
-                                    </tr>
-                                @endif
-                            </x-slot>
-                        </x-table.table>
-
-                        <!-- Pagination -->
-                        <nav dir="rtl"
-                             class="flex flex-col md:flex-row mt-8 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-                             aria-label="Table navigation">
-                            @if($this->userinfos != null)
-                                {{ $this->userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
-                            @endif
-                        </nav>
-
+                                <li class="flex items-center gap-x-1">
+                                    <x-checkbox-input x-on:click="$wire.filter_roles('operator_phones')"
+                                                      checked
+                                                      id="operator"
+                                                      value="operator"/>
+                                    <x-input-label for="operator"/>{{ __('اپراتور') }}
+                                </li>
+                                <li class="flex items-center gap-x-1">
+                                    <x-checkbox-input x-on:click="$wire.filter_roles('employee')"
+                                                      checked
+                                                      id="employee"
+                                                      value="employee"/>
+                                    <x-input-label for="employee"/>{{ __('کارمند') }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
+                @endcan
+            </div>
+            <!-- Table -->
+            <div class="pt-4 sm:px-10 sm:pt-6 shadow-md rounded-md">
+            <table class="w-full text-sm text-gray-500 dark:text-gray-400">
+                <thead
+                    class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th class="py-3">{{ __('ردیف') }}</th>
 
-                </div>
+                    @if(in_array('department_id', $infos))
+                        <th class="py-3">{{ __('دپارتمان') }}</th>
+                    @endif
+
+                    @if(in_array('full_name', $infos))
+                        <th class="py-3">{{ __('نام و نام خانوادگی') }}</th>
+                    @endif
+
+                    @if(auth()->user()->role === 'admin')
+                        @if(in_array('phone', $infos))
+                            <th class="py-3">{{ __('تلفن همراه') }}</th>
+                        @endif
+                        @if(in_array('house_phone', $infos))
+                            <th class="py-3">{{ __('تلفن منزل') }}</th>
+                        @endif
+                    @endif
+
+                    @if(in_array('work_phone', $infos))
+                        <th class="py-3">{{ __('تلفن محل کار') }}</th>
+                    @endif
+                    @can('update-phone-list')
+                        <th class="py-3"></th>
+                    @endcan
+                </tr>
+                </thead>
+                <tbody>
+                @if($this->userInfos != null)
+                    @forelse($this->userInfos as $userInfo)
+                        <tr class="py-3 border-b text-center" wire:key="{{$userInfo->id}}">
+                            <td class="py-4 whitespace-no-wrap text-sm leading-5">
+                                {{ $loop->index+1 }}
+                            </td>
+                            @if(in_array('department_id', $infos))
+                                <td class="py-4 whitespace-no-wrap text-sm leading-5">
+                                    {{ $userInfo->department->department_name ?? 'بدون واحد'}}
+                                </td>
+                            @endif
+                            @if(in_array('full_name', $infos))
+                                <td class="py-4 whitespace-no-wrap text-sm leading-5">
+                                    {{ $userInfo->full_name }}
+                                </td>
+                            @endif
+
+                            @if(auth()->user()->role === 'admin')
+                                @if(in_array('phone', $infos))
+                                    <td class="py-4 whitespace-no-wrap text-sm leading-5">
+                                        {{ $userInfo->phone }}
+                                    </td>
+                                @endif
+                                @if(in_array('house_phone', $infos))
+                                    <td class="py-4 whitespace-no-wrap text-sm leading-5">
+                                        {{ $userInfo->house_phone }}
+                                    </td>
+                                @endif
+                            @endif
+                            @if(in_array('work_phone', $infos))
+                                <td class="py-4 whitespace-no-wrap text-sm leading-5">
+                                    {{ $userInfo->work_phone }}
+                                </td>
+                            @endif
+                            @can('update-phone-list', $userInfo)
+                                <td>
+                                    <x-primary-button
+                                        wire:click="openModalEdit({{$userInfo->id}})"
+                                        class="flex gap-x-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke-width="1.5" stroke="currentColor"
+                                             class="size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
+                                        </svg>
+                                        {{__('ویرایش')}}
+                                    </x-primary-button>
+                                </td>
+                            @endcan
+
+
+                        </tr>
+                    @empty
+                        <tr class="py-3 border-b text-center">
+                            <td colspan="7"
+                                class="py-4 whitespace-no-wrap text-sm leading-5">
+                                {{__('... رکوردی یافت نشد')}}
+                            </td>
+                        </tr>
+                    @endforelse
+                @else
+                    <tr class="py-3 border-b text-center">
+                        <td colspan="7"
+                            class="py-4 whitespace-no-wrap text-sm leading-5">
+                            {{__('... رکوردی یافت نشد')}}
+                        </td>
+                    </tr>
+                @endif
+                </tbody>
+            </table>
+            <!-- Pagination -->
+            <span class="p-2 mx-2">
+                    @if($this->userinfos != null)
+                    {{ $this->userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
+                @endif
+                </span>
+            </div>
         </div>
-{{--    </x-template>--}}
-
+    </div>
 </div>

@@ -26,52 +26,254 @@
         </li>
     </x-breadcrumb>
 
+    <div wire:ignore class="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+        <div class="flex justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center">
+                <div class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center me-3">
+                    <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 19">
+                        <path d="M14.5 0A3.987 3.987 0 0 0 11 2.1a4.977 4.977 0 0 1 3.9 5.858A3.989 3.989 0 0 0 14.5 0ZM9 13h2a4 4 0 0 1 4 4v2H5v-2a4 4 0 0 1 4-4Z"/>
+                        <path d="M5 19h10v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2ZM5 7a5.008 5.008 0 0 1 4-4.9 3.988 3.988 0 1 0-3.9 5.859A4.974 4.974 0 0 1 5 7Zm5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm5-1h-.424a5.016 5.016 0 0 1-1.942 2.232A6.007 6.007 0 0 1 17 17h2a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5ZM5.424 9H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h2a6.007 6.007 0 0 1 4.366-5.768A5.016 5.016 0 0 1 5.424 9Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h5 class="leading-none text-2xl font-bold text-gray-900 dark:text-white pb-1">3.4k</h5>
+                    <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Leads generated per week</p>
+                </div>
+            </div>
+            <div>
+      <span class="bg-green-100 text-green-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md dark:bg-green-900 dark:text-green-300">
+        <svg class="w-2.5 h-2.5 me-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
+        </svg>
+        42.5%
+      </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2">
+            <dl class="flex items-center">
+                <dt class="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">Money spent:</dt>
+                <dd class="text-gray-900 text-sm dark:text-white font-semibold">$3,232</dd>
+            </dl>
+            <dl class="flex items-center justify-end">
+                <dt class="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">Conversion rate:</dt>
+                <dd class="text-gray-900 text-sm dark:text-white font-semibold">1.2%</dd>
+            </dl>
+        </div>
+
+        <div id="column-chart"></div>
+        <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
+            <div class="flex justify-between items-center pt-5">
+                <!-- Button -->
+                <button
+                    id="dropdownDefaultButton"
+                    data-dropdown-toggle="lastDaysdropdown"
+                    data-dropdown-placement="bottom"
+                    class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+                    type="button">
+                    Last 7 days
+                    <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                </button>
+                <!-- Dropdown menu -->
+                <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                        <li>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
+                        </li>
+                        <li>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
+                        </li>
+                        <li>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 7 days</a>
+                        </li>
+                        <li>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 30 days</a>
+                        </li>
+                        <li>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 90 days</a>
+                        </li>
+                    </ul>
+                </div>
+                <a
+                    href="#"
+                    class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                    Leads Report
+                    <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+   @script
+    <script>
+        const options = {
+            colors: ["#1A56DB", "#FDBA8C"],
+            series: [
+                {
+                    name: "Organic",
+                    color: "#1A56DB",
+                    data: [
+                        { x: "Mon", y: 231 },
+                        { x: "Tue", y: 122 },
+                        { x: "Wed", y: 63 },
+                        { x: "Thu", y: 421 },
+                        { x: "Fri", y: 122 },
+                        { x: "Sat", y: 323 },
+                        { x: "Sun", y: 111 },
+                    ],
+                },
+                {
+                    name: "Social media",
+                    color: "#FDBA8C",
+                    data: [
+                        { x: "Mon", y: 232 },
+                        { x: "Tue", y: 113 },
+                        { x: "Wed", y: 341 },
+                        { x: "Thu", y: 224 },
+                        { x: "Fri", y: 522 },
+                        { x: "Sat", y: 411 },
+                        { x: "Sun", y: 243 },
+                    ],
+                },
+            ],
+            chart: {
+                type: "bar",
+                height: "320px",
+                fontFamily: "Inter, sans-serif",
+                toolbar: {
+                    show: false,
+                },
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: "70%",
+                    borderRadiusApplication: "end",
+                    borderRadius: 8,
+                },
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+                style: {
+                    fontFamily: "Inter, sans-serif",
+                },
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "darken",
+                        value: 1,
+                    },
+                },
+            },
+            stroke: {
+                show: true,
+                width: 0,
+                colors: ["transparent"],
+            },
+            grid: {
+                show: false,
+                strokeDashArray: 4,
+                padding: {
+                    left: 2,
+                    right: 2,
+                    top: -14
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            legend: {
+                show: false,
+            },
+            xaxis: {
+                floating: false,
+                labels: {
+                    show: true,
+                    style: {
+                        fontFamily: "Inter, sans-serif",
+                        cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400'
+                    }
+                },
+                axisBorder: {
+                    show: false,
+                },
+                axisTicks: {
+                    show: false,
+                },
+            },
+            yaxis: {
+                show: false,
+            },
+            fill: {
+                opacity: 1,
+            },
+        }
+
+        if(document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
+            const chart = new ApexCharts(document.getElementById("column-chart"), options);
+            chart.render();
+        }
+    </script>
+    @endscript
     @if(auth()->user()->user_info->create_meeting)
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
-            <a href="{{route('invitations.result')}}"
-               class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</h3>
-                @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
-                    <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">
+        <div class="flex flex-col justify-center items-center gap-y-3 mb-4 w-full">
+            <div class="flex justify-center items-center w-full">
+                <div class="border-t border-gray-200 w-1/4"></div>
+                <span class="mx-4 text-sm text-gray-700">{{__('نقش دبیرجلسه')}}</span>
+                <div class="border-t border-gray-200 w-1/4"></div>
+            </div>
+            <div class="grid grid-cols-2 w-full gap-6">
+                <a href="{{route('invitations.result')}}"
+                   class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold"> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</h3>
+                    @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
+                        <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">
                 {{MeetingUser::with('meeting')->where('is_present','!=' , '0')->where('read_by_scriptorium',false)->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)->count()}}
                 </span>
-                @endif
-            </a>
-            <a href="{{route('task.sent')}}"
-               class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-                <h3 class="text-sm font-semibold"> {{__('اقدامات دریافت شده توسط اعضا')}}</h3>
-                <span
-                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->sentTaskCount}}</span>
-            </a>
+                    @endif
+                </a>
+                <a href="{{route('task.sent')}}"
+                   class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold"> {{__('اقدامات دریافت شده توسط اعضا')}}</h3>
+                    <span
+                        class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->sentTaskCount}}</span>
+                </a>
+            </div>
         </div>
     @endif
 
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 pt-4">
-        {{--        @if($this->invitation)--}}
-        <a href="{{route('meeting.invitation')}}"
-           class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-            <span class="text-sm font-semibold">{{__('لیست جلساتی که دعوت شده اید')}}</span>
-            <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->invitation}}</span>
-        </a>
-        {{--        @endif--}}
-        <a href="{{route('meeting.notification')}}"
-           class="flex justify-between items-center gap-x-4 bg-transparent text-black hover:bg-[#9DDE8B] hover:text-[#FFFAEC] border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-            <h3 class="text-sm font-semibold"> {{__('نتیجه نهایی جلسات')}}</h3>
-            <span
-                class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->read_by_user}}</span>
-        </a>
-        <a href="#"
-           class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
-            <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده به دبیرجلسه')}}</h3>
-            <span
-                class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5"></span>
-        </a>
+    <div class="flex flex-col justify-center items-center gap-y-3 mt-10 w-full">
+        <div class="flex justify-center items-center w-full">
+            <div class="border-t border-gray-200 w-1/4"></div>
+            <span class="mx-4 text-sm text-gray-700">{{__('نقش عضو جلسه')}}</span>
+            <div class="border-t border-gray-200 w-1/4"></div>
+        </div>
+        <div class="grid grid-cols-3 w-full gap-6">
+            {{--        @if($this->invitation)--}}
+            <a href="{{route('meeting.invitation')}}"
+               class="flex justify-between items-center hover:bg-[#006769] hover:text-[#FFFAEC] text-black border border-blue-950 hover:border-transparent hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                <span class="text-sm font-semibold">{{__('لیست جلساتی که دعوت شده اید')}}</span>
+                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->invitation}}</span>
+            </a>
+            {{--        @endif--}}
+            <a href="{{route('meeting.notification')}}"
+               class="flex justify-between items-center gap-x-4 bg-transparent text-black hover:bg-[#9DDE8B] hover:text-[#FFFAEC] border border-[#9DDE8B] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                <h3 class="text-sm font-semibold"> {{__('نتیجه نهایی جلسات')}}</h3>
+                <span
+                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{$this->read_by_user}}</span>
+            </a>
+            <a href="#"
+               class="flex justify-between items-center w-full hover:bg-[#40A578] hover:text-[#FFFAEC] border border-[#40A578] hover:drop-shadow-xl transition duration-300 ease-in-out p-4 rounded-lg">
+                <h3 class="text-sm font-semibold"> {{__('اقدامات ارسال شده به دبیرجلسه')}}</h3>
+{{--                <span--}}
+{{--                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5"></span>--}}
+            </a>
+        </div>
     </div>
-
-    {{--        <div class="relative w-full rounded-lg border border-transparent bg-blue-600 p-4 [&>svg]:absolute [&>svg]:text-foreground [&>svg]:right-4 [&>svg]:top-4 [&>svg+div]:translate-y-[-3px] [&:has(svg)]:pr-11 text-white">--}}
-    {{--            <svg class="w-5 h-5 -translate-y-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>--}}
-    {{--            <h5 class="mb-1 font-medium leading-none tracking-tight">{{__('وضعیت نهایی جلسه')}}</h5>--}}
-    {{--            <div class="text-sm opacity-80">{{__('این جلسه در این تاریخ و ساعت برگزار می شود')}}</div>--}}
-    {{--        </div>--}}
 </div>
