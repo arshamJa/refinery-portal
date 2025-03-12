@@ -1,61 +1,4 @@
 <x-app-layout>
-    {{--    advance search filter--}}
-    {{--    <form action="{{ route('your.search.route') }}" method="GET">--}}
-    {{--        <input type="text" name="name" placeholder="Name">--}}
-    {{--        <input type="email" name="email" placeholder="Email">--}}
-    {{--        <input type="date" name="date" placeholder="Date">--}}
-    {{--        <select name="status">--}}
-    {{--            <option value="">All Statuses</option>--}}
-    {{--            <option value="active">Active</option>--}}
-    {{--            <option value="inactive">Inactive</option>--}}
-    {{--        </select>--}}
-    {{--        <button type="submit">Search</button>--}}
-    {{--    </form>--}}
-
-    {{--    <table>--}}
-    {{--        <thead>--}}
-    {{--        <tr>--}}
-    {{--            <th>Name</th>--}}
-    {{--            <th>Email</th>--}}
-    {{--            <th>Date</th>--}}
-    {{--            <th>Status</th>--}}
-    {{--        </tr>--}}
-    {{--        </thead>--}}
-    {{--        <tbody>--}}
-    {{--        @foreach ($results as $result)--}}
-    {{--            <tr>--}}
-    {{--                <td>{{ $result->name }}</td>--}}
-    {{--                <td>{{ $result->email }}</td>--}}
-    {{--                <td>{{ $result->date }}</td>--}}
-    {{--                <td>{{ $result->status }}</td>--}}
-    {{--            </tr>--}}
-    {{--        @endforeach--}}
-    {{--        </tbody>--}}
-    {{--    </table>--}}
-
-    {{--    advance search filter function --}}
-    {{--    public function search(Request $request)--}}
-    {{--    {--}}
-    {{--    $query = YourModel::query(); // Start with a base query--}}
-    {{--    // Apply filters based on input fields--}}
-    {{--    if ($request->has('name') && $request->input('name') !== null) {--}}
-    {{--    $query->where('name', 'like', '%' . $request->input('name') . '%');--}}
-    {{--    }--}}
-    {{--    if ($request->has('email') && $request->input('email') !== null) {--}}
-    {{--    $query->where('email', 'like', '%' . $request->input('email') . '%');--}}
-    {{--    }--}}
-    {{--    if ($request->has('date') && $request->input('date') !== null) {--}}
-    {{--    $query->where('date', $request->input('date'));--}}
-    {{--    }--}}
-    {{--    if ($request->has('status') && $request->input('status') !== null) {--}}
-    {{--    if ($request->input('status') !== "") {--}}
-    {{--    $query->where('status', $request->input('status'));--}}
-    {{--    }--}}
-    {{--    }--}}
-    {{--    $results = $query->get();--}}
-    {{--    return view('your.view', compact('results'));--}}
-    {{--    }--}}
-
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -102,10 +45,10 @@
                                   clip-rule="evenodd"/>
                         </svg>
                     </div>
-                    <x-text-input type="text" name="search" placeholder="جست و جو..."/>
+                    <x-text-input type="text" name="search"/>
                 </div>
                 <select name="is_cancelled"
-                        class="w-1/3 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        class="text-sm bg-white w-2/3 border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                     <option>{{__('وضعیت جلسه')}}</option>
                     <option value="0">{{__('در حال بررسی ...')}}</option>
                     <option value="-1">{{__('جلساتی که تشکیل میشود')}}</option>
@@ -113,7 +56,6 @@
                 </select>
             </div>
             <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
-
                 <button type="submit"
                         class="inline-flex gap-1 items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -121,11 +63,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
                     </svg>
-                    {{__('فیلتر')}}
+                    {{__('جست و جو')}}
                 </button>
                 <a href="{{route('meetingsList')}}"
                    class="px-4 py-2 bg-[#A31621] border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    {{__('نمایش همه')}}
+                    {{__('بازگشت')}}
                 </a>
             </div>
         </form>

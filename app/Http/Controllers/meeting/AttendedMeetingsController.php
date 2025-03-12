@@ -10,6 +10,8 @@ class AttendedMeetingsController extends Controller
 {
     public function index(Request $request)
     {
+        $completedTask = Task::where('user_id',auth()->user()->id)->where('is_completed',true)->count();
+        $uncompletedTask = Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count();
 //        $query = MeetingUser::with('meeting:id,title,scriptorium,date,time')
 //            ->where('user_id', auth()->user()->id)
 //            ->select(['id', 'meeting_id', 'user_id', 'is_present']);
@@ -29,7 +31,9 @@ class AttendedMeetingsController extends Controller
 
         return view('meeting.attended-meetings',[
 //            'meetingUsers' => $meetingUsers,
-            'tasks' => $tasks
+            'tasks' => $tasks,
+            'completedTask' => $completedTask,
+            'uncompletedTask' => $uncompletedTask
         ]);
     }
 }

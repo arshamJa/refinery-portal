@@ -1,6 +1,10 @@
 @php use App\Models\MeetingUser; @endphp
 {{--<div class="col-span-3 space-y-10 place-items-center">--}}
 @if(auth()->user()->user_info->create_meeting)
+
+
+
+
     <div class="mb-8">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('مراحل جلسات')}}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -60,8 +64,9 @@
                 </svg>
                 <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>
                 </span>
-            {{--                <span--}}
-            {{--                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{MeetingUser::where('user_id',auth()->user()->id)->where('is_present',1)->count()}}</span>--}}
+{{--                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">--}}
+{{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
+{{--                </span>--}}
         </a>
         <a href="#"
            class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
@@ -71,7 +76,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122"/>
                 </svg>
-                <h3 class="text-sm font-semibold"> {{__('اقداماتی که انجام داده ام')}}</h3>
+                <h3 class="text-sm font-semibold"> {{__('اقداماتی که انجام دادم')}}</h3>
                 </span>
             {{--                <span--}}
             {{--                    class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">{{MeetingUser::where('user_id',auth()->user()->id)->where('is_present',1)->count()}}</span>--}}
