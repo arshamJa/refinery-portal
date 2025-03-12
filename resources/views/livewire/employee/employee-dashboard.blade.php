@@ -1,6 +1,6 @@
 @php use App\Models\MeetingUser; @endphp
 <div>
-    <div class="grid grid-cols-3 gap-4 mt-20">
+    <div class="max-w-4xl mt-20">
         <x-notifications/>
 {{--        <div class="col-span-2">--}}
 {{--            this is Calender--}}

@@ -37,7 +37,6 @@
                         <span class="text-3xl font-bold text-blue-600">{{$this->allMeetings}}</span>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
                     <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-300 opacity-20"></div>
                     <div class="flex items-center justify-between z-10">
@@ -64,7 +63,6 @@
                     </div>
                     <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksOnTimePercentage()}}%)</div>
                 </div>
-
                 <div>
                     <div class="flex justify-between mb-2 mt-2">
                         <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>
@@ -78,7 +76,6 @@
                     </div>
                     <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksDoneWithDelayPercentage()}}%)</div>
                 </div>
-
                 <div>
                     <div class="flex justify-between mb-2 mt-2">
                         <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>
@@ -93,10 +90,11 @@
                     <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksNotDonePercentage()}}%)</div>
                 </div>
             </div>
-        </div>
-            <div wire:ignore class="p-4 w-2/3 border shadow-md rounded-md">
-                <canvas id="largeChart"></canvas>
-            </div>
+
+    </div>
+        {{--            <div wire:ignore class="p-4 w-2/3 border shadow-md rounded-md">--}}
+{{--                <canvas id="largeChart"></canvas>--}}
+{{--            </div>--}}
 
     </div>
 
@@ -104,56 +102,156 @@
 
 
     @script
-    <script>
-        const tasksOnTime = {{$this->tasksOnTime}};
-        const tasksNotDone = {{$this->tasksNotDone}};
-        const tasksDoneWithDelay = {{$this->tasksDoneWithDelay}};
-        Chart.defaults.font.size = 16;
-        Chart.defaults.font.family = 'sans-serif';
-        const largeChart = new Chart(document.getElementById('largeChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['اقدامات انجام شده در مهلت مقرر', 'اقدامات انجام نشده در مهلت مقرر', 'اقدامات انجام شده خارج از مهلت مقرر'],
-                datasets: [{
-                    label: 'تعداد',
-                    data: [tasksOnTime, tasksNotDone, tasksDoneWithDelay],
-                    backgroundColor: [
-                        'rgb(121,71,82)',
-                        'rgb(54, 162, 235)',
-                        'rgb(183,231,13)'
-                    ],
-                    borderColor: [
-                        'rgba(221,235,157,0.35)',
-                        'rgba(87,143,202,0.35)',
-                        'rgba(249,110,42,0.35)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            usePointStyle: true, // This enables circular labels
-                            pointStyle: 'circle', // Explicitly sets the style to 'circle' (optional, as it's the default)
-                        },
-                        onHover: function(e, legendItem, legend) {
-                            // Change cursor to pointer when hovering over legend labels
-                            e.native.target.style.cursor = 'pointer';
-                        },
-                        onLeave: function(e, legendItem, legend) {
-                            // Change cursor back to default when leaving legend labels
-                            e.native.target.style.cursor = 'default';
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+{{--    <script>--}}
+
+{{--        // const options = {--}}
+{{--        //     series: [--}}
+{{--        //         {--}}
+{{--        //             name: "Income",--}}
+{{--        //             color: "#31C48D",--}}
+{{--        //             data: ["1420", "1620", "1820", "1420", "1650", "2120"],--}}
+{{--        //         },--}}
+{{--        //         {--}}
+{{--        //             name: "Expense",--}}
+{{--        //             data: ["788", "810", "866", "788", "1100", "1200"],--}}
+{{--        //             color: "#F05252",--}}
+{{--        //         }--}}
+{{--        //     ],--}}
+{{--        //     chart: {--}}
+{{--        //         sparkline: {--}}
+{{--        //             enabled: false,--}}
+{{--        //         },--}}
+{{--        //         type: "bar",--}}
+{{--        //         width: "100%",--}}
+{{--        //         height: 400,--}}
+{{--        //         toolbar: {--}}
+{{--        //             show: false,--}}
+{{--        //         }--}}
+{{--        //     },--}}
+{{--        //     fill: {--}}
+{{--        //         opacity: 1,--}}
+{{--        //     },--}}
+{{--        //     plotOptions: {--}}
+{{--        //         bar: {--}}
+{{--        //             horizontal: true,--}}
+{{--        //             columnWidth: "100%",--}}
+{{--        //             borderRadiusApplication: "end",--}}
+{{--        //             borderRadius: 6,--}}
+{{--        //             dataLabels: {--}}
+{{--        //                 position: "top",--}}
+{{--        //             },--}}
+{{--        //         },--}}
+{{--        //     },--}}
+{{--        //     legend: {--}}
+{{--        //         show: true,--}}
+{{--        //         position: "bottom",--}}
+{{--        //     },--}}
+{{--        //     dataLabels: {--}}
+{{--        //         enabled: false,--}}
+{{--        //     },--}}
+{{--        //     tooltip: {--}}
+{{--        //         shared: true,--}}
+{{--        //         intersect: false,--}}
+{{--        //         formatter: function (value) {--}}
+{{--        //             return "$" + value--}}
+{{--        //         }--}}
+{{--        //     },--}}
+{{--        //     xaxis: {--}}
+{{--        //         labels: {--}}
+{{--        //             show: true,--}}
+{{--        //             style: {--}}
+{{--        //                 fontFamily: "Inter, sans-serif",--}}
+{{--        //                 cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400'--}}
+{{--        //             },--}}
+{{--        //             formatter: function(value) {--}}
+{{--        //                 return "$" + value--}}
+{{--        //             }--}}
+{{--        //         },--}}
+{{--        //         categories: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],--}}
+{{--        //         axisTicks: {--}}
+{{--        //             show: false,--}}
+{{--        //         },--}}
+{{--        //         axisBorder: {--}}
+{{--        //             show: false,--}}
+{{--        //         },--}}
+{{--        //     },--}}
+{{--        //     yaxis: {--}}
+{{--        //         labels: {--}}
+{{--        //             show: true,--}}
+{{--        //             style: {--}}
+{{--        //                 fontFamily: "Inter, sans-serif",--}}
+{{--        //                 cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400'--}}
+{{--        //             }--}}
+{{--        //         }--}}
+{{--        //     },--}}
+{{--        //     grid: {--}}
+{{--        //         show: true,--}}
+{{--        //         strokeDashArray: 4,--}}
+{{--        //         padding: {--}}
+{{--        //             left: 2,--}}
+{{--        //             right: 2,--}}
+{{--        //             top: -20--}}
+{{--        //         },--}}
+{{--        //     },--}}
+{{--        //     fill: {--}}
+{{--        //         opacity: 1,--}}
+{{--        //     }--}}
+{{--        // }--}}
+{{--        //--}}
+{{--        // if(document.getElementById("bar-chart") && typeof ApexCharts !== 'undefined') {--}}
+{{--        //     const chart = new ApexCharts(document.getElementById("bar-chart"), options);--}}
+{{--        //     chart.render();--}}
+{{--        // }--}}
+
+{{--        --}}{{--const tasksOnTime = {{$this->tasksOnTime}};--}}
+{{--        --}}{{--const tasksNotDone = {{$this->tasksNotDone}};--}}
+{{--        --}}{{--const tasksDoneWithDelay = {{$this->tasksDoneWithDelay}};--}}
+{{--        --}}{{--Chart.defaults.font.size = 16;--}}
+{{--        --}}{{--Chart.defaults.font.family = 'sans-serif';--}}
+{{--        --}}{{--const largeChart = new Chart(document.getElementById('largeChart'), {--}}
+{{--        --}}{{--    type: 'doughnut',--}}
+{{--        --}}{{--    data: {--}}
+{{--        --}}{{--        labels: ['اقدامات انجام شده در مهلت مقرر', 'اقدامات انجام نشده در مهلت مقرر', 'اقدامات انجام شده خارج از مهلت مقرر'],--}}
+{{--        --}}{{--        datasets: [{--}}
+{{--        --}}{{--            label: 'تعداد',--}}
+{{--        --}}{{--            data: [tasksOnTime, tasksNotDone, tasksDoneWithDelay],--}}
+{{--        --}}{{--            backgroundColor: [--}}
+{{--        --}}{{--                'rgb(121,71,82)',--}}
+{{--        --}}{{--                'rgb(54, 162, 235)',--}}
+{{--        --}}{{--                'rgb(183,231,13)'--}}
+{{--        --}}{{--            ],--}}
+{{--        --}}{{--            borderColor: [--}}
+{{--        --}}{{--                'rgba(221,235,157,0.35)',--}}
+{{--        --}}{{--                'rgba(87,143,202,0.35)',--}}
+{{--        --}}{{--                'rgba(249,110,42,0.35)'--}}
+{{--        --}}{{--            ],--}}
+{{--        --}}{{--            borderWidth: 1--}}
+{{--        --}}{{--        }]--}}
+{{--        --}}{{--    },--}}
+{{--        --}}{{--    options: {--}}
+{{--        --}}{{--        scales: {--}}
+{{--        --}}{{--            y: {--}}
+{{--        --}}{{--                beginAtZero: true--}}
+{{--        --}}{{--            }--}}
+{{--        --}}{{--        },--}}
+{{--        --}}{{--        plugins: {--}}
+{{--        --}}{{--            legend: {--}}
+{{--        --}}{{--                labels: {--}}
+{{--        --}}{{--                    usePointStyle: true, // This enables circular labels--}}
+{{--        --}}{{--                    pointStyle: 'circle', // Explicitly sets the style to 'circle' (optional, as it's the default)--}}
+{{--        --}}{{--                },--}}
+{{--        --}}{{--                onHover: function(e, legendItem, legend) {--}}
+{{--        --}}{{--                    // Change cursor to pointer when hovering over legend labels--}}
+{{--        --}}{{--                    e.native.target.style.cursor = 'pointer';--}}
+{{--        --}}{{--                },--}}
+{{--        --}}{{--                onLeave: function(e, legendItem, legend) {--}}
+{{--        --}}{{--                    // Change cursor back to default when leaving legend labels--}}
+{{--        --}}{{--                    e.native.target.style.cursor = 'default';--}}
+{{--        --}}{{--                }--}}
+{{--        --}}{{--            }--}}
+{{--        --}}{{--        }--}}
+{{--        --}}{{--    }--}}
+{{--        --}}{{--});--}}
+{{--    </script>--}}
     @endscript
 </div>

@@ -26,7 +26,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li class="flex items-center h-full">
-                <span class="active-breadcrumb">{{__('لیست اقدامات ارسال شده به دبیر جلسه')}}</span>
+                <span class="active-breadcrumb">{{__('لیست اقدامات ارسال شده به دبیرجلسه')}}</span>
             </li>
     </x-breadcrumb>
 
