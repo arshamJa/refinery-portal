@@ -25,229 +25,259 @@
         </ol>
     </nav>
 
-    <div class="grid grid-cols-2 place-content-around place-items-center ">
-        <div class="w-full">
-            <div class="grid grid-cols-1 mb-4 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
-                    <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
-                    <div class="flex items-center justify-between z-10">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل جلسات')}}</span>
+    <div class="grid grid-cols-2 gap-4 place-content-around">
+
+            <div>
+                <div class="grid grid-cols-1 mb-4 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل جلسات')}}</span>
+                            </div>
+                            <span class="text-3xl font-bold text-blue-600">{{$this->allMeetings}}</span>
                         </div>
-                        <span class="text-3xl font-bold text-blue-600">{{$this->allMeetings}}</span>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-300 opacity-20"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل اقدامات')}}</span>
+                            </div>
+                            <span class="text-3xl font-bold text-green-600">{{$this->allTasks}}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
-                    <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-300 opacity-20"></div>
-                    <div class="flex items-center justify-between z-10">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل اقدامات')}}</span>
+                <div class="space-y-4 border rounded-md shadow-md p-4">
+                    <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>
+                            <a href="{{route('completedTasks')}}"
+                               class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                                {{__('نمایش')}}
+                            </a>
                         </div>
-                        <span class="text-3xl font-bold text-green-600">{{$this->allTasks}}</span>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-[#605C3C] h-2.5 rounded-full" style="width:{{$this->tasksOnTimePercentage()}}%;"></div>
+                        </div>
+                        <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksOnTimePercentage()}}%)</div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2 mt-2">
+                            <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>
+                            <a href="{{route('tasksWithDelay')}}"
+                               class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                                {{__('نمایش')}}
+                            </a>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-[#1f4037] h-2.5 rounded-full" style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>
+                        </div>
+                        <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksDoneWithDelayPercentage()}}%)</div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2 mt-2">
+                            <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>
+                            <a href="{{route('incompleteTasks')}}"
+                               class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                                {{__('نمایش')}}
+                            </a>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-[#2C5364] h-2.5 rounded-full"  style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
+                        </div>
+                        <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksNotDonePercentage()}}%)</div>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-4 border rounded-md shadow-md p-4">
-                <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>
-                        <a href="{{route('completedTasks')}}"
-                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
-                            {{__('نمایش')}}
-                        </a>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-[#605C3C] h-2.5 rounded-full" style="width:{{$this->tasksOnTimePercentage()}}%;"></div>
-                    </div>
-                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksOnTimePercentage()}}%)</div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2 mt-2">
-                        <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>
-                        <a href="{{route('tasksWithDelay')}}"
-                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
-                            {{__('نمایش')}}
-                        </a>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-[#1f4037] h-2.5 rounded-full" style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>
-                    </div>
-                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksDoneWithDelayPercentage()}}%)</div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2 mt-2">
-                        <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>
-                        <a href="{{route('incompleteTasks')}}"
-                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
-                            {{__('نمایش')}}
-                        </a>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-[#2C5364] h-2.5 rounded-full"  style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
-                    </div>
-                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksNotDonePercentage()}}%)</div>
-                </div>
-            </div>
+        <div>
+            <select id="yearSelect"  class="mt-4 px-4 py-2 border rounded">
+                <option value="1400">1400</option>
+                <option value="1401">1401</option>
+                <option value="1402" selected>1402</option>
+                <option value="1403">1403</option>
+                <option value="1404">1404</option>
+                <option value="1405">1405</option>
+            </select>
 
+            <select id="monthSelect" class="mt-4 px-4 py-2 border rounded">
+                <option value="0">فروردین-شهریور</option>
+                <option value="1">مهر-اسفند</option>
+            </select>
 
+            <div class="w-full rounded-lg shadow-sm px-6 py-4" id="bar-chart"></div>
 
-
-            <div class="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
-                <div id="bar-chart"></div>
-                <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
-                    <div class="flex justify-between items-center pt-5">
-                        <!-- Button -->
-                        <button
-                            id="dropdownDefaultButton"
-                            data-dropdown-toggle="lastDaysdropdown"
-                            data-dropdown-placement="bottom"
-                            class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-                            type="button">
-                            Last 6 months
-                            <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                            </svg>
-                        </button>
-                        <!-- Dropdown menu -->
-                        <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-                                <li>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 7 days</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 30 days</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 90 days</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 6 months</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last year</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-{{--        @script--}}
-{{--        <script>--}}
-{{--            const tasksOnTime = {{$this->tasksOnTime}};--}}
 
-{{--            const options = {--}}
-{{--                series: [--}}
-{{--                    {--}}
-{{--                        name: "اقدامات انجام شده",--}}
-{{--                        color: "#31C48D",--}}
-{{--                        data: ["1420", "1620", "1820", "1420", "1650", "2120"], // Example data--}}
-{{--                    },--}}
-{{--                    {--}}
-{{--                        name: "اقدامات انجام نشده",--}}
-{{--                        data: ["788", "810", "866", "788", "1100", "1200"], // Example data--}}
-{{--                        color: "#F05252",--}}
-{{--                    },--}}
-{{--                    {--}}
-{{--                        name: "اقدامات انجام شده با تاخیر",--}}
-{{--                        color: "#26a2d0",--}}
-{{--                        data: ["1420", "1620", "1820", "1420", "1650", "2120"], // Example data--}}
-{{--                    }--}}
-{{--                ],--}}
-{{--                chart: {--}}
-{{--                    sparkline: {--}}
-{{--                        enabled: false,--}}
-{{--                    },--}}
-{{--                    type: "bar",--}}
-{{--                    width: "100%",--}}
-{{--                    height: 400,--}}
-{{--                    toolbar: {--}}
-{{--                        show: false,--}}
-{{--                    }--}}
-{{--                },--}}
-{{--                fill: {--}}
-{{--                    opacity: 1,--}}
-{{--                },--}}
-{{--                plotOptions: {--}}
-{{--                    bar: {--}}
-{{--                        horizontal: true,--}}
-{{--                        columnWidth: "100%",--}}
-{{--                        borderRadiusApplication: "end",--}}
-{{--                        borderRadius: 6,--}}
-{{--                        dataLabels: {--}}
-{{--                            position: "top",--}}
-{{--                        },--}}
-{{--                    },--}}
-{{--                },--}}
-{{--                legend: {--}}
-{{--                    show: true,--}}
-{{--                    position: "bottom",--}}
-{{--                },--}}
-{{--                dataLabels: {--}}
-{{--                    enabled: false,--}}
-{{--                },--}}
-{{--                tooltip: {--}}
-{{--                    shared: true,--}}
-{{--                    intersect: false,--}}
-{{--                    formatter: function (value) {--}}
-{{--                        return "$" + value--}}
-{{--                    }--}}
-{{--                },--}}
-{{--                xaxis: {--}}
-{{--                    labels: {--}}
-{{--                        show: true,--}}
-{{--                        style: {--}}
-{{--                            fontFamily: "Inter, sans-serif",--}}
-{{--                            cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400'--}}
-{{--                        },--}}
-{{--                        formatter: function(value) {--}}
-{{--                            return "$" + value--}}
-{{--                        }--}}
-{{--                    },--}}
-{{--                    categories: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"].slice(0,6), // Initial 6 persian months--}}
-{{--                    axisTicks: {--}}
-{{--                        show: false,--}}
-{{--                    },--}}
-{{--                    axisBorder: {--}}
-{{--                        show: false,--}}
-{{--                    },--}}
-{{--                },--}}
-{{--                yaxis: {--}}
-{{--                    labels: {--}}
-{{--                        show: true,--}}
-{{--                        style: {--}}
-{{--                            fontFamily: "Inter, sans-serif",--}}
-{{--                            cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400'--}}
-{{--                        }--}}
-{{--                    }--}}
-{{--                },--}}
-{{--                grid: {--}}
-{{--                    show: true,--}}
-{{--                    strokeDashArray: 4,--}}
-{{--                    padding: {--}}
-{{--                        left: 2,--}}
-{{--                        right: 2,--}}
-{{--                        top: -20--}}
-{{--                    },--}}
-{{--                },--}}
-{{--                fill: {--}}
-{{--                    opacity: 1,--}}
-{{--                }--}}
-{{--            };--}}
+        <script>
+            let currentYear = parseInt(document.getElementById("yearSelect").value);
+            let currentMonth = parseInt(document.getElementById("monthSelect").value);
+            const yearData = {
+                "1400": {
+                    "done": ["1000", "1200", "1400", "1100", "1300", "1500"],
+                    "notDone": ["600", "700", "800", "500", "900", "1000"],
+                    "delayed": ["500", "600", "700", "400", "800", "900"]
+                },
+                "1401": {
+                    "done": ["1200", "1400", "1600", "1300", "1500", "1700"],
+                    "notDone": ["700", "800", "900", "600", "1000", "1100"],
+                    "delayed": ["600", "700", "800", "500", "900", "1000"]
+                },
+                "1402": {
+                    "done": ["1420", "1620", "1820", "1420", "1650", "2120"],
+                    "notDone": ["788", "810", "866", "788", "1100", "1200"],
+                    "delayed": ["788", "810", "866", "788", "1100", "1200"]
+                },
+                "1403": {
+                    "done": ["1600", "1800", "2000", "1600", "1800", "2200"],
+                    "notDone": ["900", "1000", "1100", "800", "1200", "1300"],
+                    "delayed": ["800", "900", "1000", "700", "1100", "1200"]
+                },
+                "1404": {
+                    "done": ["1800", "2000", "2200", "1800", "2000", "2400"],
+                    "notDone": ["1000", "1100", "1200", "900", "1300", "1400"],
+                    "delayed": ["900", "1000", "1100", "800", "1200", "1300"]
+                },
+                "1405": {
+                    "done": ["2000", "2200", "2400", "2000", "2200", "2600"],
+                    "notDone": ["1100", "1200", "1300", "1000", "1400", "1500"],
+                    "delayed": ["1000", "1100", "1200", "900", "1300", "1400"]
+                }
+            };
+            const options = {
+                series: [
+                    {
+                        name: "اقدامات انجام شده",
+                        color: "#31C48D",
+                        data: yearData[currentYear].done,
+                    },
+                    {
+                        name: "اقدامات انجام نشده",
+                        data: yearData[currentYear].notDone,
+                        color: "#F05252",
+                    },
+                    {
+                        name: "اقدامات انجام شده با تاخیر",
+                        data: yearData[currentYear].delayed,
+                        color: "#e11ab2",
+                    }
+                ],
+                chart: {
+                    sparkline: {
+                        enabled: false,
+                    },
+                    type: "bar",
+                    width: "100%",
+                    height: 400,
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                fill: {
+                    opacity: 1,
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        columnWidth: "100%",
+                        borderRadiusApplication: "end",
+                        borderRadius: 6,
+                        dataLabels: {
+                            position: "top",
+                        },
+                    },
+                },
+                legend: {
+                    show: true,
+                    position: "bottom",
+                    fontSize:"16px",
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+                    formatter: function (value) {
+                        return value
+                    }
+                },
+                xaxis: {
+                    labels: {
+                        show: true,
+                        style: {
+                            fontFamily: "Inter, sans-serif",
+                            cssClass: 'text-sm font-normal fill-gray-600 dark:fill-gray-400'
+                        },
+                        formatter: function(value) {
+                            return value
+                        }
+                    },
+                    categories: generateCategories(currentYear, currentMonth),
+                    axisTicks: {
+                        show: false,
+                    },
+                    axisBorder: {
+                        show: false,
+                    },
+                },
+                yaxis: {
+                    labels: {
+                        show: true,
+                        style: {
+                            fontFamily: "Inter, sans-serif",
+                            cssClass: 'text-sm font-normal fill-gray-900 dark:fill-gray-400'
+                        },
+                        // offsetX: -35
+                    }
+                },
+                grid: {
+                    show: true,
+                    strokeDashArray: 4,
+                    padding: {
+                        left: 2,
+                        right: 2,
+                        top: -20
+                    },
+                },
+                fill: {
+                    opacity: 1,
+                }
+            };
+            function generateCategories(year, month) {
+                const months1 = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور"];
+                const months2 = ["مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
 
-{{--            if(document.getElementById("bar-chart") && typeof ApexCharts !== 'undefined') {--}}
-{{--                const chart = new ApexCharts(document.getElementById("bar-chart"), options);--}}
-{{--                chart.render();--}}
-{{--            }--}}
-{{--        </script>--}}
-{{--        @endscript--}}
+                if (month === 0) {
+                    return months1;
+                } else {
+                    return months2;
+                }
+            }
+            if (document.getElementById("bar-chart") && typeof ApexCharts !== 'undefined') {
+                const chart = new ApexCharts(document.getElementById("bar-chart"), options);
+                chart.render();
+
+                document.getElementById("yearSelect").addEventListener("change", function () {
+                    currentYear = parseInt(this.value);
+                    options.xaxis.categories = generateCategories(currentYear, currentMonth);
+                    options.series[0].data = yearData[currentYear].done;
+                    options.series[1].data = yearData[currentYear].notDone;
+                    options.series[2].data = yearData[currentYear].delayed;
+
+                    chart.updateOptions(options);
+                });
+
+                document.getElementById("monthSelect").addEventListener("change", function () {
+                    currentMonth = parseInt(this.value);
+                    options.xaxis.categories = generateCategories(currentYear, currentMonth);
+
+                    chart.updateOptions(options);
+                });
+            }
+        </script>
+
     </div>
 </div>

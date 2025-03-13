@@ -10,6 +10,7 @@ use App\Trait\MeetingsTasks;
 use App\Trait\MessageReceived;
 use App\Trait\Organizations;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
@@ -23,6 +24,13 @@ class EmployeeDashboard extends Component
     public $meetingTitle;
     public $meeting_id;
 
+
+    #[Computed]
+    public function getMeetingsToday()
+    {
+        $jalaliNow = gregorian_to_jalali(now()->year, now()->month, now()->day, '/');
+        return Meeting::where('date','like',$jalaliNow)->get();
+    }
 
 
     public function render()

@@ -5,25 +5,33 @@ namespace App\Livewire\Reports;
 
 use App\Models\Meeting;
 use App\Models\Task;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 
 class MeetingDashboardReport extends Component
 {
+
+
     public function render()
     {
         return view('livewire.reports.meeting-dashboard-report');
     }
 
+
+
+
     #[Computed]
     public function tasksOnTime()
     {
         return Task::with('meeting')
-            ->where('is_completed',true)
+            ->where('is_completed', true)
             ->whereColumn('sent_date', '<=', 'time_out')
             ->count();
     }
+
     #[Computed]
     public function tasksOnTimePercentage()
     {
@@ -42,10 +50,11 @@ class MeetingDashboardReport extends Component
     public function tasksNotDone()
     {
         return Task::with('meeting')
-            ->where('is_completed',false)
-            ->where('sent_date',null)
+            ->where('is_completed', false)
+            ->where('sent_date', null)
             ->count();
     }
+
     #[Computed]
     public function tasksNotDonePercentage()
     {
@@ -59,14 +68,16 @@ class MeetingDashboardReport extends Component
             ->count();
         return (int) (($tasksNotDone / $totalTasks) * 100); // Get the integer part of the percentage
     }
+
     #[Computed]
     public function tasksDoneWithDelay()
     {
         return Task::with('meeting')
-            ->where('is_completed',true)
+            ->where('is_completed', true)
             ->whereColumn('sent_date', '>', 'time_out')
             ->count();
     }
+
     #[Computed]
     public function tasksDoneWithDelayPercentage()
     {
