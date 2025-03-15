@@ -1,37 +1,37 @@
 @php use App\Models\MeetingUser; @endphp
 <div>
 
-    <div class="max-w-4xl mt-20">
-        <div class="p-4">
-            <h1 class="text-2xl font-bold mb-6 text-center">List of Today's Meetings</h1>
+    <div class="grid lg:grid-cols-2 mt-20">
 
-            <div class="bg-white rounded-lg shadow p-6">
-                <ul class="space-y-4">
-                    <li class="flex items-center justify-between border-b border-gray-200 pb-4">
-                        <div class="flex-grow">
-                            <p class="text-lg font-medium">جلسه جدید بهی</p>
-                        </div>
-                        <div class="text-gray-600">
-                            <span class="font-mono">1403/12/23</span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+        <div class="p-2 h-3/4">
+            <x-notifications/>
         </div>
-        list of todays meeting
-        @if ($this->getMeetingsToday->isNotEmpty())
-            <ul>
-                @foreach ($this->getMeetingsToday as $meeting)
-                    <li>{{ $meeting->date }} - {{ $meeting->title }}</li>
-                @endforeach
-            </ul>
-        @else
-            <p>No meetings found for today.</p>
-        @endif
+
+        <div class="px-8 overflow-y-auto h-3/4">
+{{--            @if ($this->getMeetingsToday->isNotEmpty())--}}
+                <h1 class="text-xl text-[#4332BD] font-bold mb-6 text-center">{{__('لیست جلسات امروز')}}</h1>
+                <div class="rounded-lg text-[#F5F0F1] bg-[#E96742] shadow p-6">
+                    <ul class="space-y-4">
+{{--                        @foreach ($this->getMeetingsToday as $meeting)--}}
+                            <li class="flex items-center justify-between border-b border-gray-200 pb-4">
+                                <div class="flex-grow">
+{{--                                    <p class="text-lg font-medium">{{ $meeting->title }}</p>--}}
+                                    <p class="text-lg font-medium">جلسه چهارم</p>
+{{--                                    <p class="text-lg font-medium">{{ $meeting->time }}</p>--}}
+                                    <p class="text-lg font-medium">12:00</p>
+                                </div>
+                                <div>
+                                    <span class="font-mono">1403/12/10</span>
+                                </div>
+                            </li>
+{{--                        @endforeach--}}
+                    </ul>
+                </div>
+{{--            @endif--}}
+        </div>
 
 
 
-        <x-notifications/>
         {{--        <div class="col-span-2">--}}
         {{--            this is Calender--}}
         {{--            <div class="w-full p-4 rounded-lg shadow-md">--}}

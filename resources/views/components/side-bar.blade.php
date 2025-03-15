@@ -103,7 +103,7 @@
 </ul>
 <div class="absolute bottom-2 left-0 w-full pr-2">
     <ul>
-        <li class="hover:text-white bg-transparent border border-[#990302] hover:border-transparent hover:bg-[#990302] rounded-md  transition ease-in-out duration-200 ">
+        <li class="hover:text-white bg-transparent border border-[#990302] hover:border-transparent hover:bg-[#E96742] rounded-md  transition ease-in-out duration-200 ">
             <form action="{{route('logout')}}" method="post">
                 @csrf
                 <button type="submit"

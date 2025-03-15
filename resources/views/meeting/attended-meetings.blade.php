@@ -20,39 +20,6 @@
             <span class="active-breadcrumb">{{__('لیست جلساتی که در آن شرکت کردم')}}</span>
         </li>
     </x-breadcrumb>
-
-
-    <div class="mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 w-1/2 gap-4">
-            <div class="bg-[#FCF7F8] shadow-md flex flex-col gap-2 text-black px-4 py-2 rounded-lg">
-                <div class="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                         stroke="currentColor" class="size-5 text-green-600">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
-                    <h3 class="text-sm font-semibold"> {{__('تعداد اقدامات انجام شده')}}</h3>
-                </div>
-                <span class="text-2xl text-blue-600 font-bold">
-                    {{$completedTask}}
-                </span>
-            </div>
-            <div class="bg-[#FCF7F8] shadow-md flex flex-col gap-2 text-black px-4 py-2 rounded-lg">
-                <div class="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                         stroke="currentColor" class="size-5 text-green-600">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
-                    <h3 class="text-sm font-semibold"> {{__('تعداد اقدامات انجام نشده')}}</h3>
-                </div>
-                <span class="text-2xl text-blue-600 font-bold">
-                    {{$uncompletedTask}}
-                </span>
-            </div>
-        </div>
-    </div>
-
     <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
         <form method="GET" action="{{ route('attended.meetings') }}">
             @csrf
@@ -68,24 +35,28 @@
                                   clip-rule="evenodd"/>
                         </svg>
                     </div>
-                    <x-text-input type="text" name="search" placeholder="جست و جو..."/>
+                    <x-text-input type="text" name="search"/>
                 </div>
+                <select name="task_status"
+                        class="text-sm bg-white w-2/5 border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                    <option>{{__('وضعیت اقدامات...')}}</option>
+                    <option value="1">{{__('انجام شده')}}</option>
+                    <option value="0">{{__('انجام نشده')}}</option>
+                </select>
             </div>
             <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
                 <button type="submit"
-                        class="inline-flex gap-1 items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
-                    </svg>
-                    {{__('فیلتر')}}
+                        class="inline-flex justify-between gap-1 items-center px-4 py-2 text-[#F5F0F1] bg-[#4332BD] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 border border-transparent rounded-md font-semibold text-xs uppercase transition ease-in-out duration-300">
+                    {{__('جست و جو')}}
                 </button>
-                <a href="{{route('attended.meetings')}}"
-                   class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    {{__('نمایش همه')}}
-                </a>
+            @if ($originalTasksCount != $filteredTasksCount)
+                    <a href="{{route('attended.meetings')}}"
+                       class="px-4 py-2 bg-[#E96742] text-[#F5F0F1] hover:ring-2 hover:ring-[#E96742] hover:ring-offset-2 border border-transparent rounded-md font-semibold text-xs uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                        {{__('نمایش همه')}}
+                    </a>
+                @endif
             </div>
+
         </form>
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead

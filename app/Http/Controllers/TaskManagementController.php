@@ -53,7 +53,7 @@ class TaskManagementController extends Controller
     {
 
         $meetings = Meeting::find($meeting);
-        $employees = MeetingUser::where('meeting_id',$meeting)->where('is_present','=','1')->get();
+        $employees = MeetingUser::where('meeting_id',$meeting)->get();
         $tasks = Task::with('user')->where('meeting_id',$meeting)->get();
 //        $allEmployeesAssigned = $this->areAllTasksAssignedToAllEmployees($tasks, $employees);
         return view('task.create' , [

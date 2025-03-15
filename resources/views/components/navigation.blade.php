@@ -1,6 +1,6 @@
 <header
     class="absolute top-0 right-0 md:px-12 px-4 md:mr-64 md:border-b left-0 z-50 pt-4 mb-20 flex justify-between items-center">
-    <nav class="hidden md:flex gap-x-10  w-full">
+    <nav class="hidden md:flex gap-x-10 w-full">
         <x-link.link href="{{route('dashboard')}}"
                      :active="request()->is('dashboard')">
             {{__('داشبورد')}}

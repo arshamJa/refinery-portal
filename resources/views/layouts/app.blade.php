@@ -26,7 +26,7 @@
     <script src="{{asset('jalali-moment.js')}}" ></script>
     <script src="{{asset('flowBiteChart.js')}}"></script>
 </head>
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased">
 
 {{--<livewire:layout.navigation/>--}}
 <div dir="rtl"
@@ -39,12 +39,12 @@
         <!-- Sidebar -->
         <aside
             :class="{'translate-x-full': open, 'translate-x-0': !open}"
-            class="fixed bg-white md:pt-2 pt-14 drop-shadow-md pr-2 inset-y-0 right-0 top-0 bottom-0 z-20 w-64 transform transition-transform duration-300 md:translate-x-0">
+            class="fixed bg-[#F5F0F1] md:pt-2 pt-14 drop-shadow-md pr-2 inset-y-0 right-0 top-0 bottom-0 z-20 w-64 transform transition-transform duration-300 md:translate-x-0">
             <x-side-bar/>
         </aside>
 
         <!-- Main content -->
-        <main class="flex-1 px-4 md:mr-72 mt-20">
+        <main class="flex-1 px-4 md:mr-72  mt-20">
             <x-sessionMessage name="status"/>
             {{ $slot }}
         </main>

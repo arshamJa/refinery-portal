@@ -4,9 +4,9 @@
 
     <div class="mb-8">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('مراحل جلسات')}}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <a href="{{route('meeting.create')}}"
-               class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
+               class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -14,7 +14,7 @@
                 <h3 class="text-sm font-semibold"> {{__('ایجاد جلسه جدید')}}</h3>
             </a>
             <a href="{{route('meetingsList')}}"
-               class="bg-[#FCF7F8]  hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
+               class="bg-[#FCF7F8]  hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -23,7 +23,7 @@
                 <h3 class="text-sm font-semibold"> {{__('لیست جلسات در حال برگزاری')}}</h3>
             </a>
             <a href="{{route('scriptorium.report')}}"
-               class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
+               class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
                 <span class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
@@ -38,9 +38,9 @@
 @endif
 <div class="mb-8">
     <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('پیام ها و اقدامات')}}</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <a href="{{route('message')}}"
-           class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
+           class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
                         <span class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="size-5"><path stroke-linecap="round"
@@ -52,7 +52,7 @@
             <p class="text-2xl text-blue-600 font-bold">{{$this->messages}}</p>
         </a>
         <a href="{{route('attended.meetings')}}"
-           class="bg-[#FCF7F8]  flex justify-between gap-2 hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
+           class="bg-[#FCF7F8]  flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
                 <span class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
@@ -66,7 +66,7 @@
 {{--                </span>--}}
         </a>
         <a href="#"
-           class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
+           class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
                 <span class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
@@ -83,9 +83,9 @@
 
     <div class="mb-8">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('گزارش کل جلسات')}}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <a href="{{route('meeting.report')}}"
-               class="bg-[#FCF7F8] flex gap-2 hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
+               class="bg-[#FCF7F8] flex gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
                     <path stroke-linecap="round" stroke-linejoin="round"

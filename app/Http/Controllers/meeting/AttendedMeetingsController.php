@@ -10,32 +10,33 @@ class AttendedMeetingsController extends Controller
 {
     public function index(Request $request)
     {
-        $completedTask = Task::where('user_id',auth()->user()->id)->where('is_completed',true)->count();
-        $uncompletedTask = Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count();
 
-//        $query = MeetingUser::with('meeting:id,title,scriptorium,date,time')
-//            ->where('user_id', auth()->user()->id)
-//            ->select(['id', 'meeting_id', 'user_id', 'is_present']);
+        $query = Task::with('meeting')->where('user_id', auth()->user()->id);
 
-        $query = Task::with('meeting')->where('user_id',auth()->user()->id);
+        $originalTasksCount = $query->count(); // Count before any filtering
 
-//        if ($request->filled('search')){
-//            $search = $request->input('search');
-//            $query->whereHas('meeting' , function ($meeting) use ($search){
-//                $meeting->where('title','like','%'.$search.'%')
-//                    ->orWhere('scriptorium','like','%'.$search.'%')
-//                    ->orWhere('date','like','%'.$search.'%')
-//                    ->orWhere('time','like','%'.$search.'%');
-//            });
-//        }
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereHas('meeting', function ($meeting) use ($search) {
+                $meeting->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('scriptorium', 'like', '%' . $search . '%')
+                    ->orWhere('date', 'like', '%' . $search . '%')
+                    ->orWhere('time', 'like', '%' . $search . '%');
+            });
+        }
+        if ($request->filled('task_status')) {
+            $taskStatus = $request->input('task_status');
+            if ($taskStatus === '0' || $taskStatus === '1') {
+                $query->where('is_completed', $taskStatus);
+            }
+        }
         $tasks = $query->paginate(5);
-//        $meetingUsers = $query->paginate(5);
+        $filteredTasksCount = $tasks->total(); // Count after filtering
 
-        return view('meeting.attended-meetings',[
-//            'meetingUsers' => $meetingUsers,
+        return view('meeting.attended-meetings', [
             'tasks' => $tasks,
-            'completedTask' => $completedTask,
-            'uncompletedTask' => $uncompletedTask
+            'originalTasksCount' => $originalTasksCount,
+            'filteredTasksCount' => $filteredTasksCount,
         ]);
     }
 }
