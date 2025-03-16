@@ -10,6 +10,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/task/list/{meeting}',\App\Livewire\TaskList::class)->name('task.list');
 
 
+
+    // route to participantsTask
+    Route::get('participants/task',[\App\Http\Controllers\ParticipantsTaskController::class,'index'])
+        ->name('participants.task');
+
     // sent tasks by participants to their scriptorium
     Route::get('/tasks/sent',\App\Livewire\TaskSent::class)->name('task.sent');
 

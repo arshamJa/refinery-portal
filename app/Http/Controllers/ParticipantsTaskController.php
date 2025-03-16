@@ -8,6 +8,6 @@ class ParticipantsTaskController extends Controller
 {
     public function index()
     {
-        return view('');
+        return view('participantsTask.index');
     }
 }

@@ -3,12 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\Meeting;
-use App\Models\MeetingUser;
 use App\Models\Task;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class TaskSent extends Component
 {
@@ -26,21 +24,22 @@ class TaskSent extends Component
 //            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
 //            ->get();
 
-        $meetings = Meeting::with(['meetingUsers', 'tasks' => function ($query) {
-            $query->where('is_completed', 1); // Filter tasks where is_completed is 1
+        // Filter tasks where is_completed is true
+        $meetings = Meeting::with(['meetingUsers', 'tasks' => function (Builder $query) {
+            $query->where('is_completed', true);
         }])
             ->where('scriptorium', '=', auth()->user()->user_info->full_name)
             ->where('is_cancelled', '=', -1)
             ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled'])
             ->get();
         // Filter meetings to include only those with tasks
-        return $meetings->filter(function ($meeting){
+        return $meetings->filter(function (Meeting $meeting){
            return $meeting->tasks->isNotEmpty();
         });
     }
     #[Computed]
     public function tasks()
     {
-        return Task::with('user')->where('is_completed','=','1')->get();
+        return Task::with('user')->where('is_completed',true)->get();
     }
 }

@@ -65,7 +65,7 @@
 {{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
 {{--                </span>--}}
         </a>
-        <a href="#"
+        <a href="{{route('participants.task')}}"
            class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
                 <span class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
