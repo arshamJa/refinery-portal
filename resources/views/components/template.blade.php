@@ -1,4 +1,4 @@
-@php use App\Models\MeetingUser; @endphp
+{{--@php use App\Models\MeetingUser; @endphp--}}
 
 {{--<section dir="rtl" class="antialiased">--}}
 {{--    <div class="p-4 lg:flex lg:items-start lg:gap-12 xl:gap-16">--}}

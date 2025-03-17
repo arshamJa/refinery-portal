@@ -15,6 +15,7 @@ class MeetingListController extends Controller
         $query = Meeting::with('meetingUsers')
             ->where('scriptorium', auth()->user()->user_info->full_name)
             ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled']);
+        $originalMeetingsCount = $query->count(); // Count before any filtering
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -55,6 +56,14 @@ class MeetingListController extends Controller
             }
             $allUsersHaveTasks[$meeting->id] = $hasTasks; // Store the result
         }
-        return view('meeting.meetings-list',['meetings'=>$meetings ,  'allUsersHaveTasks' => $allUsersHaveTasks]);
+
+        $filteredMeetingsCount = $meetings->total(); // Count after filtering
+
+        return view('meeting.meetings-list',[
+            'meetings'=> $meetings ,
+            'allUsersHaveTasks' => $allUsersHaveTasks ,
+            'originalMeetingsCount' => $originalMeetingsCount,
+            'filteredMeetingsCount' => $filteredMeetingsCount
+            ]);
     }
 }

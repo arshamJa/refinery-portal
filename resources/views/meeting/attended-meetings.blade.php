@@ -45,15 +45,9 @@
                 </select>
             </div>
             <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
-                <button type="submit"
-                        class="inline-flex justify-between gap-1 items-center px-4 py-2 text-[#F5F0F1] bg-[#4332BD] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 border border-transparent rounded-md font-semibold text-xs uppercase transition ease-in-out duration-300">
-                    {{__('جست و جو')}}
-                </button>
-            @if ($originalTasksCount != $filteredTasksCount)
-                    <a href="{{route('attended.meetings')}}"
-                       class="px-4 py-2 bg-[#E96742] text-[#F5F0F1] hover:ring-2 hover:ring-[#E96742] hover:ring-offset-2 border border-transparent rounded-md font-semibold text-xs uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                        {{__('نمایش همه')}}
-                    </a>
+                <x-search-button>{{__('جست و جو')}}</x-search-button>
+                @if ($originalTasksCount != $filteredTasksCount)
+                    <x-view-all-link href="{{route('attended.meetings')}}">  {{__('نمایش همه')}}</x-view-all-link>
                 @endif
             </div>
 
