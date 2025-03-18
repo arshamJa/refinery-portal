@@ -41,8 +41,12 @@ class MeetingUser extends Model
 
     public function holders()
     {
-        return UserInfo::where('user_id',$this->user_id)->value('full_name');
+        return $this->user() && $this->user->user_info ? $this->user->user_info->full_name : null;
     }
+//    public function holders()
+//    {
+//        return UserInfo::where('user_id',$this->user_id)->value('full_name');
+//    }
 
 
     public function is_present()

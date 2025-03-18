@@ -12,7 +12,20 @@ class MeetingListController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Meeting::with('meetingUsers')
+        $query = Meeting::with([
+            'meetingUsers' => function ($query) {
+                $query->select('meeting_id', 'user_id', 'is_present');
+            },
+            'meetingUsers.user' => function ($query) {
+                $query->select('id'); // Only need the user ID
+            },
+            'meetingUsers.user.user_info' => function ($query) {
+                $query->select('user_id', 'full_name'); // Only need user ID and full name
+            },
+            'tasks' => function ($query) {
+                $query->whereNotNull('request_task')->select('meeting_id', 'request_task');
+            }
+        ])
             ->where('scriptorium', auth()->user()->user_info->full_name)
             ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled']);
         $originalMeetingsCount = $query->count(); // Count before any filtering
@@ -31,7 +44,7 @@ class MeetingListController extends Controller
         }
         if ($request->filled('is_cancelled')) {
             $isCancelledFilter = $request->input('is_cancelled');
-            if ($isCancelledFilter === '1' || $isCancelledFilter === '-1' || $isCancelledFilter === '0') {
+            if (in_array($isCancelledFilter, ['1', '-1', '0'])) {
                 $query->where('is_cancelled', $isCancelledFilter);
             }
         }
@@ -39,22 +52,18 @@ class MeetingListController extends Controller
 
         $allUsersHaveTasks = []; // Initialize the array outside the loop
         foreach ($meetings as $meeting) {
-            $meetingUsers = MeetingUser::where('meeting_id', $meeting->id)->pluck('user_id');
-            $hasTasks = true; // Assume all users have tasks initially
-            if ($meetingUsers->isEmpty()) {
-                $hasTasks = false; // No users, so no tasks
+            $userIds = $meeting->meetingUsers->pluck('user_id')->toArray(); // Get user IDs directly from relationship
+
+            if (empty($userIds)) {
+                $allUsersHaveTasks[$meeting->id] = false;
             } else {
-                foreach ($meetingUsers as $userId) {
-                    $taskExists = Task::where('meeting_id', $meeting->id)
-                        ->where('user_id', $userId)
-                        ->exists();
-                    if (!$taskExists) {
-                        $hasTasks = false; // At least one user doesn't have a task
-                        break; // Exit the inner loop
-                    }
-                }
+                $taskCounts = Task::where('meeting_id', $meeting->id)
+                    ->whereIn('user_id', $userIds)
+                    ->groupBy('user_id')
+                    ->pluck('user_id')
+                    ->toArray();
+                $allUsersHaveTasks[$meeting->id] = count($taskCounts) === count($userIds);
             }
-            $allUsersHaveTasks[$meeting->id] = $hasTasks; // Store the result
         }
 
         $filteredMeetingsCount = $meetings->total(); // Count after filtering

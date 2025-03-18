@@ -11,7 +11,9 @@ class AttendedMeetingsController extends Controller
     public function index(Request $request)
     {
 
-        $query = Task::with('meeting')->where('user_id', auth()->user()->id);
+        $query = Task::with('meeting:id,title,scriptorium,date,time')
+            ->where('user_id', auth()->user()->id)
+            ->select('id', 'meeting_id', 'time_out', 'sent_date', 'is_completed'); // Select specific columns from Task
 
         $originalTasksCount = $query->count(); // Count before any filtering
 

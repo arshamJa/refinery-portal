@@ -9,6 +9,7 @@ use App\Models\MeetingUser;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\UserInfo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -17,15 +18,33 @@ class CreateNewMeetingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $meetings = Meeting::with('meetingUsers')
-//            ->where('title', 'like', '%'.$this->search.'%')
+        $query = Meeting::with('meetingUsers')
             ->where('scriptorium','=',auth()->user()->user_info->full_name)
-            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
-            ->paginate(3);
+            ->select(['id','title','unit_organization','scriptorium','location','date','time']);
+
+        $originalMeetingsCount = $query->count(); // Count before any filtering
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('unit_organization', 'like', '%' . $search . '%')
+                    ->orWhere('scriptorium', 'like', '%' . $search . '%')
+                    ->orWhere('location', 'like', '%' . $search . '%')
+                    ->orWhere('date', 'like', '%' . $search . '%')
+                    ->orWhere('time', 'like', '%' . $search . '%');
+            });
+        }
+        $meetings = $query->paginate(5);
+        $filteredMeetingsCount = $meetings->total(); // Count after filtering
+
+
         return view('meeting.crud.index' , [
-            'meetings' => $meetings
+            'meetings' => $meetings,
+            'originalMeetingsCount' => $originalMeetingsCount,
+            'filteredMeetingsCount' => $filteredMeetingsCount
         ]);
     }
     /**
@@ -117,15 +136,33 @@ class CreateNewMeetingController extends Controller
      */
     public function edit(string $id)
     {
-        $meeting = Meeting::find($id);
+//        $meeting = Meeting::findOrFail($id);
+//        $userIds = MeetingUser::where('meeting_id',$meeting->id)->get();
+//        $users = User::query()
+//            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
+//            ->select('user_infos.id','user_infos.full_name')
+//            ->whereNull('deleted_at')
+//            ->get();
+//
+//        return view('meeting.crud.edit',[
+//            'meeting' => $meeting ,
+//            'users' => $users,
+//            'userIds' => $userIds
+//        ]);
+        $meeting = Meeting::with('meetingUsers:meeting_id,user_id')->findOrFail($id);
+        $userIds = MeetingUser::where('meeting_id',$meeting->id)->get();
         $users = User::query()
             ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
-            ->select('user_infos.id','user_infos.full_name')
+            ->select('users.id as user_id', 'user_infos.full_name')
             ->whereNull('deleted_at')
             ->get();
-        return view('meeting.crud.edit',['meeting' => $meeting , 'users' => $users]);
-    }
 
+        return view('meeting.crud.edit', [
+            'meeting' => $meeting,
+            'users' => $users,
+            'userIds' => $userIds
+        ]);
+    }
     /**
      * Update the specified resource in storage.
      * @throws ValidationException
@@ -176,28 +213,43 @@ class CreateNewMeetingController extends Controller
         $meeting->reminder = $request->reminder;
         $meeting->save();
         foreach ($holders as $holder){
-            if (MeetingUser::where('meeting_id',$meeting->id)->where('user_id',$holder)->exists()){
-                MeetingUser::updateOrCreate(
-                    ['user_id' => $holder],
-                    ['meeting_id' => $meeting->id]
-                );
-            }else{
+            $meetingUser = MeetingUser::where('meeting_id', $meeting->id)->where('user_id', $holder)->first();
+            if ($meetingUser) {
+                $meetingUser->update([
+                    'user_id' => $holder,
+                    'is_present' => false,
+                    'reason_for_absent' => null,
+                    'read_by_scriptorium' => false,
+                    'read_by_user' => false,
+                    'replacement' => null
+                ]);
+            } else {
                 MeetingUser::create([
                     'user_id' => $holder,
-                    'meeting_id' => $meeting->id
+                    'meeting_id' => $meeting->id,
+                    'is_present' => false,
+                    'reason_for_absent' => null,
+                    'read_by_scriptorium' => false,
+                    'read_by_user' => false,
+                    'replacement' => null
                 ]);
             }
         }
         return to_route('meeting.table')->with('status',' جلسه با موفقیت بروز شد');
     }
 
+    public function deleteUser(Request $request, $meetingId, $userId)
+    {
+        // Assuming $meetingId and $userId are passed as route parameters or request input
+        MeetingUser::where('user_id', $userId)->where('meeting_id',$meetingId)->delete();
+        return response()->json(['success' => 'User deleted successfully']);
+    }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        $meeting = Meeting::find($id)->delete();
+        $meeting = Meeting::findOrFail($id)->delete();
         return to_route('meeting.table')->with('status',' جلسه با موفقیت حذف شد');
-
     }
 }

@@ -38,7 +38,7 @@ class MeetingInvitation extends Component
     {
         return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled')
             ->where('user_id',auth()->user()->id)
-            ->select('id','meeting_id','user_id','is_present','replacement')->paginate(3);
+            ->select('id','meeting_id','user_id','is_present','replacement')->paginate(5);
     }
     public function accept($meetingId)
     {

@@ -41,87 +41,92 @@
             </li>
     </x-breadcrumb>
 
+    <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
 
-    <div class="mx-auto bg-white w-full">
-        <div class="relative shadow-md sm:rounded-lg overflow-hidden">
-            <!-- Table Header -->
-            <div
-                class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-                <!-- Search Bar -->
-                <div class="w-full md:w-1/2">
-                    <form class="flex items-center">
-                        <label for="simple-search" class="sr-only">Search</label>
-                        <div class="relative w-full">
-                            <div
-                                class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                                     fill="currentColor" viewbox="0 0 20 20"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                          clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <input type="text" wire:model.live="search" id="simple-search" dir="rtl"
-                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full"
-                                   placeholder="جست و جو" required="">
-                        </div>
-                    </form>
+        <form method="GET" action="{{route('meeting.table')}}">
+            @csrf
+            <div class="grid grid-cols-2 items-end gap-4">
+                <div class="relative">
+                    <div
+                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
+                             fill="currentColor" viewbox="0 0 20 20"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <x-text-input type="text" name="search"/>
                 </div>
             </div>
-            <!-- Table Body -->
-            <div class="overflow-x-auto" dir="rtl">
-                <x-table.table>
-                    <x-slot name="head">
-                        <th class="px-4 py-3">{{__('ردیف')}}</th>
-                        <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
-                        <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
-                        <th class="px-4 py-3">{{__('تاریخ جلسه')}}</th>
-                        <th class="px-4 py-3">{{__('ساعت جلسه')}}</th>
-                        <th class="px-4 py-3 text-start">{{__('قابلیت')}}</th>
-                    </x-slot>
-                    <x-slot name="body">
-                        @foreach($meetings as $meeting)
-                            <tr class="px-4 py-3 border-b text-center">
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->time}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                                    <x-dropdown>
-                                        <x-slot name="trigger">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                 stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                                            </svg>
-                                        </x-slot>
-                                        <x-slot name="content">
-                                            <x-dropdown-link href="{{route('meeting.show',$meeting->id)}}">
-                                                {{__('نمایش')}}
-                                            </x-dropdown-link>
-                                            <x-dropdown-link href="{{route('meeting.edit',$meeting->id)}}">
-                                                {{__('ویرایش')}}
-                                            </x-dropdown-link>
-                                            <form action="{{route('meeting.destroy',$meeting->id)}}" method="post">
-                                                @csrf
-                                                @method('delete')
-                                                <x-dropdown-link type="submit">
-                                                    {{__('حذف')}}
-                                                </x-dropdown-link>
-                                            </form>
-                                        </x-slot>
-                                    </x-dropdown>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </x-slot>
-                </x-table.table>
-                <span class="p-2 mx-2">
-                    {{ $meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
-                </span>
+            <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
+                <x-search-button>{{__('جست و جو')}}</x-search-button>
+                @if ($originalMeetingsCount != $filteredMeetingsCount)
+                    <x-view-all-link href="#">{{__('نمایش همه')}}</x-view-all-link>
+                @endif
             </div>
-        </div>
+        </form>
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead
+                class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th class="px-4 py-3">{{__('ردیف')}}</th>
+                <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
+                <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
+                <th class="px-4 py-3">{{__('تاریخ جلسه')}}</th>
+                <th class="px-4 py-3">{{__('ساعت جلسه')}}</th>
+                <th class="px-4 py-3 text-start">{{__('قابلیت')}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            @forelse($meetings as $meeting)
+                <tr class="px-4 py-3 border-b text-center">
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->time}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                        <x-dropdown>
+                            <x-slot name="trigger">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                </svg>
+                            </x-slot>
+                            <x-slot name="content">
+                                <x-dropdown-link href="{{route('meeting.show',$meeting->id)}}">
+                                    {{__('نمایش')}}
+                                </x-dropdown-link>
+                                <x-dropdown-link href="{{route('meeting.edit',$meeting->id)}}">
+                                    {{__('ویرایش')}}
+                                </x-dropdown-link>
+                                <form action="{{route('meeting.destroy',$meeting->id)}}" method="post">
+                                    @csrf
+                                    @method('delete')
+                                    <x-dropdown-link type="submit">
+                                        {{__('حذف')}}
+                                    </x-dropdown-link>
+                                </form>
+                            </x-slot>
+                        </x-dropdown>
+                    </td>
+                </tr>
+            @empty
+                <tr class="border-b dark:border-gray-700">
+                    <th colspan="8"
+                        class="text-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {{__('رکوردی یافت نشد ...')}}
+                    </th>
+                </tr>
+            @endforelse
+            </tbody>
+        </table>
+        <span class="p-2 mx-2">
+           {{ $meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
+       </span>
     </div>
+
 </x-app-layout>

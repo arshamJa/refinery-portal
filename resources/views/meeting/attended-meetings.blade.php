@@ -67,14 +67,13 @@
             </thead>
             <tbody>
             @forelse($tasks as $task)
-{{--            @forelse($meetingUsers as $meetingUser)--}}
                 <tr class="px-4 py-3 border-b text-center">
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->date}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->deadLineTask()}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sentDate()}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date}}</td>
                     <td class="px-4 py-3">
                         @if($tasks && !$task->is_completed)
                             <a href="{{route('task.list',$task->meeting->id)}}">

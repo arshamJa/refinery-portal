@@ -52,17 +52,27 @@ class TaskManagementController extends Controller
     public function create(string $meeting)
     {
 
+//        $meetings = Meeting::find($meeting);
+//        $employees = MeetingUser::where('meeting_id',$meeting)->get();
+//        $tasks = Task::with('user')->where('meeting_id',$meeting)->get();
+
         $meetings = Meeting::find($meeting);
-        $employees = MeetingUser::where('meeting_id',$meeting)->get();
-        $tasks = Task::with('user')->where('meeting_id',$meeting)->get();
-//        $allEmployeesAssigned = $this->areAllTasksAssignedToAllEmployees($tasks, $employees);
+
+        $employees = MeetingUser::with('user.user_info') // Eager load user and userInfo
+        ->where('meeting_id', $meeting)
+            ->get();
+
+        $tasks = Task::with('user.user_info') // Eager load user and userInfo
+        ->where('meeting_id', $meeting)
+            ->get();
+
+
+
         return view('task.create' , [
             'meetings' => $meetings,
             'employees' => $employees,
             'tasks' => $tasks,
-//            'allEmployeesAssigned' => $allEmployeesAssigned
         ]);
-        // return view('tasks.show', compact('task', 'allEmployeesAssigned'));
     }
 
 

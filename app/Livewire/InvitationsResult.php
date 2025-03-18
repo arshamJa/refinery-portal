@@ -19,21 +19,14 @@ class InvitationsResult extends Component
     {
         return view('livewire.invitations-result');
     }
-
-//    #[Computed]
-//    public function meetings()
-//    {
-//        return Meeting::with('meetingUsers')
-//            ->where('title', 'like', '%'.$this->search.'%')
-//            ->where('scriptorium','==',auth()->user()->user_info->full_name)
-//            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
-//            ->paginate(3);
-//    }
-
     #[Computed]
     public function meetingUsers()
     {
-        return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled','user')
+        return MeetingUser::with([
+            'meeting:id,title,scriptorium,date,time,is_cancelled',
+            'user:id',
+            'user.user_info:user_id,full_name'
+        ])
             ->where('is_present','!=','0')
             ->where('read_by_scriptorium',false)
             ->whereRelation('meeting','scriptorium','=',auth()->user()->user_info->full_name)
@@ -42,9 +35,13 @@ class InvitationsResult extends Component
 
     public function markNotification(string $id)
     {
-        $meetingUser = MeetingUser::find($id);
-        $meetingUser->read_by_scriptorium = true;
-        $meetingUser->save();
+        $meetingUser = MeetingUser::with('user.user_info')
+        ->find($id);
+
+        if ($meetingUser) {
+            $meetingUser->read_by_scriptorium = true;
+            $meetingUser->save();
+        }
         return to_route('invitations.result');
     }
 }

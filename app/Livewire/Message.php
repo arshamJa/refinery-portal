@@ -25,7 +25,7 @@ class Message extends Component
     #[Computed]
     public function read_by_user()
     {
-        return MeetingUser::with('meeting')
+        return MeetingUser::with('meeting:id,is_cancelled')
             ->whereRelation('meeting','is_cancelled','!=','0')
             ->where('user_id',auth()->user()->id)
             ->where('read_by_user',false)
@@ -36,10 +36,15 @@ class Message extends Component
     #[Computed]
     public function sentTaskCount()
     {
-        $meetingIds = Meeting::where('scriptorium', auth()->user()->user_info->full_name)
-            ->pluck('id');
-
+//        $meetingIds = Meeting::where('scriptorium', auth()->user()->user_info->full_name)
+//            ->pluck('id');
         // Count the completed tasks that belong to those meetings
+//        return \App\Models\Task::whereIn('meeting_id', $meetingIds)
+//            ->where('is_completed', true)
+//            ->count();
+        $meetingIds = Meeting::where('scriptorium', auth()->user()->user_info->full_name)
+            ->pluck('id')
+            ->toArray(); // Convert to array for whereIn
         return \App\Models\Task::whereIn('meeting_id', $meetingIds)
             ->where('is_completed', true)
             ->count();
@@ -48,12 +53,29 @@ class Message extends Component
     #[Computed]
     public function meetingUsers()
     {
-        return MeetingUser::with('meeting:id,title,scriptorium,date,time,is_cancelled','user')
+        return MeetingUser::with([
+            'meeting:id,title,scriptorium,date,time,is_cancelled',
+            'user:id',
+            'user.user_info:user_id,full_name'
+        ])
             ->where('is_present','!=','0')
             ->where('read_by_scriptorium',false)
             ->whereRelation('meeting','scriptorium','=',auth()->user()->user_info->full_name)
-            ->limit(2)
             ->get(['id','meeting_id','user_id','is_present','reason_for_absent','replacement']);
+    }
+    #[Computed]
+    public function meetingCount()
+    {
+        return Meeting::where('scriptorium', auth()->user()->user_info->full_name)->count();
+    }
+    #[Computed]
+    public function unreadMeetingUsersCount()
+    {
+        return MeetingUser::with('meeting:id,scriptorium')
+            ->where('is_present', '!=', '0')
+            ->where('read_by_scriptorium', false)
+            ->whereRelation('meeting', 'scriptorium', auth()->user()->user_info->full_name)
+            ->count();
     }
 
 

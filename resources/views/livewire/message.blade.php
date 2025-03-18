@@ -36,9 +36,9 @@
                     <a href="{{route('invitations.result')}}"
                        class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow flex flex-col gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
                         <p class="text-sm "> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</p>
-                        @if(Meeting::where('scriptorium',auth()->user()->user_info->full_name)->exists())
+                        @if($this->meetingCount > 0)
                             <p class="text-2xl text-blue-600 font-bold">
-                                {{MeetingUser::with('meeting')->where('is_present','!=' , '0')->where('read_by_scriptorium',false)->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)->count()}}
+                                {{ $this->unreadMeetingUsersCount }}
                             </p>
                         @endif
                     </a>

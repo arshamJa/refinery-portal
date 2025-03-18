@@ -34,6 +34,8 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
         ->name('meeting.update');
     Route::delete('/meetings/{meeting}', [CreateNewMeetingController::class, 'destroy'])
         ->name('meeting.destroy');
+    Route::delete('/meetings/{meetingId}/users/{userId}', [CreateNewMeetingController::class, 'deleteUser'])
+        ->name('meeting-users.delete');
 //    the end of creating new meeting
 
 //    list of meetings that are going to hold

@@ -55,7 +55,6 @@
                         <thead
                             class="text-sm text-center border-b text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-{{--                            <th class="px-4 py-2">عنوان جلسه</th>--}}
                             <th class="px-4 py-2">اقدام کننده</th>
                             <th class="px-4 py-2">اقدامات</th>
                             <th class="px-4 py-2">مهلت اقدام</th>
@@ -65,32 +64,12 @@
                         <tbody>
                             @foreach($meeting->tasks as $task)
                                 <tr class="border-b">
-{{--                                    @if ($loop->first)--}}
-{{--                                        <td class="px-6 py-4 whitespace-nowrap text-center"--}}
-{{--                                            rowspan="{{ $task->where('meeting_id', $meeting->id)->count() }}">--}}
-{{--                                            {{ $meeting->title }}--}}
-{{--                                        </td>--}}
-{{--                                    @endif--}}
                                     <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->full_name()}}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->body }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->time_out }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->sent_date }}</td>
                                 </tr>
                         @endforeach
-{{--                        @foreach($this->tasks->where('meeting_id', $meeting->id) as $task)--}}
-{{--                            <tr>--}}
-{{--                                @if ($loop->first)--}}
-{{--                                    <td class="px-6 py-4 whitespace-nowrap text-center"--}}
-{{--                                        rowspan="{{ $this->tasks->where('meeting_id', $meeting->id)->count() }}">--}}
-{{--                                        {{ $meeting->title }}--}}
-{{--                                    </td>--}}
-{{--                                @endif--}}
-{{--                                <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->full_name() }}</td>--}}
-{{--                                <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->body }}</td>--}}
-{{--                                <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->time_out }}</td>--}}
-{{--                                <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->sent_date }}</td>--}}
-{{--                            </tr>--}}
-{{--                        @endforeach--}}
                         </tbody>
                     </table>
                 </div>
@@ -98,98 +77,4 @@
         @endforeach
     </div>
 
-
-    {{--    <div x-data="{ openSession1: false, openSession2: false }">--}}
-
-    {{--        <div class="mb-4 border border-gray-300 rounded-md overflow-hidden">--}}
-    {{--            <button class="w-full bg-gray-100 p-3 flex justify-between items-center" @click="openSession1 = !openSession1">--}}
-    {{--                <span>جلسه اول</span>--}}
-    {{--                <svg class="w-4 h-4 duration-200 ease-out" :class="{ 'rotate-180': openSession1==false }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>--}}
-    {{--            </button>--}}
-    {{--            <div x-show="openSession1"--}}
-    {{--                 x-transition:enter="ease-out duration-300"--}}
-    {{--                 x-transition:enter-start="opacity-0"--}}
-    {{--                 x-transition:enter-end="opacity-100"--}}
-    {{--                 x-transition:leave="ease-in duration-200"--}}
-    {{--                 x-transition:leave-start="opacity-100"--}}
-    {{--                 x-transition:leave-end="opacity-0"--}}
-    {{--                 class="p-4">--}}
-    {{--                <table class="w-full table-auto">--}}
-    {{--                    <thead>--}}
-    {{--                    <tr class="bg-gray-200">--}}
-    {{--                        <th class="border px-4 py-2">تاریخ ارسال</th>--}}
-    {{--                        <th class="border px-4 py-2">مهلت اقدام</th>--}}
-    {{--                        <th class="border px-4 py-2">اقدامات</th>--}}
-    {{--                        <th class="border px-4 py-2">اقدام کننده</th>--}}
-    {{--                    </tr>--}}
-    {{--                    </thead>--}}
-    {{--                    <tbody>--}}
-    {{--                    <tr>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/04</td>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/20</td>--}}
-    {{--                        <td class="border px-4 py-2">اولین اقدامات که باید انجام شود</td>--}}
-    {{--                        <td class="border px-4 py-2">زاب کامکار</td>--}}
-    {{--                    </tr>--}}
-    {{--                    <tr>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/10</td>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/21</td>--}}
-    {{--                        <td class="border px-4 py-2">دومین اقدامات که باید انجام شود</td>--}}
-    {{--                        <td class="border px-4 py-2">دکتر هشام آهنگری</td>--}}
-    {{--                    </tr>--}}
-    {{--                    <tr>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/19</td>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/22</td>--}}
-    {{--                        <td class="border px-4 py-2">سومین اقدامات که باید انجام شود</td>--}}
-    {{--                        <td class="border px-4 py-2">وریا دستغیب</td>--}}
-    {{--                    </tr>--}}
-    {{--                    <tr>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/20</td>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/23</td>--}}
-    {{--                        <td class="border px-4 py-2">چهارمین اقداماتی که باید انجام دهد</td>--}}
-    {{--                        <td class="border px-4 py-2">تابال زین الدین</td>--}}
-    {{--                    </tr>--}}
-    {{--                    <tr>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/20</td>--}}
-    {{--                        <td class="border px-4 py-2">1403/12/24</td>--}}
-    {{--                        <td class="border px-4 py-2">پنجمین اقدامی که باید انجام شود</td>--}}
-    {{--                        <td class="border px-4 py-2">آراد پایور</td>--}}
-    {{--                    </tr>--}}
-    {{--                    </tbody>--}}
-    {{--                </table>--}}
-    {{--            </div>--}}
-    {{--        </div>--}}
-
-    {{--    </div>--}}
-
-
-    {{--    <div class="mx-auto p-4">--}}
-    {{--        <table class="min-w-full bg-lime-300 divide-y divide-gray-200">--}}
-    {{--            <thead class="bg-gray-50">--}}
-    {{--            <tr>--}}
-    {{--                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('جلسات')}}</th>--}}
-    {{--                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('اقدام کننده')}}</th>--}}
-    {{--                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('اقدامات')}}</th>--}}
-    {{--                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('مهلت اقدام')}}</th>--}}
-    {{--                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('تاریخ ارسال')}}</th>--}}
-    {{--            </tr>--}}
-    {{--            </thead>--}}
-    {{--            <tbody class="bg-white divide-y divide-gray-200">--}}
-    {{--            @foreach($this->meetings as $meeting)--}}
-    {{--                @foreach($this->tasks->where('meeting_id', $meeting->id) as $task)--}}
-    {{--                    <tr>--}}
-    {{--                        @if ($loop->first)--}}
-    {{--                            <td class="px-6 py-4 whitespace-nowrap text-center" rowspan="{{ $this->tasks->where('meeting_id', $meeting->id)->count() }}">--}}
-    {{--                                {{ $meeting->title }}--}}
-    {{--                            </td>--}}
-    {{--                        @endif--}}
-    {{--                        <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->full_name()}}</td>--}}
-    {{--                        <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->body }}</td>--}}
-    {{--                        <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->time_out }}</td>--}}
-    {{--                        <td class="px-6 py-4 whitespace-nowrap text-center">{{ $task->sent_date }}</td>--}}
-    {{--                    </tr>--}}
-    {{--                @endforeach--}}
-    {{--            @endforeach--}}
-    {{--            </tbody>--}}
-    {{--        </table>--}}
-    {{--    </div>--}}
 </div>

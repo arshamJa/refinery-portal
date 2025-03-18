@@ -18,12 +18,6 @@ class TaskSent extends Component
     #[Computed]
     public function meetings()
     {
-//        $meetings = Meeting::with('meetingUsers','tasks')
-//            ->where('scriptorium','=',auth()->user()->user_info->full_name)
-//            ->where('is_cancelled','=',-1)
-//            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
-//            ->get();
-
         // Filter tasks where is_completed is true
         $meetings = Meeting::with(['meetingUsers', 'tasks' => function (Builder $query) {
             $query->where('is_completed', true);

@@ -55,10 +55,10 @@
                         {{__('موضوع جلسه')}} : {{$meetings->title}}
                     </span>
                 <span>{{__('حاضرین')}} :
-                    @foreach($employees as $employee)
-                        {{UserInfo::where('user_id',$employee->user_id)->value('full_name')}} -
+                    @foreach ($employees as $employee)
+                        {{ $employee->user->user_info->full_name }} -
                     @endforeach
-                    </span>
+                </span>
             </div>
 
 
@@ -97,7 +97,7 @@
                                 <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
                                 @foreach($employees as $employee)
                                     <div class="option" data-value="{{$employee->user_id}}">
-                                        {{UserInfo::where('user_id',$employee->user_id)->value('full_name')}}
+                                        {{ $employee->user->user_info->full_name }}
                                     </div>
                                 @endforeach
                                 <div class="no-result-message" style="display:none;">No result match</div>
@@ -107,31 +107,26 @@
                     </div>
 
 
-
-
-
-
-
                     <div class="my-2 col-span-1">
                         <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
-                            <div class="flex gap-2">
-                                <div class="w-full">
-                                    <div class="flex items-center gap-1">
-                                        <label for="month" class="block text-gray-700 text-sm">{{__('سال:')}}</label>
-                                        <select name="year" id="year" dir="ltr"
-                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                            <option value="">...</option>
-                                            @for($i = 1400; $i <= 1440; $i++)
-                                                <option value="{{$i}}" @if (old('year') == $i) selected @endif>
-                                                    {{$i}}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('year')" class="my-2"/>
+                        <div class="flex gap-2">
+                            <div class="w-full">
+                                <div class="flex items-center gap-1">
+                                    <label for="month" class="block text-gray-700 text-sm">{{__('سال:')}}</label>
+                                    <select name="year" id="year" dir="ltr"
+                                            class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                        <option value="">...</option>
+                                        @for($i = 1400; $i <= 1440; $i++)
+                                            <option value="{{$i}}" @if (old('year') == $i) selected @endif>
+                                                {{$i}}
+                                            </option>
+                                        @endfor
+                                    </select>
                                 </div>
-                                <div class="w-full">
-                                    <div class="flex items-center gap-1">
+                                <x-input-error :messages="$errors->get('year')" class="my-2"/>
+                            </div>
+                            <div class="w-full">
+                                <div class="flex items-center gap-1">
                                     @php
                                         $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
                                     @endphp
@@ -145,11 +140,11 @@
                                             </option>
                                         @endfor
                                     </select>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('month')" class="my-2"/>
                                 </div>
-                                <div class="w-full">
-                                    <div class="flex items-center gap-1">
+                                <x-input-error :messages="$errors->get('month')" class="my-2"/>
+                            </div>
+                            <div class="w-full">
+                                <div class="flex items-center gap-1">
                                     <label for="day" class="block text-gray-700 text-sm">{{__('روز:')}}</label>
                                     <select name="day" id="day" dir="ltr"
                                             class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
@@ -160,10 +155,10 @@
                                             </option>
                                         @endfor
                                     </select>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('day')" class="my-2"/>
                                 </div>
+                                <x-input-error :messages="$errors->get('day')" class="my-2"/>
                             </div>
+                        </div>
 
                         {{--                            <x-text-input name="time_out" value="{{old('time_out')}}" id="time_out"--}}
                         {{--                                          class="block my-2 w-full" type="text" autofocus/>--}}
@@ -220,7 +215,7 @@
                 <th class="px-4 py-3">{{__('خلاصه مذاکرات و تصمیمات اتخاذ شده')}}</th>
                 <th class="px-4 py-3">{{__('مهلت اقدام')}}</th>
                 <th class="px-4 py-3">{{__('اقدام کننده')}}</th>
-{{--                <th class="px-4 text-center">{{__('وضعیت')}}</th>--}}
+                {{--                <th class="px-4 text-center">{{__('وضعیت')}}</th>--}}
             </x-slot>
             <x-slot name="body">
                 @foreach($tasks as $task)
@@ -229,12 +224,12 @@
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>
-{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
-{{--                               <span--}}
-{{--                                   class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">--}}
-{{--                                   {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}--}}
-{{--                               </span>--}}
-{{--                        </td>--}}
+                        {{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+                        {{--                               <span--}}
+                        {{--                                   class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">--}}
+                        {{--                                   {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}--}}
+                        {{--                               </span>--}}
+                        {{--                        </td>--}}
                     </tr>
                 @endforeach
             </x-slot>
