@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Trait\MeetingsTasks;
 use App\Trait\MessageReceived;
 use App\Trait\Organizations;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -23,6 +24,90 @@ class AdminDashboard extends Component
     public function render()
     {
         return view('livewire.admin.admin-dashboard');
+    }
+    public $yearData = [];
+    public $currentYear = 1403; // Default year
+    public $currentMonth = 0; // Default month (0 for first 6, 1 for last 6)
+
+    public function mount()
+    {
+        $this->fetchData();
+    }
+
+    public function updatedCurrentYear()
+    {
+        $this->fetchData();
+    }
+
+    public function updatedCurrentMonth()
+    {
+        $this->fetchData(); // Refetch data when month changes
+    }
+    private function fetchData()
+    {
+        $this->yearData = [];
+
+        // Loop through years 1403 to 1450
+        for ($year = 1403; $year <= 1450; $year++) {
+            $processedData = [
+                'done' => array_fill(1, 12, 0),
+                'notDone' => array_fill(1, 12, 0),
+                'delayed' => array_fill(1, 12, 0),
+            ];
+
+            // Fetch tasks for the current year
+            $tasks = DB::table('tasks')
+                ->select('sent_date', 'time_out', 'is_completed')
+                ->get();
+
+            foreach ($tasks as $task) {
+                // Count notDone tasks based on time_out
+                if ($task->is_completed === 0) {
+                    if ($task->time_out !== null) {
+                        $timeOutParts = explode('/', $task->time_out);
+                        if (count($timeOutParts) === 3) {
+                            $taskYear = (int) $timeOutParts[0];
+                            $taskMonth = (int) $timeOutParts[1];
+
+                            if ($taskYear === $year) {
+                                if ($this->currentMonth === 0 && $taskMonth >= 1 && $taskMonth <= 6) {
+                                    $processedData['notDone'][$taskMonth]++;
+                                } elseif ($this->currentMonth === 1 && $taskMonth >= 7 && $taskMonth <= 12) {
+                                    $processedData['notDone'][$taskMonth - 6]++;
+                                }
+                            }
+                        }
+                    }
+                    continue; // Skip further processing for is_completed = 0
+                }
+                // Count done and delayed tasks based on sent_date
+                if ($task->sent_date !== null) {
+                    $sentDateParts = explode('/', $task->sent_date);
+                    if (count($sentDateParts) === 3) {
+                        $taskYear = (int) $sentDateParts[0];
+                        $month = (int) $sentDateParts[1];
+                        if ($taskYear === $year) {
+                            if ($this->currentMonth === 0 && $month >= 1 && $month <= 6) {
+                                if ($task->is_completed === 1) {
+                                    $processedData['done'][$month]++;
+                                    if ($task->time_out !== null && strtotime($task->sent_date) > strtotime($task->time_out)) {
+                                        $processedData['delayed'][$month]++;
+                                    }
+                                }
+                            } elseif ($this->currentMonth === 1 && $month >= 7 && $month <= 12) {
+                                if ($task->is_completed === 1) {
+                                    $processedData['done'][$month - 6]++;
+                                    if ($task->time_out !== null && strtotime($task->sent_date) > strtotime($task->time_out)) {
+                                        $processedData['delayed'][$month - 6]++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $this->yearData[$year] = $processedData;
+        }
     }
     #[Computed]
     public function users()
