@@ -25,20 +25,21 @@ class AdminDashboard extends Component
     {
         return view('livewire.admin.admin-dashboard');
     }
+
     public $yearData = [];
-    public $currentYear = 1403; // Default year
+    public $currentYear = 1404; // Default year
     public $currentMonth = 0; // Default month (0 for first 6, 1 for last 6)
 
     public function mount()
     {
         $this->fetchData();
+        $this->fetchDataMeeting();
+        $this->calculateTotals();
     }
-
     public function updatedCurrentYear()
     {
         $this->fetchData();
     }
-
     public function updatedCurrentMonth()
     {
         $this->fetchData(); // Refetch data when month changes
@@ -47,8 +48,8 @@ class AdminDashboard extends Component
     {
         $this->yearData = [];
 
-        // Loop through years 1403 to 1450
-        for ($year = 1403; $year <= 1450; $year++) {
+        // Loop through years 1404 to 1430
+        for ($year = 1404; $year <= 1430; $year++) {
             $processedData = [
                 'done' => array_fill(1, 12, 0),
                 'notDone' => array_fill(1, 12, 0),
@@ -109,6 +110,94 @@ class AdminDashboard extends Component
             $this->yearData[$year] = $processedData;
         }
     }
+
+
+
+    public $yearDataMeeting = [];
+    public $currentYearMeeting = 1404; // Default year
+    public $currentMonthMeeting = 0; // Default month (0 for first 6, 1 for last 6)
+    public $allMeetings = 0;
+    public $allCancelledMeetings = 0;
+
+//    public function mount()
+//    {
+//        $this->fetchDataMeeting();
+//        $this->calculateTotals();
+//    }
+
+    public function updatedCurrentYearMeeting()
+    {
+        $this->fetchDataMeeting();
+        $this->calculateTotals();
+    }
+
+    public function updatedCurrentMonthMeeting()
+    {
+        $this->fetchDataMeeting();
+        $this->calculateTotals();
+    }
+
+    private function fetchDataMeeting()
+    {
+        $this->yearDataMeeting = [];
+
+        for ($year = 1404; $year <= 1450; $year++) {
+            $processedData = [
+                'cancelled' => array_fill(1, 12, 0),
+                'notCancelled' => array_fill(1, 12, 0),
+                'pending' => array_fill(1, 12, 0),
+            ];
+
+            $meetings = Meeting::whereYear('date', $year)->get();
+
+            foreach ($meetings as $meeting) {
+                $month = (int) date('n', strtotime($meeting->date));
+
+                if ($this->currentMonthMeeting === 0 && $month >= 1 && $month <= 6) {
+                    if ($meeting->is_cancelled === 1) {
+                        $processedData['cancelled'][$month]++;
+                    } elseif ($meeting->is_cancelled === -1) {
+                        $processedData['notCancelled'][$month]++;
+                    } else {
+                        $processedData['pending'][$month]++;
+                    }
+                } elseif ($this->currentMonthMeeting === 1 && $month >= 7 && $month <= 12) {
+                    if ($meeting->is_cancelled === 1) {
+                        $processedData['cancelled'][$month - 6]++;
+                    } elseif ($meeting->is_cancelled === -1) {
+                        $processedData['notCancelled'][$month - 6]++;
+                    } else {
+                        $processedData['pending'][$month - 6]++;
+                    }
+                }
+            }
+
+            $this->yearDataMeeting[$year] = $processedData;
+        }
+    }
+
+    private function calculateTotals()
+    {
+        $this->allMeetings = 0;
+        $this->allCancelledMeetings = 0;
+
+        $meetings = Meeting::whereYear('date', $this->currentYearMeeting)->get();
+        foreach($meetings as $meeting){
+            $month = (int) date('n', strtotime($meeting->date));
+            if($this->currentMonthMeeting === 0 && $month >=1 && $month<=6){
+                $this->allMeetings++;
+                if($meeting->is_cancelled ===1){
+                    $this->allCancelledMeetings++;
+                }
+
+            } else if ($this->currentMonthMeeting === 1 && $month >=7 && $month<=12){
+                $this->allMeetings++;
+                if($meeting->is_cancelled ===1){
+                    $this->allCancelledMeetings++;
+                }
+            }
+        }
+    }
     #[Computed]
     public function users()
     {
@@ -124,6 +213,18 @@ class AdminDashboard extends Component
         return Meeting::where('scriptorium', '=' ,auth()->user()->user_info->full_name)
             ->where('is_cancelled', '=','-1')
             ->count();
+    }
+
+
+    #[Computed]
+    public function allMeetings()
+    {
+        return Meeting::all()->count();
+    }
+    #[Computed]
+    public function allCancelledMeetings()
+    {
+        return Meeting::where('is_cancelled',1)->count();
     }
 
 

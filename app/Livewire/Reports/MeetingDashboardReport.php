@@ -35,8 +35,8 @@ class MeetingDashboardReport extends Component
     {
         $this->yearData = [];
 
-        // Loop through years 1403 to 1450
-        for ($year = 1403; $year <= 1450; $year++) {
+        // Loop through years 1403 to 1430
+        for ($year = 1403; $year <= 1430; $year++) {
             $processedData = [
                 'done' => array_fill(1, 12, 0),
                 'notDone' => array_fill(1, 12, 0),
