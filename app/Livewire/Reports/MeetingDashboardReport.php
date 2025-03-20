@@ -14,7 +14,7 @@ use Livewire\Component;
 class MeetingDashboardReport extends Component
 {
     public $yearData = [];
-    public $currentYear = 1403; // Default year
+    public $currentYear = 1404; // Default year
     public $currentMonth = 0; // Default month (0 for first 6, 1 for last 6)
 
     public function mount()
@@ -35,8 +35,8 @@ class MeetingDashboardReport extends Component
     {
         $this->yearData = [];
 
-        // Loop through years 1403 to 1430
-        for ($year = 1403; $year <= 1430; $year++) {
+        // Loop through years 1404 to 1430
+        for ($year = 1404; $year <= 1430; $year++) {
             $processedData = [
                 'done' => array_fill(1, 12, 0),
                 'notDone' => array_fill(1, 12, 0),
