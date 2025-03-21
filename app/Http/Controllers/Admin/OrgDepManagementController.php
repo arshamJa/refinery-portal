@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserInfo;
@@ -14,7 +15,6 @@ class OrgDepManagementController extends Controller
 {
     public function index(Request $request)
     {
-
         $query = User::with([
             'user_info:id,department_id,user_id,full_name',
             'organizations:id,organization_name', // Eager load organization names
@@ -52,24 +52,36 @@ class OrgDepManagementController extends Controller
         $organizations = DB::table('organizations')->select('id', 'organization_name')->get();
         $userInfos = DB::table('user_infos')->select('id', 'user_id', 'full_name')
             ->get();
+
         return view('admin.user-dep-org', [
             'departments' => $departments,
             'organizations' => $organizations,
             'userInfos' => $userInfos
         ]);
     }
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         Gate::authorize('create-department-organization');
+
         $validated = $request->validate([
             'departmentId' => 'required',
             'organization_ids' => 'required',
         ]);
-        $userIds = UserInfo::where('department_id','=', $request->departmentId)->get();
-        $users = User::find($userIds);
-        foreach ($request->organization_ids as $organization_id) {
-            $organization = Organization::find($organization_id);
-            $organization->department_id = $request->departmentId;
-            $organization->save();
+
+        $departmentId = $validated['departmentId'];
+        $organizationIds = $validated['organization_ids'];
+
+        if(!is_array($organizationIds)){
+            $organizationIds = explode(',', $organizationIds);
+            $organizationIds = array_map('trim', $organizationIds);
+        }
+        // Retrieve user IDs in a single query
+        $userIds = UserInfo::where('department_id', $departmentId)->get('user_id');
+        // Retrieve users in a single query
+        $users = User::whereIn('id', $userIds)->get();
+        foreach ($organizationIds as $organization_id) {
+            // Update organization's department_id
+            Organization::where('id', $organization_id)->update(['department_id' => $departmentId]);
 
             foreach ($users as $user){
                 if (DB::table('organization_user')
@@ -81,11 +93,14 @@ class OrgDepManagementController extends Controller
                         ->where('user_id',$user->id)
                         ->update(['updated_at' => now() ]);
                 }else{
-                    $user->organizations()->attach($organization_id);
+                   DB::table('organization_user')->insert([
+                       'organization_id' => $organization_id,
+                       'user_id' => $user->id
+                   ]);
                 }
             }
         }
-        return to_route('departments.organizations')->with('status', 'ارتباط دپارتمان و سامانه انجام شد');
+        return to_route('department.organization.connection')->with('status', 'ارتباط دپارتمان و سامانه انجام شد');
     }
 
 }

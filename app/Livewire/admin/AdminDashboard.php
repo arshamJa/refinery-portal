@@ -19,16 +19,25 @@ class AdminDashboard extends Component
 {
 
     use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
-    public $meetingTitle;
-    public $meeting_id;
+
+
+    // this is for taskChart
+    public $yearData = [];
+    public $currentYear = 1404; // Default year
+    public $currentMonth = 0; // Default month (0 for first 6, 1 for last 6)
+
+    // this is for meetingChart
+    public $yearDataMeeting = [];
+    public $currentYearMeeting = 1404; // Default year
+    public $currentMonthMeeting = 0; // Default month (0 for first 6, 1 for last 6)
+    public $allMeetings = 0;
+    public $allCancelledMeetings = 0;
+
     public function render()
     {
         return view('livewire.admin.admin-dashboard');
     }
 
-    public $yearData = [];
-    public $currentYear = 1404; // Default year
-    public $currentMonth = 0; // Default month (0 for first 6, 1 for last 6)
 
     public function mount()
     {
@@ -48,6 +57,11 @@ class AdminDashboard extends Component
     {
         $this->yearData = [];
 
+        // Fetch all tasks once
+        $allTasks = DB::table('tasks')
+            ->select('sent_date', 'time_out', 'is_completed')
+            ->get();
+
         // Loop through years 1404 to 1430
         for ($year = 1404; $year <= 1430; $year++) {
             $processedData = [
@@ -56,10 +70,22 @@ class AdminDashboard extends Component
                 'delayed' => array_fill(1, 12, 0),
             ];
 
-            // Fetch tasks for the current year
-            $tasks = DB::table('tasks')
-                ->select('sent_date', 'time_out', 'is_completed')
-                ->get();
+            // Filter tasks for the current year
+            $tasks = $allTasks->filter(function ($task) use ($year) {
+                if ($task->time_out !== null) {
+                    $timeOutParts = explode('/', $task->time_out);
+                    if (count($timeOutParts) === 3 && (int) $timeOutParts[0] === $year) {
+                        return true;
+                    }
+                }
+                if ($task->sent_date !== null) {
+                    $sentDateParts = explode('/', $task->sent_date);
+                    if (count($sentDateParts) === 3 && (int) $sentDateParts[0] === $year) {
+                        return true;
+                    }
+                }
+                return false;
+            });
 
             foreach ($tasks as $task) {
                 // Count notDone tasks based on time_out
@@ -111,20 +137,6 @@ class AdminDashboard extends Component
         }
     }
 
-
-
-    public $yearDataMeeting = [];
-    public $currentYearMeeting = 1404; // Default year
-    public $currentMonthMeeting = 0; // Default month (0 for first 6, 1 for last 6)
-    public $allMeetings = 0;
-    public $allCancelledMeetings = 0;
-
-//    public function mount()
-//    {
-//        $this->fetchDataMeeting();
-//        $this->calculateTotals();
-//    }
-
     public function updatedCurrentYearMeeting()
     {
         $this->fetchDataMeeting();
@@ -141,6 +153,9 @@ class AdminDashboard extends Component
     {
         $this->yearDataMeeting = [];
 
+        // Fetch all meetings once
+        $allMeetings = Meeting::all();
+
         for ($year = 1404; $year <= 1450; $year++) {
             $processedData = [
                 'cancelled' => array_fill(1, 12, 0),
@@ -148,7 +163,10 @@ class AdminDashboard extends Component
                 'pending' => array_fill(1, 12, 0),
             ];
 
-            $meetings = Meeting::whereYear('date', $year)->get();
+            // Filter meetings for the current year
+            $meetings = $allMeetings->filter(function ($meeting) use ($year) {
+                return date('Y', strtotime($meeting->date)) == $year;
+            });
 
             foreach ($meetings as $meeting) {
                 $month = (int) date('n', strtotime($meeting->date));
@@ -171,7 +189,6 @@ class AdminDashboard extends Component
                     }
                 }
             }
-
             $this->yearDataMeeting[$year] = $processedData;
         }
     }
@@ -214,8 +231,6 @@ class AdminDashboard extends Component
             ->where('is_cancelled', '=','-1')
             ->count();
     }
-
-
     #[Computed]
     public function allMeetings()
     {
@@ -226,71 +241,10 @@ class AdminDashboard extends Component
     {
         return Meeting::where('is_cancelled',1)->count();
     }
-
-
-    /**
-     * this is for scriptoriums only
-     */
-//    #[Computed]
-//    public function meetingNotifications()
-//    {
-//        return Meeting::where('scriptorium',auth()->user()->user_info->full_name)
-//            ->where('is_cancelled','-1')
-//            ->get(['title','location','date','time']);
-//    }
-    #[Computed]
-    public function meetingsSchedule()
-    {
-        return Meeting::with('meetingUsers')
-            ->where('is_cancelled','=','-1')
-            ->whereRelation('meetingUsers','user_id','=',auth()->user()->id)
-            ->get(['title','location','date','time']);
-    }
-
     #[Computed]
     public function invitation()
     {
         return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
     }
-    public function acceptMeeting($meetingId)
-    {
-        $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '-1';
-        $meeting->save();
-        return redirect()->back();
-    }
 
-    public function openModalDelete($meetingId)
-    {
-        $this->meetingTitle = Meeting::where('id',$meetingId)->value('title');
-        $this->meeting_id = $meetingId;
-        $this->dispatch('crud-modal', name: 'delete');
-    }
-    public function denyMeeting($meetingId)
-    {
-        $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '1';
-        $meeting->save();
-        $this->close();
-    }
-    public function accept($meetingId)
-    {
-        MeetingUser::where('user_id', auth()->user()->id)->where('meeting_id', $meetingId)->update([
-            'is_present' => '1'
-        ]);
-        return redirect()->back();
-    }
-
-    public function deny($meetingId)
-    {
-        MeetingUser::where('user_id', auth()->user()->id)->where('meeting_id', $meetingId)->update([
-            'is_present' => '-1'
-        ]);
-        return redirect()->back();
-    }
-    public function close()
-    {
-        $this->dispatch('close-modal');
-        return redirect()->back();
-    }
 }
