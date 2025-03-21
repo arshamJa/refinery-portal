@@ -28,8 +28,18 @@ class EmployeeDashboard extends Component
     #[Computed]
     public function getMeetingsToday()
     {
-        $jalaliNow = gregorian_to_jalali(now()->year, now()->month, now()->day, '/');
-        return Meeting::where('date','like',$jalaliNow)->get();
+
+        $jalaliNow = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $jaYear = $jalaliNow[0];
+        $jaMonth = $jalaliNow[1];
+        $jaDay = $jalaliNow[2];
+
+        $new_month = sprintf("%02d", $jaMonth);
+        $new_day = sprintf("%02d", $jaDay);
+
+        $newDate = $jaYear . '/' . $new_month . '/' . $new_day;
+
+        return Meeting::where('date',$newDate)->get();
     }
 
 

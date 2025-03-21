@@ -136,19 +136,6 @@ class CreateNewMeetingController extends Controller
      */
     public function edit(string $id)
     {
-//        $meeting = Meeting::findOrFail($id);
-//        $userIds = MeetingUser::where('meeting_id',$meeting->id)->get();
-//        $users = User::query()
-//            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
-//            ->select('user_infos.id','user_infos.full_name')
-//            ->whereNull('deleted_at')
-//            ->get();
-//
-//        return view('meeting.crud.edit',[
-//            'meeting' => $meeting ,
-//            'users' => $users,
-//            'userIds' => $userIds
-//        ]);
         $meeting = Meeting::with('meetingUsers:meeting_id,user_id')->findOrFail($id);
         $userIds = MeetingUser::where('meeting_id',$meeting->id)->get();
         $users = User::query()

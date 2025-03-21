@@ -19,7 +19,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
             <li>
-                <a  href="{{route('departments.organizations')}}" class="{{ (\Illuminate\Support\Facades\Route::is('departments.organizations')) ? 'active-breadcrumb underline underline-offset-2' : ''  }} inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
+                <a  href="{{route('department.organization.connection')}}" class="{{ (\Illuminate\Support\Facades\Route::is('department.organization.connection')) ? 'active-breadcrumb underline underline-offset-2' : ''  }} inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
                     {{__('ارتباط دپارتمان با سامانه')}}
                 </a>
             </li>

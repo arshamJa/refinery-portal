@@ -8,26 +8,24 @@
         </div>
 
         <div class="px-8 overflow-y-auto h-3/4">
-{{--            @if ($this->getMeetingsToday->isNotEmpty())--}}
+            @if ($this->getMeetingsToday->isNotEmpty())
                 <h1 class="text-xl text-[#4332BD] font-bold mb-6 text-center">{{__('لیست جلسات امروز')}}</h1>
                 <div class="rounded-lg text-[#F5F0F1] bg-[#E96742] shadow p-6">
                     <ul class="space-y-4">
-{{--                        @foreach ($this->getMeetingsToday as $meeting)--}}
+                        @foreach ($this->getMeetingsToday as $meeting)
                             <li class="flex items-center justify-between border-b border-gray-200 pb-4">
                                 <div class="flex-grow">
-{{--                                    <p class="text-lg font-medium">{{ $meeting->title }}</p>--}}
-                                    <p class="text-lg font-medium">جلسه چهارم</p>
-{{--                                    <p class="text-lg font-medium">{{ $meeting->time }}</p>--}}
-                                    <p class="text-lg font-medium">12:00</p>
+                                    <p class="text-lg font-medium">{{ $meeting->title }}</p>
+                                    <p class="text-lg font-medium">{{ $meeting->time }}</p>
                                 </div>
                                 <div>
-                                    <span class="font-mono">1403/12/10</span>
+                                    <span class="font-mono">{{ $meeting->date }}</span>
                                 </div>
                             </li>
-{{--                        @endforeach--}}
+                        @endforeach
                     </ul>
                 </div>
-{{--            @endif--}}
+            @endif
         </div>
 
 

@@ -5,8 +5,6 @@
             <x-organizationDepartmentHeader/>
 {{--            <div class="py-12 bg-gray-100" dir="rtl">--}}
 {{--                <div class="max-w-7xl sm:px-6 lg:px-8 space-y-6">--}}
-
-
                     {{-- Relation Department & Organization--}}
                     <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                         <div class="max-w-xl">
@@ -145,5 +143,6 @@
 {{--                </div>--}}
 {{--            </div>--}}
 {{--        </x-template>--}}
+
     </div>
 </x-app-layout>

@@ -4,7 +4,6 @@ namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Str;
 use Illuminate\Translation\PotentiallyTranslatedString;
 
 class Time implements ValidationRule
@@ -17,10 +16,9 @@ class Time implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
 
-        if ($value === null){
+        if ($value === null) {
             $fail('فیلد :attribute اجباری است');
-        }else{
-
+        } else {
             $hour = intval(substr($value, 0, -3));
             $minute = intval(substr($value, 3));
 
@@ -34,7 +32,6 @@ class Time implements ValidationRule
                     $fail('ساعت باید بعد از الان باشد');
                 }
             }
-
         }
 
     }

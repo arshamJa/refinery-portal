@@ -28,7 +28,7 @@ class MeetingStoreRequest extends FormRequest
             'title' => ['required','string','min:5','max:20'],
             'unit_organization' => ['required','string','min:5','max:30', new farsi_chs()],
             'scriptorium' => ['required','string', new farsi_chs()],
-            'location' => ['required','string','min:5','max:30', new farsi_chs()],
+            'location' => ['required','string','min:5','max:30'],
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],

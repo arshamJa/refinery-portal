@@ -27,11 +27,8 @@
     <script src="{{asset('flowBiteChart.js')}}"></script>
 </head>
 <body class="font-sans antialiased">
-
 {{--<livewire:layout.navigation/>--}}
-<div dir="rtl"
-    x-data="{ open: true }"
->
+<div dir="rtl" x-data="{ open: true }">
     <!-- Top Navigation Bar -->
     <x-navigation/>
 

@@ -69,11 +69,14 @@ class OrganizationTable extends Component
             'url' => ['bail','required','starts_with:www.'],
             'image' => ['nullable','mimes:jpg,jpeg,png,webp','max:1024']
         ]);
-        $path = $this->image->store('organizations','public');
+        $imagePath = null; // Initialize imagePath to null
+        if ($this->image) { // Check if an image was uploaded
+            $imagePath = $this->image->store('organizations', 'public');
+        }
         Organization::create([
             'organization_name' => $this->organization,
             'url' => $this->url,
-            'image' => $path
+            'image' => $imagePath
         ]);
         $this->close();
         session()->flash('status', 'سامانه جدید با موفقیت ثبت شد');
@@ -95,12 +98,22 @@ class OrganizationTable extends Component
             'url' => ['bail','required','starts_with:www.'],
             'image' => ['nullable','mimes:jpg,jpeg,png,webp','max:1024']
         ]);
-        $new_image = $this->newImage->store('organizations','public');
-        Organization::where('id',$organizationId)->update([
-            'organization_name' => $this->organization,
-            'url' => $this->url,
-            'image' => $new_image
-        ]);
+        if ($this->image) { // Check if a new image was uploaded
+            if (file_exists($old_image_path)) {
+                unlink($old_image_path);
+            }
+            $new_image = $this->image->store('organizations', 'public');
+            Organization::where('id', $organizationId)->update([
+                'organization_name' => $this->organization,
+                'url' => $this->url,
+                'image' => $new_image,
+            ]);
+        } else { // No new image, update only organization and url
+            Organization::where('id', $organizationId)->update([
+                'organization_name' => $this->organization,
+                'url' => $this->url,
+            ]);
+        }
         $this->close();
         $this->reset();
         session()->flash('status', 'سامانه با موفقیت آپدیت شد');

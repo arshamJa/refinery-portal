@@ -47,13 +47,13 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
         ->name('attended.meetings');
 
 
-    Route::get('/meeting/notification', MeetingNotification::class)
+    Route::get('meeting/notification', MeetingNotification::class)
         ->name('meeting.notification');
 
-    Route::get('/meeting/report', MeetingDashboardReport::class)->name('meeting.report');
+    Route::get('meeting/report', MeetingDashboardReport::class)->name('meeting.report');
 
 
-    Route::get('/scriptorium/report', [ScriptoriumReportController::class, 'index'])
+    Route::get('scriptorium/report', [ScriptoriumReportController::class, 'index'])
         ->name('scriptorium.report');
 //    Route::get('/scriptorium/report',\App\Livewire\ScriptoriumReport::class)
 //        ->name('scriptorium.report');

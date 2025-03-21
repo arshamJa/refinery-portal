@@ -14,13 +14,11 @@ class DepOrgConnection extends Component
     {
         return view('livewire.admin.dep-org-connection');
     }
-
-
-    #[Computed]
-    public function departments()
-    {
-        return Department::with('organizations')->get();
-    }
+//    #[Computed]
+//    public function departments()
+//    {
+//        return Department::with('organizations')->get();
+//    }
 
 
 }
