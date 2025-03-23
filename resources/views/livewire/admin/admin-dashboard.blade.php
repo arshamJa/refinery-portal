@@ -3,18 +3,18 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                       <select wire:model="currentYearMeeting" id="yearSelectMeeting" dir="ltr"
-                               class="border border-gray-300 w-32 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                           @foreach (array_keys($yearDataMeeting) as $year)
-                               <option value="{{ $year }}">{{ $year }}</option>
-                           @endforeach
-                       </select>
-                       <select wire:model="currentMonthMeeting" id="monthSelectMeeting" dir="ltr"
-                               class="border border-gray-300 w-40 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                           <option value="0">فروردین - شهریور</option>
-                           <option value="1">مهر - اسفند</option>
-                       </select>
-                <div class="flex gap-4 mb-4 mt-4 text-xl font-semibold text-gray-900 dark:text-white">
+                <select wire:model="currentYearMeeting" id="yearSelectMeeting" dir="ltr"
+                        class="border border-gray-300 w-32 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    @foreach (array_keys($yearDataMeeting) as $year)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                    @endforeach
+                </select>
+                <select wire:model="currentMonthMeeting" id="monthSelectMeeting" dir="ltr"
+                        class="border border-gray-300 w-40 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="0">فروردین - شهریور</option>
+                    <option value="1">مهر - اسفند</option>
+                </select>
+                <div class="flex gap-2 items-center mb-4 mt-4 text-xl font-semibold text-gray-900 dark:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor"
                          class="size-6">
@@ -79,7 +79,15 @@
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mt-6">
-            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">{{__('نمودار اقدامات')}}</h2>
+            <h2 class="text-xl flex items-center gap-2 font-semibold mb-4 text-gray-900 dark:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor"
+                     class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
+                </svg>
+                {{__('نمودار اقدامات')}}
+            </h2>
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-4">
                     <label for="yearSelect"
@@ -104,10 +112,6 @@
             <div class="w-full rounded-lg" id="bar-chart"></div>
         </div>
     </div>
-    <div class="max-w-4xl mt-16">
-        <x-notifications/>
-    </div>
-
 
     <script>
         // this is Column-Chart

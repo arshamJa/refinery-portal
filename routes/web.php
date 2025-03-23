@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
         ->name('employeeAccess');
 
 
+
 //    Route::get('/chat', App\Livewire\Chat\Index::class)
 //        ->name('chat.index');
 //    Route::get('/chat/{query}', App\Livewire\Chat\Chat::class)
@@ -71,3 +72,4 @@ require __DIR__.'/newUser.php';
 require __DIR__.'/task.php';
 require __DIR__.'/meeting.php';
 require __DIR__.'/profile.php';
+require __DIR__.'/rolePermission.php';

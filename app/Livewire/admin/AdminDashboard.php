@@ -3,22 +3,18 @@
 namespace App\Livewire\admin;
 use App\Models\Department;
 use App\Models\Meeting;
-use App\Models\MeetingUser;
 use App\Models\User;
 use App\Trait\MeetingsTasks;
 use App\Trait\MessageReceived;
 use App\Trait\Organizations;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Livewire\WithoutUrlPagination;
-use Livewire\WithPagination;
 
 class AdminDashboard extends Component
 {
 
-    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
+    use Organizations;
 
 
     // this is for taskChart
@@ -37,22 +33,20 @@ class AdminDashboard extends Component
     {
         return view('livewire.admin.admin-dashboard');
     }
-
-
     public function mount()
     {
         $this->fetchData();
         $this->fetchDataMeeting();
         $this->calculateTotals();
     }
-    public function updatedCurrentYear()
-    {
-        $this->fetchData();
-    }
-    public function updatedCurrentMonth()
-    {
-        $this->fetchData(); // Refetch data when month changes
-    }
+//    public function updatedCurrentYear()
+//    {
+//        $this->fetchData();
+//    }
+//    public function updatedCurrentMonth()
+//    {
+//        $this->fetchData(); // Refetch data when month changes
+//    }
     private function fetchData()
     {
         $this->yearData = [];
@@ -136,18 +130,16 @@ class AdminDashboard extends Component
             $this->yearData[$year] = $processedData;
         }
     }
-
-    public function updatedCurrentYearMeeting()
-    {
-        $this->fetchDataMeeting();
-        $this->calculateTotals();
-    }
-
-    public function updatedCurrentMonthMeeting()
-    {
-        $this->fetchDataMeeting();
-        $this->calculateTotals();
-    }
+//    public function updatedCurrentYearMeeting()
+//    {
+//        $this->fetchDataMeeting();
+//        $this->calculateTotals();
+//    }
+//    public function updatedCurrentMonthMeeting()
+//    {
+//        $this->fetchDataMeeting();
+//        $this->calculateTotals();
+//    }
 
     private function fetchDataMeeting()
     {
@@ -192,13 +184,11 @@ class AdminDashboard extends Component
             $this->yearDataMeeting[$year] = $processedData;
         }
     }
-
     private function calculateTotals()
     {
         $this->allMeetings = 0;
         $this->allCancelledMeetings = 0;
-
-        $meetings = Meeting::whereYear('date', $this->currentYearMeeting)->get();
+        $meetings = Meeting::where('date', $this->currentYearMeeting)->get();
         foreach($meetings as $meeting){
             $month = (int) date('n', strtotime($meeting->date));
             if($this->currentMonthMeeting === 0 && $month >=1 && $month<=6){
@@ -224,27 +214,6 @@ class AdminDashboard extends Component
     public function departments()
     {
         return Department::all()->count();
-    }
-    #[Computed]
-    public function meetings(){
-        return Meeting::where('scriptorium', '=' ,auth()->user()->user_info->full_name)
-            ->where('is_cancelled', '=','-1')
-            ->count();
-    }
-    #[Computed]
-    public function allMeetings()
-    {
-        return Meeting::all()->count();
-    }
-    #[Computed]
-    public function allCancelledMeetings()
-    {
-        return Meeting::where('is_cancelled',1)->count();
-    }
-    #[Computed]
-    public function invitation()
-    {
-        return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
     }
 
 }

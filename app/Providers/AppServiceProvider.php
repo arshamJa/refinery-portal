@@ -21,6 +21,7 @@ use Illuminate\Queue\Listener;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -47,6 +48,13 @@ class AppServiceProvider extends ServiceProvider
 //        $this->configureModels();
 //        $this->configureUrl();
         Paginator::useTailwind();
+
+
+        // Gate for SuperAdmin
+//        Gate::before(function ($user, $ability) {
+//            return $user->hasRole('super-admin') ? true : null;
+//        });
+
 
         //gate definition for profile page
         Gate::define('view-profile-page',[ProfilePolicy::class,'view']);

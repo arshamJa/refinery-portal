@@ -18,17 +18,16 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li>
-                        <span
-                            class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                            {{__('جدول دسترسی کاربران')}}
-                        </span>
+                <span
+                    class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                    {{__('جدول دسترسی کاربران')}}
+                </span>
             </li>
         </ol>
     </nav>
     <!-- Start coding here -->
     <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
-        <div
-            class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+        <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
             <div class="relative w-full md:w-3/6">
                 <div
                     class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -45,7 +44,6 @@
                        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500">
             </div>
         </div>
-
 
         <div class="pt-4 sm:px-10 sm:pt-6  shadow-md rounded-md">
             <table wire:loading.class.delay="opacity-70"
