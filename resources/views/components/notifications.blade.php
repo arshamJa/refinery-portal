@@ -1,7 +1,6 @@
 @php use App\Models\MeetingUser; @endphp
 {{--<div class="col-span-3 space-y-10 place-items-center">--}}
 @if(auth()->user()->user_info->create_meeting)
-
     <div class="mb-8">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('مراحل جلسات')}}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

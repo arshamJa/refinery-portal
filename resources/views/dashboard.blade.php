@@ -1,9 +1,12 @@
 <x-app-layout>
-    @if(auth()->user()->role === 'admin')
-        {{--        @can('admin-dashboard')--}}
+    @if (Auth::user()->hasAnyRole(['super-admin', 'admin']))
         <livewire:admin.admin-dashboard/>
-        {{--        @endcan--}}
     @endif
+{{--    @if(auth()->user()->hasRole('admin') === 'admin')--}}
+        {{--        @can('admin-dashboard')--}}
+{{--        <livewire:admin.admin-dashboard/>--}}
+        {{--        @endcan--}}
+{{--    @endif--}}
     @if(auth()->user()->role === 'operator_news' || auth()->user()->role === 'operator_phones')
         {{--        @can('operator-dashboard')--}}
         <livewire:operator.operator-dashboard/>

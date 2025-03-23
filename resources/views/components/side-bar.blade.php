@@ -15,18 +15,18 @@
         <div class="text-center">
             <p class="text-lg font-semibold mb-1">{{auth()->user()->full_name()}}</p>
             <p class="text-sm"> {{__('نقش')}} :
-                @if(auth()->user()->role === 'admin')
+                @if (Auth::user()->hasAnyRole(['super-admin', 'admin']))
                     {{__('ادمین')}}
-                @elseif(auth()->user()->role === 'employee')
+                @elseif(auth()->user()->hasRole('employee'))
                     {{__('کاربر')}}
-                @elseif(auth()->user()->role === 'operator_news')
+                @elseif(auth()->user()->hasRole('operator_news'))
                     {{__('اپراتور اخبار و اطلاعیه')}}
-                @elseif(auth()->user()->role === 'operator_phones')
+                @elseif(auth()->user()->hasRole('operator_phones'))
                     {{__('اپراتور دفترچه تلفنی')}}
                 @endif
             </p>
             <p class="text-sm">{{__('واحد')}}
-                : {{auth()->user()->user_info->department->department_name}}</p>
+{{--                : {{auth()->user()->user_info->department->department_name}}</p>--}}
         </div>
     </div>
 </div>
@@ -44,7 +44,7 @@
 
             {{__('پروفایل')}}
         </x-link.responsive-link>
-        @if(auth()->user()->role === 'admin')
+        @if (Auth::user()->hasAnyRole(['super-admin', 'admin']))
             <x-link.responsive-link href="{{route('organizations.index')}}"
                                     :active="request()->is('organizations')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -65,8 +65,8 @@
                 {{__('لیست سامانه')}}
             </x-link.responsive-link>
         @endif
-        @can('view-user')
-            <x-link.responsive-link href="{{route('newUser.index')}}"
+        @if (Auth::user()->hasAnyRole(['super-admin', 'admin']))
+        <x-link.responsive-link href="{{route('newUser.index')}}"
                                     :active="request()->is('users/table')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
@@ -75,8 +75,7 @@
                 </svg>
                 {{__('جدول کاربران')}}
             </x-link.responsive-link>
-        @endcan
-        @can('view-department-organization')
+
             <x-link.responsive-link
                 href="{{route('organization.department.manage')}}"
                 :active="request()->is('department/organization/manage')" class="flex items-center gap-x-2">
@@ -87,8 +86,7 @@
                 </svg>
                 {{__('مدیریت سامانه/دپارتمان')}}
             </x-link.responsive-link>
-        @endcan
-        @can('view-user')
+
             <x-link.responsive-link
                 href="{{Illuminate\Support\Facades\URL::signedRoute('employeeAccess')}}"
                 :active="request()->is('employee/access')" class="flex items-center gap-x-2">
@@ -98,7 +96,7 @@
 
                 {{__('جدول دسترسی کاربران')}}
             </x-link.responsive-link>
-        @endcan
+
         <x-link.responsive-link href="{{route('role.permission.table')}}"
                                 :active="request()->is('roles/permissions')" class="flex items-center gap-x-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
@@ -107,7 +105,7 @@
             {{__('مدیریت نقش / دسترسی')}}
         </x-link.responsive-link>
 
-{{--        @if(auth()->user()->role === 'admin')--}}
+
             <x-link.responsive-link href="{{route('meeting.report')}}"
                                     :active="request()->is('meeting/report')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -117,7 +115,7 @@
                 </svg>
                 {{__('داشبورد جلسات')}}
             </x-link.responsive-link>
-{{--        @endif--}}
+        @endif
     </li>
 </ul>
 <div class="absolute bottom-2 left-0 w-full pr-2">

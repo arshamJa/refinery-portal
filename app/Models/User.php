@@ -13,10 +13,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable ,SoftDeletes;
+    use HasFactory, Notifiable ,SoftDeletes, HasRoles;
     /**
      * The attributes that are mass assignable.
      *
@@ -25,7 +26,6 @@ class User extends Authenticatable
     protected $fillable = [
         'password',
         'p_code',
-        'role',
         'profile_photo_path'
     ];
 
