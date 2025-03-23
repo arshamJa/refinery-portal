@@ -30,31 +30,28 @@
                 <li>
                 <span
                     class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                    {{__('ایجاد نقش جدید')}}
+                    {{__('آپدیت نقش ')}}
                 </span>
                 </li>
             </ol>
         </nav>
 
-        <form action="{{route('role.store')}}" method="post">
+        <form action="{{route('permission.update',$permission->id)}}" method="post">
             @csrf
+            @method('put')
             <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                {{__('ایجاد نقش جدید')}}
+                {{__('آپدیت سطح دسترسی ')}}
             </div>
             <div class="px-6 py-4" dir="rtl">
                 <div class="mt-4 text-sm text-gray-600">
                     <div class="w-full">
-                        <x-input-label for="role" :value="__('نقش')"/>
-                        <x-text-input name="role" id="role"
+                        <x-input-label for="permission" :value="__('نقش')"/>
+                        <x-text-input name="permission" value="{{$permission->name}}" id="permission"
                                       class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('role')" class="my-2"/>
+                        <x-input-error :messages="$errors->get('permission')" class="my-2"/>
                     </div>
                 </div>
             </div>
-            @foreach($permissions as $permission)
-                <input type="checkbox" name="permissions[{{$permission->name}}]" value="{{$permission->name}}">{{$permission->name}}
-            @endforeach
-            <x-input-error :messages="$errors->get('permissions')" class="my-2"/>
             <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
                 <a href="{{route('role.permission.table')}}">
                     <x-secondary-button>

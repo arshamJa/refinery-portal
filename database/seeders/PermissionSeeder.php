@@ -15,9 +15,11 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
           'create-meeting',
+           'view-phone-list',
+           'view-profile',
         ];
         foreach ($permissions as $key => $permission){
-            Permission::create(['name'=>$permission]);
+            Permission::updateOrCreate(['name'=>$permission]);
         }
     }
 }

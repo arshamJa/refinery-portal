@@ -58,8 +58,6 @@
                     </x-primary-button>
                 </a>
 
-
-
                 <div class="pt-4 sm:px-10 sm:pt-6 shadow-md rounded-md">
                     <table
                         class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -78,12 +76,22 @@
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$role->name}}</td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                                    {{$role->permission}}
+                                    @foreach($role->permissions as $permission)
+                                        {{$permission->name}}
+                                    @endforeach
                                 </td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                                    <x-primary-button>{{__('نمایش')}}</x-primary-button>
-                                    <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
-                                    <x-danger-button>{{__('حذف')}}</x-danger-button>
+{{--                                    <a href="{{route('role.show',$role->id)}}">--}}
+{{--                                        <x-primary-button>{{__('نمایش')}}</x-primary-button>--}}
+{{--                                    </a>--}}
+                                    <a href="{{route('role.edit',$role->id)}}">
+                                        <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
+                                    </a>
+                                    <form action="{{route('role.destroy',$role->id)}}" method="post">
+                                        @csrf
+                                        @method('delete')
+                                        <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -123,6 +131,16 @@
                                class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500">
                     </div>
                 </div>
+                <a href="{{route('permission.create')}}">
+                    <x-primary-button>
+                        {{__('افزودن سطح دسترسی')}}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                    </x-primary-button>
+                </a>
 
                 <div class="pt-4 sm:px-10 sm:pt-6  shadow-md rounded-md">
                     <table
@@ -141,9 +159,18 @@
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$permission->name}}</td>
                                 <td class="px-4 py-4 whitespace-no-wrap flex flex-row gap-x-2 text-sm leading-5 text-coll-gray-900">
-                                    <x-primary-button>{{__('نمایش')}}</x-primary-button>
-                                    <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
-                                    <x-danger-button>{{__('حذف')}}</x-danger-button>
+{{--                                    <a href="{{route('permission.show',$permission->id)}}">--}}
+{{--                                        <x-primary-button>{{__('نمایش')}}</x-primary-button>--}}
+{{--                                    </a>--}}
+                                    <a href="{{route('permission.edit',$permission->id)}}">
+                                        <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
+                                    </a>
+                                    <form action="{{route('permission.destroy',$permission->id)}}" method="post">
+                                        @csrf
+                                        @method('delete')
+                                        <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>
+                                    </form>
+                                </td>
                             </tr>
                         @empty
                             <tr class="px-4 py-3 border-b text-center">
@@ -155,8 +182,8 @@
                         </tbody>
                     </table>
                     <span class="p-2 mx-2">
-                {{$permissions->withQueryString()->links(data:['scrollTo'=>false]) }}
-            </span>
+                    {{$permissions->withQueryString()->links(data:['scrollTo'=>false]) }}
+                    </span>
                 </div>
             </div>
         </div>

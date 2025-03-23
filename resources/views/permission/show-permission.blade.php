@@ -23,49 +23,28 @@
                     {{__('جدول مدیریت نقش / تعیین سطح دسترسی')}}
                 </span>
                 </li>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                     stroke="currentColor" class="w-3 h-3 text-gray-400">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
-                </svg>
-                <li>
-                <span
-                    class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                    {{__('ایجاد نقش جدید')}}
-                </span>
-                </li>
             </ol>
         </nav>
-
-        <form action="{{route('role.store')}}" method="post">
-            @csrf
             <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                {{__('ایجاد نقش جدید')}}
+                {{__('نمایش سطح دسترسی')}}
             </div>
             <div class="px-6 py-4" dir="rtl">
                 <div class="mt-4 text-sm text-gray-600">
                     <div class="w-full">
-                        <x-input-label for="role" :value="__('نقش')"/>
-                        <x-text-input name="role" id="role"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('role')" class="my-2"/>
+                        <x-input-label for="permission" :value="__('سطح دسترسی')"/>
+                        <x-text-input value="{{$permission->name}}" id="permission" class="block my-2 w-full" type="text" autofocus/>
                     </div>
                 </div>
             </div>
-            @foreach($permissions as $permission)
-                <input type="checkbox" name="permissions[{{$permission->name}}]" value="{{$permission->name}}">{{$permission->name}}
-            @endforeach
-            <x-input-error :messages="$errors->get('permissions')" class="my-2"/>
             <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
                 <a href="{{route('role.permission.table')}}">
                     <x-secondary-button>
-                        {{ __('لفو') }}
+                        {{ __('بازگشت') }}
                     </x-secondary-button>
                 </a>
-                <x-primary-button type="submit">
-                    {{ __('ثبت') }}
-                </x-primary-button>
+
             </div>
-        </form>
+
 
 
 
