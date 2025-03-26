@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PermissionStoreRequest;
 use App\Http\Requests\RoleStoreRequest;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Rules\farsi_chs;
-use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -74,12 +74,11 @@ class RolePermissionController extends Controller
     {
         return view('permission.create-permission');
     }
-    public function store_permission(Request $request)
+    public function store_permission(PermissionStoreRequest $request)
     {
-        $validated = $request->validate([
-            'permission' => ['required','string','max:40',new farsi_chs()],
-        ]);
-        $permission = Permission::create(['name'=>$request->permission]);
+        $request->validated();
+        $permission = Str::squish($request->permission);
+        Permission::create(['name' => $permission]);
         return to_route('role.permission.table')->with('status','سطح دسترسی جدید با موفقیت ایجاد شد');
     }
 //    public function show_permission(string $id)
@@ -92,13 +91,12 @@ class RolePermissionController extends Controller
         $permission = Permission::findOrFail($id);
         return view('permission.edit-permission',['permission'=> $permission]);
     }
-    public function update_permission(Request $request, string $id)
+    public function update_permission(PermissionStoreRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'permission' => ['required','string','max:40',new farsi_chs()],
-        ]);
+        $request->validated();
+        $permissionName = Str::squish($request->permission);
         $permission = Permission::findOrFail($id);
-        $permission->name = $request->permission;
+        $permission->name = $permissionName;
         $permission->save();
         return to_route('role.permission.table')->with('status','سطح دسترسی با موفقیت آپدیت شد');
     }

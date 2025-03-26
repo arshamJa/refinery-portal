@@ -74,7 +74,6 @@ class User extends Authenticatable
     {
         return $this->roles()->where('name', $role)->exists();
     }
-
     public function hasPermissionTo(Permission $permission): bool
     {
         foreach ($this->roles as $role) {
@@ -84,6 +83,11 @@ class User extends Authenticatable
         }
         return false;
     }
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
     public function otp(): HasOne
     {
         return $this->hasOne(VerificationCode::class)->chaperone();
