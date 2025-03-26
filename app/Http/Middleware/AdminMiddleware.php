@@ -16,9 +16,9 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-       if (Auth::user()->role === 'admin'){
+       if (Auth::user()->hasRole('ادمین') || Auth::user()->hasRole('super-admin')){
            return $next($request);
        }
-       return redirect()->back()->with('auth','شما اجازه دسترسی به این صفحه را ندارید');
+       return redirect()->back()->with('status','شما اجازه دسترسی به این صفحه را ندارید');
     }
 }

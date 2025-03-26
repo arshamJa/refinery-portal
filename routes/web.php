@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogOutController;
 use App\Http\Controllers\ResetPasswordController;
@@ -13,26 +14,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
 
-    Route::get('/', [LoginController::class, 'create'])->name('login');
-
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
-
-
-
-//    Route::get('/', LoginPage::class)->name('login');
-    Route::get('register',[\App\Http\Controllers\AuthController::class,'registrationPage'])->name('register');
-    Route::post('register',[\App\Http\Controllers\AuthController::class,'register'])->name('register.store')
-    ->middleware('throttle:5,1');
+    Route::get('/', [AuthController::class, 'create'])->name('login');
+    Route::post('/login', [AuthController::class, 'store'])->name('login.store');
+    Route::get('register', [AuthController::class, 'registrationPage'])->name('register');
+    Route::post('register', [AuthController::class, 'register'])->name('register.store')
+        ->middleware('throttle:5,1');
 });
 
 Route::middleware('auth')->group(function () {
+
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
+
 
     Route::post('sendInvitation/{meetingId}',
         [SendInvitationToReplacementController::class, '__invoke'])
         ->name('sendInvitation');
 
-    Route::post('/logout', [LogOutController::class, 'logout'])
-        ->name('logout');
+
 
     Route::view('dashboard', 'dashboard')
         ->middleware(['auth', 'verified'])
@@ -45,7 +44,6 @@ Route::middleware('auth')->group(function () {
     // Employee-Access-Table Route
     Route::get('employee/access', EmployeeAccess::class)
         ->name('employeeAccess');
-
 
 
 //    Route::get('/chat', App\Livewire\Chat\Index::class)

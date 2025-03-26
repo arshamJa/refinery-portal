@@ -9,9 +9,12 @@ use App\Models\Department;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserInfo;
+use Database\Seeders\PermissionSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class NewUserController extends Controller
 {
@@ -20,9 +23,13 @@ class NewUserController extends Controller
      */
     public function create()
     {
-        Gate::authorize('create-user');
+//        Gate::authorize('create-user');
+        $roles = Role::all();
+        $permissions = Permission::all();
         return view('newUser.create' , [
-            'departments' => Department::all()
+            'departments' => Department::all(),
+            'roles' => $roles,
+            'permissions' => $permissions
             ]);
     }
     /**
@@ -30,18 +37,22 @@ class NewUserController extends Controller
      */
     public function store(StoreNewUserRequest $request)
     {
-        Gate::authorize('create-user');
-        $meeting = (bool) $request->create_meeting;
-        $phoneList = (bool) $request->phoneList;
-        $blog = (bool) $request->blog;
-        $chat = (bool) $request->chat;
-        $dictionary = (bool) $request->dictionary;
+//        Gate::authorize('create-user');
+//        $meeting = (bool) $request->create_meeting;
+//        $phoneList = (bool) $request->phoneList;
+//        $blog = (bool) $request->blog;
+//        $chat = (bool) $request->chat;
+//        $dictionary = (bool) $request->dictionary;
         $request->validated();
         $newUser = User::create([
-            'role' => $request->role,
             'password' => Hash::make($request->password),
             'p_code' => $request->p_code,
         ]);
+
+        $newUser->syncRoles($request->role);
+
+        $newUser->syncPermissions($request->permissions);
+
         $departments = Department::find($request->departmentId);
         UserInfo::create([
             'user_id' => $newUser->id,
@@ -52,16 +63,18 @@ class NewUserController extends Controller
             'phone' => $request->phone,
             'n_code' => $request->n_code,
             'position' => $request->position,
-            'create_meeting' => $meeting,
-            'is_phoneList_allowed' => $phoneList,
-            'is_blog_allowed' => $blog,
-            'is_chat_allowed' => $chat,
-            'is_dictionary_allowed' => $dictionary,
+            'create_meeting' => 0,
+            'is_phoneList_allowed' => 0,
+            'is_blog_allowed' => 0,
+            'is_chat_allowed' => 0,
+            'is_dictionary_allowed' => 0,
         ]);
+
         $organizations = Organization::where('department_id',$departments->id)->get();
         foreach ($organizations as $organization){
             $organization->users()->attach($newUser->id);
         }
+
         return to_route('newUser.index')->with('status','کاربر جدید ساخته شد');
     }
 
@@ -70,9 +83,10 @@ class NewUserController extends Controller
      */
     public function show(string $id)
     {
-       Gate::authorize('view-user',$id);
+//       Gate::authorize('view-user',$id);
        $userInfo = UserInfo::find($id);
-       $users = User::with('organizations:id,organization_name')->where('id',$userInfo->user_id)->get();
+       $users = User::with('organizations:id,organization_name','permissions')
+           ->where('id',$userInfo->user_id)->get();
        return view('newUser.show',[
            'userInfo'=> $userInfo,
            'users' => $users
@@ -84,8 +98,8 @@ class NewUserController extends Controller
      */
     public function edit(string $id)
     {
-        Gate::authorize('update-user',$id);
-        $userInfo = UserInfo::with(['user:id,role,p_code','department:id,department_name'])->find($id);
+//        Gate::authorize('update-user',$id);
+        $userInfo = UserInfo::with(['user:id,p_code','department:id,department_name'])->find($id);
         $departments = Department::get(['id','department_name']);
         return view('newUser.edit',['userInfo' => $userInfo , 'departments' => $departments]);
     }
@@ -94,7 +108,7 @@ class NewUserController extends Controller
      */
     public function update(StoreNewUserRequest $request, string $id)
     {
-        Gate::authorize('update-user',$id);
+//        Gate::authorize('update-user',$id);
         $phoneList = (bool) $request->phoneList;
         $blog = (bool) $request->blog;
         $chat = (bool) $request->chat;

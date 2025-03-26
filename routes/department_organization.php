@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'adminMiddleware'])->group(function () {
 
     Route::get('department/organization/manage',[OrgDepManagementController::class, 'index'])
-        ->name('organization.department.manage')
-        ->can('view-department-organization');
+        ->name('organization.department.manage');
+//        ->can('view-department-organization');
 
     Route::get('department/organization/connection', [OrgDepManagementController::class, 'departmentOrganizationConnection'])
-        ->name('department.organization.connection')
-        ->can('create-department-organization');
+        ->name('department.organization.connection');
+//        ->can('create-department-organization');
 
     Route::post('/department/organization/connection', [OrgDepManagementController::class, 'store'])
         ->name('departments.organizations.store');
@@ -46,12 +46,12 @@ Route::middleware(['auth', 'adminMiddleware'])->group(function () {
 
     // Department Route
     Route::get('/departments', DepartmentTable::class)
-        ->name('departments.index')
-        ->can('view-department-organization');
+        ->name('departments.index');
+//        ->can('view-department-organization');
 
     // Organization Route
-    Route::get('/organizations', OrganizationTable::class)
-        ->name('organizations.index')
-        ->can('view-department-organization');
+    Route::get('organizations', OrganizationTable::class)
+        ->name('organizations');
+//        ->can('view-department-organization');
 
 });

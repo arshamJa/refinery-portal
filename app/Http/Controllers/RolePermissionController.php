@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Rules\farsi_chs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -13,12 +14,25 @@ class RolePermissionController extends Controller
 {
     public function table()
     {
-        $roles = Role::with('permissions:id,name')->paginate(5);
-        $permissions = DB::table('permissions')->select('id','name')->paginate(5);
-        return view('permission.role-permission-table',[
-           'roles' => $roles,
-           'permissions' => $permissions
+        $user = Auth::user();
+        $rolesQuery = Role::with('permissions:id,name');
+        // Check if the authenticated user is a super-admin
+        if (!$user->hasRole('super-admin')) {
+            // If not super-admin, filter out the super-admin role
+            $rolesQuery->where('name', '!=', 'super-admin');
+        }
+        $roles = $rolesQuery->paginate(5);
+        $permissions = DB::table('permissions')->select('id', 'name')->paginate(5);
+        return view('permission.role-permission-table', [
+            'roles' => $roles,
+            'permissions' => $permissions,
         ]);
+//        $roles = Role::with('permissions:id,name')->paginate(5);
+//        $permissions = DB::table('permissions')->select('id','name')->paginate(5);
+//        return view('permission.role-permission-table',[
+//           'roles' => $roles,
+//           'permissions' => $permissions
+//        ]);
 
     }
     public function create_role()

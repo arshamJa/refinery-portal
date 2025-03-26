@@ -51,9 +51,9 @@ class AppServiceProvider extends ServiceProvider
 
 
         // Gate for SuperAdmin
-//        Gate::before(function ($user, $ability) {
-//            return $user->hasRole('super-admin') ? true : null;
-//        });
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('super-admin') ? true : null;
+        });
 
 
         //gate definition for profile page

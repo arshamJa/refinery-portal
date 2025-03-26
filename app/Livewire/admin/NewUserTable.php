@@ -29,12 +29,12 @@ class NewUserTable extends Component
     #[Computed]
     public function userInfos()
     {
-        return UserInfo::with('user:id,p_code,role','department:id,department_name')
+        return UserInfo::with('user:id,p_code','department:id,department_name')
             ->where('full_name','like','%'.$this->search.'%')
             ->where('position','like','%'.$this->search.'%')
             ->orWhere('n_code','like','%'.$this->search.'%')
             ->orWhereRelation('user','p_code','like','%'.$this->search.'%')
-            ->orWhereRelation('user','role','like','%'.$this->search.'%')
+//            ->orWhereRelation('user','role','like','%'.$this->search.'%')
             ->orWhereRelation('department','department_name','like','%'.$this->search.'%')
             ->select(['id','user_id','department_id','full_name','n_code','position'])
             ->paginate(5);

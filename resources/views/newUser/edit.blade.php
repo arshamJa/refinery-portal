@@ -18,9 +18,9 @@
                                 <x-input-label for="role" :value="__('نقش')"/>
                                 <select dir="ltr" name="role"  id="role" class="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                     <option selected>...</option>
-                                    <option value="admin">{{__('ادمین')}}</option>
-                                    <option value="operator_phones">{{__('اپراتور')}}</option>
-                                    <option value="employee">{{__('کارمند')}}</option>
+                                    <option value="ادمین">{{__('ادمین')}}</option>
+                                    <option value="اپراتور">{{__('اپراتور')}}</option>
+                                    <option value="کاربر">{{__('کارمند')}}</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('role')" class="my-2"/>
 

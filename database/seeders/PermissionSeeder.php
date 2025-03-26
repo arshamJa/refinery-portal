@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
+
 
 class PermissionSeeder extends Seeder
 {
@@ -15,40 +16,36 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = [
-            'super-admin',
-            'admin',
-            'boss',
-            'scriptorium',
-            'operator_news',
-            'operator_blog',
-            'employee',
-        ];
-        foreach ($roles as $key => $role){
-            Role::create(['name' => $role]);
+        // Create roles
+        $superAdminRole = Role::create(['name' => 'super-admin']);
+        $adminRole = Role::create(['name' => 'ادمین']);
+        $operatorRole = Role::create(['name' => 'اپراتور']);
+        $userRole = Role::create(['name' => 'کاربر']);
 
+        // Create permissions
+        $editArticlesPermission = Permission::create(['name' => 'ایجاد جلسه']);
+        $deleteUsersPermission = Permission::create(['name' => 'ایجاد جلسه']);
+
+        // Assign permissions to the admin role
+        $superAdminRole->givePermissionTo($editArticlesPermission);
+        $superAdminRole->givePermissionTo($deleteUsersPermission);
+        $adminRole->givePermissionTo($editArticlesPermission);
+        $adminRole->givePermissionTo($deleteUsersPermission);
+
+        // Assign permissions to the editor role
+        $operatorRole->givePermissionTo($editArticlesPermission);
+        $userRole->givePermissionTo($editArticlesPermission);
+
+        // Assign the admin role to a user
+        $user = User::find(1); // Replace 1 with the user ID
+        if (!$user) {
+            // User with ID 1 does not exist. Create one, or handle the error.
+            $user = User::create([
+                'password' => Hash::make('Samael'),
+                'p_code' => Hash::make('SamaelProgrammer'),
+            ]);
         }
+        $user->assignRole($superAdminRole);
 
-        DB::table('model_has_roles')->insert([
-            'role_id' => 1,
-            'model_type' => 'App\Models\User',
-            'model_id' => 1,
-        ]);
-        DB::table('model_has_roles')->insert([
-            'role_id' => 2,
-            'model_type' => 'App\Models\User',
-            'model_id' => 2,
-        ]);
-
-
-
-        $permissions = [
-          'create-meeting',
-           'view-phone-list',
-           'view-profile',
-        ];
-        foreach ($permissions as $key => $permission){
-            Permission::updateOrCreate(['name'=>$permission]);
-        }
     }
 }

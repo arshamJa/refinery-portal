@@ -6,6 +6,6 @@
                 : 'px-3 py-2 text-sm font-medium text-gray-600 transition ease-in-out hover:text-gray-900 hover:border-b-2 hover:border-b-[#001BC9] duration-200';
 @endphp
 
-<a wire:navigate.hover {{ $attributes->merge(['class' => $classes]) }}>
+<a {{ $attributes->merge(['class' => $classes]) }}>
     {{ $slot }}
 </a>

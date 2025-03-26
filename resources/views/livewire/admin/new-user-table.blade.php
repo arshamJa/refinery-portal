@@ -83,7 +83,7 @@
             <div
                 class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
                 <div class="flex items-center justify-center w-full md:w-auto gap-2">
-                    @can('create-user')
+{{--                    @can('create-user')--}}
                         <a href="{{Illuminate\Support\Facades\URL::signedRoute('newUser.create')}}">
                             <x-primary-button>
                                 {{__('ساخت کاربر جدید')}}
@@ -94,7 +94,7 @@
                                 </svg>
                             </x-primary-button>
                         </a>
-                    @endcan
+{{--                    @endcan--}}
                 </div>
             </div>
         </div>
@@ -120,7 +120,11 @@
                 @forelse($this->userInfos as $userInfo)
                     <tr class="px-4 py-3 border-b text-center" wire:key="{{$userInfo->id}}">
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->id}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->user->role}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                            @foreach($userInfo->user->roles as $role)
+                                {{$role->name}}
+                            @endforeach
+                        </td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->full_name}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->user->p_code}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->n_code}}</td>
@@ -143,25 +147,25 @@
                                     </svg>
                                 </x-slot>
                                 <x-slot name="content">
-                                    @can('view-user')
+{{--                                    @can('view-user')--}}
                                         <x-dropdown-link
                                             href="{{Illuminate\Support\Facades\URL::signedRoute('newUser.show',$userInfo->id)}}">
                                             {{__('نمایش')}}
                                         </x-dropdown-link>
 
-                                    @endcan
-                                    @can('update-user')
+{{--                                    @endcan--}}
+{{--                                    @can('update-user')--}}
                                         <x-dropdown-link
                                             href="{{Illuminate\Support\Facades\URL::signedRoute('newUser.edit',$userInfo->id)}}">
                                             {{__('ویرایش')}}
                                         </x-dropdown-link>
-                                    @endcan
-                                    @can('delete-user')
+{{--                                    @endcan--}}
+{{--                                    @can('delete-user')--}}
                                         <button wire:click="openModalDelete({{$userInfo->id}})"
                                                 class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
                                             {{__('حذف')}}
                                         </button>
-                                    @endcan
+{{--                                    @endcan--}}
                                 </x-slot>
                             </x-dropdown>
                     </tr>

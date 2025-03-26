@@ -30,11 +30,9 @@
                                 {{__('کد ملی')}} : {{$userInfo->n_code}}
                             </p>
 
-
                             <p class="mb-2">
                                 {{__('شماره همراه')}} : {{$userInfo->phone}}
                             </p>
-
 
                             <p class="mb-2">
                                 {{__('شماره منزل')}} : {{$userInfo->house_phone}}
@@ -87,6 +85,14 @@
                                 {{__(' بخش دسترسی کاربر')}}
                             </h2>
                         </header>
+                        @foreach($users as $user)
+                            @foreach($user->getAllPermissions() as $permission)
+                            {{$permission->name}}
+                            @endforeach
+                        @endforeach
+
+
+
                         {{__('چت')}} = {{$userInfo->is_chat_allowed ? 'فعال' : 'غیر فعال'}}
                         <br>
                         {{__('اخبار و اطلاعیه')}} = {{$userInfo->is_blog_allowed ? 'فعال' : 'غیر فعال'}}
