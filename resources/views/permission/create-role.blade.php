@@ -52,7 +52,7 @@
                 </div>
             </div>
             @foreach($permissions as $permission)
-                <input type="checkbox" name="permissions[{{$permission->name}}]" value="{{$permission->name}}">{{$permission->name}}
+                <input type="checkbox" name="permissions[{{$permission->name}}]" value="{{$permission->id}}">{{$permission->name}}
             @endforeach
             <x-input-error :messages="$errors->get('permissions')" class="my-2"/>
             <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">

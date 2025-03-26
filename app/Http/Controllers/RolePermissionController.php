@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RoleStoreRequest;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Rules\farsi_chs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use function Symfony\Component\String\s;
 
 class RolePermissionController extends Controller
 {
@@ -27,13 +27,6 @@ class RolePermissionController extends Controller
             'roles' => $roles,
             'permissions' => $permissions,
         ]);
-//        $roles = Role::with('permissions:id,name')->paginate(5);
-//        $permissions = DB::table('permissions')->select('id','name')->paginate(5);
-//        return view('permission.role-permission-table',[
-//           'roles' => $roles,
-//           'permissions' => $permissions
-//        ]);
-
     }
     public function create_role()
     {
@@ -42,12 +35,9 @@ class RolePermissionController extends Controller
             'permissions' => $permissions
         ]);
     }
-    public function store_role(Request $request)
+    public function store_role(RoleStoreRequest $request)
     {
-        $validated = $request->validate([
-           'role' => ['required','string','max:40',new farsi_chs()],
-            'permissions' => ['required']
-        ]);
+        $request->validated();
         $role = Role::create(['name' => $request->role]);
         $role->syncPermissions($request->permissions);
         return to_route('role.permission.table')->with('status','نقش جدید اضافه و سطح دسترسی اعمال شد');
@@ -60,15 +50,12 @@ class RolePermissionController extends Controller
     public function edit_role(string $id)
     {
         $role = Role::findOrFail($id);
-        $permissions = DB::table('permissions')->select('id','name')->get();
+        $permissions = Permission::select('id', 'name')->get();
         return view('permission.edit-role',['role'=>$role , 'permissions'=> $permissions]);
     }
-    public function update_role(Request $request, string $id)
+    public function update_role(RoleStoreRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'role' => ['required','string','max:40',new farsi_chs()],
-            'permissions' => ['required']
-        ]);
+        $request->validated();
         $role = Role::findOrFail($id);
         $role->name = $request->role;
         $role->save();
@@ -78,6 +65,7 @@ class RolePermissionController extends Controller
     public function destroy_role(string $id)
     {
         $role = Role::findOrFail($id)->delete();
+        DB::table('permission_role')->where('role_id',$id)->delete();
         return to_route('role.permission.table')->with('status','نقش با موفقیت حذف شد');
     }
 

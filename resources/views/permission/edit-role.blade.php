@@ -54,13 +54,14 @@
             </div>
             @foreach($permissions as $permission)
                 <input type="checkbox"
-                       {{$role->hasPermissionTo($permission->name) ? 'checked' : ''}}
-                       name="permissions[{{$permission->name}}]"
-                       value="{{$permission->name}}">
-                {{$permission->name}}
+                       {{ $role->permissions()->where('permissions.id', $permission->id)->exists() ? 'checked' : '' }}
+                       name="permissions[{{ $permission->id }}]"
+                       value="{{ $permission->id }}">
+                {{ $permission->name }}
                 <br>
             @endforeach
             <x-input-error :messages="$errors->get('permissions')" class="my-2"/>
+
             <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
                 <a href="{{route('role.permission.table')}}">
                     <x-secondary-button>

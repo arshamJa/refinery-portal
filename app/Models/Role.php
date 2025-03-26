@@ -34,14 +34,12 @@ class Role extends Model
     public function revokePermissionTo(Permission $permission): self
     {
         $this->permissions()->detach($permission);
-
         return $this;
     }
 
     public function syncPermissions(array $permissions): self
     {
         $this->permissions()->sync($permissions);
-
         return $this;
     }
 

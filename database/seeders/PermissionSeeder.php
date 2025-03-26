@@ -24,13 +24,10 @@ class PermissionSeeder extends Seeder
 
         // Create permissions
         $editArticlesPermission = Permission::create(['name' => 'ایجاد جلسه']);
-        $deleteUsersPermission = Permission::create(['name' => 'ایجاد جلسه']);
 
         // Assign permissions to the admin role
         $superAdminRole->givePermissionTo($editArticlesPermission);
-        $superAdminRole->givePermissionTo($deleteUsersPermission);
         $adminRole->givePermissionTo($editArticlesPermission);
-        $adminRole->givePermissionTo($deleteUsersPermission);
 
         // Assign permissions to the editor role
         $operatorRole->givePermissionTo($editArticlesPermission);
