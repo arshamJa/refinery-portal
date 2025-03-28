@@ -21,9 +21,8 @@ class EmployeeAccess extends Component
     #[Computed]
     public function userInfos()
     {
-        return UserInfo::with('user:id,role')
+        return UserInfo::with('user:id')
             ->where('full_name', 'like', '%'.$this->search.'%')
-            ->orWhereRelation('user','role','like','%'.$this->search.'%')
             ->paginate(5);
     }
 

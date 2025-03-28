@@ -2,14 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\NewMeetingCreated;
-use App\Events\SetNewMeeting;
-use App\Listeners\InvitationNotification;
-use App\Listeners\SendInvitationNotification;
-use App\Listeners\SendMeetingInvitation;
-use App\Livewire\ProfilePage;
 use App\Models\User;
-use App\Notifications\NewNotification;
 use App\Policies\BlogPolicy;
 use App\Policies\DepartmentOrganizationPolicy;
 use App\Policies\ProfilePolicy;
@@ -17,17 +10,15 @@ use App\Policies\UserPolicy;
 use App\Policies\PhoneListPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Queue\Listener;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+
     /**
      * Register any application services.
      */

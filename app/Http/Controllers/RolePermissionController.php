@@ -6,6 +6,7 @@ use App\Http\Requests\PermissionStoreRequest;
 use App\Http\Requests\RoleStoreRequest;
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +23,15 @@ class RolePermissionController extends Controller
             $rolesQuery->where('name', '!=', 'super-admin');
         }
         $roles = $rolesQuery->paginate(5);
+//        $authorizedRoles = [];
+//        foreach ($roles as $role) {
+//            $authorizedRoles[$role->id] = Gate::allows('update', $role);
+//        }
         $permissions = DB::table('permissions')->select('id', 'name')->paginate(5);
         return view('permission.role-permission-table', [
             'roles' => $roles,
             'permissions' => $permissions,
+//            'authorizedRoles' => $authorizedRoles
         ]);
     }
     public function create_role()

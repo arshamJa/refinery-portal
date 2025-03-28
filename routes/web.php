@@ -37,8 +37,7 @@ Route::middleware('auth')->group(function () {
         ->middleware(['auth', 'verified'])
         ->name('dashboard');
 
-    Route::get('employee/organization', EmployeesOrganization::class)
-        ->name('employee.organization');
+
 
 
     // Employee-Access-Table Route

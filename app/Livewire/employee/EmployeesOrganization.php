@@ -2,8 +2,8 @@
 
 namespace App\Livewire\employee;
 
-use App\Trait\MeetingsTasks;
-use App\Trait\Organizations;
+use App\Traits\MeetingsTasks;
+use App\Traits\Organizations;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;

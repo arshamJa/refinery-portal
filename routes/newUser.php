@@ -6,11 +6,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('users/table',[\App\Http\Controllers\Admin\UsersTableController::class,'index'])
+        ->name('users.index');
+
 //    Route::get('newUser',\App\Livewire\NewUser::class)->name('newUser');
 
 //    Route::get('/newUsers', [NewUserController::class, 'index']);
-    Route::get('/users/table', \App\Livewire\admin\NewUserTable::class)
-        ->name('newUser.index');
+//    Route::get('/users/table', \App\Livewire\admin\NewUserTable::class)
+//        ->name('users.index');
 
     Route::get('/newUsers/create', [NewUserController::class, 'create'])
         ->name('newUser.create')

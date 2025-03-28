@@ -47,16 +47,18 @@
                                class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500">
                     </div>
                 </div>
-                <a href="{{route('role.create')}}">
-                    <x-primary-button>
-                    {{__('افزودن نقش')}}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
-                    </x-primary-button>
-                </a>
+                @can('create',App\Models\Role::class)
+                    <a href="{{route('role.create')}}">
+                        <x-primary-button>
+                            {{__('افزودن نقش')}}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                        </x-primary-button>
+                    </a>
+                @endcan
 
                 <div class="pt-4 sm:px-10 sm:pt-6 shadow-md rounded-md">
                     <table
@@ -77,16 +79,20 @@
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$role->name}}</td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
                                     @foreach($role->permissions as $permission)
-                                        {{$permission->name}}
+                                        {{$permission->name}} ,
                                     @endforeach
                                 </td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
 {{--                                    <a href="{{route('role.show',$role->id)}}">--}}
 {{--                                        <x-primary-button>{{__('نمایش')}}</x-primary-button>--}}
 {{--                                    </a>--}}
-                                    <a href="{{route('role.edit',$role->id)}}">
-                                        <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
-                                    </a>
+{{--                                    @if ($authorizedRoles[$role->id])--}}
+{{--                                    @can('update',$role)--}}
+                                        <a href="{{route('role.edit',$role->id)}}">
+                                            <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
+                                        </a>
+{{--                                    @endcan--}}
+{{--                                    @endif--}}
                                     <form action="{{route('role.destroy',$role->id)}}" method="post">
                                         @csrf
                                         @method('delete')

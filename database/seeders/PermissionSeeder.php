@@ -34,15 +34,14 @@ class PermissionSeeder extends Seeder
         $userRole->givePermissionTo($editArticlesPermission);
 
         // Assign the admin role to a user
-        $user = User::find(1); // Replace 1 with the user ID
-        if (!$user) {
+        $super_admin = User::find(1); // Replace 1 with the user ID
+        if (!$super_admin) {
             // User with ID 1 does not exist. Create one, or handle the error.
-            $user = User::create([
+            $super_admin = User::create([
                 'password' => Hash::make('Samael'),
                 'p_code' => Hash::make('SamaelProgrammer'),
             ]);
         }
-        $user->assignRole($superAdminRole);
-
+        $super_admin->assignRole($superAdminRole);
     }
 }

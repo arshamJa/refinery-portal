@@ -57,25 +57,49 @@ class User extends Authenticatable
     }
     public function assignRole(Role $role): self
     {
+        // Eager load roles before syncing
+        if (! $this->relationLoaded('roles')) {
+            $this->load('roles');
+        }
         $this->roles()->syncWithoutDetaching($role);
         return $this;
     }
     public function removeRole(Role $role): self
     {
+        // Eager load roles before detaching
+        if (! $this->relationLoaded('roles')) {
+            $this->load('roles');
+        }
         $this->roles()->detach($role);
         return $this;
     }
     public function syncRoles(array $roles): self
     {
+        // Eager load roles before syncing
+        if (! $this->relationLoaded('roles')) {
+            $this->load('roles');
+        }
         $this->roles()->sync($roles);
         return $this;
     }
-    public function hasRole(string $role): bool
-    {
-        return $this->roles()->where('name', $role)->exists();
+    public function hasRole(string $role) {
+        if (! $this->relationLoaded('roles')) {
+            $this->load('roles'); // Eager load if not already loaded
+        }
+        return $this->roles->contains('name', $role);
     }
-    public function hasPermissionTo(Permission $permission): bool
+    public function hasPermissionTo($permission): bool
     {
+        // Eager load roles before checking permissions
+        if (! $this->relationLoaded('roles')) {
+            $this->load('roles.permissions'); // Eager load roles and their permissions
+        }
+        if (is_string($permission)){
+            $permission = Permission::where('name', $permission)->first();
+            if($permission === null){
+                return false;
+            }
+        }
         foreach ($this->roles as $role) {
             if ($role->hasPermissionTo($permission)) {
                 return true;

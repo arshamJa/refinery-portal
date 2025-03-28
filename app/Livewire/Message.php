@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Meeting;
 use App\Models\MeetingUser;
-use App\Trait\MessageReceived;
+use App\Traits\MessageReceived;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
