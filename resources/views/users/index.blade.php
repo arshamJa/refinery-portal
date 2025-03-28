@@ -24,7 +24,7 @@
                         </span>
             </li>
         </ol>
-        <a href="{{Illuminate\Support\Facades\URL::signedRoute('newUser.create')}}">
+        <a href="{{route('users.create')}}">
             <x-primary-button>
                 {{__('ساخت کاربر جدید')}}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -38,7 +38,7 @@
     <!-- Start coding here -->
     <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
         <form method="GET" action="{{ route('users.index') }}" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-3 pt-3">
                 <div>
                     <x-input-label for="full_name">{{ __('نام و نام حانوادگی') }}</x-input-label>
                     <x-text-input type="text" name="full_name" id="full_name" />
@@ -70,7 +70,7 @@
                 </div>
 
             </div>
-            <div class="w-full flex gap-4 items-center pl-4 pr-3 py-2 mt-1">
+            <div class="w-full flex gap-4 items-center px-3 pb-3">
                 <x-search-button>{{__('جست و جو')}}</x-search-button>
                 @if ($originalUsersCount != $filteredUsersCount)
                     <x-view-all-link href="{{route('users.index')}}">{{__('نمایش همه')}}</x-view-all-link>
@@ -79,8 +79,7 @@
         </form>
 
         <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
-            <table wire:loading.class.delay="opacity-70"
-                   class="w-full text-sm text-left mb-6 rtl:text-right text-gray-500 dark:text-gray-400">
+            <table class="w-full text-sm text-left mb-6 rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead
                     class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
@@ -125,25 +124,18 @@
                                     </svg>
                                 </x-slot>
                                 <x-slot name="content">
-                                    {{--                                    @can('view-user')--}}
                                     <x-dropdown-link
-                                        href="{{Illuminate\Support\Facades\URL::signedRoute('newUser.show',$userInfo->id)}}">
+                                        href="{{route('users.show',$userInfo->id)}}">
                                         {{__('نمایش')}}
                                     </x-dropdown-link>
-
-                                    {{--                                    @endcan--}}
-                                    {{--                                    @can('update-user')--}}
                                     <x-dropdown-link
-                                        href="{{Illuminate\Support\Facades\URL::signedRoute('newUser.edit',$userInfo->id)}}">
+                                        href="{{route('users.edit',$userInfo->id)}}">
                                         {{__('ویرایش')}}
                                     </x-dropdown-link>
-                                    {{--                                    @endcan--}}
-                                    {{--                                    @can('delete-user')--}}
                                     <button wire:click="openModalDelete({{$userInfo->id}})"
                                             class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
                                         {{__('حذف')}}
                                     </button>
-                                    {{--                                    @endcan--}}
                                 </x-slot>
                             </x-dropdown>
                     </tr>
