@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -55,15 +53,15 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
-    public function assignRole(Role $role): self
-    {
-        // Eager load roles before syncing
-        if (! $this->relationLoaded('roles')) {
-            $this->load('roles');
+        public function assignRole(Role $role): self
+        {
+            // Eager load roles before syncing
+            if (! $this->relationLoaded('roles')) {
+                $this->load('roles');
+            }
+            $this->roles()->syncWithoutDetaching($role);
+            return $this;
         }
-        $this->roles()->syncWithoutDetaching($role);
-        return $this;
-    }
     public function removeRole(Role $role): self
     {
         // Eager load roles before detaching
@@ -82,8 +80,9 @@ class User extends Authenticatable
         $this->roles()->sync($roles);
         return $this;
     }
-    public function hasRole(string $role) {
-        if (! $this->relationLoaded('roles')) {
+    public function hasRole(string $role): bool
+    {
+        if (!$this->relationLoaded('roles')) {
             $this->load('roles'); // Eager load if not already loaded
         }
         return $this->roles->contains('name', $role);
@@ -91,12 +90,12 @@ class User extends Authenticatable
     public function hasPermissionTo($permission): bool
     {
         // Eager load roles before checking permissions
-        if (! $this->relationLoaded('roles')) {
+        if (!$this->relationLoaded('roles')) {
             $this->load('roles.permissions'); // Eager load roles and their permissions
         }
-        if (is_string($permission)){
+        if (is_string($permission)) {
             $permission = Permission::where('name', $permission)->first();
-            if($permission === null){
+            if ($permission === null) {
                 return false;
             }
         }
@@ -105,6 +104,7 @@ class User extends Authenticatable
                 return true;
             }
         }
+
         return false;
     }
     public function permissions(): BelongsToMany

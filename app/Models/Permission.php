@@ -12,57 +12,21 @@ class Permission extends Model
 
     protected $fillable = ['name'];
 
+    /**
+     * The roles that belong to the permission.
+     */
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class);
     }
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class);
-    }
     /**
-     * Assign the permission to a user.
+     * Check if the permission belongs to a specific role.
      *
-     * @param User $user
-     * @return self
-     */
-    public function assignToUser(User $user): self
-    {
-        if (! $this->users()->where('users.id', $user->id)->exists()) {
-            $this->users()->attach($user);
-        }
-        return $this;
-    }
-    /**
-     * Revoke the permission from a user.
-     *
-     * @param User $user
-     * @return self
-     */
-    public function removeFromUser(User $user): self
-    {
-        $this->users()->detach($user);
-        return $this;
-    }
-    /**
-     * Sync the users associated with the permission.
-     *
-     * @param array $users
-     * @return self
-     */
-    public function syncUsers(array $users): self
-    {
-        $this->users()->sync($users);
-        return $this;
-    }
-    /**
-     * Check if the permission is assigned to a user.
-     *
-     * @param User $user
+     * @param  string  $roleName
      * @return bool
      */
-    public function isAssignedToUser(User $user): bool
+    public function belongsToRole(string $roleName): bool
     {
-        return $this->users()->where('users.id', $user->id)->exists();
+        return $this->roles()->where('name', $roleName)->exists();
     }
 }

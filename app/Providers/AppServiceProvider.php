@@ -47,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
 
+
         //gate definition for profile page
         Gate::define('view-profile-page',[ProfilePolicy::class,'view']);
         Gate::define('update-profile-page',[ProfilePolicy::class,'update']);

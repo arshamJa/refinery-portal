@@ -1,6 +1,9 @@
 <div>
 
 
+
+
+
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -263,24 +266,26 @@
         if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
             const chart = new ApexCharts(document.getElementById("column-chart"), optionsMeeting);
             chart.render();
+
+            function updateChartData() {
+                processedYearDataMeeting = generateMeetingData(yearsMeeting);
+                optionsMeeting.series[0].data = processedYearDataMeeting[currentYearMeeting].cancelled;
+                optionsMeeting.series[1].data = processedYearDataMeeting[currentYearMeeting].notCancelled;
+                optionsMeeting.series[2].data = processedYearDataMeeting[currentYearMeeting].pending;
+                optionsMeeting.xaxis.categories = generateCategoriesMeeting(currentMonthMeeting); // Corrected line
+                chart.updateOptions(optionsMeeting);
+            }
+
             document.getElementById("yearSelectMeeting").addEventListener("change", function () {
                 currentYearMeeting = parseInt(this.value);
-                processedYearDataMeeting = generateMeetingData(yearsMeeting);
-                optionsMeeting.series[0].data = processedYearDataMeeting[currentYearMeeting].cancelled;
-                optionsMeeting.series[1].data = processedYearDataMeeting[currentYearMeeting].notCancelled;
-                optionsMeeting.series[2].data = processedYearDataMeeting[currentYearMeeting].pending;
-                optionsMeeting.xaxis.categories = generateCategories(currentMonthMeeting);
-                chart.updateOptions(optionsMeeting);
+                updateChartData();
             });
+
             document.getElementById("monthSelectMeeting").addEventListener("change", function () {
                 currentMonthMeeting = parseInt(this.value);
-                processedYearDataMeeting = generateMeetingData(yearsMeeting);
-                optionsMeeting.series[0].data = processedYearDataMeeting[currentYearMeeting].cancelled;
-                optionsMeeting.series[1].data = processedYearDataMeeting[currentYearMeeting].notCancelled;
-                optionsMeeting.series[2].data = processedYearDataMeeting[currentYearMeeting].pending;
-                optionsMeeting.xaxis.categories = generateCategories(currentMonthMeeting);
-                chart.updateOptions(optionsMeeting);
+                updateChartData();
             });
+
         }
         // the end of Column-Chart
 

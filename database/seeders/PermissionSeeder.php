@@ -16,32 +16,28 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles
-        $superAdminRole = Role::create(['name' => 'super-admin']);
-        $adminRole = Role::create(['name' => 'ادمین']);
-        $operatorRole = Role::create(['name' => 'اپراتور']);
-        $userRole = Role::create(['name' => 'کاربر']);
 
-        // Create permissions
-        $editArticlesPermission = Permission::create(['name' => 'ایجاد جلسه']);
-
-        // Assign permissions to the admin role
-        $superAdminRole->givePermissionTo($editArticlesPermission);
-        $adminRole->givePermissionTo($editArticlesPermission);
-
-        // Assign permissions to the editor role
-        $operatorRole->givePermissionTo($editArticlesPermission);
-        $userRole->givePermissionTo($editArticlesPermission);
-
-        // Assign the admin role to a user
-        $super_admin = User::find(1); // Replace 1 with the user ID
-        if (!$super_admin) {
-            // User with ID 1 does not exist. Create one, or handle the error.
-            $super_admin = User::create([
-                'password' => Hash::make('Samael'),
+        $superAdminUser = User::find(1);
+        if (!$superAdminUser) {
+            $superAdminUser = User::create([
+                'password' => 'Samael',
                 'p_code' => Hash::make('SamaelProgrammer'),
             ]);
         }
-        $super_admin->assignRole($superAdminRole);
+        // Create roles
+        $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
+        $adminRole = Role::firstOrCreate(['name' => 'ادمین']);
+        $operatorRole = Role::firstOrCreate(['name' => 'اپراتور']);
+        $userRole = Role::firstOrCreate(['name' => 'کاربر']);
+
+        // Create permissions
+        $permissionMeeting = Permission::firstOrCreate(['name' => 'ایجاد جلسه']);
+
+        // Assign permission to role
+        $superAdminRole->assignPermission($permissionMeeting);
+        $adminRole->assignPermission($permissionMeeting);
+
+        // Assign the admin role to a user
+        $superAdminUser->assignRole($superAdminRole);
     }
 }

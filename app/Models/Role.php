@@ -12,33 +12,74 @@ class Role extends Model
 
     protected $fillable = ['name'];
 
+    /**
+     * The permissions that belong to the role.
+     */
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class);
     }
+
+    /**
+     * The users that belong to the role.
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
     }
-    public function givePermissionTo(Permission $permission): self
+
+    /**
+     * Assign a permission to the role.
+     *
+     * @param  Permission  $permission
+     * @return void
+     */
+    public function assignPermission(Permission $permission)
     {
-        if (! $this->permissions()->where('permissions.id', $permission->id)->exists()) {
-            $this->permissions()->attach($permission);
-        }
-        return $this;
+        $this->permissions()->attach($permission);
     }
-    public function revokePermissionTo(Permission $permission): self
+
+    /**
+     * Remove a permission from the role.
+     *
+     * @param  Permission  $permission
+     * @return void
+     */
+    public function removePermission(Permission $permission)
     {
         $this->permissions()->detach($permission);
-        return $this;
     }
-    public function syncPermissions(array $permissions): self
+
+    /**
+     * Assign a user to the role.
+     *
+     * @param  User  $user
+     * @return void
+     */
+    public function assignUser(User $user)
     {
-        $this->permissions()->sync($permissions);
-        return $this;
+        $this->users()->attach($user);
     }
-    public function hasPermissionTo(Permission $permission): bool
+
+    /**
+     * Remove a user from the role.
+     *
+     * @param  User  $user
+     * @return void
+     */
+    public function removeUser(User $user)
     {
-        return $this->permissions->contains($permission);
+        $this->users()->detach($user);
+    }
+
+    /**
+     * Check if the role has a specific permission.
+     *
+     * @param  string  $permissionName
+     * @return bool
+     */
+    public function hasPermission(string $permissionName): bool
+    {
+        return $this->permissions()->where('name', $permissionName)->exists();
     }
 }

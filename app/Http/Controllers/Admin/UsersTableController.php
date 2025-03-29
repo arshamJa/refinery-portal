@@ -71,7 +71,7 @@ class UsersTableController extends Controller
             'p_code' => $request->p_code,
         ]);
 
-        $newUser->syncRoles($request->role);
+        $newUser->syncRoles([$request->role]);
 
         $newUser->syncPermissions($request->permissions);
 
@@ -85,11 +85,6 @@ class UsersTableController extends Controller
             'phone' => $request->phone,
             'n_code' => $request->n_code,
             'position' => $request->position,
-            'create_meeting' => 0,
-            'is_phoneList_allowed' => 0,
-            'is_blog_allowed' => 0,
-            'is_chat_allowed' => 0,
-            'is_dictionary_allowed' => 0,
         ]);
 
         $organizations = Organization::where('department_id',$departments->id)->get();
@@ -97,7 +92,7 @@ class UsersTableController extends Controller
             $organization->users()->attach($newUser->id);
         }
 
-        return to_route('newUser.index')->with('status','کاربر جدید ساخته شد');
+        return to_route('users.index')->with('status','کاربر جدید ساخته شد');
     }
 
     /**
@@ -106,11 +101,18 @@ class UsersTableController extends Controller
     public function show(string $id)
     {
         $userInfo = UserInfo::find($id);
-        $users = User::with('organizations:id,organization_name','permissions')
-            ->where('id',$userInfo->user_id)->get();
-        return view('newUser.show',[
-            'userInfo'=> $userInfo,
-            'users' => $users
+        $user = User::with('organizations:id,organization_name', 'permissions', 'roles:id,name')
+            ->where('id', $userInfo->user_id)
+            ->first(); // Use first() instead of get()
+
+        if (!$user) {
+            // Handle the case where the user is not found
+            abort(404, 'User not found');
+        }
+        return view('users.show', [
+            'userInfo' => $userInfo,
+            'user' => $user, // Use user instead of users.
+            'userRoles' => $user->roles, // Access roles from the eager-loaded relationship
         ]);
     }
 
@@ -119,10 +121,26 @@ class UsersTableController extends Controller
      */
     public function edit(string $id)
     {
-//        Gate::authorize('update-user',$id);
-        $userInfo = UserInfo::with(['user:id,p_code','department:id,department_name'])->find($id);
-        $departments = Department::get(['id','department_name']);
-        return view('newUser.edit',['userInfo' => $userInfo , 'departments' => $departments]);
+        $userInfo = UserInfo::with(['user:id,p_code', 'department:id,department_name'])
+            ->find($id);
+        if (!$userInfo) {
+            abort(404, 'Users Information not found');
+        }
+        $departments = Department::select(['id', 'department_name'])->get(); // Select only needed columns
+        $user = User::with('permissions', 'roles:id,name')
+            ->where('id', $userInfo->user_id)
+            ->first();
+        if (!$user) {
+            abort(404, 'User not found');
+        }
+        $permissions = Permission::select(['id', 'name'])->get(); // Select only needed columns
+        return view('users.edit', [
+            'userInfo' => $userInfo,
+            'departments' => $departments,
+            'user' => $user,
+            'userRoles' => $user->roles,
+            'permissions' => $permissions,
+        ]);
     }
     /**
      * Update the specified resource in storage.
@@ -130,10 +148,6 @@ class UsersTableController extends Controller
     public function update(StoreNewUserRequest $request, string $id)
     {
 //        Gate::authorize('update-user',$id);
-//        $phoneList = (bool) $request->phoneList;
-//        $blog = (bool) $request->blog;
-//        $chat = (bool) $request->chat;
-//        $dictionary = (bool) $request->dictionary;
         $request->validated();
 
         $userInfo = UserInfo::find($id);
@@ -153,10 +167,6 @@ class UsersTableController extends Controller
         $userInfo->phone = $request->phone;
         $userInfo->n_code = $request->n_code;
         $userInfo->position = $request->position;
-        $userInfo->is_phoneList_allowed = $phoneList;
-        $userInfo->is_blog_allowed = $blog;
-        $userInfo->is_chat_allowed = $chat;
-        $userInfo->is_dictionary_allowed = $dictionary;
         $userInfo->save();
 
         $departments = Department::find($request->departmentId);
@@ -174,7 +184,7 @@ class UsersTableController extends Controller
                 $organization->users()->attach($user->id);
             }
         }
-        return to_route('newUser.index')->with('status','کاربر با موفقیت بروز شد');
+        return to_route('users.index')->with('status','کاربر با موفقیت بروز شد');
     }
 
     /**

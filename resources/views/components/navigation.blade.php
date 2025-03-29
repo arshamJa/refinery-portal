@@ -1,28 +1,26 @@
 <header
     class="absolute top-0 right-0 md:px-12 px-4 md:mr-64 md:border-b left-0 z-50 pt-4 mb-20 flex justify-between items-center">
-    <nav class="hidden md:flex gap-x-10 w-full">
-        <x-link.link href="{{route('dashboard')}}"
-                     :active="request()->is('dashboard')">
-            {{__('داشبورد')}}
+    <nav class="hidden md:flex items-center gap-x-10 w-full">
+
+{{--        @if(auth()->user()->hasRole('ادمین'))--}}
+            <x-link.link href="{{route('dashboard')}}"
+                         :active="request()->is('dashboard')">
+                {{__('داشبورد')}}
+            </x-link.link>
+{{--            @endcan--}}
+        <x-link.link href="{{route('translate')}}"
+                     :active="request()->is('translate')">
+            {{__('دیکشنری')}}
         </x-link.link>
-        @if(auth()->user()->user_info->is_dictionary_allowed)
-            @can('view-any')
-                <x-link.link href="{{route('translate')}}"
-                             :active="request()->is('translate')">
-                    {{__('دیکشنری')}}
-                </x-link.link>
-            @endcan
-        @endif
-        @if(auth()->user()->user_info->is_blog_allowed)
-            <x-link.link href="{{route('blogs.index')}}"
-                         :active="request()->is('blogs')">{{__('اخبار و اطلاعیه')}}
-            </x-link.link>
-        @endif
-        @if(auth()->user()->user_info->is_phoneList_allowed)
-            <x-link.link href="{{route('phones.index')}}"
-                         :active="request()->is('phones')">{{__('دفترچه تلفنی')}}
-            </x-link.link>
-        @endif
+
+        <x-link.link href="{{route('blogs.index')}}"
+                     :active="request()->is('blogs')">{{__('اخبار و اطلاعیه')}}
+        </x-link.link>
+
+        <x-link.link href="{{route('phones.index')}}"
+                     :active="request()->is('phones')">{{__('دفترچه تلفنی')}}
+        </x-link.link>
+
     </nav>
     <div class="md:hidden">
         <button @click="open = !open"

@@ -1,12 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\LogOutController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SendInvitationToReplacementController;
 use App\Livewire\admin\EmployeeAccess;
-use App\Livewire\employee\EmployeesOrganization;
 use App\Livewire\Message;
 use App\Livewire\TranslatePage;
 use Illuminate\Support\Facades\Route;
@@ -26,11 +23,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
-
     Route::post('sendInvitation/{meetingId}',
         [SendInvitationToReplacementController::class, '__invoke'])
         ->name('sendInvitation');
-
 
 
     Route::view('dashboard', 'dashboard')
@@ -38,20 +33,9 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard');
 
 
-
-
     // Employee-Access-Table Route
     Route::get('employee/access', EmployeeAccess::class)
         ->name('employeeAccess');
-
-
-//    Route::get('/chat', App\Livewire\Chat\Index::class)
-//        ->name('chat.index');
-//    Route::get('/chat/{query}', App\Livewire\Chat\Chat::class)
-//        ->name('chat');
-//    Route::get('/users', Users::class)
-//        ->name('users');
-
 
     Route::get('/translate', TranslatePage::class)
         ->name('translate')

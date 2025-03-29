@@ -17,16 +17,15 @@
         <div class="text-center">
             <p class="text-lg font-semibold mb-1">{{auth()->user()->full_name()}}</p>
             <p class="text-sm"> {{__('نقش')}} :
-                @if (auth()->user()->hasRole('super-admin'))
-                    {{__('Samael')}}
-                @endif
-                @if (Auth::check())
-                    @if(Auth::user()->roles->contains('name', UserRole::ADMIN->value))
-                        {{ UserRole::ADMIN->value }}
-                    @elseif(Auth::user()->roles->contains('name', UserRole::OPERATOR->value))
-                        {{ UserRole::OPERATOR->value }}
-                    @elseif(Auth::user()->roles->contains('name', UserRole::USER->value))
-                        {{ UserRole::USER->value }}
+                @if (auth()->check())
+                    @if (auth()->user()->hasRole('super-admin'))
+                        {{ __('Samael') }}
+                    @elseif (auth()->user()->hasRole(\App\UserRole::ADMIN->value))
+                        {{ \App\UserRole::ADMIN->value }}
+                    @elseif (auth()->user()->hasRole(\App\UserRole::OPERATOR->value))
+                        {{ \App\UserRole::OPERATOR->value }}
+                    @elseif (auth()->user()->hasRole(\App\UserRole::USER->value))
+                        {{ \App\UserRole::USER->value }}
                     @endif
                 @endif
             </p>

@@ -15,7 +15,14 @@
                                 </h2>
                             </header>
                             <div>
-                                <x-input-label for="role" :value="__('نقش')"/>
+                                <p><strong>{{ __('نقش فعلی') }}:</strong>
+                                    @if($userRoles->isNotEmpty())
+                                        {{ $userRoles->pluck('name')->implode(', ') }}
+                                    @else
+                                        {{ __('بدون نقش') }}
+                                    @endif
+                                </p>
+                                <x-input-label for="role" :value="__('نقش جدید')"/>
                                 <select dir="ltr" name="role"  id="role" class="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                     <option selected>...</option>
                                     <option value="ادمین">{{__('ادمین')}}</option>
@@ -103,12 +110,30 @@
 
                 <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                     <div class="max-w-xl">
+
                         <section class="space-y-6 mb-4">
                             <header>
                                 <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                                     {{__('تعیین بخش دسترسی هر کاربر:')}}
                                 </h2>
                             </header>
+
+                            <div>
+                                @if($user->permissions->isNotEmpty())
+                                    {{ $user->permissions->pluck('name')->implode(', ') }}
+                                @else
+                                    <p>{{ __('کاربر هیچ دسترسی ندارد') }}</p>
+                                @endif
+                            </div>
+                            @foreach($permissions as $permission)
+                                <input type="checkbox" name="permissions[{{ $permission->name }}]" value="{{ $permission->name }}"
+                                       @if(isset($user) && $user->permissions->contains('name', $permission->name))
+                                           checked
+                                       @endif
+                                >
+                                {{ $permission->name }}
+                                <br>
+                            @endforeach
 
                         </section>
                     </div>
