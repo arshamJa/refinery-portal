@@ -1,4 +1,4 @@
-@php use App\UserRole;use Illuminate\Support\Facades\Auth; @endphp
+@php use App\UserRole; @endphp
 <div>
     <div class="mr-2 text-sm flex flex-col justify-center items-center mb-4">
         <div>
@@ -18,16 +18,28 @@
             <p class="text-lg font-semibold mb-1">{{auth()->user()->full_name()}}</p>
             <p class="text-sm"> {{__('نقش')}} :
                 @if (auth()->check())
-                    @if (auth()->user()->hasRole('super-admin'))
+                    @if (auth()->user()->hasRole('super_admin'))
                         {{ __('Samael') }}
-                    @elseif (auth()->user()->hasRole(\App\UserRole::ADMIN->value))
-                        {{ \App\UserRole::ADMIN->value }}
+                    @elseif (auth()->user()->hasRole('ادمین'))
+                        {{__('ادمین')}}
                     @elseif (auth()->user()->hasRole(\App\UserRole::OPERATOR->value))
                         {{ \App\UserRole::OPERATOR->value }}
                     @elseif (auth()->user()->hasRole(\App\UserRole::USER->value))
                         {{ \App\UserRole::USER->value }}
                     @endif
                 @endif
+
+{{--                @if (auth()->check())--}}
+{{--                    @if (auth()->user()->hasRole('super-admin'))--}}
+{{--                        {{ __('Samael') }}--}}
+{{--                    @elseif (auth()->user()->hasRole(UserRole::ADMIN->value))--}}
+{{--                        {{ UserRole::ADMIN->value }}--}}
+{{--                    @elseif (auth()->user()->hasRole(UserRole::OPERATOR->value))--}}
+{{--                        {{ UserRole::OPERATOR->value }}--}}
+{{--                    @elseif (auth()->user()->hasRole(UserRole::USER->value))--}}
+{{--                        {{ UserRole::USER->value }}--}}
+{{--                    @endif--}}
+{{--                @endif--}}
             </p>
             <p class="text-sm">{{__('واحد')}}
                 : {{auth()->user()->user_info->department->department_name}}</p>
@@ -47,17 +59,7 @@
 
             {{__('پروفایل')}}
         </x-link.responsive-link>
-        @if(Auth::user()->roles->contains('name', UserRole::ADMIN->value) || Auth::user()->roles->contains('name', UserRole::SUPER_ADMIN->value))
-            <x-link.responsive-link href="{{route('organizations')}}"
-                                    :active="request()->is('organizations')" class="flex items-center gap-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
-                </svg>
-                {{__('لیست سامانه')}}
-            </x-link.responsive-link>
-        @elseif( Auth::user()->roles->contains('name', UserRole::OPERATOR->value) ||Auth::user()->roles->contains('name', UserRole::USER->value))
+        @if(Auth::user()->roles->contains('name', UserRole::OPERATOR->value) ||Auth::user()->roles->contains('name', UserRole::USER->value))
             <x-link.responsive-link href="{{route('employee.organization')}}"
                                     :active="request()->is('employee/organization')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -68,7 +70,17 @@
                 {{__('لیست سامانه')}}
             </x-link.responsive-link>
         @endif
-        @if(Auth::user()->roles->contains('name', UserRole::ADMIN->value) || Auth::user()->roles->contains('name', UserRole::SUPER_ADMIN->value))
+
+        @can('side-bar-notifications')
+            <x-link.responsive-link href="{{route('organizations')}}"
+                                    :active="request()->is('organizations')" class="flex items-center gap-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+                </svg>
+                {{__('لیست سامانه')}}
+            </x-link.responsive-link>
             <x-link.responsive-link href="{{route('users.index')}}"
                                     :active="request()->is('users/table')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -98,15 +110,15 @@
                 </svg>
                 {{__('جدول دسترسی کاربران')}}
             </x-link.responsive-link>
-                <x-link.responsive-link href="{{route('role.permission.table')}}"
-                                        :active="request()->is('roles/permissions')" class="flex items-center gap-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M10.05 4.575a1.575 1.575 0 1 0-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 0 1 3.15 0v1.5m-3.15 0 .075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 0 1 3.15 0V15M6.9 7.575a1.575 1.575 0 1 0-3.15 0v8.175a6.75 6.75 0 0 0 6.75 6.75h2.018a5.25 5.25 0 0 0 3.712-1.538l1.732-1.732a5.25 5.25 0 0 0 1.538-3.712l.003-2.024a.668.668 0 0 1 .198-.471 1.575 1.575 0 1 0-2.228-2.228 3.818 3.818 0 0 0-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0 1 16.35 15m.002 0h-.002"/>
-                    </svg>
-                    {{__('مدیریت نقش / دسترسی')}}
-                </x-link.responsive-link>
+            <x-link.responsive-link href="{{route('role.permission.table')}}"
+                                    :active="request()->is('roles/permissions')" class="flex items-center gap-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M10.05 4.575a1.575 1.575 0 1 0-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 0 1 3.15 0v1.5m-3.15 0 .075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 0 1 3.15 0V15M6.9 7.575a1.575 1.575 0 1 0-3.15 0v8.175a6.75 6.75 0 0 0 6.75 6.75h2.018a5.25 5.25 0 0 0 3.712-1.538l1.732-1.732a5.25 5.25 0 0 0 1.538-3.712l.003-2.024a.668.668 0 0 1 .198-.471 1.575 1.575 0 1 0-2.228-2.228 3.818 3.818 0 0 0-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0 1 16.35 15m.002 0h-.002"/>
+                </svg>
+                {{__('مدیریت نقش / دسترسی')}}
+            </x-link.responsive-link>
             <x-link.responsive-link href="{{route('meeting.report')}}"
                                     :active="request()->is('meeting/report')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -116,7 +128,8 @@
                 </svg>
                 {{__('داشبورد جلسات')}}
             </x-link.responsive-link>
-        @endif
+        @endcanany
+
     </li>
 </ul>
 <div class="absolute bottom-2 left-0 w-full pr-2">

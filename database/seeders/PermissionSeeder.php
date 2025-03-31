@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
-use App\Models\Role;
 use App\Models\User;
+use App\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -20,24 +20,27 @@ class PermissionSeeder extends Seeder
         $superAdminUser = User::find(1);
         if (!$superAdminUser) {
             $superAdminUser = User::create([
-                'password' => 'Samael',
+                'password' => Hash::make('Samael'),
                 'p_code' => Hash::make('SamaelProgrammer'),
             ]);
         }
-        // Create roles
-        $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
-        $adminRole = Role::firstOrCreate(['name' => 'ادمین']);
-        $operatorRole = Role::firstOrCreate(['name' => 'اپراتور']);
-        $userRole = Role::firstOrCreate(['name' => 'کاربر']);
 
-        // Create permissions
-        $permissionMeeting = Permission::firstOrCreate(['name' => 'ایجاد جلسه']);
+        // Create Roles
+        $superAdminRole = Role::create(['name' => UserRole::SUPER_ADMIN->value]);
+        $adminRole = Role::create(['name' => UserRole::ADMIN->value]);
+        $operatorRole = Role::create(['name' => UserRole::OPERATOR->value]);
+        $userRole = Role::create(['name' => UserRole::USER->value]);
 
-        // Assign permission to role
-        $superAdminRole->assignPermission($permissionMeeting);
-        $adminRole->assignPermission($permissionMeeting);
+        // Assign Role to Super Admin User
+        $superAdminUser->assignRole(UserRole::SUPER_ADMIN->value);
 
-        // Assign the admin role to a user
-        $superAdminUser->assignRole($superAdminRole);
+
+        // Create Permissions
+        $meetingCreate = Permission::create(['name' => 'ایجاد جلسه']);
+        $rolePermissionTable = Permission::create(['name' => 'مدیریت نقش-دسترسی']);
+
+        // Assign Permissions to Roles
+        $superAdminRole->syncPermissions([$meetingCreate, $rolePermissionTable]);
+
     }
 }

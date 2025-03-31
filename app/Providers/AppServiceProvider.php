@@ -8,6 +8,7 @@ use App\Policies\DepartmentOrganizationPolicy;
 use App\Policies\ProfilePolicy;
 use App\Policies\UserPolicy;
 use App\Policies\PhoneListPolicy;
+use App\UserRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
@@ -42,10 +43,13 @@ class AppServiceProvider extends ServiceProvider
 
 
         // Gate for SuperAdmin
-        Gate::before(function ($user, $ability) {
+        Gate::before(function (User $user, $ability) {
             return $user->hasRole('super-admin') ? true : null;
         });
 
+        Gate::define('side-bar-notifications',function (User $user){
+            return $user->hasRole(UserRole::SUPER_ADMIN->value) || $user->hasRole(UserRole::ADMIN->value);
+        });
 
 
         //gate definition for profile page

@@ -17,8 +17,8 @@
                      :active="request()->is('blogs')">{{__('اخبار و اطلاعیه')}}
         </x-link.link>
 
-        <x-link.link href="{{route('phones.index')}}"
-                     :active="request()->is('phones')">{{__('دفترچه تلفنی')}}
+        <x-link.link href="{{route('phone-list.index')}}"
+                     :active="request()->is('phone-list')">{{__('دفترچه تلفنی')}}
         </x-link.link>
 
     </nav>

@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreNewUserRequest;
 use App\Models\Department;
 use App\Models\Organization;
-use App\Models\Permission;
-use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Traits\UserSearchTrait;
+use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UsersTableController extends Controller
 {
@@ -26,10 +26,10 @@ class UsersTableController extends Controller
         $query = UserInfo::with('user:id,p_code', 'department:id,department_name', 'user.roles')
             ->where('full_name','!=','Arsham Jamali')
             ->select(['id','user_id','department_id','full_name','n_code','position']);
-        if (auth()->user()->hasRole('super-admin')){
-            $roles = \App\Models\Role::get(['id','name']); // Fetch all roles for the dropdown
+        if (auth()->user()->hasRole('super_admin')){
+            $roles = Role::get(['id','name']); // Fetch all roles for the dropdown
         }else{
-            $roles = Role::where('name','!=','super-admin')->get(['id','name']);
+            $roles = Role::where('name','!=','super_admin')->get(['id','name']);
         }
 
         $originalUsersCount = $query->count(); // Count before any filtering
