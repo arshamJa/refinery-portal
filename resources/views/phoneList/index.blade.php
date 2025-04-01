@@ -3,7 +3,7 @@
         <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
 
             <form method="GET" action="{{ route('phone-list.index') }}" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-3 pt-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 px-3 pt-3">
                     <div>
                         <x-input-label for="department">{{ __('دپارتمان') }}</x-input-label>
                         <x-text-input type="text" name="department" id="department"/>
@@ -24,6 +24,7 @@
                         <x-input-label for="work_phone">{{ __('تلفن محل کار') }}</x-input-label>
                         <x-text-input type="text" name="work_phone" id="work_phone"/>
                     </div>
+                    @if($showAllColumns)
                     <div>
                         <x-label for="role">{{ __('نقش') }}</x-label>
                         <select name="role" id="role"
@@ -34,6 +35,7 @@
                             @endforeach
                         </select>
                     </div>
+                    @endif
 
                 </div>
                 <div class="w-full flex gap-4 items-center px-3 pb-3">
@@ -43,7 +45,6 @@
                     @endif
                 </div>
             </form>
-
             <div class="pt-4 sm:px-10 sm:pt-6 shadow-md rounded-md">
                 <table class="w-full text-sm text-gray-500 dark:text-gray-400">
                     <thead
@@ -52,10 +53,10 @@
                         <th class="py-3">{{ __('ردیف') }}</th>
                         <th class="py-3">{{ __('دپارتمان') }}</th>
                         <th class="py-3">{{ __('نام و نام خانوادگی') }}</th>
+                        <th class="py-3">{{ __('تلفن محل کار') }}</th>
                         @if($showAllColumns)
                             <th class="py-3">{{ __('تلفن همراه') }}</th>
                             <th class="py-3">{{ __('تلفن منزل') }}</th>
-                            <th class="py-3">{{ __('تلفن محل کار') }}</th>
                             <th class="py-3"></th>
                         @endif
                     </tr>
@@ -72,31 +73,46 @@
                             <td class="py-4 whitespace-no-wrap text-sm leading-5">
                                 {{ $userInfo->full_name }}
                             </td>
+                            <td class="py-4 whitespace-no-wrap text-sm leading-5">
+                                {{ $userInfo->phone }}
+                            </td>
                             @if($showAllColumns)
-                                <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                    {{ $userInfo->phone }}
-                                </td>
                                 <td class="py-4 whitespace-no-wrap text-sm leading-5">
                                     {{ $userInfo->house_phone }}
                                 </td>
                                 <td class="py-4 whitespace-no-wrap text-sm leading-5">
                                     {{ $userInfo->work_phone }}
                                 </td>
-                            @endif
                             <td>
-                                {{--                                <x-primary-button--}}
-                                {{--                                    x-on:click="$dispatch('crud-modal', { name: 'update', userInfoId: {{ $userInfo->id }} })"--}}
-                                {{--                                    class="flex gap-x-1">--}}
-                                {{--                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"--}}
-                                {{--                                         viewBox="0 0 24 24"--}}
-                                {{--                                         stroke-width="1.5" stroke="currentColor"--}}
-                                {{--                                         class="size-4">--}}
-                                {{--                                        <path stroke-linecap="round" stroke-linejoin="round"--}}
-                                {{--                                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 0 0 1 5.25 6H10"/>--}}
-                                {{--                                    </svg>--}}
-                                {{--                                    {{__('ویرایش')}}--}}
-                                {{--                                </x-primary-button>--}}
+                                @can('update',$userInfo)
+                                <a href="{{route('phone-list.edit',$userInfo->id)}}">
+                                    <x-primary-button>
+                                        {{__('ویرایش')}}
+                                    </x-primary-button>
+                                </a>
+                                @endcan
+{{--                                <x-dropdown>--}}
+{{--                                    <x-slot name="trigger">--}}
+{{--                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"--}}
+{{--                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"--}}
+{{--                                             class="size-6 hover:cursor-pointer">--}}
+{{--                                            <path stroke-linecap="round" stroke-linejoin="round"--}}
+{{--                                                  d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>--}}
+{{--                                        </svg>--}}
+{{--                                    </x-slot>--}}
+{{--                                    <x-slot name="content">--}}
+{{--                                        <x-dropdown-link--}}
+{{--                                            href="{{route('users.show',$userInfo->id)}}">--}}
+{{--                                            {{__('نمایش')}}--}}
+{{--                                        </x-dropdown-link>--}}
+{{--                                        <x-dropdown-link--}}
+{{--                                            href="{{route('users.edit',$userInfo->id)}}">--}}
+{{--                                            {{__('ویرایش')}}--}}
+{{--                                        </x-dropdown-link>--}}
+{{--                                    </x-slot>--}}
+{{--                                </x-dropdown>--}}
                             </td>
+                            @endif
                         </tr>
                     @empty
                         <tr class="py-3 border-b text-center">

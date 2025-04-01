@@ -1,6 +1,6 @@
 @php use App\UserRole; @endphp
 <div>
-    <div class="mr-2 text-sm flex flex-col justify-center items-center mb-4">
+    <div class=" text-sm flex flex-col justify-center items-center mb-4">
         <div>
             @if(auth()->user()->profile_photo_path)
                 <img class="rounded-full m-2 w-14 h-14 object-cover" src="{{ auth()->user()->profilePhoto() }}" alt="">
@@ -132,7 +132,7 @@
 
     </li>
 </ul>
-<div class="absolute bottom-2 left-0 w-full pr-2">
+<div class="absolute bottom-2 left-0 w-full px-2">
     <ul>
         <li class="hover:text-white bg-transparent border border-[#990302] hover:border-transparent hover:bg-[#E96742] rounded-md  transition ease-in-out duration-200 ">
             <form action="{{route('logout')}}" method="post">

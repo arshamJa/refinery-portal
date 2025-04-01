@@ -6,7 +6,7 @@
             <!-- Email Address -->
             <div>
                 <x-input-label for="p_code" :value="__('کدپرسنلی')" />
-                <x-text-input name="p_code" class="mt-2" maxlength="6"  autofocus/>
+                <x-text-input name="p_code" class="mt-2" autofocus/>
                 <x-input-error :messages="$errors->get('p_code')" class="mt-2" />
             </div>
             <!-- Password -->

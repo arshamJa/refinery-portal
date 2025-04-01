@@ -20,13 +20,12 @@
     @livewireStyles
     <link rel="stylesheet" href="{{asset('style.css')}}">
     <link rel="stylesheet" href="{{asset('multiSelect.css')}}">
-    <link rel="stylesheet" href="{{asset('richText.css')}}">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{asset('jalali-moment.js')}}" ></script>
+{{--    <link rel="stylesheet" href="{{asset('richText.css')}}">--}}
+{{--    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>--}}
+{{--    <script src="{{asset('jalali-moment.js')}}" ></script>--}}
     <script src="{{asset('flowBiteChart.js')}}"></script>
 </head>
-<body class="font-sans antialiased">
+<body>
 {{--<livewire:layout.navigation/>--}}
 <div dir="rtl" x-data="{ open: true }">
     <!-- Top Navigation Bar -->
@@ -36,7 +35,7 @@
         <!-- Sidebar -->
         <aside
             :class="{'translate-x-full': open, 'translate-x-0': !open}"
-            class="fixed bg-[#F5F0F1] md:pt-2 pt-14 drop-shadow-md pr-2 inset-y-0 right-0 top-0 bottom-0 z-20 w-64 transform transition-transform duration-300 md:translate-x-0">
+            class="fixed bg-[#F5F0F1] md:pt-2 pt-14 drop-shadow-md px-2 inset-y-0 right-0 top-0 bottom-0 z-20 w-64 transform transition-transform duration-300 md:translate-x-0">
             <x-side-bar/>
         </aside>
 
@@ -52,10 +51,10 @@
 
 @livewireScripts
 <script src="{{asset('multiSelect.js')}}"></script>
-<script src="{{asset('richText.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{{--<script src="{{asset('richText.js')}}"></script>--}}
+{{--<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"--}}
+{{--        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="--}}
+{{--        crossorigin="anonymous" referrerpolicy="no-referrer"></script>--}}
 
 </body>
 </html>

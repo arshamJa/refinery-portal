@@ -80,4 +80,5 @@ class LoginRequest extends FormRequest
     {
         return Str::transliterate(Str::lower($this->input('p_code')).'|'.$this->ip());
     }
+
 }

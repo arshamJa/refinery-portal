@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use App\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -32,15 +32,15 @@ class PermissionSeeder extends Seeder
         $userRole = Role::create(['name' => UserRole::USER->value]);
 
         // Assign Role to Super Admin User
-        $superAdminUser->assignRole(UserRole::SUPER_ADMIN->value);
-
+        $superAdminUser->assignRole($superAdminRole);
 
         // Create Permissions
         $meetingCreate = Permission::create(['name' => 'ایجاد جلسه']);
         $rolePermissionTable = Permission::create(['name' => 'مدیریت نقش-دسترسی']);
 
         // Assign Permissions to Roles
-        $superAdminRole->syncPermissions([$meetingCreate, $rolePermissionTable]);
+        $superAdminRole->assignPermission($meetingCreate);
+        $superAdminRole->assignPermission($rolePermissionTable);
 
     }
 }
