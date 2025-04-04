@@ -56,7 +56,6 @@ Route::middleware(['auth', 'adminMiddleware'])->group(function () {
 //        ->can('view-department-organization');
 
 
-    Route::get('employee/organization', EmployeesOrganization::class)
-        ->name('employee.organization');
+
 
 });

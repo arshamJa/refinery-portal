@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
                 <select wire:model="currentYearMeeting" id="yearSelectMeeting" dir="ltr"
                         class="border border-gray-300 w-32 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     @foreach (array_keys($yearDataMeeting) as $year)

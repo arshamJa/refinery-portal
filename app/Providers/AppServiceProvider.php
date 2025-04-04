@@ -8,6 +8,7 @@ use App\Policies\DepartmentOrganizationPolicy;
 use App\Policies\ProfilePolicy;
 use App\Policies\UserPolicy;
 use App\Policies\PhoneListPolicy;
+use App\UserPermission;
 use App\UserRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -47,14 +48,32 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super-admin') ? true : null;
         });
 
+
+
+
+        // Gate For Side Bar
         Gate::define('side-bar-notifications',function (User $user){
             return $user->hasRole(UserRole::SUPER_ADMIN->value) || $user->hasRole(UserRole::ADMIN->value);
         });
 
 
+
+
+
+
         //gate definition for profile page
         Gate::define('view-profile-page',[ProfilePolicy::class,'view']);
         Gate::define('update-profile-page',[ProfilePolicy::class,'update']);
+
+
+        // Gate for creating meeting
+        Gate::define('create-meeting',function (User $user){
+            return $user->userHasPermission(UserPermission::CREATE_MEETING->value);
+        });
+
+
+
+
 
 
         //gate definition for phone list via phoneListPolicy...

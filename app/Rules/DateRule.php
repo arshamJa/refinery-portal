@@ -17,21 +17,40 @@ class DateRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $gregorianPattern = '/^(19|20)\d\d\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/';
+
         if (preg_match($gregorianPattern, $value)) {
             $fail('تاریخ با فرمت شمسی وارد کنید');
         } else {
-
-            $year = intval(substr($value, 0, -6));
-            $month = intval(substr($value, 5, -3));
+            $year = intval(substr($value, 0, 4));
+            $month = intval(substr($value, 5, 2));
             $day = intval(substr($value, 8));
 
-            $timestamp = jmktime(
-                jgetdate()['hours'], jgetdate()['minutes'], jgetdate()['seconds'],
-                $month, $day, $year
-            );
-            if (time() > $timestamp) {
-                $fail('تاریخ  باید بعد از الان باشد');
+            $jalaliNow = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+            $jaYear = intval($jalaliNow[0]);
+            $jaMonth = intval($jalaliNow[1]);
+            $jaDay = intval($jalaliNow[2]);
+
+            if ($year < $jaYear || ($year == $jaYear && $month < $jaMonth) || ($year == $jaYear && $month == $jaMonth && $day < $jaDay)) {
+                $fail('تاریخ باید بعد از امروز باشد');
             }
         }
+
+//        $gregorianPattern = '/^(19|20)\d\d\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/';
+//        if (preg_match($gregorianPattern, $value)) {
+//            $fail('تاریخ با فرمت شمسی وارد کنید');
+//        } else {
+//
+//            $year = intval(substr($value, 0, -6));
+//            $month = intval(substr($value, 5, -3));
+//            $day = intval(substr($value, 8));
+//
+//            $timestamp = jmktime(
+//                jgetdate()['hours'], jgetdate()['minutes'], jgetdate()['seconds'],
+//                $month, $day, $year
+//            );
+//            if (time() > $timestamp) {
+//                $fail('تاریخ  باید بعد از الان باشد');
+//            }
+//        }
     }
 }

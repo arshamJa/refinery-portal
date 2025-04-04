@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UsersTableController;
+use App\Models\UserInfo;
 use Illuminate\Support\Facades\Route;
 
 

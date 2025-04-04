@@ -28,18 +28,6 @@
                         {{ \App\UserRole::USER->value }}
                     @endif
                 @endif
-
-{{--                @if (auth()->check())--}}
-{{--                    @if (auth()->user()->hasRole('super-admin'))--}}
-{{--                        {{ __('Samael') }}--}}
-{{--                    @elseif (auth()->user()->hasRole(UserRole::ADMIN->value))--}}
-{{--                        {{ UserRole::ADMIN->value }}--}}
-{{--                    @elseif (auth()->user()->hasRole(UserRole::OPERATOR->value))--}}
-{{--                        {{ UserRole::OPERATOR->value }}--}}
-{{--                    @elseif (auth()->user()->hasRole(UserRole::USER->value))--}}
-{{--                        {{ UserRole::USER->value }}--}}
-{{--                    @endif--}}
-{{--                @endif--}}
             </p>
             <p class="text-sm">{{__('واحد')}}
                 : {{auth()->user()->user_info->department->department_name}}</p>
@@ -59,7 +47,7 @@
 
             {{__('پروفایل')}}
         </x-link.responsive-link>
-        @if(Auth::user()->roles->contains('name', UserRole::OPERATOR->value) ||Auth::user()->roles->contains('name', UserRole::USER->value))
+        @if(auth()->user()->hasRole(UserRole::OPERATOR->value) || auth()->user()->hasRole(UserRole::USER->value))
             <x-link.responsive-link href="{{route('employee.organization')}}"
                                     :active="request()->is('employee/organization')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -132,6 +120,7 @@
 
     </li>
 </ul>
+
 <div class="absolute bottom-2 left-0 w-full px-2">
     <ul>
         <li class="hover:text-white bg-transparent border border-[#990302] hover:border-transparent hover:bg-[#E96742] rounded-md  transition ease-in-out duration-200 ">

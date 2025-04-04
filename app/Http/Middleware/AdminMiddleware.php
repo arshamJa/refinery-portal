@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-       if (Auth::user()->hasRole('ادمین') || Auth::user()->hasRole('super-admin')){
+       if (Auth::user()->hasRole(UserRole::SUPER_ADMIN->value) || Auth::user()->hasRole(UserRole::ADMIN->value)){
            return $next($request);
        }
        return redirect()->back()->with('status','شما اجازه دسترسی به این صفحه را ندارید');

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -110,8 +111,17 @@ class User extends Authenticatable
                 return true;
             }
         }
-
         return false;
+    }
+
+
+    // use this for checking which user has a specific permission
+    function userHasPermission($permission): bool
+    {
+        $user = Auth::user()->load('permissions');
+
+        // Check if the authenticated user has the specified permission
+        return $user->permissions->contains('name', $permission);
     }
     public function assignPermission(Permission $permission)
     {

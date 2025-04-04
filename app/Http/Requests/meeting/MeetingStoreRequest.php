@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\meeting;
 
+use App\Rules\DateRule;
 use App\Rules\farsi_chs;
 use App\Rules\Time;
 use Illuminate\Contracts\Validation\ValidationRule;

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePhoneRequest;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\UserInfo;
 use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\Models\Role;
 
 class PhoneListController extends Controller
 {
@@ -17,14 +18,13 @@ class PhoneListController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $showAllColumns = $user->hasAnyRole([UserRole::SUPER_ADMIN->value, UserRole::ADMIN->value]);
+        $showAllColumns = $user->hasRole(UserRole::SUPER_ADMIN->value) || $user->hasRole(UserRole::ADMIN->value);
 
         $query = UserInfo::with([
-            'user.roles' => fn ($q) => $q->where('name', '!=', 'super_admin'),
+            'user.roles:id,name',
             'department:id,department_name',
-        ])
-            ->select('id', 'user_id', 'department_id', 'full_name', 'work_phone', 'house_phone', 'phone')
-            ->whereHas('user.roles', fn ($q) => $q->where('name', '!=', 'super_admin'));
+        ])->select('id', 'user_id', 'department_id', 'full_name', 'work_phone', 'house_phone', 'phone')
+            ->whereHas('user.roles', fn ($q) => $q->where('name', '!=', UserRole::SUPER_ADMIN->value));
 
         $originalUsersCount = $query->count();
 
@@ -46,7 +46,11 @@ class PhoneListController extends Controller
         $userInfos = $query->paginate(5);
         $filteredUsersCount = $userInfos->total();
 
-        $roles = Role::where('name', '!=', UserRole::SUPER_ADMIN->value)->get();
+        // Fetch roles excluding SUPER_ADMIN
+        $roles = Role::where('name', '!=', UserRole::SUPER_ADMIN->value)
+            ->select(['id', 'name'])
+            ->get();
+
         return view('phoneList.index', [
             'userInfos' => $userInfos,
             'showAllColumns' => $showAllColumns,
@@ -88,6 +92,7 @@ class PhoneListController extends Controller
         $userInfo = UserInfo::with(['user', 'department'])
             ->select('id','user_id','department_id','full_name','work_phone','house_phone','phone')
             ->findOrFail($id);
+        Gate::authorize('update', $userInfo);
         return view('phoneList.edit',[
             'userInfo' => $userInfo
         ]);
@@ -98,12 +103,13 @@ class PhoneListController extends Controller
      */
     public function update(StorePhoneRequest $request, string $id)
     {
-//        Gate::authorize('update-phone-list');
-        $request->validated();
-        UserInfo::where('id', $id)->update([
-            'house_phone' => $request->input('house_phone'),
-            'work_phone' => $request->input('work_phone'),
-            'phone' => $request->input('phone'),
+        $userInfo = UserInfo::findOrFail($id);
+        Gate::authorize('update', $userInfo);
+        $validatedData = $request->validated();
+        $userInfo->update([
+            'house_phone' => $validatedData['house_phone'],
+            'work_phone' => $validatedData['work_phone'],
+            'phone' => $validatedData['phone'],
         ]);
         return to_route('phone-list.index')->with('status', 'اطلاعات با موفقیت آپدیت شد');
     }

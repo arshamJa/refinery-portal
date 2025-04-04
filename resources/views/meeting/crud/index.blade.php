@@ -71,23 +71,20 @@
             <thead
                 class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th class="px-4 py-3">{{__('ردیف')}}</th>
-                <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
-                <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
-                <th class="px-4 py-3">{{__('تاریخ جلسه')}}</th>
-                <th class="px-4 py-3">{{__('ساعت جلسه')}}</th>
-                <th class="px-4 py-3 text-start">{{__('قابلیت')}}</th>
+                @foreach (['ردیف', 'موضوع جلسه', 'دبیر جلسه', 'تاریخ جلسه', 'ساعت جلسه', 'قابلیت'] as $th)
+                    <th class="px-4 py-3">{{ __($th) }}</th>
+                @endforeach
             </tr>
             </thead>
             <tbody>
             @forelse($meetings as $meeting)
                 <tr class="px-4 py-3 border-b text-center">
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->time}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                    <td class="px-4 py-4">{{$loop->index+1}}</td>
+                    <td class="px-4 py-4">{{$meeting->title}}</td>
+                    <td class="px-4 py-4">{{$meeting->scriptorium}}</td>
+                    <td class="px-4 py-4">{{$meeting->date}}</td>
+                    <td class="px-4 py-4">{{$meeting->time}}</td>
+                    <td class="px-4 py-4 flex justify-center">
                         <x-dropdown>
                             <x-slot name="trigger">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

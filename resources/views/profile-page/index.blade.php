@@ -48,13 +48,21 @@
                 <form action="{{route('updateProfileInformation')}}" method="post" class="mt-6 space-y-6">
                     @csrf
                     <div>
-                        <x-input-label for="role" :value="__('نقش')"/>
-                        <p class="mt-1 block w-full">{{$users->role}}</p>
-                        <x-input-label for="department" :value="__('دپارتمان')" class="mt-4"/>
-                        <p class="mt-1 block w-full">{{$department}}</p>
+                        <p class="mt-1 block w-full">
+                            {{__('نقش : ')}}
+                            @if (auth()->user()->hasRole('super_admin'))
+                                {{ __('Samael') }}
+                            @elseif (auth()->user()->hasRole('ادمین'))
+                                {{__('ادمین')}}
+                            @elseif (auth()->user()->hasRole(\App\UserRole::OPERATOR->value))
+                                {{ \App\UserRole::OPERATOR->value }}
+                            @elseif (auth()->user()->hasRole(\App\UserRole::USER->value))
+                                {{ \App\UserRole::USER->value }}
+                            @endif
+                        </p>
+                        <p class="my-2 block w-full">{{__('دپارتمان : ')}}{{$department}}</p>
 
-                        <x-input-label for="position" :value="__('سمت')" class="mt-4"/>
-                        <p class="mt-1 block w-full">{{$users->user_info->position}}</p>
+                        <p class="mt-1 block w-full">{{__('سمت : ')}}{{$users->user_info->position}}</p>
 
                         <x-input-label for="full_name" :value="__('نام و نام خانوادگی')" class="mt-4"/>
                         <x-text-input name="full_name" value="{{$users->user_info->full_name}}" id="full_name"
@@ -138,5 +146,4 @@
             </div>
         </div>
     </div>
-    {{--    </x-template>--}}
 </x-app-layout>

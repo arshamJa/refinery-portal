@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SendInvitationToReplacementController;
 use App\Livewire\admin\EmployeeAccess;
+use App\Livewire\employee\EmployeesOrganization;
 use App\Livewire\Message;
 use App\Livewire\TranslatePage;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,10 @@ Route::middleware('auth')->group(function () {
         ->can('view-any');
 
     Route::get('message', Message::class)->name('message');
+
+
+    Route::get('employee/organization', EmployeesOrganization::class)
+        ->name('employee.organization');
 });
 
 Route::get('/reset/password/{id}', [ResetPasswordController::class, 'index'])

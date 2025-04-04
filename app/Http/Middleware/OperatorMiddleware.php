@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +17,9 @@ class OperatorMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->role === 'operator') {
+        if (Auth::user()->hasRole(UserRole::OPERATOR->value)){
             return $next($request);
         }
-        return redirect()->back()->with('auth', 'شما اجازه دسترسی به این صفحه را ندارید');
+        return redirect()->back()->with('status', 'شما اجازه دسترسی به این صفحه را ندارید');
     }
 }

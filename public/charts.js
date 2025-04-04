@@ -69,9 +69,9 @@ const optionsMeeting = {
     tooltip: {
         shared: true,
         intersect: false,
-        formatter: function (value) {
-            return value
-        }
+        style: {
+            fontFamily: "Inter, sans-serif",
+        },
     },
     states: {
         hover: {
@@ -137,7 +137,6 @@ function generateCategoriesMeeting(month) {
 if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
     const chart = new ApexCharts(document.getElementById("column-chart"), optionsMeeting);
     chart.render();
-
     function updateChartData() {
         processedYearDataMeeting = generateMeetingData(yearsMeeting);
         optionsMeeting.series[0].data = processedYearDataMeeting[currentYearMeeting].cancelled;
@@ -146,19 +145,16 @@ if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined'
         optionsMeeting.xaxis.categories = generateCategoriesMeeting(currentMonthMeeting); // Corrected line
         chart.updateOptions(optionsMeeting);
     }
-
     document.getElementById("yearSelectMeeting").addEventListener("change", function () {
         currentYearMeeting = parseInt(this.value);
         updateChartData();
     });
-
     document.getElementById("monthSelectMeeting").addEventListener("change", function () {
         currentMonthMeeting = parseInt(this.value);
         updateChartData();
     });
-
 }
-// the end of Column-Chart
+// the end of Column-Char
 
 
 // this is the Radial-Chart

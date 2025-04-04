@@ -96,7 +96,7 @@
                             <select name="year" id="year" dir="ltr"
                                     class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">...</option>
-                                @for($i = 1400; $i <= 1440; $i++)
+                                @for($i = 1404; $i <= 1440; $i++)
                                     <option value="{{$i}}" @if (old('year') == $i) selected @endif>
                                         {{$i}}
                                     </option>
@@ -129,11 +129,6 @@
                         <x-input-error :messages="$errors->get('year')" class="my-2"/>
                         <x-input-error :messages="$errors->get('month')" class="my-2"/>
                         <x-input-error :messages="$errors->get('day')" class="my-2"/>
-                        {{--                    <x-text-input name="date" id="date"--}}
-                        {{--                                  value="{{old('date')}}"--}}
-                        {{--                                  class="block my-2 w-full" type="text"--}}
-                        {{--                                  placeholder="{{__('0000/00/00')}}" autofocus/>--}}
-                        {{--                    <x-input-error :messages="$errors->get('date')" class="my-2"/>--}}
                     </div>
 
                     <div class="sm:col-span-4">
@@ -155,15 +150,20 @@
                     <div class="sm:col-span-8">
                         <div class="mb-2">{{ __('اعضای جلسه فعلی') }}:</div>
                         <div class="flex flex-wrap gap-2">
-                            @foreach($userIds as $userId)
-                                <div id="user-{{ $userId->user_id }}" class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
-                                    <span>{{ UserInfo::where('user_id', $userId->user_id)->value('full_name') }}</span>
-                                    <button class="delete-user bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
-                                            data-meeting-id="{{ $meeting->id }}" data-user-id="{{ $userId->user_id }}">
+                            @foreach($userIds as $meetingUser)
+                                <div id="user-{{ $meetingUser->user_id }}"
+                                     class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
+                                        <span>
+                                            {{ $meetingUser->user->user_info->full_name }}
+                                        </span>
+                                    <button
+                                        class="delete-user bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
+                                        data-meeting-id="{{ $meeting->id }}" data-user-id="{{ $meetingUser->user_id }}">
                                         {{ __('حذف') }}
                                     </button>
                                 </div>
                             @endforeach
+
                         </div>
                     </div>
 
@@ -197,14 +197,9 @@
                                 </div>
                                 <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
                                 @foreach($users->where('user_id', '!=', auth()->user()->id)
-                                    ->whereNotIn('user_id', $meeting->meetingUsers->pluck('user_id')->toArray()) as $user)
+                                   ->whereNotIn('user_id', $meeting->meetingUsers->pluck('user_id')->toArray()) as $user)
                                     <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}}</div>
                                 @endforeach
-
-{{--                                @foreach($users->where('user_id','!=',auth()->user()->id)--}}
-{{--                                        ->whereNotIn('user_id', $meeting->meetingUsers->user_id) as $user)--}}
-{{--                                    <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}}</div>--}}
-{{--                                @endforeach--}}
                                 <div class="no-result-message" style="display:none;">No result match</div>
                             </div>
                         </div>
@@ -314,7 +309,7 @@
                 const meetingId = $(this).data('meeting-id');
                 const userId = $(this).data('user-id');
                 const userDiv = $('#user-' + userId); // Select the parent div
-                if (confirm('Are you sure you want to delete this user?')) { //Optional confirmation
+                if (confirm('آیا مطمئن هستید که این شحض حذف شود؟')) { //Optional confirmation
                     $.ajax({
                         url: '/meetings/' + meetingId + '/users/' + userId, // Construct the URL
                         type: 'DELETE',

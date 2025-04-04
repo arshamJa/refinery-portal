@@ -1,6 +1,6 @@
-@php use App\Models\MeetingUser; @endphp
+@php use App\Models\MeetingUser;use App\Models\User; @endphp
 {{--<div class="col-span-3 space-y-10 place-items-center">--}}
-@if(auth()->user()->user_info->create_meeting)
+@can('create-meeting')
     <div class="mb-8">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('مراحل جلسات')}}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -34,7 +34,7 @@
             </a>
         </div>
     </div>
-@endif
+@endcan
 <div class="mb-8">
     <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('پیام ها و اقدامات')}}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -60,9 +60,9 @@
                 </svg>
                 <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>
                 </span>
-{{--                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">--}}
-{{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
-{{--                </span>--}}
+            {{--                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">--}}
+            {{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
+            {{--                </span>--}}
         </a>
         <a href="{{route('participants.task')}}"
            class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
@@ -80,20 +80,20 @@
     </div>
 </div>
 
-    <div class="mb-8">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('گزارش کل جلسات')}}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a href="{{route('meeting.report')}}"
-               class="bg-[#FCF7F8] flex gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"/>
-                </svg>
-                <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
-            </a>
-        </div>
+<div class="mb-8">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('گزارش کل جلسات')}}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="{{route('meeting.report')}}"
+           class="bg-[#FCF7F8] flex gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"/>
+            </svg>
+            <h3 class="text-sm font-semibold"> {{__('داشبورد جلسات')}}</h3>
+        </a>
     </div>
+</div>
 
 
 {{--</div>--}}

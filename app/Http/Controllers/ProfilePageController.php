@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileInformationRequest;
 use App\Models\Department;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
@@ -19,7 +21,6 @@ class ProfilePageController extends Controller
 {
     public function index()
     {
-
         $department_id = \auth()->user()->user_info->department_id;
         $userinfo = UserInfo::where('user_id',\auth()->user()->id)->value('department_id');
         if ($userinfo){
@@ -28,11 +29,14 @@ class ProfilePageController extends Controller
             $department = 'دپارتمان وجود ندارد';
         }
 
-        $users = User::with('user_info')->find(auth()->user()->id);
+        $users = User::with([
+            'user_info:id,department_id,user_id,full_name,work_phone,house_phone,phone,n_code,position',
+            'permissions'
+        ])->find(auth()->user()->id);
 
         return view('profile-page.index' , [
             'users' => $users,
-            'department' => $department
+            'department' => $department,
         ]);
     }
 
