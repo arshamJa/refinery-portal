@@ -33,17 +33,15 @@
             <thead
                 class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th scope="col" class="px-4 py-3">{{__('ردیف')}}</th>
-                <th scope="col" class="px-4 py-3">{{__('نام و نام خانوادگی')}}</th>
-                <th scope="col" class="px-4 py-3">{{__('دپارتمان')}}</th>
-                <th scope="col" class="px-4 py-3">{{__('سامانه')}}</th>
-                <th scope="col" class="px-4 py-3">{{__('افزودن سامانه')}}</th>
+                @foreach (['ردیف', 'نام و نام خانوادگی', 'دپارتمان','سامانه','افزودن سامانه'] as $th)
+                    <th class="px-4 py-3">{{ __($th) }}</th>
+                @endforeach
             </tr>
             </thead>
             <tbody>
             @forelse($users as $user)
                 <tr class="border-b text-center">
-                    <td class="px-4 py-3">{{$user->id}}</td>
+                    <td class="px-4 py-3">{{$loop->index+1}}</td>
                     <td class="px-4 py-3">{{$user->user_info->full_name}}</td>
                     <td class="px-4 py-3">
                         {{$user->user_info->department->department_name}}

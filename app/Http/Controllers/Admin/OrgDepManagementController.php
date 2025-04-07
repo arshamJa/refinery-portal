@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserInfo;
+use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -19,9 +20,11 @@ class OrgDepManagementController extends Controller
             'user_info:id,department_id,user_id,full_name',
             'organizations:id,organization_name', // Eager load organization names
             'user_info.department:id,department_name' // Eager load department name for user_info
-        ])->whereNull('deleted_at')->select('id');
+        ])->whereNull('deleted_at')
+            ->whereHas('roles', fn ($q) => $q->where('name', '!=', UserRole::SUPER_ADMIN->value))
+            ->select('id');
 
-        $originalUsersCount = $query->count(); // Count before any filtering
+        $originalUsersCount = (clone $query)->count(); // Clone to get unfiltered count
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -47,7 +50,7 @@ class OrgDepManagementController extends Controller
 
     public function departmentOrganizationConnection()
     {
-        Gate::authorize('create-department-organization');
+//        Gate::authorize('create-department-organization');
         $departments = DB::table('departments')->select('id', 'department_name')->get();
         $organizations = DB::table('organizations')->select('id', 'organization_name')->get();
         $userInfos = DB::table('user_infos')->select('id', 'user_id', 'full_name')
@@ -61,7 +64,7 @@ class OrgDepManagementController extends Controller
     }
     public function store(Request $request)
     {
-        Gate::authorize('create-department-organization');
+//        Gate::authorize('create-department-organization');
 
         $validated = $request->validate([
             'departmentId' => 'required',

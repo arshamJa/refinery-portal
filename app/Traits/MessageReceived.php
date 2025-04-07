@@ -11,22 +11,35 @@ trait MessageReceived
     #[Computed]
     public function messages()
     {
-        // send invitation to participants
-        $send_invitation = MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
+        $userId = auth()->id();
+        $fullName = auth()->user()->user_info->full_name;
 
-        // invitations result
-        $invitations_result = MeetingUser::with('meeting')
-            ->where('is_present','!=' , '0')
-            ->where('read_by_scriptorium',false)
-            ->whereRelation('meeting','scriptorium',auth()->user()->user_info->full_name)
+        // Count: Invitations the user hasn't responded to
+        $send_invitation = MeetingUser::where('user_id', $userId)
+            ->where('is_present', 0)
             ->count();
 
-        // to send final result of meeting to participants
-        $meeting_final_result = MeetingUser::with('meeting')
-            ->whereRelation('meeting','is_cancelled','!=','0')
-            ->whereRelation('meeting','scriptorium','!=',auth()->user()->user_info->full_name)
-            ->where('user_id',auth()->user()->id)->where('read_by_user',false)->count();
+        // Count: Unread invitations result for meetings organized by user
+        $invitations_result = MeetingUser::where('is_present', '!=', '0')
+            ->where('read_by_scriptorium', false)
+            ->whereHas('meeting', function ($query) use ($fullName) {
+                $query->where('scriptorium', $fullName);
+            })
+            ->count();
+
+        // Count: Final meeting result not read by the user (meetings they didn't organize)
+        $meeting_final_result = MeetingUser::where('user_id', $userId)
+            ->where('read_by_user', false)
+            ->whereHas('meeting', function ($query) use ($fullName) {
+                $query->where('is_cancelled', '!=', '0')
+                    ->where('scriptorium', '!=', $fullName);
+            })
+            ->count();
 
         return $send_invitation + $invitations_result + $meeting_final_result;
     }
+
+
+
+
 }

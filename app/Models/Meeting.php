@@ -32,9 +32,9 @@ class Meeting extends Model
         'is_cancelled'
     ];
 
-//    protected $casts = [
-//        'is_cancelled' => MeetingStatus::class
-//    ];
+    protected $casts = [
+        'guest' => 'array',
+    ];
     protected function guest(): Attribute
     {
         return Attribute::make(

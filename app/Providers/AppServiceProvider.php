@@ -94,10 +94,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('delete-user',[UserPolicy::class,'delete']);
 
         //gate definition for department and organization
-        Gate::define('view-department-organization',[DepartmentOrganizationPolicy::class,'view']);
-        Gate::define('create-department-organization',[DepartmentOrganizationPolicy::class,'create']);
-        Gate::define('update-department-organization',[DepartmentOrganizationPolicy::class,'update']);
-        Gate::define('delete-department-organization',[DepartmentOrganizationPolicy::class,'delete']);
+//        Gate::define('view-department-organization',[DepartmentOrganizationPolicy::class,'view']);
+//        Gate::define('create-department-organization',[DepartmentOrganizationPolicy::class,'create']);
+//        Gate::define('update-department-organization',[DepartmentOrganizationPolicy::class,'update']);
+//        Gate::define('delete-department-organization',[DepartmentOrganizationPolicy::class,'delete']);
 
 
         Gate::define('admin-dashboard',function (User $user){

@@ -64,38 +64,56 @@
                     </span>
             </li>
     </x-breadcrumb>
+    <div class="bg-white p-6 rounded-xl shadow-md max-w-4xl">
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+            <div class="bg-gray-800 text-white px-4 py-2 rounded-md">
+                {{__('تعداد ثبت نشده:')}}
+                <span class="font-bold">
+                    {{$this->not_sent}}
+                </span>
+            </div>
+            <div class="bg-green-600 text-white px-4 py-2 rounded-md">
+                {{__('تعداد حاضرین: ')}}
+                <span class="font-bold">
+                    {{$this->present}}
+                </span>
+            </div>
+            <div class="bg-red-600 text-white px-4 py-2 rounded-md">
+                {{__('تعداد غایبین: ')}}
+                <span class="font-bold">
+                     {{$this->absent}}
+                </span>
+            </div>
+        </div>
 
-
-    <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg" dir="rtl">
-        <div class="max-w-xl">
-            <section>
-                <div class="flex justify-between items-center">
-                    <p class="bg-gray-800 text-white py-2.5 px-4 rounded-md">{{__('تعداد ثبت نشده')}}
-                        : {{$this->not_sent}}</p>
-                    <p class="bg-green-600 text-white py-2.5 px-4 rounded-md">{{__('تعداد حاضرین')}}
-                        : {{$this->present}}</p>
-                    <p class="bg-red-600 text-white py-2.5 px-4 rounded-md">{{__('تعداد غایبین')}}
-                        : {{$this->absent}}</p>
-                </div>
-                <div class="border-b my-4 py-2">
-                    {{__('اسامی ثبت نشده')}} :
-                    <br>
+        <div class="space-y-4 text-right">
+            <div>
+                <p class="font-bold">{{__('اسامی ثبت نشده:')}}</p>
+                <p class="text-gray-700">
                     @foreach($this->meetingUsers->where('is_present',0) as $meetingUser)
                         {{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}
                         -
                     @endforeach
-                </div>
-                <div class="border-b my-4 py-2">
-                    {{__('اسامی حاضرین')}} :
-                    <br>
+                </p>
+            </div>
+
+            <hr>
+
+            <div>
+                <p class="font-bold">{{__('اسامی حاضرین:')}}</p>
+                <p class="text-gray-700 italic">
                     @foreach($this->meetingUsers->where('is_present',1) as $meetingUser)
                         {{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}
                         -
                     @endforeach
-                </div>
-                <div class="my-4 py-2">
-                    {{__('اسامی غایبین به همراه دلیل')}} :
-                    <br>
+                </p>
+            </div>
+
+            <hr>
+
+            <div>
+                <p class="font-bold">{{__('اسامی غایبین به همراه دلیل:')}}</p>
+                <p class="text-gray-700 italic">
                     @foreach($this->meetingUsers->where('is_present',-1) as $meetingUser)
                         {{UserInfo::where('user_id',$meetingUser->user_id)->value('full_name')}}
                         :
@@ -106,27 +124,24 @@
                         @endif
                         <br>
                     @endforeach
-                </div>
-            </section>
+                </p>
+            </div>
         </div>
-        {{--            <a href="{{route('meetingsList')}}">--}}
-        {{--                <x-secondary-button>--}}
-        {{--                    {{__('بازگشت')}}--}}
-        {{--                </x-secondary-button>--}}
-        {{--            </a>--}}
 
-
-        @if($this->meeting == '0')
-            <button wire:click="acceptMeeting({{$meetingId}})"
-                    class="px-3 py-1.5 mb-2 bg-gray-800 border border-transparent rounded-md text-sm text-white">
-                {{('تایید جلسه')}}
-            </button>
-            <button wire:click="openModalDeny({{$meetingId}})"
-                    class="px-3 py-1.5 mb-2 bg-red-600 border border-transparent rounded-md text-sm text-white">
-                {{('لغو جلسه')}}
-            </button>
-        @endif
+        <div class="flex justify-end mt-6 gap-3">
+            @if($this->meeting == '0')
+                <button wire:click="acceptMeeting({{$meetingId}})"
+                        class="px-3 py-1.5 mb-2 bg-gray-800 border border-transparent rounded-md text-sm text-white">
+                    {{('تایید جلسه')}}
+                </button>
+                <button wire:click="openModalDeny({{$meetingId}})"
+                        class="px-3 py-1.5 mb-2 bg-red-600 border border-transparent rounded-md text-sm text-white">
+                    {{('لغو جلسه')}}
+                </button>
+            @endif
+        </div>
     </div>
+
 
 </div>
 

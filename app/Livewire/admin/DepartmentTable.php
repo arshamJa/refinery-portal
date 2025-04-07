@@ -14,13 +14,12 @@ use Livewire\WithPagination;
 class DepartmentTable extends Component
 {
     use WithPagination, WithoutUrlPagination;
-
-    public ?string $department = '';
-
-    #[Locked]
-    public $departmentId = '';
-
+    public ?string $department;
+    public $departmentId;
+    public $isUpdate = false;
     public ?string $search = '';
+
+
 
     public function render()
     {
@@ -36,12 +35,10 @@ class DepartmentTable extends Component
     {
         $this->dispatch('crud-modal', name: 'import');
     }
-
     public function openModalCreate()
     {
         $this->dispatch('crud-modal', name: 'create');
     }
-
     public function openModalEdit($id)
     {
         $departmentName = Department::findOrFail($id);
@@ -60,7 +57,7 @@ class DepartmentTable extends Component
      */
     public function createNewDepartment()
     {
-        $this->authorize('create-department-organization');
+//        $this->authorize('create-department-organization');
         $this->validate([
             'department' => ['bail','required','min:5','max:50','unique:departments,department_name', new farsi_chs()]
         ]);
@@ -76,7 +73,7 @@ class DepartmentTable extends Component
      */
     public function updateDep($id)
     {
-        $this->authorize('update-department-organization',$id);
+//        $this->authorize('update-department-organization',$id);
         $this->validate([
             'department' => ['bail','required','min:5','max:50', new farsi_chs()]
         ]);
@@ -89,13 +86,12 @@ class DepartmentTable extends Component
      */
     public function delete($id)
     {
-        $this->authorize('delete-department-organization',$id);
+//        $this->authorize('delete-department-organization',$id);
         $department = Department::find($id);
         $department->delete();
         $this->close();
         session()->flash('status', 'دپارتمان با موفقیت حذف شد');
     }
-
     public function close()
     {
         $this->dispatch('close-modal');

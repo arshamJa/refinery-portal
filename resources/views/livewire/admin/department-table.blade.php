@@ -2,11 +2,10 @@
 <div>
     <x-sessionMessage name="status"/>
 
-
-    @can('create-department-organization')
+{{--    @can('create-department-organization')--}}
         <x-modal name="create">
             <form wire:submit="createNewDepartment">
-                <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 text-start">
+                <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
                     {{__('ایجاد دپارتمان جدید')}}
                 </div>
                 <div class="px-6 py-4" dir="rtl">
@@ -29,14 +28,14 @@
                 </div>
             </form>
         </x-modal>
-    @endcan
+{{--    @endcan--}}
 
 
-    @can('update-department-organization')
+{{--    @can('update-department-organization')--}}
         <x-modal name="update">
             @if($departmentId)
                 <form wire:submit="updateDep({{$departmentId}})">
-                    <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 text-start">
+                    <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
                         {{__('ویرایش دپارتمان')}}
                     </div>
                     <div class="px-6 py-4" dir="rtl">
@@ -61,9 +60,9 @@
                 </form>
             @endif
         </x-modal>
-    @endcan
+{{--    @endcan--}}
 
-    @can('delete-department-organization')
+{{--    @can('delete-department-organization')--}}
         <x-modal name="delete">
             @if($departmentId)
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
@@ -94,7 +93,7 @@
                 </div>
             @endif
         </x-modal>
-    @endcan
+{{--    @endcan--}}
 
 
     <x-organizationDepartmentHeader/>
@@ -127,7 +126,7 @@
             <div
                 class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
                 <div class="flex items-center justify-center w-full md:w-auto gap-2">
-                    @can('create-department-organization')
+{{--                    @can('create-department-organization')--}}
 {{--                        <a href="{{route('department.export')}}">--}}
 {{--                            <x-secondary-button>--}}
 {{--                                Export--}}
@@ -156,7 +155,7 @@
                                       d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                             </svg>
                         </x-primary-button>
-                    @endcan
+{{--                    @endcan--}}
                 </div>
             </div>
         </div>
@@ -167,9 +166,9 @@
                 <thead
                     class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                    <th class="px-4 py-3">{{__('ردیف')}}</th>
-                    <th class="px-4 py-3">{{__('دپارتمان')}}</th>
-                    <th class="px-4 py-3">{{__('قابلیت')}}</th>
+                    @foreach (['ردیف', 'دپارتمان', 'قابلیت'] as $th)
+                        <th class="px-4 py-3">{{ __($th) }}</th>
+                    @endforeach
                 </tr>
                 </thead>
                 <tbody>
@@ -183,7 +182,7 @@
                             {{$department->department_name}}
                         </td>
                         <td class="px-4 py-4 flex gap-x-3 justify-center whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            @can('update-department-organization')
+{{--                            @can('update-department-organization')--}}
                                 <x-primary-button class="flex gap-x-1"
                                                   wire:click="openModalEdit({{$department->id}})">
                                     {{__('ویرایش')}}
@@ -194,12 +193,12 @@
                                               d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
                                     </svg>
                                 </x-primary-button>
-                            @endcan
-                            @can('delete-department-organization')
+{{--                            @endcan--}}
+{{--                            @can('delete-department-organization')--}}
                                 <x-danger-button wire:click="openModalDelete({{$department->id}})">
                                     {{__('حذف')}}
                                 </x-danger-button>
-                            @endcan
+{{--                            @endcan--}}
                         </td>
                     </tr>
                 @empty

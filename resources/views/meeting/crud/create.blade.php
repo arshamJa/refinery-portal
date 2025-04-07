@@ -30,114 +30,122 @@
     <form action="{{route('meeting.store')}}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
-            <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-12">
-                <div class="sm:col-span-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
+                <div>
                     <x-input-label for="title" :value="__('موضوع جلسه')"/>
                     <x-text-input name="title" id="title"
-                                  value="{{old('title')}}" class="block my-2 w-full"
+                                  value="{{old('title')}}" class="block "
                                   type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('title')" class="my-2"/>
+                    <x-input-error :messages="$errors->get('title')"/>
                 </div>
-
-                <div class="sm:col-span-4">
+                <div>
                     <x-input-label for="unit_organization" :value="__('انتخاب واحد سازمانی')"/>
                     <x-text-input name="unit_organization" id="unit_organization"
                                   value="{{old('unit_organization')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('unit_organization')" class="my-2"/>
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('unit_organization')"/>
                 </div>
-                <div class="sm:col-span-4">
+                <div>
                     <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
                     <x-text-input name="scriptorium" id="scriptorium"
                                   value="{{old('scriptorium')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('scriptorium')" class="my-2"/>
+                                  class="block " type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('scriptorium')"/>
                 </div>
-
-                <div class="sm:col-span-4">
+                <div>
                     <x-input-label for="position_organization" :value="__('سمت سازمانی')"/>
                     <x-text-input name="position_organization" id="position_organization"
                                   value="{{old('position_organization')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('position_organization')" class="my-2"/>
+                                  class="block " type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('position_organization')"/>
                 </div>
-
-                <div class="sm:col-span-4">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
+                <div>
                     <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
                     <x-text-input name="location" id="location"
                                   value="{{old('location')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('location')" class="my-2"/>
+                                  class="block " type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('location')"/>
                 </div>
-
-                <div class="sm:col-span-4">
-                    <x-input-label for="date" :value="__('تاریخ جلسه')" class="mb-1.5"/>
-                    <div class="flex gap-3 items-center">
-                        <select name="year" id="year" dir="ltr"
-                                class="border border-gray-300 text-sm rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">...سال</option>
-                            @for($i = 1404; $i <= 1430; $i++)
-                                <option value="{{$i}}" @if (old('year') == $i) selected @endif>
-                                    {{$i}}
-                                </option>
-                            @endfor
-                        </select>
-                        @php
-                            $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                        @endphp
-                        <select name="month" id="month" dir="ltr"
-                                class="border text-sm border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">...ماه</option>
-                            @for ($i = 1; $i <= 12; $i++)
-                                <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
-                                    {{ $persian_months[$i - 1] }}
-                                </option>
-                            @endfor
-                        </select>
-                        <select name="day" id="day" dir="ltr"
-                                class="border text-sm border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">...روز</option>
-                            @for($i = 1; $i <= 31; $i++)
-                                <option value="{{$i}}" @if (old('day') == $i) selected @endif>
-                                    {{$i}}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
-                    <x-input-error :messages="$errors->get('year')" class="my-2"/>
-                    <x-input-error :messages="$errors->get('month')" class="my-2"/>
-                    <x-input-error :messages="$errors->get('day')" class="my-2"/>
-                </div>
-
-                <div class="sm:col-span-4">
-                    <x-input-label for="time" :value="__('ساعت جلسه')"/>
-                    <x-text-input name="time" id="time"
-                                  value="{{old('time')}}"
-                                  class="block my-2 w-full" type="text" placeholder="{{__('00:00')}}"
-                                  autofocus/>
-                    <x-input-error :messages="$errors->get('time')" class="my-2"/>
-                </div>
-                <div class="sm:col-span-4">
-
+                <div>
                     <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
                     <x-text-input name="unit_held" id="unit_held"
                                   value="{{old('unit_held')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('unit_held')" class="my-2"/>
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('unit_held')"/>
                 </div>
-
-                <div class="sm:col-span-4">
+                <div>
+                    <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
+                    <x-text-input name="applicant" id="applicant"
+                                  value="{{old('applicant')}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('applicant')"/>
+                </div>
+                <div>
                     <x-input-label for="treat" :value="__('پذیرایی')"/>
-                    <label for="yes">{{__('بلی')}}
-                        <input type="radio" name="treat" value="true">
+                    <label for="yes">
+                        {{ __('بلی') }}
+                        <input type="radio" name="treat" value="true" {{ old('treat') === 'true' ? 'checked' : '' }}>
                     </label>
-                    <label for="no" class="mr-3">{{__('خیر')}}
-                        <input type="radio" name="treat" value="false">
+                    <label for="no" class="mr-3">
+                        {{ __('خیر') }}
+                        <input type="radio" name="treat" value="false" {{ old('treat') === 'false' ? 'checked' : '' }}>
                     </label>
-                    <x-input-error :messages="$errors->get('treat')" class="my-2"/>
+                    <x-input-error :messages="$errors->get('treat')"/>
                 </div>
-
-                <div class="sm:col-span-8">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 ">
+                <div>
+                    <x-input-label for="year" :value="__('سال')"/>
+                    <x-select-input name="year" id="year" dir="ltr">
+                        <option value="">...سال</option>
+                        @for($i = 1404; $i <= 1430; $i++)
+                            <option value="{{$i}}" @if(old('year', $year ?? '') == $i) selected @endif>
+                                {{$i}}
+                            </option>
+                        @endfor
+                    </x-select-input>
+                    <x-input-error :messages="$errors->get('year')"/>
+                </div>
+                <div>
+                    @php
+                        $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+                    @endphp
+                    <x-input-label for="month" :value="__('ماه')"/>
+                    <x-select-input name="month" id="year" dir="ltr">
+                        <option value="">...ماه</option>
+                        @for ($i = 1; $i <= 12; $i++)
+                            <option value="{{ $i }}" @if(old('month', $month ?? '') == $i) selected @endif>
+                                {{ $persian_months[$i - 1] }}
+                            </option>
+                        @endfor
+                    </x-select-input>
+                    <x-input-error :messages="$errors->get('month')"/>
+                </div>
+                <div>
+                    <x-input-label for="day" :value="__('روز')"/>
+                    <x-select-input name="day" id="year" dir="ltr">
+                        <option value="">...روز</option>
+                        @for($i = 1; $i <= 31; $i++)
+                            <option value="{{$i}}" @if(old('day', $day ?? '') == $i) selected @endif>
+                                {{$i}}
+                            </option>
+                        @endfor
+                    </x-select-input>
+                    <x-input-error :messages="$errors->get('day')"/>
+                </div>
+                <div>
+                    <x-input-label for="time" :value="__('ساعت جلسه')"/>
+                    <x-text-input name="time" id="time"
+                                  value="{{old('time')}}"
+                                  class="block" type="text" placeholder="{{__('00:00')}}"
+                                  autofocus/>
+                    <x-input-error :messages="$errors->get('time')"/>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
+                <div class="col-span-3">
                     <x-input-label for="holders" class="mb-2"
                                    :value="__('انتخاب اعضای جلسه یا حاضرین در جلسه')"/>
                     <div class="custom-select">
@@ -172,9 +180,11 @@
                             <div class="no-result-message" style="display:none;">No result match</div>
                         </div>
                     </div>
-                    <x-input-error :messages="$errors->get('holders')" class="my-2"/>
+                    <x-input-error :messages="$errors->get('holders')"/>
                 </div>
-                <div class="sm:col-span-4">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 ">
+                <div class="sm:col-span-2">
                     <div class="row my-2 py-2" x-data="handler()">
                         <div class="col">
                             <table class="table table-bordered align-items-center table-sm">
@@ -227,33 +237,24 @@
                             }
                         }
                     </script>
-                    <x-input-error :messages="$errors->get('guest')" class="my-2"/>
+                    <x-input-error :messages="$errors->get('guest')"/>
                 </div>
-
-                <div class="sm:col-span-4">
-                    <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
-                    <x-text-input name="applicant" id="applicant"
-                                  value="{{old('applicant')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('applicant')" class="my-2"/>
-                </div>
-
-                <div class="sm:col-span-4">
+                <div class="sm:col-span-1">
                     <x-input-label for="signature" :value="__('امضا')"/>
                     <x-text-input name="signature" id="signature"
                                   value="{{old('signature')}}"
-                                  class="block my-2 p-2 w-full" type="file" autofocus/>
-                    <x-input-error :messages="$errors->get('signature')" class="my-2"/>
+                                  class="block p-2" type="file" autofocus/>
+                    <x-input-error :messages="$errors->get('signature')"/>
                 </div>
-
-                <div class="sm:col-span-4">
+                <div class="sm:col-span-1">
                     <x-input-label for="reminder" :value="__('زمان جهت یادآوری (دقیقه)')"/>
                     <x-text-input name="reminder" id="reminder"
                                   value="{{old('reminder')}}" placeholder="{{__('دقیقه')}}"
-                                  class="block my-2 w-full" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('reminder')" class="my-2"/>
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('reminder')"/>
                 </div>
             </div>
+
             <x-primary-button type="submit">
                 {{ __('ارسال') }}
             </x-primary-button>

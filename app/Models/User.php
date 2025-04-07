@@ -87,6 +87,14 @@ class User extends Authenticatable
         $this->roles()->sync($roles);
         return $this;
     }
+    public function syncPermissions(array $permissions): self
+    {
+        if (! $this->relationLoaded('permissions')) {
+            $this->load('permissions');
+        }
+        $this->permissions()->sync($permissions);
+        return $this;
+    }
     public function hasRole(string $role): bool
     {
         if (!$this->relationLoaded('roles')) {

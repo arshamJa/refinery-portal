@@ -4,6 +4,7 @@ namespace App\Http\Controllers\meeting;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\meeting\MeetingStoreRequest;
+use App\Http\Requests\MeetingUpdateRequest;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Task;
@@ -54,7 +55,11 @@ class CreateNewMeetingController extends Controller
      */
     public function create()
     {
-        $users = UserInfo::get(['id', 'user_id', 'full_name']);
+        $users = UserInfo::whereHas('user', function ($query) {
+            $query->whereDoesntHave('roles', function ($roleQuery) {
+                $roleQuery->whereIn('name', [UserRole::SUPER_ADMIN->value, UserRole::ADMIN->value]);
+            });
+        })->get(['id', 'user_id', 'full_name']);
         return view('meeting.crud.create' , ['users' => $users]);
     }
 
@@ -109,7 +114,9 @@ class CreateNewMeetingController extends Controller
             // Add meeting users in bulk
             $holders = Str::of($request->holders)->explode(',')->map(fn($holder) => [
                 'user_id' => trim($holder),
-                'meeting_id' => $meeting->id
+                'meeting_id' => $meeting->id,
+                'created_at'  => now(),
+                'updated_at'  => now(),
             ])->toArray();
             MeetingUser::insert($holders);
         }
@@ -149,8 +156,18 @@ class CreateNewMeetingController extends Controller
             'meetingUsers.user.user_info'
         ])->findOrFail($id);
 
+        $date = $meeting->date;
+        if ($date) {
+            [$year, $month, $day] = explode('/', $date);
+        } else {
+            $year = $month = $day = null;
+        }
+
 //        $users = User::with('user_info:id,full_name,user_id')->whereNull('deleted_at')->get();
         $users = User::query()
+            ->whereDoesntHave('roles', function ($query) {
+                $query->whereIn('name', [UserRole::SUPER_ADMIN->value,UserRole::ADMIN->value]);
+            })
             ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->select('users.id as user_id', 'user_infos.full_name')
             ->whereNull('deleted_at')
@@ -158,25 +175,19 @@ class CreateNewMeetingController extends Controller
         return view('meeting.crud.edit', [
             'meeting' => $meeting,
             'users' => $users,
-            'userIds' => $meeting->meetingUsers
+            'userIds' => $meeting->meetingUsers,
+            'year' => $year,
+            'month' => $month,
+            'day' => $day
         ]);
-
-//        $meeting = Meeting::with('meetingUsers:meeting_id,user_id')->findOrFail($id);
-//        $userIds = MeetingUser::where('meeting_id',$meeting->id)->get();
-
-//
-//        return view('meeting.crud.edit', [
-//            'meeting' => $meeting,
-//            'users' => $users,
-//            'userIds' => $userIds
-//        ]);
     }
     /**
      * Update the specified resource in storage.
      * @throws ValidationException
      */
-    public function update(MeetingStoreRequest $request, string $id)
+    public function update(MeetingUpdateRequest $request, string $id)
     {
+        $request->validated();
         // Convert current Gregorian date to Jalali
         [$jaYear, $jaMonth, $jaDay] = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
@@ -222,7 +233,11 @@ class CreateNewMeetingController extends Controller
         ]);
 
         // Process meeting holders
-        $holders = collect(explode(',', preg_replace('/\s+/', '', $request->holders))); // Trim and split
+        $holders = collect(explode(',', preg_replace('/\s+/', '', $request->holders)))
+            ->filter(function ($value) {
+                return is_numeric($value) && !empty($value);
+            })
+            ->map(fn($id) => (int)$id); // cast to int for safety
 
         // Get current user IDs in the meeting
         $existingUserIds = $meeting->meetingUsers->pluck('user_id')->toArray();
@@ -331,14 +346,33 @@ class CreateNewMeetingController extends Controller
     {
         // Assuming $meetingId and $userId are passed as route parameters or request input
         MeetingUser::where('user_id', $userId)->where('meeting_id',$meetingId)->delete();
-        return response()->json(['success' => 'User deleted successfully']);
+        return response()->json(['status' => 'این شخص از جلسه حذف شد']);
+    }
+    public function deleteGuest($meetingId, $index)
+    {
+        $meeting = Meeting::findOrFail($meetingId);
+        $guests = $meeting->guest ?? [];
+
+        if (!isset($guests[$index])) {
+            return response()->json(['status' => 'مهمان یافت نشد'], 404);
+        }
+
+        unset($guests[$index]);
+        $guests = array_values($guests); // Reindex
+
+        $meeting->guest = $guests;
+        $meeting->save();
+
+        return response()->json(['status' => 'مهمان با موفقیت پاک شد']);
     }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        $meeting = Meeting::findOrFail($id)->delete();
+        $meeting = Meeting::findOrFail($id);
+        $meeting->meetingUsers()->delete();
+        $meeting->delete();
         return to_route('meeting.table')->with('status',' جلسه با موفقیت حذف شد');
     }
 }

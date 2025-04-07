@@ -87,14 +87,9 @@
                 <thead
                     class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                    <th class="px-4 py-3">{{__('ردیف')}}</th>
-                    <th class="px-4 py-3">{{__('نقش')}}</th>
-                    <th class="px-4 py-3">{{__('نام و نام خانوادگی')}}</th>
-                    <th class="px-4 py-3">{{__('کد پرسنلی')}}</th>
-                    <th class="px-4 py-3">{{__('کد ملی')}}</th>
-                    <th class="px-4 py-3">{{__('سمت')}}</th>
-                    <th class="px-4 py-3">{{__('دپارتمان')}}</th>
-                    <th class="px-4 py-3">{{__('قابلیت')}}</th>
+                    @foreach (['ردیف', 'نقش', 'نام و نام خانوادگی', 'کد پرسنلی','کد ملی', 'سمت', 'دپارتمان','قابلیت'] as $th)
+                        <th class="px-4 py-3">{{ __($th) }}</th>
+                    @endforeach
                 </tr>
                 </thead>
                 <tbody>
@@ -111,7 +106,7 @@
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
                             {{ $userInfo->department->department_name ?? __('دپارتمان وجود ندارد') }}
                         </td>
-                        <td class="px-4 py-4 whitespace-no-wrap flex flex-row gap-x-2 text-sm leading-5 text-coll-gray-900">
+                        <td class="px-4 py-4 whitespace-no-wrap flex flex-row justify-center gap-x-2 text-sm leading-5 text-coll-gray-900">
                             @can('viewUserTable',UserInfo::class)
                                 <x-dropdown>
                                     <x-slot name="trigger">

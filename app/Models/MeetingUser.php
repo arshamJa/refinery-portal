@@ -49,25 +49,40 @@ class MeetingUser extends Model
 //    }
 
 
-    public function is_present()
+//    public function is_present()
+//    {
+//        return MeetingUser::where('meeting_id',$this->meeting_id)
+//                ->where('user_id',$this->user_id)
+//                ->value('is_present') == '1';
+//    }
+//
+//    public function is_absent()
+//    {
+//        return MeetingUser::where('meeting_id',$this->meeting_id)
+//                ->where('user_id',$this->user_id)
+//                ->value('is_present') == '-1';
+//    }
+    public function getIsPresentStatusAttribute(): ?int
     {
-        return MeetingUser::where('meeting_id',$this->meeting_id)
-                ->where('user_id',$this->user_id)
-                ->value('is_present') == '1';
+        return (int) $this->attributes['is_present'];
     }
 
-    public function is_absent()
+    public function is_present(): bool
     {
-        return MeetingUser::where('meeting_id',$this->meeting_id)
-                ->where('user_id',$this->user_id)
-                ->value('is_present') == '-1';
+        return $this->attributes['is_present'] == 1;
     }
 
-    public function replacementName()
+    public function is_absent(): bool
     {
-            return UserInfo::with('user')
-                ->whereRelation('user','id','=',$this->replacement)
-                ->value('full_name');
+        return $this->attributes['is_present'] == -1;
+    }
+    public function replacementName(): ?string
+    {
+        if (! $this->replacement) return null;
+
+        return UserInfo::with('user')
+            ->whereRelation('user', 'id', $this->replacement)
+            ->value('full_name');
     }
     public function deadLineTask()
     {

@@ -1,7 +1,5 @@
 @php use App\Models\UserInfo; @endphp
 <x-app-layout>
-
-
     <x-breadcrumb>
         <li class="flex items-center h-full">
             <a href="{{route('dashboard')}}"
@@ -52,255 +50,284 @@
     </x-breadcrumb>
 
 
-    <div dir="rtl">
+    <div dir="rtl" class="p-6 bg-white rounded-xl shadow-md space-y-6">
         <form action="{{route('meeting.update',$meeting->id)}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('patch')
-            <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-12">
-                    <div class="sm:col-span-4">
-                        <x-input-label for="title" :value="__('موضوع جلسه')"/>
-                        <x-text-input name="title" id="title" value="{{$meeting->title}}"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('title')" class="my-2"/>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <x-input-label for="title" :value="__('موضوع جلسه')"/>
+                    <x-text-input name="title" id="title" value="{{$meeting->title}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('title')"/>
+                </div>
+                <div>
+                    <x-input-label for="unit_organization" :value="__('انتخاب واحد سازمانی')"/>
+                    <x-text-input name="unit_organization" id="unit_organization"
+                                  value="{{$meeting->unit_organization}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('unit_organization')"/>
+                </div>
+                <div>
+                    <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
+                    <x-text-input name="scriptorium" id="scriptorium"
+                                  value="{{$meeting->scriptorium}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('scriptorium')"/>
+                </div>
+                <div>
+                    <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
+                    <x-text-input name="location" id="location"
+                                  value="{{$meeting->location}}"
+                                  class="block" type="text" autofocus/>
 
-                    <div class="sm:col-span-4">
-                        <x-input-label for="unit_organization" :value="__('انتخاب واحد سازمانی')"/>
-                        <x-text-input name="unit_organization" id="unit_organization"
-                                      value="{{$meeting->unit_organization}}"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('unit_organization')" class="my-2"/>
-                    </div>
+                    <x-input-error :messages="$errors->get('location')"/>
+                </div>
+            </div>
 
-                    <div class="sm:col-span-4">
-                        <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
-                        <x-text-input name="scriptorium" id="scriptorium"
-                                      value="{{$meeting->scriptorium}}"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('scriptorium')" class="my-2"/>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <x-input-label for="year" :value="__('سال')"/>
+                    <select name="year" id="year" dir="ltr"
+                            class="w-full my-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">...</option>
+                        @for($i = 1404; $i <= 1440; $i++)
+                            <option value="{{$i}}" @if(old('year', $year ?? '') == $i) selected @endif>
+                                {{$i}}
+                            </option>
+                        @endfor
+                    </select>
+                    <x-input-error :messages="$errors->get('year')"/>
+                </div>
+                <div>
+                    @php
+                        $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+                    @endphp
+                    <x-input-label for="month" :value="__('ماه')"/>
+                    <select name="month" id="month" dir="ltr"
+                            class="w-full my-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">...</option>
+                        @for ($i = 1; $i <= 12; $i++)
+                            <option value="{{ $i }}" @if(old('month', $month ?? '') == $i) selected @endif>
+                                {{ $persian_months[$i - 1] }}
+                            </option>
+                        @endfor
+                    </select>
+                    <x-input-error :messages="$errors->get('month')"/>
+                </div>
+                <div>
+                    <x-input-label for="day" :value="__('روز')"/>
+                    <select name="day" id="day" dir="ltr"
+                            class="w-full my-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">...</option>
+                        @for($i = 1; $i <= 31; $i++)
+                            <option value="{{$i}}" @if(old('day', $day ?? '') == $i) selected @endif>
+                                {{$i}}
+                            </option>
+                        @endfor
+                    </select>
+                    <x-input-error :messages="$errors->get('day')"/>
+                </div>
 
-                    <div class="sm:col-span-4">
-                        <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
-                        <x-text-input name="location" id="location"
-                                      value="{{$meeting->location}}"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('location')" class="my-2"/>
-                    </div>
+                <div>
+                    <x-input-label for="time" :value="__('ساعت جلسه')"/>
+                    <x-text-input name="time" id="time"
+                                  value="{{$meeting->time}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('time')"/>
+                </div>
+            </div>
 
-                    <div class="sm:col-span-4">
-                        <x-input-label for="date" :value="__('تاریخ جلسه')" class="mb-1.5"/>
-                        <div class="flex items-center">
-                            <label for="month" class="block text-gray-700 text-sm">سال:</label>
-                            <select name="year" id="year" dir="ltr"
-                                    class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">...</option>
-                                @for($i = 1404; $i <= 1440; $i++)
-                                    <option value="{{$i}}" @if (old('year') == $i) selected @endif>
-                                        {{$i}}
-                                    </option>
-                                @endfor
-                            </select>
-                            @php
-                                $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                            @endphp
-                            <label for="month" class="block text-gray-700 text-sm">ماه:</label>
-                            <select name="month" id="month" dir="ltr"
-                                    class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">...</option>
-                                @for ($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
-                                        {{ $persian_months[$i - 1] }}
-                                    </option>
-                                @endfor
-                            </select>
-                            <label for="day" class="block text-gray-700 text-sm">روز:</label>
-                            <select name="day" id="day" dir="ltr"
-                                    class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">...</option>
-                                @for($i = 1; $i <= 31; $i++)
-                                    <option value="{{$i}}" @if (old('day') == $i) selected @endif>
-                                        {{$i}}
-                                    </option>
-                                @endfor
-                            </select>
-                        </div>
-                        <x-input-error :messages="$errors->get('year')" class="my-2"/>
-                        <x-input-error :messages="$errors->get('month')" class="my-2"/>
-                        <x-input-error :messages="$errors->get('day')" class="my-2"/>
-                    </div>
-
-                    <div class="sm:col-span-4">
-                        <x-input-label for="time" :value="__('ساعت جلسه')"/>
-                        <x-text-input name="time" id="time"
-                                      value="{{$meeting->time}}"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('time')" class="my-2"/>
-                    </div>
-
-                    <div class="sm:col-span-4">
-                        <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
-                        <x-text-input name="unit_held" id="unit_held"
-                                      value="{{$meeting->unit_held}}"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('unit_held')" class="my-2"/>
-                    </div>
-
-                    <div class="sm:col-span-8">
-                        <div class="mb-2">{{ __('اعضای جلسه فعلی') }}:</div>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($userIds as $meetingUser)
-                                <div id="user-{{ $meetingUser->user_id }}"
-                                     class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="col-span-4">
+                    <div class="mb-2">{{ __('اعضای جلسه فعلی') }}:</div>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($userIds as $meetingUser)
+                            <div id="user-{{ $meetingUser->user_id }}"
+                                 class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
                                         <span>
                                             {{ $meetingUser->user->user_info->full_name }}
                                         </span>
-                                    <button
-                                        class="delete-user bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
-                                        data-meeting-id="{{ $meeting->id }}" data-user-id="{{ $meetingUser->user_id }}">
-                                        {{ __('حذف') }}
-                                    </button>
-                                </div>
-                            @endforeach
-
-                        </div>
-                    </div>
-
-                    <div class="sm:col-span-8">
-                        <x-input-label for="holders" class="mb-2"
-                                       :value="__('انتخاب اعضای جدید')"/>
-                        <div class="custom-select">
-                            <div class="select-box">
-                                <input type="text" class="tags_input" multiple name="holders" hidden>
-                                <div class="selected-options"></div>
-                                <div class="arrow">
+                                <button
+                                    class="delete-user bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full"
+                                    data-meeting-id="{{ $meeting->id }}" data-user-id="{{ $meetingUser->user_id }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5"
+                                         stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="col-span-3 mb-4">
+                    <x-input-label for="holders" class="mb-2"
+                                   :value="__('انتخاب اعضای جدید')"/>
+                    <div class="custom-select">
+                        <div class="select-box">
+                            <input type="text" class="tags_input" multiple name="holders" hidden>
+                            <div class="selected-options"></div>
+                            <div class="arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="options">
+                            <div class="option-search-tags">
+                                <input type="text" class="search-tags" placeholder="جست و جو ...">
+                                <button type="button" class="clear">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                         viewBox="0 0 24 24" stroke-width="1.5"
                                          stroke="currentColor" class="size-4">
                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
+                                              d="M6 18 18 6M6 6l12 12"/>
                                     </svg>
-                                </div>
+                                </button>
                             </div>
-                            <div class="options">
-                                <div class="option-search-tags">
-                                    <input type="text" class="search-tags" placeholder="جست و جو ...">
-                                    <button type="button" class="clear">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                             viewBox="0 0 24 24" stroke-width="1.5"
-                                             stroke="currentColor" class="size-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M6 18 18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                                @foreach($users->where('user_id', '!=', auth()->user()->id)
-                                   ->whereNotIn('user_id', $meeting->meetingUsers->pluck('user_id')->toArray()) as $user)
-                                    <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}}</div>
-                                @endforeach
-                                <div class="no-result-message" style="display:none;">No result match</div>
-                            </div>
+                            <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
+                            @foreach($users->where('user_id', '!=', auth()->user()->id)
+                               ->whereNotIn('user_id', $meeting->meetingUsers->pluck('user_id')->toArray()) as $user)
+                                <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}}</div>
+                            @endforeach
+                            <div class="no-result-message" style="display:none;">No result match</div>
                         </div>
-                        <x-input-error :messages="$errors->get('holders')" class="my-2"/>
                     </div>
+                    <x-input-error :messages="$errors->get('holders')"/>
+                </div>
+            </div>
 
-                    <div class="sm:col-span-4">
-                        <x-input-label for="treat" :value="__('پذیرایی')"/>
-                        <label for="yes">{{__('بلی')}}
-                            <input type="radio" name="treat" value="true">
-                        </label>
-                        <label for="no" class="mr-3">{{__('خیر')}}
-                            <input type="radio" name="treat" value="false">
-                        </label>
-                        <x-input-error :messages="$errors->get('treat')" class="my-2"/>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
+                    <x-text-input name="unit_held" id="unit_held"
+                                  value="{{$meeting->unit_held}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('unit_held')"/>
+                </div>
+                <div>
+                    <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
+                    <x-text-input name="applicant" value="{{$meeting->applicant}}"
+                                  id="applicant" class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('applicant')"/>
+                </div>
+                <div>
+                    <x-input-label for="position_organization" :value="__('سمت سازمانی')"/>
+                    <x-text-input name="position_organization" id="position_organization"
+                                  value="{{$meeting->position_organization}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('position_organization')"/>
+                </div>
+                <div>
+                    <x-input-label for="reminder" :value="__('زمان جهت یادآوری')"/>
+                    <x-text-input name="reminder" value="{{$meeting->reminder}}"
+                                  id="reminder" class="block" type="text"
+                                  autofocus/>
+                    <x-input-error :messages="$errors->get('reminder')"/>
+                </div>
+            </div>
 
-                    <div class="sm:col-span-4">
-                        <div class="row my-2 py-2" x-data="handler()">
-                            <div class="col">
-                                <table class="table table-bordered align-items-center table-sm">
-                                    <thead class="thead-light">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="col-span-1">
+                    <x-input-label for="treat" :value="__('پذیرایی')"/>
+                    <label for="yes">{{__('بلی')}}
+                        <input type="radio" name="treat" value="true">
+                    </label>
+                    <label for="no" class="mr-3">{{__('خیر')}}
+                        <input type="radio" name="treat" value="false">
+                    </label>
+                    <x-input-error :messages="$errors->get('treat')"/>
+                </div>
+                <div class="col-span-1">
+                    <x-input-label for="signature" :value="__('امضا')"/>
+                    <x-text-input name="signature" id="signature" class="block p-2"
+                                  type="file"
+                                  autofocus/>
+                    <x-input-error :messages="$errors->get('signature')"/>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="col-span-4">
+                    <div class="mb-2">{{ __('لیست مهمان فعلی:') }}</div>
+                    @foreach($meeting->guest as $index => $nameGuest)
+                        <div id="guest-{{ $index }}"
+                             class="flex items-center gap-4 p-2 bg-blue-100 rounded-md mb-1">
+                            <span>{{ $nameGuest }}</span>
+                            <button
+                                class="delete-guest bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-full"
+                                data-meeting-id="{{ $meeting->id }}" data-guest-index="{{ $index }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+                <div>
+                    <div class="row py-2 col-span-2" x-data="handler()">
+                        <div class="col">
+                            <table class="table table-bordered align-items-center table-sm">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{__('نام و نام خانوادگی')}}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template x-for="(field, index) in fields" :key="index">
                                     <tr>
-                                        <th>#</th>
-                                        <th>{{__('نام و نام خانوادگی')}}</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <template x-for="(field, index) in fields" :key="index">
-                                        <tr>
-                                            <td x-text="index + 1"></td>
-                                            <td>
-                                                <x-text-input x-model="field.guest" type="text"
-                                                              name="guest[]"
-                                                              class="block my-2 w-full mr-1" autofocus/>
-                                            </td>
-                                            <td>
-                                                <button type="button" class="mr-2"
-                                                        @click="removeField(index)">&times;
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <td colspan="4" class="text-right">
-                                            <button type="button" class="btn btn-info"
-                                                    @click="addNewField()">{{__('افزودن مهمان')}}</button>
+                                        <td x-text="index + 1"></td>
+                                        <td>
+                                            <x-text-input x-model="field.guest" type="text"
+                                                          name="guest[]"
+                                                          class="block mr-1" autofocus/>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="mr-2"
+                                                    @click="removeField(index)">&times;
+                                            </button>
                                         </td>
                                     </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                                </template>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-right">
+                                        <button type="button" class="btn btn-info"
+                                                @click="addNewField()">{{__('افزودن مهمان')}}</button>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
                         </div>
-                        <x-input-error :messages="$errors->get('guest')" class="my-2"/>
                     </div>
-
-                    <div class="sm:col-span-4">
-                        <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
-                        <x-text-input name="applicant" value="{{$meeting->applicant}}"
-                                      id="applicant" class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('applicant')" class="my-2"/>
-
-                    </div>
-                    <div class="sm:col-span-4">
-                        <x-input-label for="position_organization" :value="__('سمت سازمانی')"/>
-                        <x-text-input name="position_organization" id="position_organization"
-                                      value="{{$meeting->position_organization}}"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('position_organization')" class="my-2"/>
-                    </div>
-                    <div class="sm:col-span-4">
-                        <x-input-label for="signature" :value="__('امضا')"/>
-                        <x-text-input name="signature" id="signature" class="block my-2 p-2 w-full"
-                                      type="file"
-                                      autofocus/>
-                        <x-input-error :messages="$errors->get('signature')" class="my-2"/>
-                    </div>
-                    <div class="sm:col-span-4">
-                        <x-input-label for="reminder" :value="__('زمان جهت یادآوری')"/>
-                        <x-text-input name="reminder" value="{{$meeting->reminder}}"
-                                      id="reminder" class="block my-2 w-full" type="text"
-                                      autofocus/>
-                        <x-input-error :messages="$errors->get('reminder')" class="my-2"/>
-                    </div>
+                    <x-input-error :messages="$errors->get('guest')"/>
                 </div>
+            </div>
 
-                <div class="mt-4">
-                    <x-primary-button type="submit">
-                        {{ __('ذخیره') }}
-                    </x-primary-button>
-                    <a href="{{route('meeting.table')}}">
-                        <x-secondary-button>
-                            {{__('لغو')}}
-                        </x-secondary-button>
-                    </a>
-                </div>
+            <!-- Buttons -->
+            <div class="mt-4">
+                <x-primary-button type="submit">
+                    {{ __('ذخیره') }}
+                </x-primary-button>
+                <a href="{{route('meeting.table')}}">
+                    <x-secondary-button>
+                        {{__('لغو')}}
+                    </x-secondary-button>
+                </a>
             </div>
         </form>
     </div>
+
+
+
+
+
     <script>
         // this is for deleting the current participants
         $(document).ready(function () {
@@ -330,6 +357,32 @@
                     });
                 }
             });
+        });
+
+        $('.delete-guest').click(function (e) {
+            e.preventDefault();
+            const meetingId = $(this).data('meeting-id');
+            const guestIndex = $(this).data('guest-index');
+            const guestDiv = $('#guest-' + guestIndex);
+
+            if (confirm('آیا مطمئن هستید که این مهمان حذف شود؟')) {
+                $.ajax({
+                    url: '/meetings/' + meetingId + '/guests/' + guestIndex,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        guestDiv.fadeOut(300, function () {
+                            $(this).remove();
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                        alert('خطا در حذف مهمان!');
+                    }
+                });
+            }
         });
 
         // this is for adding new guest

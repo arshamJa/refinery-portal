@@ -1,4 +1,54 @@
 <x-app-layout>
+    <div class="overflow-x-auto bg-white p-4 rounded shadow">
+        <div class="flex flex-wrap gap-4 items-center mb-4 justify-between">
+            <div class="flex gap-2">
+                <select class="border border-gray-300 text-sm rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option>وضعیت جلسه</option>
+                    <option>تایید شده</option>
+                    <option>درحال بررسی</option>
+                </select>
+                <input type="text" placeholder="جستجوی موضوع، محل یا دبیر جلسه..."
+                       class="border border-gray-300 text-sm rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:outline-none w-64"/>
+            </div>
+            <button class="bg-blue-600 text-white text-sm rounded px-4 py-1.5 hover:bg-blue-700">جست و جو</button>
+        </div>
+
+        <table class="min-w-full text-xs text-right border border-gray-200">
+            <thead class="bg-gray-50 text-gray-600">
+            <tr class="border-b">
+                <th class="px-4 py-2">جلسات</th>
+                <th class="px-4 py-2">تاریخ</th>
+                <th class="px-4 py-2">ساعت</th>
+                <th class="px-4 py-2">مکان</th>
+                <th class="px-4 py-2">دبیر جلسه</th>
+                <th class="px-4 py-2">واحد برگزارکننده</th>
+                <th class="px-4 py-2">درخواست‌دهنده</th>
+                <th class="px-4 py-2">واحد سازمانی</th>
+                <th class="px-4 py-2">مشاهده اعضا</th>
+                <th class="px-4 py-2">حاضرین</th>
+                <th class="px-4 py-2">وضعیت جلسه</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2 font-bold text-indigo-700 whitespace-nowrap">جلسه دهم</td>
+                <td class="px-4 py-2">1404/07/20</td>
+                <td class="px-4 py-2">10:20</td>
+                <td class="px-4 py-2">ساختمان دوم</td>
+                <td class="px-4 py-2">لیث سادات</td>
+                <td class="px-4 py-2">کمیته تشکیل</td>
+                <td class="px-4 py-2">دکتر کورش بیگی</td>
+                <td class="px-4 py-2">واحد آی تی دو</td>
+                <td class="px-4 py-2 text-blue-600 hover:underline cursor-pointer">نمایش</td>
+                <td class="px-4 py-2">0</td>
+                <td class="px-4 py-2">
+                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">تایید شده</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -51,8 +101,8 @@
                         class="text-sm bg-white w-2/3 border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                     <option>{{__('وضعیت جلسه')}}</option>
                     <option value="0">{{__('در حال بررسی ...')}}</option>
-                    <option value="-1">{{__('جلساتی که تشکیل میشود')}}</option>
-                    <option value="1">{{__('جلساتی که لفو شد')}}</option>
+                    <option value="-1">{{__('تایید شده')}}</option>
+                    <option value="1">{{__('لغو شده')}}</option>
                 </select>
             </div>
             <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
@@ -95,18 +145,15 @@
             </thead>
             <tbody>
             @forelse($meetings as $meeting)
-                <tr class="hover:bg-gray-100 relative text-center border-b dark:border-gray-700">
+                <tr class="relative text-center border-b dark:border-gray-700">
                     <th scope="row"
                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                        <a href="{{route('meeting.show',$meeting->id)}}"
-                           class="p-2 mb-2 hover:underline underline-offset-2 w-full transition ease-in-out">
                             {{$meeting->title}}
-                        </a>
-                        @if($meeting->tasks->where('request_task',!null)->value('request_task'))
-                            <span class="absolute right-2 top-1/2 -translate-y-1/2 flex h-3 w-3"><span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span
-                                    class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span></span>
-                        @endif
+{{--                        @if($meeting->tasks->where('request_task',!null)->value('request_task'))--}}
+{{--                            <span class="absolute right-2 top-1/2 -translate-y-1/2 flex h-3 w-3"><span--}}
+{{--                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span--}}
+{{--                                    class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span></span>--}}
+{{--                        @endif--}}
                     </th>
                     <td class="px-6 py-4">
                         {{$meeting->scriptorium}}

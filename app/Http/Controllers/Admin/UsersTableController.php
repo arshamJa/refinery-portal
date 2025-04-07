@@ -114,16 +114,40 @@ class UsersTableController extends Controller
      */
     public function show(string $id)
     {
+//        $userInfo = UserInfo::findOrFail($id);
+//        Gate::authorize('viewUsers', $userInfo);
+//
+//        $user = User::with('organizations:id,organization_name', 'permissions', 'roles:id,name')
+//            ->findOrFail($userInfo->user_id);
+//
+//        return view('users.show', [
+//            'userInfo' => $userInfo,
+//            'user' => $user,
+//            'userRoles' => $user->roles,
+//        ]);
         $userInfo = UserInfo::findOrFail($id);
         Gate::authorize('viewUsers', $userInfo);
 
-        $user = User::with('organizations:id,organization_name', 'permissions', 'roles:id,name')
+        // Load user with related roles and direct permissions
+        $user = User::with(['organizations:id,organization_name', 'permissions', 'roles.permissions', 'roles:id,name'])
             ->findOrFail($userInfo->user_id);
+
+        // Get direct permissions
+        $directPermissions = $user->permissions;
+
+        // Get role-based permissions
+        $rolePermissions = $user->roles->flatMap(function ($role) {
+            return $role->permissions;
+        });
+
+        // Merge and remove duplicates
+        $allPermissions = $directPermissions->merge($rolePermissions)->unique('id');
 
         return view('users.show', [
             'userInfo' => $userInfo,
             'user' => $user,
             'userRoles' => $user->roles,
+            'allPermissions' => $allPermissions, // Pass merged permissions to the view
         ]);
     }
 
@@ -149,7 +173,7 @@ class UsersTableController extends Controller
             'userInfo' => $userInfo,
             'departments' => $departments,
             'user' => $user,
-            'userRoles' => $user->roles,
+            'roles' => $user->roles,
             'permissions' => $permissions,
         ]);
     }
@@ -159,20 +183,28 @@ class UsersTableController extends Controller
     public function update(StoreNewUserRequest $request, string $id)
     {
         $request->validated();
+
         $userInfo = UserInfo::findOrFail($id);
         Gate::authorize('updateUsers', $userInfo);
-        $user = User::find($userInfo->user_id);
 
+        $user = User::findOrFail($userInfo->user_id);
+
+        // Update user basic info
         $user->update([
-            'role' => $request->role, // Make sure roles are synced, not just set
+            'p_code' => $request->p_code,
             'password' => Hash::make($request->password),
-            'p_code' => $request->p_code
         ]);
 
-        // Sync roles and permissions properly (if needed)
-        $user->syncRoles([$request->role]);
+        $role = Role::where('name', $request->role)->firstOrFail();
+        // Sync role (only one role in your dropdown)
+        if ($request->filled('role')) {
+            $user->syncRoles([$role->id]);
+        }
+
+        // Sync permissions
         $user->syncPermissions($request->permissions);
 
+        // Update user info
         $userInfo->update([
             'user_id' => $user->id,
             'department_id' => $request->departmentId,
@@ -181,17 +213,56 @@ class UsersTableController extends Controller
             'house_phone' => $request->house_phone,
             'phone' => $request->phone,
             'n_code' => $request->n_code,
-            'position' => $request->position
+            'position' => $request->position,
         ]);
 
-        $department = Department::find($request->departmentId);
-        $organizations = Organization::where('department_id', $department->id)->get();
+        // Sync organizations related to new department
+        if ($request->filled('departmentId')) {
+            $department = Department::find($request->departmentId);
+            if ($department) {
+                $organizations = Organization::where('department_id', $department->id)->get();
 
-        // Sync user with the organizations
-        foreach ($organizations as $organization) {
-            // Use `syncWithoutDetaching` to ensure the pivot is updated correctly
-            $organization->users()->syncWithoutDetaching([$user->id]);
+                foreach ($organizations as $organization) {
+                    $organization->users()->syncWithoutDetaching([$user->id]);
+                }
+            }
         }
+
+        return redirect()->route('users.index')->with('success', 'کاربر با موفقیت بروزرسانی شد.');
+//        $request->validated();
+//        $userInfo = UserInfo::findOrFail($id);
+//        Gate::authorize('updateUsers', $userInfo);
+//        $user = User::find($userInfo->user_id);
+//
+//        $user->update([
+//            'role' => $request->role, // Make sure roles are synced, not just set
+//            'password' => Hash::make($request->password),
+//            'p_code' => $request->p_code
+//        ]);
+//
+//        // Sync roles and permissions properly (if needed)
+//        $user->syncRoles([$request->role]);
+//        $user->syncPermissions($request->permissions);
+//
+//        $userInfo->update([
+//            'user_id' => $user->id,
+//            'department_id' => $request->departmentId,
+//            'full_name' => $request->full_name,
+//            'work_phone' => $request->work_phone,
+//            'house_phone' => $request->house_phone,
+//            'phone' => $request->phone,
+//            'n_code' => $request->n_code,
+//            'position' => $request->position
+//        ]);
+//
+//        $department = Department::find($request->departmentId);
+//        $organizations = Organization::where('department_id', $department->id)->get();
+//
+//        // Sync user with the organizations
+//        foreach ($organizations as $organization) {
+//            // Use `syncWithoutDetaching` to ensure the pivot is updated correctly
+//            $organization->users()->syncWithoutDetaching([$user->id]);
+//        }
 
 //        $request->validated();
 //        $userInfo = UserInfo::findOrFail($id);
@@ -225,7 +296,6 @@ class UsersTableController extends Controller
 //                $organization->users()->attach($user->id);
 //            }
 //        }
-        return to_route('users.index')->with('status','کاربر با موفقیت بروز شد');
     }
 
     /**

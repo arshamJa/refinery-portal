@@ -30,7 +30,7 @@ class StoreNewUserRequest extends FormRequest
             'role' => ['bail', 'required'],
             'permissions' => ['bail', 'required'],
             'full_name' => ['bail', 'required', 'string', 'min:5', 'max:255', new farsi_chs()],
-            'p_code' => ['bail', 'required', 'numeric', 'digits:6', 'unique:users,p_code'],
+            'p_code' => ['bail', 'required', 'numeric', 'digits:6'],
             'n_code' => ['bail', 'required', 'numeric', 'digits:10', new NationalCodeRule()],
             'phone' => ['bail', 'required', 'digits:11', new PhoneNumberRule()],
             'house_phone' => ['bail', 'required', 'numeric'],

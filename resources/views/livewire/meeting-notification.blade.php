@@ -1,103 +1,157 @@
 @php use App\Models\MeetingUser; @endphp
-<div wire:poll.visible.60s>
-
-
+<div>
     <x-sessionMessage name="status"/>
     <x-breadcrumb>
-            <li class="flex items-center h-full">
-                <a href="{{route('dashboard')}}"
-                   class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M13.6986 3.68267C12.7492 2.77246 11.2512 2.77244 10.3018 3.68263L4.20402 9.52838C3.43486 10.2658 3 11.2852 3 12.3507V19C3 20.1046 3.89543 21 5 21H8.04559C8.59787 21 9.04559 20.5523 9.04559 20V13.4547C9.04559 13.2034 9.24925 13 9.5 13H14.5456C14.7963 13 15 13.2034 15 13.4547V20C15 20.5523 15.4477 21 16 21H19C20.1046 21 21 20.1046 21 19V12.3507C21 11.2851 20.5652 10.2658 19.796 9.52838L13.6986 3.68267Z"
-                            fill="currentColor"></path>
-                    </svg>
-                    <span>{{__('داشبورد')}}</span>
-                </a>
-            </li>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                 stroke="currentColor" class="w-3 h-3 text-gray-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
-            </svg>
-            <li>
-                <a href="{{route('message')}}"
-                   class="inline-flex items-center px-2 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>{{__('پیغام های دریافتی')}}</span>
-                </a>
-            </li>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                 stroke="currentColor" class="w-3 h-3 text-gray-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
-            </svg>
-            <li>
+        <li class="flex items-center h-full">
+            <a href="{{route('dashboard')}}"
+               class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M13.6986 3.68267C12.7492 2.77246 11.2512 2.77244 10.3018 3.68263L4.20402 9.52838C3.43486 10.2658 3 11.2852 3 12.3507V19C3 20.1046 3.89543 21 5 21H8.04559C8.59787 21 9.04559 20.5523 9.04559 20V13.4547C9.04559 13.2034 9.24925 13 9.5 13H14.5456C14.7963 13 15 13.2034 15 13.4547V20C15 20.5523 15.4477 21 16 21H19C20.1046 21 21 20.1046 21 19V12.3507C21 11.2851 20.5652 10.2658 19.796 9.52838L13.6986 3.68267Z"
+                        fill="currentColor"></path>
+                </svg>
+                <span>{{__('داشبورد')}}</span>
+            </a>
+        </li>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+             stroke="currentColor" class="w-3 h-3 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+        </svg>
+        <li>
+            <a href="{{route('message')}}"
+               class="inline-flex items-center px-2 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
+                <span>{{__('پیغام های دریافتی')}}</span>
+            </a>
+        </li>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+             stroke="currentColor" class="w-3 h-3 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+        </svg>
+        <li>
                     <span
                         class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
                       {{__('نتیجه نهایی برگزاری/لغو جلسات')}}
                     </span>
-            </li>
-
-
+        </li>
         {{--            <a href="{{route('meetings.index')}}">--}}
         {{--                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>--}}
         {{--            </a>--}}
     </x-breadcrumb>
     @foreach($this->meetingUsers as $meetingUser)
-        @if(!MeetingUser::where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('read_by_user'))
-            <div class="mb-4">
-                <div class="bg-teal-50 rounded-lg p-4 dark:bg-teal-800/30">
-                    <div class="flex">
-                        <div class="shrink-0">
-                            <span
-                                class="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">
-                                 @if($meetingUser->meeting->is_present == 1)
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5" stroke="currentColor"
-                                         class="shrink-0 size-4 text-green-600"><path stroke-linecap="round"
-                                                                                      stroke-linejoin="round"
-                                                                                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                                @else
-                                    <svg class="shrink-0 size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg"
-                                         width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12"
-                                                                                                                 cy="12"
-                                                                                                                 r="10"></circle><path
-                                            d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        <div class="bg-teal-50 dark:bg-teal-800/30 mb-4 rounded-lg p-4 shadow-sm max-w-4xl">
+            <div class="flex items-start gap-3">
+                <div>
+                    <span
+                        class="inline-flex items-center justify-center size-10 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">
+                        @if($meetingUser->meeting->is_present == 1)
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke-width="1.5" stroke="currentColor"
+                                 class="shrink-0 size-4 text-green-600"><path stroke-linecap="round"
+                                                                              stroke-linejoin="round"
+                                                                              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                        @else
+                            <svg class="shrink-0 size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12"
+                                                                                                         cy="12"
+                                                                                                         r="10"></circle><path
+                                    d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        @endif
+                    </span>
+                </div>
+
+                <div class="w-full">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">
+                        {{ $meetingUser->meeting->title }}
+                    </h3>
+                    <div class="mt-1 text-sm text-gray-700 dark:text-neutral-300 flex justify-between items-center">
+                            <span>
+                                {{'این جلسه که در تاریخ '}}
+                                    <span class="font-bold">{{$meetingUser->meeting->date}}</span>
+                                {{__('و در ساعت')}}
+                                    <span class="font-bold">{{$meetingUser->meeting->time}}</span>
+                                @if($meetingUser->meeting->is_present == '1')
+                                    {{__('که اینجانب قبول کردید، ')}}
+                                @elseif($meetingUser->meeting->is_present == '-1')
+                                    {{__('که اینجانب رد کردید، ')}}
                                 @endif
-                        </span>
-                        </div>
-                        <div class="ms-3 w-full">
-                            <h3 class="text-gray-800 font-semibold dark:text-white">
-                                {{$meetingUser->meeting->title}}
-                            </h3>
-                            <div
-                                class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">
-                                    <span>
-                                        {{'این جلسه که در تاریخ '}}
-                                        <span class="font-bold">{{$meetingUser->meeting->date}}</span>
-                                        {{__('و در ساعت')}}
-                                        <span class="font-bold">{{$meetingUser->meeting->time}}</span>
-                                        @if($meetingUser->meeting->is_present == '1')
-                                            {{__('که اینجانب قبول کردید، ')}}
-                                        @elseif($meetingUser->meeting->is_present == '-1')
-                                            {{__('که اینجانب رد کردید، ')}}
-                                        @endif
-                                        @if($meetingUser->meeting->is_cancelled == '1')
-                                            <span class="font-bold">{{__('لغو شد')}}</span>
-                                        @elseif($meetingUser->meeting->is_cancelled == '-1')
-                                            <span class="font-bold">{{__('برگزار میشود')}}</span>
-                                        @elseif($meetingUser->meeting->is_cancelled == '0')
-                                            <span class="font-bold">{{__('در حال بررسی است')}}</span>
-                                        @endif
+                                @if($meetingUser->meeting->is_cancelled == '1')
+                                    <span class="font-bold">{{__('لغو شد')}}</span>
+                                @elseif($meetingUser->meeting->is_cancelled == '-1')
+                                    <span class="font-bold">{{__('برگزار میشود')}}</span>
+                                @elseif($meetingUser->meeting->is_cancelled == '0')
+                                    <span class="font-bold">{{__('در حال بررسی است')}}</span>
+                                @endif
                                     </span>
-                                <x-primary-button
-                                    wire:click="markNotification({{$meetingUser->meeting->id}})">{{__('متوجه شدم')}}</x-primary-button>
-                            </div>
-                        </div>
+
+                        <x-primary-button wire:click="markNotification({{ $meetingUser->meeting->id }})">
+                            {{ __('متوجه شدم') }}
+                        </x-primary-button>
                     </div>
                 </div>
             </div>
-        @endif
+        </div>
     @endforeach
+    <span class="p-2 mx-2">
+            {{ $this->meetingUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
+        </span>
+    {{--    @foreach($this->meetingUsers as $meetingUser)--}}
+    {{--        @if(!MeetingUser::where('meeting_id',$meetingUser->meeting->id)->where('user_id',auth()->user()->id)->value('read_by_user'))--}}
+    {{--            <div class="mb-4">--}}
+    {{--                <div class="bg-teal-50 rounded-lg p-4 dark:bg-teal-800/30">--}}
+    {{--                    <div class="flex">--}}
+    {{--                        <div class="shrink-0">--}}
+    {{--                            <span--}}
+    {{--                                class="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">--}}
+    {{--                                 @if($meetingUser->meeting->is_present == 1)--}}
+    {{--                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
+    {{--                                         stroke-width="1.5" stroke="currentColor"--}}
+    {{--                                         class="shrink-0 size-4 text-green-600"><path stroke-linecap="round"--}}
+    {{--                                                                                      stroke-linejoin="round"--}}
+    {{--                                                                                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>--}}
+    {{--                                @else--}}
+    {{--                                    <svg class="shrink-0 size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg"--}}
+    {{--                                         width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"--}}
+    {{--                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12"--}}
+    {{--                                                                                                                 cy="12"--}}
+    {{--                                                                                                                 r="10"></circle><path--}}
+    {{--                                            d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>--}}
+    {{--                                @endif--}}
+    {{--                        </span>--}}
+    {{--                        </div>--}}
+    {{--                        <div class="ms-3 w-full">--}}
+    {{--                            <h3 class="text-gray-800 font-semibold dark:text-white">--}}
+    {{--                                {{$meetingUser->meeting->title}}--}}
+    {{--                            </h3>--}}
+    {{--                            <div--}}
+    {{--                                class="text-sm text-gray-700 flex justify-between items-center dark:text-neutral-400">--}}
+    {{--                                    <span>--}}
+    {{--                                        {{'این جلسه که در تاریخ '}}--}}
+    {{--                                        <span class="font-bold">{{$meetingUser->meeting->date}}</span>--}}
+    {{--                                        {{__('و در ساعت')}}--}}
+    {{--                                        <span class="font-bold">{{$meetingUser->meeting->time}}</span>--}}
+    {{--                                        @if($meetingUser->meeting->is_present == '1')--}}
+    {{--                                            {{__('که اینجانب قبول کردید، ')}}--}}
+    {{--                                        @elseif($meetingUser->meeting->is_present == '-1')--}}
+    {{--                                            {{__('که اینجانب رد کردید، ')}}--}}
+    {{--                                        @endif--}}
+    {{--                                        @if($meetingUser->meeting->is_cancelled == '1')--}}
+    {{--                                            <span class="font-bold">{{__('لغو شد')}}</span>--}}
+    {{--                                        @elseif($meetingUser->meeting->is_cancelled == '-1')--}}
+    {{--                                            <span class="font-bold">{{__('برگزار میشود')}}</span>--}}
+    {{--                                        @elseif($meetingUser->meeting->is_cancelled == '0')--}}
+    {{--                                            <span class="font-bold">{{__('در حال بررسی است')}}</span>--}}
+    {{--                                        @endif--}}
+    {{--                                    </span>--}}
+    {{--                                <x-primary-button--}}
+    {{--                                    wire:click="markNotification({{$meetingUser->meeting->id}})">{{__('متوجه شدم')}}</x-primary-button>--}}
+    {{--                            </div>--}}
+    {{--                        </div>--}}
+    {{--                    </div>--}}
+    {{--                </div>--}}
+    {{--            </div>--}}
+    {{--        @endif--}}
+    {{--    @endforeach--}}
 
     {{--                    <div class="p-4 h-auto">--}}
     {{--                        <div class="mx-auto bg-white w-full">--}}
@@ -179,9 +233,9 @@
     {{--                                            @endforeach--}}
     {{--                                        </x-slot>--}}
     {{--                                    </x-table.table>--}}
-{{--    <span class="p-2 mx-2">--}}
-{{--        {{ $this->meetings->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
-{{--    </span>--}}
+    {{--    <span class="p-2 mx-2">--}}
+    {{--        {{ $this->meetings->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
+    {{--    </span>--}}
     {{--                                </div>--}}
     {{--                            </div>--}}
     {{--                        </div>--}}

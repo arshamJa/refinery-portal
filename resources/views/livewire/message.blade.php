@@ -1,7 +1,6 @@
 @php use App\Models\MeetingUser; @endphp
 @php use App\Models\Meeting; @endphp
 <div wire:poll.visible.60s>
-
     <x-breadcrumb>
         <li class="flex items-center h-full">
             <a href="{{route('dashboard')}}"
@@ -26,13 +25,12 @@
         </li>
     </x-breadcrumb>
 
-    <div class="max-w-3xl">
-        @if(auth()->user()->user_info->create_meeting)
-            <div class="mb-8">
-                <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('نقش دبیرجلسه')}}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white rounded-xl shadow-md max-w-4xl">
+
+        @can('create-meeting')
+            <div class="col-span-full mb-8">
+                <h2 class="text-lg font-bold text-gray-800 border-b pb-1 mb-4">{{__('نقش دبیرجلسه')}}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-
                     <a href="{{route('invitations.result')}}"
                        class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow flex flex-col gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">
                         <p class="text-sm "> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</p>
@@ -42,7 +40,6 @@
                             </p>
                         @endif
                     </a>
-
                     <a href="{{route('task.sent')}}"
                        class="bg-[#FCF7F8] shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 flex flex-col items-start transition duration-300 ease-in-out p-4 rounded-lg">
                         <p class="text-sm "> {{__('اقدامات ارسال شده به دبیرجلسه')}}</p>
@@ -50,10 +47,10 @@
                     </a>
                 </div>
             </div>
-        @endif
+        @endcan
 
-        <div>
-            <h2 class="text-lg font-semibold mb-4 text-gray-800">{{__('نقش عضو جلسه')}}</h2>
+        <div class="col-span-full mt-8">
+            <h2 class="text-lg font-bold text-gray-800 border-b pb-1 mb-4">{{__('نقش عضو جلسه')}}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <a href="{{route('meeting.invitation')}}"
                    class="bg-[#FCF7F8] shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2  flex flex-col items-start transition duration-300 ease-in-out p-4 rounded-lg">
@@ -68,4 +65,6 @@
             </div>
         </div>
     </div>
+
+
 </div>

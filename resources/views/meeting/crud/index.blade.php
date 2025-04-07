@@ -63,7 +63,7 @@
             <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
                 <x-search-button>{{__('جست و جو')}}</x-search-button>
                 @if ($originalMeetingsCount != $filteredMeetingsCount)
-                    <x-view-all-link href="#">{{__('نمایش همه')}}</x-view-all-link>
+                    <x-view-all-link href="{{route('meeting.table')}}">{{__('نمایش همه')}}</x-view-all-link>
                 @endif
             </div>
         </form>
@@ -103,9 +103,9 @@
                                 <form action="{{route('meeting.destroy',$meeting->id)}}" method="post">
                                     @csrf
                                     @method('delete')
-                                    <x-dropdown-link type="submit">
+                                    <button type="submit" class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
                                         {{__('حذف')}}
-                                    </x-dropdown-link>
+                                    </button>
                                 </form>
                             </x-slot>
                         </x-dropdown>
