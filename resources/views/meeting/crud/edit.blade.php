@@ -54,38 +54,34 @@
         <form action="{{route('meeting.update',$meeting->id)}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('patch')
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
                 <div>
                     <x-input-label for="title" :value="__('موضوع جلسه')"/>
-                    <x-text-input name="title" id="title" value="{{$meeting->title}}"
-                                  class="block" type="text" autofocus/>
+                    <x-text-input name="title" id="title" value="{{$meeting->title}}" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('title')"/>
                 </div>
                 <div>
                     <x-input-label for="unit_organization" :value="__('انتخاب واحد سازمانی')"/>
                     <x-text-input name="unit_organization" id="unit_organization"
-                                  value="{{$meeting->unit_organization}}"
-                                  class="block" type="text" autofocus/>
+                                  value="{{$meeting->unit_organization}}" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('unit_organization')"/>
                 </div>
                 <div>
                     <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
                     <x-text-input name="scriptorium" id="scriptorium"
-                                  value="{{$meeting->scriptorium}}"
-                                  class="block" type="text" autofocus/>
+                                  value="{{$meeting->scriptorium}}" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('scriptorium')"/>
                 </div>
                 <div>
                     <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
                     <x-text-input name="location" id="location"
-                                  value="{{$meeting->location}}"
-                                  class="block" type="text" autofocus/>
+                                  value="{{$meeting->location}}" type="text" autofocus/>
 
                     <x-input-error :messages="$errors->get('location')"/>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
                 <div>
                     <x-input-label for="year" :value="__('سال')"/>
                     <select name="year" id="year" dir="ltr"
@@ -131,14 +127,12 @@
 
                 <div>
                     <x-input-label for="time" :value="__('ساعت جلسه')"/>
-                    <x-text-input name="time" id="time"
-                                  value="{{$meeting->time}}"
-                                  class="block" type="text" autofocus/>
+                    <x-text-input name="time" id="time" value="{{$meeting->time}}" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('time')"/>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
                 <div class="col-span-4">
                     <div class="mb-2">{{ __('اعضای جلسه فعلی') }}:</div>
                     <div class="flex flex-wrap gap-2">
@@ -200,73 +194,66 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
                 <div>
                     <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
-                    <x-text-input name="unit_held" id="unit_held"
-                                  value="{{$meeting->unit_held}}"
-                                  class="block" type="text" autofocus/>
+                    <x-text-input name="unit_held" id="unit_held" value="{{$meeting->unit_held}}" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('unit_held')"/>
                 </div>
                 <div>
                     <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
-                    <x-text-input name="applicant" value="{{$meeting->applicant}}"
-                                  id="applicant" class="block" type="text" autofocus/>
+                    <x-text-input name="applicant" value="{{$meeting->applicant}}" id="applicant" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('applicant')"/>
                 </div>
                 <div>
                     <x-input-label for="position_organization" :value="__('سمت سازمانی')"/>
-                    <x-text-input name="position_organization" id="position_organization"
-                                  value="{{$meeting->position_organization}}"
-                                  class="block" type="text" autofocus/>
+                    <x-text-input name="position_organization" id="position_organization" value="{{$meeting->position_organization}}" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('position_organization')"/>
                 </div>
                 <div>
                     <x-input-label for="reminder" :value="__('زمان جهت یادآوری')"/>
-                    <x-text-input name="reminder" value="{{$meeting->reminder}}"
-                                  id="reminder" class="block" type="text"
-                                  autofocus/>
+                    <x-text-input name="reminder" value="{{$meeting->reminder}}" id="reminder" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('reminder')"/>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 mt-2 gap-4">
                 <div class="col-span-1">
                     <x-input-label for="treat" :value="__('پذیرایی')"/>
                     <label for="yes">{{__('بلی')}}
-                        <input type="radio" name="treat" value="true">
+                        <input type="radio" name="treat" value="true" {{ old('treat', $meeting->treat) == 'true' ? 'checked' : '' }}>
                     </label>
                     <label for="no" class="mr-3">{{__('خیر')}}
-                        <input type="radio" name="treat" value="false">
+                        <input type="radio" name="treat" value="false"  {{ old('treat', $meeting->treat) == 'false' ? 'checked' : '' }}>
                     </label>
                     <x-input-error :messages="$errors->get('treat')"/>
                 </div>
                 <div class="col-span-1">
                     <x-input-label for="signature" :value="__('امضا')"/>
-                    <x-text-input name="signature" id="signature" class="block p-2"
-                                  type="file"
-                                  autofocus/>
+                    <x-text-input name="signature" id="signature" class="p-2" type="file" autofocus/>
                     <x-input-error :messages="$errors->get('signature')"/>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
                 <div class="col-span-4">
                     <div class="mb-2">{{ __('لیست مهمان فعلی:') }}</div>
-                    @foreach($meeting->guest as $index => $nameGuest)
-                        <div id="guest-{{ $index }}"
-                             class="flex items-center gap-4 p-2 bg-blue-100 rounded-md mb-1">
-                            <span>{{ $nameGuest }}</span>
-                            <button
-                                class="delete-guest bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-full"
-                                data-meeting-id="{{ $meeting->id }}" data-guest-index="{{ $index }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5" stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    @endforeach
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($meeting->guest as $index => $nameGuest)
+                            <div id="guest-{{ $index }}"
+                                 class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
+                                <span>{{ $nameGuest }}</span>
+                                <button
+                                    class="delete-guest bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-full"
+                                    data-meeting-id="{{ $meeting->id }}" data-guest-index="{{ $index }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
                 <div>
                     <div class="row py-2 col-span-2" x-data="handler()">
@@ -323,9 +310,6 @@
             </div>
         </form>
     </div>
-
-
-
 
 
     <script>

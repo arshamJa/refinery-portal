@@ -26,7 +26,7 @@
     <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
         <form method="GET" action="{{ route('scriptorium.report') }}" class="w-full">
             @csrf
-            <div class="grid gap-4 lg:grid-cols-6 items-end">
+            <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
                 <!-- Search Input -->
                 <div class="col-span-6 sm:col-span-3 lg:col-span-2">
                     <x-input-label for="search" value="{{ __('جست و جو') }}"/>

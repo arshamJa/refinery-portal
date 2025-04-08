@@ -121,8 +121,6 @@ class User extends Authenticatable
         }
         return false;
     }
-
-
     // use this for checking which user has a specific permission
     function userHasPermission($permission): bool
     {

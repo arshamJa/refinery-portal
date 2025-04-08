@@ -34,9 +34,9 @@
 
         <form method="GET" action="{{ route('meetingsList') }}" class="mb-4">
             @csrf
-            <div class="grid gap-4 lg:grid-cols-6 items-end">
+            <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
                 <!-- Search Input -->
-                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                <div class="col-span-6 lg:col-span-2">
                     <x-input-label for="search" value="{{ __('جست و جو') }}"/>
                     <x-search-input>
                         <x-text-input type="text" id="search" name="search"
@@ -46,7 +46,7 @@
                 </div>
 
                 <!-- Status Select -->
-                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                <div class="col-span-6 lg:col-span-1">
                     <x-input-label for="search" value="{{ __('وضعیت جلسه') }}"/>
                     <x-select-input name="is_cancelled" id="is_cancelled">
                         <option value="">...</option>
@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Search + Show All Buttons -->
-                <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
+                <div class="col-span-6 lg:col-span-3 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
                     <x-search-button>{{ __('جست و جو') }}</x-search-button>
                     @if ($originalMeetingsCount != $filteredMeetingsCount)
                         <x-view-all-link href="{{ route('meetingsList') }}">
