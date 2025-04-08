@@ -84,6 +84,15 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
         ->name('presentUsers');
 
 
+
+    // this is the export for scriptorium report table
+    Route::get('/scriptorium-report/export-excel', [ScriptoriumReportController::class, 'exportExcel'])
+        ->name('scriptorium.report.export.excel');
+
+
+
+
+
 });
 
 

@@ -54,4 +54,29 @@ class Meeting extends Model
     {
         return $this->hasMany(Task::class)->chaperone();
     }
+
+
+    // Scope for Scriptorium Report
+    public function scopeDateRange($query, $start, $end)
+    {
+        return $query->whereBetween('date', [$start, $end]);
+    }
+    public function scopeSearch($query, $term)
+    {
+        return $query->where(function ($q) use ($term) {
+            $q->where('title', 'like', "%{$term}%")
+                ->orWhere('unit_organization', 'like', "%{$term}%")
+                ->orWhere('scriptorium', 'like', "%{$term}%")
+                ->orWhere('location', 'like', "%{$term}%")
+                ->orWhere('date', 'like', "%{$term}%")
+                ->orWhere('time', 'like', "%{$term}%")
+                ->orWhere('unit_held', 'like', "%{$term}%")
+                ->orWhere('guest', 'like', "%{$term}%")
+                ->orWhere('applicant', 'like', "%{$term}%")
+                ->orWhere('position_organization', 'like', "%{$term}%");
+        });
+    }
+    // End of  Scope for Scriptorium Report
+
+
 }

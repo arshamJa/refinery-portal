@@ -2,57 +2,61 @@
 
 namespace App\Http\Controllers\Reports;
 
+use App\Exports\MeetingsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Meeting;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+
+
 
 class ScriptoriumReportController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Meeting::with(['meetingUsers' => function ($query) {
-            $query->select('meeting_id', 'user_id'); // Select only needed columns from MeetingUser
-        }, 'meetingUsers.user' => function ($query) {
-            $query->select('id'); // Select only needed columns from User
-        }, 'meetingUsers.user.user_info' => function ($query) {
-            $query->select('user_id', 'full_name'); // Select only needed columns from UserInfo
-        }])
-            ->where('scriptorium', auth()->user()->user_info->full_name)
-            ->where('is_cancelled', '=' , '-1')
-            ->select(['id', 'title', 'scriptorium', 'location', 'date', 'time']);
-        $originalMeetingsCount = $query->count(); // Count before any filtering
+        // Get the base filtered query
+        $query = $this->filteredMeetingsQuery($request);
 
-        // Date range filter
-        if ($request->filled(['start_date', 'end_date'])) {
-            $query->whereBetween('date', [$request->input('start_date'), $request->input('end_date')]);
-        }
-//        if ($request->filled('start_date') && $request->filled('end_date')) {
-//            $startDate = $request->input('start_date');
-//            $endDate = $request->input('end_date');
-//            $query->where('date', '>=', $startDate)
-//                ->where('date', '<=', $endDate);
-//        }
-        // Search filter
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('scriptorium', 'like', '%' . $search . '%')
-                    ->orWhere('location', 'like', '%' . $search . '%')
-                    ->orWhere('date', 'like', '%' . $search . '%');
-            });
-        }
-//        if (auth()->check() && auth()->user()->user_info) {
-//            $query->where('scriptorium', '=', auth()->user()->user_info->full_name);
-//        }
-//        $query->where('is_cancelled', '=', '-1');
+        // Paginate the filtered results
         $meetings = $query->paginate(5);
-        $filteredMeetingsCount = $meetings->total(); // Count after filtering
+
+        // Transform to add `holders` property
+        $meetings->getCollection()->transform(function ($meeting) {
+            $meeting->holders = $meeting->meetingUsers
+                ->map(fn($mu) => optional($mu->user->user_info)->full_name)
+                ->filter()
+                ->join(', ');
+            return $meeting;
+        });
 
         return view('reports.scriptorium-report', [
             'meetings' => $meetings,
-            'originalMeetingsCount' => $originalMeetingsCount,
-            'filteredMeetingsCount' => $filteredMeetingsCount
-            ]);
+        ]);
+    }
+    protected function filteredMeetingsQuery(Request $request)
+    {
+        // I used Scope in this function and scopeFunctions are in Meeting.php
+        return Meeting::with([
+            'meetingUsers:id,meeting_id,user_id',
+            'meetingUsers.user:id',
+            'meetingUsers.user.user_info:id,user_id,full_name',
+        ])
+            ->where('scriptorium', auth()->user()->user_info->full_name)
+            ->where('is_cancelled', '-1')
+            ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                $query->dateRange($request->start_date, $request->end_date);
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->search($request->search);
+            })
+            ->select(['id', 'title','unit_organization', 'scriptorium',
+                    'location', 'date', 'time','unit_held','guest','applicant','position_organization']);
+    }
+    public function exportExcel(Request $request)
+    {
+        $meetings = $this->filteredMeetingsQuery($request)
+            ->with('meetingUsers.user.user_info')
+            ->get();
+        return Excel::download(new MeetingsExport($meetings), 'meetings.xlsx');
     }
 }

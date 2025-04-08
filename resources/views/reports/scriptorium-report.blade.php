@@ -24,79 +24,106 @@
 
 
     <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
-        <form method="GET" action="{{route('scriptorium.report')}}">
+        <form method="GET" action="{{ route('scriptorium.report') }}" class="w-full">
             @csrf
-            <div class="grid grid-cols-2 items-end gap-4">
-                <div class="col-span-1 gap-4 grid grid-cols-2">
-                    <div>
-                        <x-input-label value="{{__('تاریخ شروع')}}" class="mb-2"/>
-                        <x-text-input name="start_date"/>
-                    </div>
-                    <div>
-                        <x-input-label value="{{__('تاریخ پایان')}}" class="mb-2"/>
-                        <x-text-input name="end_date"/>
-                    </div>
+            <div class="grid gap-4 lg:grid-cols-6 items-end">
+                <!-- Search Input -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                    <x-search-input>
+                        <x-text-input type="text" id="search" name="search"
+                                      class="block ps-10"
+                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                    </x-search-input>
                 </div>
-                <div class="relative">
-                    <div
-                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                             fill="currentColor" viewbox="0 0 20 20"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd"
-                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                  clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <x-text-input type="text" name="search"/>
-                </div>
-            </div>
 
-            <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
-                <x-search-button>{{__('جست و جو')}}</x-search-button>
-                @if ($originalMeetingsCount != $filteredMeetingsCount)
-                    <x-view-all-link href="{{route('scriptorium.report')}}">{{__('نمایش همه')}}</x-view-all-link>
-                @endif
+                <!-- Date Inputs (side-by-side) -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
+                            <x-date-input>
+                                <x-text-input id="start_date" name="start_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
+                        <div class="flex-1">
+                            <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
+                            <x-date-input>
+                                <x-text-input id="end_date" name="end_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search + Show All Buttons -->
+                <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
+                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                    @if(request()->has('search') || request()->has('start_date'))
+                        <x-view-all-link href="{{ route('scriptorium.report') }}">
+                            {{ __('نمایش همه') }}
+                        </x-view-all-link>
+                    @endif
+                </div>
+
+                <!-- Export Button under the right group -->
+                <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
+                    <x-export-link href="{{ route('scriptorium.report.export.excel', request()->query()) }}">
+                        {{ __('خروجی Excel') }}
+                    </x-export-link>
+                </div>
             </div>
         </form>
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead
-                class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th class="px-4 py-3">{{__('ردیف')}}</th>
-                <th class="px-4 py-3">{{__('نام دبیر')}}</th>
-                <th class="px-4 py-3">{{__('موضوع')}}</th>
-                <th class="px-4 py-3">{{__('تاریخ برگزاری')}}</th>
-                <th class="px-4 py-3">{{__('مکان')}}</th>
-                <th class="px-4 py-3">{{__('اعضای جلسه')}}</th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse($meetings as $meeting)
-                <tr class="px-4 py-3 border-b text-center">
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->location}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-pretty text-sm leading-5 text-coll-gray-900">
-                        @foreach($meeting->meetingUsers as $meetingUser)
-{{--                             i retrive this one from MeetingUser Models --}}
-                            {{$meetingUser->holders()}} ,
-                        @endforeach
-                    </td>
+
+
+        <div class="overflow-x-auto overflow-y-hidden">
+            <table class="min-w-[1000px] text-sm text-center text-gray-700 bg-white dark:bg-gray-800">
+                <thead
+                    class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    @foreach (['ردیف', 'نام دبیر','واحد سازمانی', 'موضوع جلسه',
+                                'تاریخ برگزاری','مکان','زمان','سمت سازمانی','واحد برگزار کننده',
+                                'درخواست دهنده جلسه','اعضای جلسه','مهمان'] as $th)
+                        <th class="px-4 py-3">{{ __($th) }}</th>
+                    @endforeach
                 </tr>
-            @empty
-                <tr class="border-b text-center">
-                    <td colspan="6" class="py-6">
-                        {{__('رکوردی یافت نشد...')}}
-                    </td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                @forelse($meetings as $meeting)
+                    <tr class="px-4 py-3 border-b">
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->scriptorium}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->unit_organization}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->title}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->date}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->time}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->location}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->position_organization}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->unit_held}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$meeting->applicant}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-pretty text-sm leading-5 text-coll-gray-900">
+                            {{ $meeting->holders }}
+                        </td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-pretty text-sm leading-5 text-coll-gray-900">
+                            @if($meeting->guest)
+                                @foreach($meeting->guest as $guestName)
+                                    {{$guestName}} ,
+                                @endforeach
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr class="border-b text-center">
+                        <td colspan="6" class="py-6">
+                            {{__('رکوردی یافت نشد...')}}
+                        </td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
         <span class="p-2 mx-2">
             {{$meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
         </span>
+
     </div>
 </x-app-layout>

@@ -1,54 +1,4 @@
 <x-app-layout>
-    <div class="overflow-x-auto bg-white p-4 rounded shadow">
-        <div class="flex flex-wrap gap-4 items-center mb-4 justify-between">
-            <div class="flex gap-2">
-                <select class="border border-gray-300 text-sm rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    <option>وضعیت جلسه</option>
-                    <option>تایید شده</option>
-                    <option>درحال بررسی</option>
-                </select>
-                <input type="text" placeholder="جستجوی موضوع، محل یا دبیر جلسه..."
-                       class="border border-gray-300 text-sm rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:outline-none w-64"/>
-            </div>
-            <button class="bg-blue-600 text-white text-sm rounded px-4 py-1.5 hover:bg-blue-700">جست و جو</button>
-        </div>
-
-        <table class="min-w-full text-xs text-right border border-gray-200">
-            <thead class="bg-gray-50 text-gray-600">
-            <tr class="border-b">
-                <th class="px-4 py-2">جلسات</th>
-                <th class="px-4 py-2">تاریخ</th>
-                <th class="px-4 py-2">ساعت</th>
-                <th class="px-4 py-2">مکان</th>
-                <th class="px-4 py-2">دبیر جلسه</th>
-                <th class="px-4 py-2">واحد برگزارکننده</th>
-                <th class="px-4 py-2">درخواست‌دهنده</th>
-                <th class="px-4 py-2">واحد سازمانی</th>
-                <th class="px-4 py-2">مشاهده اعضا</th>
-                <th class="px-4 py-2">حاضرین</th>
-                <th class="px-4 py-2">وضعیت جلسه</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="border-b hover:bg-gray-50">
-                <td class="px-4 py-2 font-bold text-indigo-700 whitespace-nowrap">جلسه دهم</td>
-                <td class="px-4 py-2">1404/07/20</td>
-                <td class="px-4 py-2">10:20</td>
-                <td class="px-4 py-2">ساختمان دوم</td>
-                <td class="px-4 py-2">لیث سادات</td>
-                <td class="px-4 py-2">کمیته تشکیل</td>
-                <td class="px-4 py-2">دکتر کورش بیگی</td>
-                <td class="px-4 py-2">واحد آی تی دو</td>
-                <td class="px-4 py-2 text-blue-600 hover:underline cursor-pointer">نمایش</td>
-                <td class="px-4 py-2">0</td>
-                <td class="px-4 py-2">
-                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">تایید شده</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -81,133 +31,122 @@
     </nav>
     <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
 
-        <form method="GET" action="{{ route('meetingsList') }}">
+
+        <form method="GET" action="{{ route('meetingsList') }}" class="mb-4">
             @csrf
-            <div class="grid grid-cols-2 items-end gap-4">
-                <div class="relative">
-                    <div
-                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                             fill="currentColor" viewbox="0 0 20 20"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd"
-                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                  clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <x-text-input type="text" name="search"/>
+            <div class="grid gap-4 lg:grid-cols-6 items-end">
+                <!-- Search Input -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                    <x-search-input>
+                        <x-text-input type="text" id="search" name="search"
+                                      class="block ps-10"
+                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                    </x-search-input>
                 </div>
-                <select name="is_cancelled"
-                        class="text-sm bg-white w-2/3 border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                    <option>{{__('وضعیت جلسه')}}</option>
-                    <option value="0">{{__('در حال بررسی ...')}}</option>
-                    <option value="-1">{{__('تایید شده')}}</option>
-                    <option value="1">{{__('لغو شده')}}</option>
-                </select>
-            </div>
-            <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
-                <x-search-button>{{__('جست و جو')}}</x-search-button>
-                @if ($originalMeetingsCount != $filteredMeetingsCount)
-                    <x-view-all-link href="{{route('meetingsList')}}">{{__('نمایش همه')}}</x-view-all-link>
-                @endif
+
+                <!-- Status Select -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <x-input-label for="search" value="{{ __('وضعیت جلسه') }}"/>
+                    <x-select-input name="is_cancelled" id="is_cancelled">
+                        <option value="">...</option>
+                        <option value="0">{{ __('در حال بررسی ...') }}</option>
+                        <option value="-1">{{ __('تایید شده') }}</option>
+                        <option value="1">{{ __('لغو شده') }}</option>
+                    </x-select-input>
+                </div>
+
+                <!-- Search + Show All Buttons -->
+                <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
+                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                    @if ($originalMeetingsCount != $filteredMeetingsCount)
+                        <x-view-all-link href="{{ route('meetingsList') }}">
+                            {{ __('نمایش همه') }}
+                        </x-view-all-link>
+                    @endif
+                </div>
             </div>
         </form>
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead
-                class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3">
-                    {{__('جلسات')}}
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    {{__('دبیرجلسه')}}
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    {{__('تاریخ')}}
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    {{__('مکان')}}
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    {{__('ساعت')}}
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    {{__('حاضرین')}}
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    {{__('مشاهده اعضا')}}
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    {{__('وضعیت جلسه')}}
-                </th>
-                <th scope="col" class="px-6 py-3"></th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse($meetings as $meeting)
-                <tr class="relative text-center border-b dark:border-gray-700">
-                    <th scope="row"
-                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+
+        <div class="overflow-x-auto overflow-y-hidden">
+            <table class="min-w-[1000px] w-full text-sm text-center text-gray-700 bg-white dark:bg-gray-800">
+                <thead
+                    class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    @foreach (['جلسات', 'دبیرجلسه','تاریخ','ساعت','مکان',
+                               'حاضرین','مشاهده اعضا','وضعیت جلسه'] as $th)
+                        <th class="px-4 py-3">{{ __($th) }}</th>
+                    @endforeach
+                    <th scope="col" class="px-6 py-3"></th>
+                </tr>
+                </thead>
+                <tbody>
+                @forelse($meetings as $meeting)
+                    <tr class="relative text-center border-b dark:border-gray-700">
+                        <th scope="row"
+                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             {{$meeting->title}}
-{{--                        @if($meeting->tasks->where('request_task',!null)->value('request_task'))--}}
-{{--                            <span class="absolute right-2 top-1/2 -translate-y-1/2 flex h-3 w-3"><span--}}
-{{--                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span--}}
-{{--                                    class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span></span>--}}
-{{--                        @endif--}}
-                    </th>
-                    <td class="px-6 py-4">
-                        {{$meeting->scriptorium}}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{$meeting->date}}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{$meeting->location}}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{$meeting->time}}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{$meeting->meetingUsers->where('meeting_id',$meeting->id)->where('is_present','1')->count()}}
-                    </td>
-                    <td class="px-6 py-4">
-                        <a href="{{route('presentUsers',$meeting->id)}}"
-                           class="hover:underline font-bold text-black"> {{__('نمایش')}}</a>
-                    </td>
-                    <td class="px-6 py-4">
-                        @if($meeting->is_cancelled == '0')
-                            {{__('درحال بررسی...')}}
-                        @elseif($meeting->is_cancelled == '1')
-                            {{__('جلسه لغو شد')}}
-                        @elseif($meeting->is_cancelled == '-1')
-                            {{__('جلسه تشکیل میشود')}}
-                        @endif
-                    </td>
-                    <td class="px-6 py-4">
-                        {{-- Display the "Add Tasks" button based on the condition --}}
-                        @if($meeting->is_cancelled == -1 && (!isset($allUsersHaveTasks[$meeting->id]) || $allUsersHaveTasks[$meeting->id] === false))
-                            <a href="{{ route('tasks.create', $meeting->id) }}">
-                                <x-primary-button>
-                                    {{ __('افزودن اقدامات') }}
-                                </x-primary-button>
-                            </a>
-                        @elseif((isset($allUsersHaveTasks[$meeting->id]) && $allUsersHaveTasks[$meeting->id]))
-                            <p>{{__('اقدامات برای تمامی اعضا ارسال شد')}}</p>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr class="border-b dark:border-gray-700">
-                    <th colspan="8"
-                        class="text-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                        {{__('رکوردی یافت نشد ...')}}
-                    </th>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
+                            {{--                        @if($meeting->tasks->where('request_task',!null)->value('request_task'))--}}
+                            {{--                            <span class="absolute right-2 top-1/2 -translate-y-1/2 flex h-3 w-3"><span--}}
+                            {{--                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span--}}
+                            {{--                                    class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span></span>--}}
+                            {{--                        @endif--}}
+                        </th>
+                        <td class="px-6 py-4">
+                            {{$meeting->scriptorium}}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{$meeting->date}}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{$meeting->time}}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{$meeting->location}}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{$meeting->meetingUsers->where('meeting_id',$meeting->id)->where('is_present','1')->count()}}
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{route('presentUsers',$meeting->id)}}"
+                               class="hover:underline font-bold text-black"> {{__('نمایش')}}</a>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($meeting->is_cancelled == '0')
+                                {{__('درحال بررسی...')}}
+                            @elseif($meeting->is_cancelled == '1')
+                                {{__('جلسه لغو شد')}}
+                            @elseif($meeting->is_cancelled == '-1')
+                                {{__('جلسه تشکیل میشود')}}
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
+                            {{-- Display the "Add Tasks" button based on the condition --}}
+                            @if($meeting->is_cancelled == -1 && (!isset($allUsersHaveTasks[$meeting->id]) || $allUsersHaveTasks[$meeting->id] === false))
+                                <a href="{{ route('tasks.create', $meeting->id) }}">
+                                    <x-primary-button>
+                                        {{ __('افزودن اقدامات') }}
+                                    </x-primary-button>
+                                </a>
+                            @elseif((isset($allUsersHaveTasks[$meeting->id]) && $allUsersHaveTasks[$meeting->id]))
+                                <p>{{__('اقدامات برای تمامی اعضا ارسال شد')}}</p>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr class="border-b dark:border-gray-700">
+                        <th colspan="8"
+                            class="text-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                            {{__('رکوردی یافت نشد ...')}}
+                        </th>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
         <span class="p-2 mx-2">
-           {{ $meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
-       </span>
+                {{ $meetings->withQueryString()->links(data:['scrollTo'=>false]) }}
+        </span>
+
     </div>
 </x-app-layout>
