@@ -23,39 +23,11 @@ class TaskManagementController extends Controller
     {
         return view('task.index');
     }
-//    private function areAllTasksAssignedToAllEmployees($tasks, $employees)
-//    {
-//        if ($employees->isEmpty() || $tasks->isEmpty()) {
-//            return true; // No employees or tasks, so consider all assigned.
-//        }
-//        foreach ($tasks as $task) {
-//            foreach ($employees as $employee) {
-//                // Check if the task is assigned to the employee
-//                if (!$this->isTaskAssignedToEmployee($task, $employee)) {
-//                    return false; // If any task is not assigned, return false
-//                }
-//            }
-//        }
-//        return true; // All tasks are assigned to all employees
-//    }
-//    private function isTaskAssignedToEmployee(Task $task, MeetingUser $employee)
-//    {
-//        return DB::table('tasks')
-//            ->where('id', $task->id)
-//            ->where('user_id', $employee->user_id)
-//            ->exists();
-//    }
-
     /**
      * Show the form for creating a new resource.
      */
     public function create(string $meeting)
     {
-
-//        $meetings = Meeting::find($meeting);
-//        $employees = MeetingUser::where('meeting_id',$meeting)->get();
-//        $tasks = Task::with('user')->where('meeting_id',$meeting)->get();
-
         $meetings = Meeting::find($meeting);
 
         $employees = MeetingUser::with('user.user_info') // Eager load user and userInfo
@@ -65,8 +37,6 @@ class TaskManagementController extends Controller
         $tasks = Task::with('user.user_info') // Eager load user and userInfo
         ->where('meeting_id', $meeting)
             ->get();
-
-
 
         return view('task.create' , [
             'meetings' => $meetings,
@@ -88,7 +58,7 @@ class TaskManagementController extends Controller
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],
-            'body' => ['required','string']
+            'body' => ['required', 'string', 'min:5']
         ]);
         $gr_day = now()->day;
         $gr_month = now()->month;
@@ -103,11 +73,12 @@ class TaskManagementController extends Controller
             ($request->year < $ja_year) ||
             ($request->year == $ja_year && $request->month < $ja_month) ||
             ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day)
-        ){
+        ) {
             throw ValidationException::withMessages([
-                'year' => 'تاریخ گذشته نباید باشد'
+                'year' => 'تاریخ نمی‌تواند در گذشته باشد.'
             ]);
         }
+
         $new_month = sprintf("%02d", $request->month);
         $new_day = sprintf("%02d", $request->day);
         $newTime = $request->year . '/' . $new_month . '/' . $new_day;

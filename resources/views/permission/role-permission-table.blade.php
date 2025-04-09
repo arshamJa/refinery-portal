@@ -75,7 +75,7 @@
                         <tbody>
                         @forelse($roles as $role)
                             <tr class="px-4 py-3 border-b text-center">
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
+                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$role->name}}</td>
                                 <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
                                     @foreach($role->permissions as $permission)

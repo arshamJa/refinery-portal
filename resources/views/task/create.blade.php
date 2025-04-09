@@ -1,9 +1,6 @@
 @php use App\Models\UserInfo; @endphp
 <x-app-layout>
-
-
     <x-sessionMessage name="status"/>
-    {{--    <x-template>--}}
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -39,34 +36,26 @@
             </li>
         </ol>
     </nav>
-    <div class="border-2 p-4 bg-gray-100 rounded-md" dir="rtl">
+    <div class="p-6 max-w-6xl bg-white rounded-2xl shadow-md space-y-6">
         <form action="{{route('tasks.store', $meetings->id)}}" method="post" enctype="multipart/form-data">
             @csrf
-            <div class="grid grid-cols-3 gap-4 max-w-full pb-4 border-b border-gray-300">
-                <p>{{__('واحد/کمیته')}} : {{$meetings->unit_held}}</p>
-                <p>{{__('تهیه کننده')}} : {{$meetings->scriptorium}}</p>
-                <p>{{__('پیوست')}} : {{__('پیوست')}}</p>
-                <p>{{__('تاریخ جلسه')}} : {{$meetings->date}}</p>
-                <p>{{__('زمان جلسه')}} : {{$meetings->time}}</p>
-                <p>{{__('مکان جلسه')}} : {{$meetings->location}}</p>
-            </div>
-            <div class="flex flex-col gap-y-2 my-2 pb-4 border-b border-gray-300">
-                    <span>
-                        {{__('موضوع جلسه')}} : {{$meetings->title}}
-                    </span>
-                <span>{{__('حاضرین')}} :
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                <div><strong>{{__('واحد/کمیته:')}}</strong>{{$meetings->unit_held}}</div>
+                <div><strong>{{__('تهیه کننده:')}}</strong>{{$meetings->scriptorium}}</div>
+                <div><strong>{{__('پیوست:')}}</strong> {{__('پیوست')}}</div>
+                <div><strong>{{__('تاریخ جلسه:')}}</strong>{{$meetings->date}}</div>
+                <div><strong>{{__('زمان جلسه:')}}</strong>{{$meetings->time}}</div>
+                <div><strong>{{__('مکان جلسه:')}}</strong>{{$meetings->location}}</div>
+                <div class="col-span-2"><strong>{{__('موضوع جلسه:')}}</strong> {{$meetings->title}}</div>
+                <div class="col-span-2 mb-2"><strong>{{__('حاضرین:')}}</strong>
                     @foreach ($employees as $employee)
                         {{ $employee->user->user_info->full_name }} -
                     @endforeach
-                </span>
+                </div>
             </div>
-
-
-            <div class="max-w-full">
-                <div class="mt-4 grid grid-cols-2 gap-x-3">
-
-
-                    <div class="sm:col-span-1">
+            <div class="border-t pt-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
                         <x-input-label for="holders" class="mb-2"
                                        :value="__('اقدام کننده')"/>
                         <div class="custom-select">
@@ -106,16 +95,14 @@
                         <x-input-error :messages="$errors->get('holders')" class="my-2"/>
                     </div>
 
-
-                    <div class="my-2 col-span-1">
+                    <div>
                         <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
                         <div class="flex gap-2">
                             <div class="w-full">
                                 <div class="flex items-center gap-1">
-                                    <label for="month" class="block text-gray-700 text-sm">{{__('سال:')}}</label>
                                     <select name="year" id="year" dir="ltr"
                                             class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                        <option value="">...</option>
+                                        <option value="">{{__(':سال')}}</option>
                                         @for($i = 1404; $i <= 1430; $i++)
                                             <option value="{{$i}}" @if (old('year') == $i) selected @endif>
                                                 {{$i}}
@@ -130,10 +117,9 @@
                                     @php
                                         $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
                                     @endphp
-                                    <label for="month" class="block text-gray-700 text-sm">{{__('ماه:')}}</label>
                                     <select name="month" id="month" dir="ltr"
                                             class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                        <option value="">...</option>
+                                        <option value="">{{__(':ماه')}}</option>
                                         @for ($i = 1; $i <= 12; $i++)
                                             <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
                                                 {{ $persian_months[$i - 1] }}
@@ -145,10 +131,9 @@
                             </div>
                             <div class="w-full">
                                 <div class="flex items-center gap-1">
-                                    <label for="day" class="block text-gray-700 text-sm">{{__('روز:')}}</label>
                                     <select name="day" id="day" dir="ltr"
                                             class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                        <option value="">...</option>
+                                        <option value="">{{__(':روز')}}</option>
                                         @for($i = 1; $i <= 31; $i++)
                                             <option value="{{$i}}" @if (old('day') == $i) selected @endif>
                                                 {{$i}}
@@ -159,67 +144,44 @@
                                 <x-input-error :messages="$errors->get('day')" class="my-2"/>
                             </div>
                         </div>
-
-                        {{--                            <x-text-input name="time_out" value="{{old('time_out')}}" id="time_out"--}}
-                        {{--                                          class="block my-2 w-full" type="text" autofocus/>--}}
-                        {{--                            <x-input-error :messages="$errors->get('time_out')" class="my-2"/>--}}
                     </div>
+                </div>
 
-                    {{--                        <div class="my-2 col-span-1">--}}
-                    {{--                            <x-input-label for="title" :value="__('عنوان')" class="mb-2"/>--}}
-                    {{--                            <x-text-input name="title" id="title"--}}
-                    {{--                                          class="block my-2 w-full" type="text" autofocus/>--}}
-                    {{--                            <x-input-error :messages="$errors->get('title')" class="my-2"/>--}}
-                    {{--                        </div>--}}
-
-                    <div class="my-2 col-span-2">
-                        <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" class="mb-2"/>
-                        <textarea type="text" name="body"
-                                  class="flex w-full h-auto min-h-[80px] px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                <div>
+                    <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" class="mb-2"/>
+                    <textarea type="text" name="body" rows="4"
+                              class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                             {{old('body')}}
                         </textarea>
-                        <x-input-error :messages="$errors->get('body')" class="mt-2"/>
-                    </div>
+                    <x-input-error :messages="$errors->get('body')" class="mt-2"/>
+                </div>
 
-                    {{--                        <div class="my-2 col-span-1">--}}
-                    {{--                        <x-input-label for="date" :value="__('تاریخ ارسال شده')" class="my-2"/>--}}
-                    {{--                        <x-text-input name="date" id="date"--}}
-                    {{--                                      class="block my-2 w-full" type="text" autofocus/>--}}
-                    {{--                        <x-input-error :messages="$errors->get('date')" class="my-2"/>--}}
-                    {{--                        </div>--}}
-                    {{--                            <x-input-label for="file" :value="__('فایل')" class="my-2"/>--}}
-                    {{--                            <input name="files" multiple--}}
-                    {{--                                   class="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"--}}
-                    {{--                                   id="file" type="file">--}}
-                    {{--                            <x-input-error :messages="$errors->get('files')" class="my-2"/>--}}
-
+                <div class="flex space-x-2 rtl:space-x-reverse">
+                    <x-primary-button type="submit">
+                        {{ __('ارسال') }}
+                    </x-primary-button>
+                    <a href="{{route('meetingsList')}}">
+                        <x-secondary-button>
+                            {{__('لغو')}}
+                        </x-secondary-button>
+                    </a>
                 </div>
             </div>
-            <div class="mt-6">
-                <x-primary-button type="submit">
-                    {{ __('ارسال') }}
-                </x-primary-button>
-                <a href="{{route('meetingsList')}}">
-                    <x-secondary-button>
-                        {{__('لغو')}}
-                    </x-secondary-button>
-                </a>
-            </div>
-        </form>
-    </div>
 
-    <div class="my-6" dir="rtl">
-        <x-table.table>
-            <x-slot name="head">
-                <th class="px-4 py-3">{{__('ردیف')}}</th>
-                <th class="px-4 py-3">{{__('خلاصه مذاکرات و تصمیمات اتخاذ شده')}}</th>
-                <th class="px-4 py-3">{{__('مهلت اقدام')}}</th>
-                <th class="px-4 py-3">{{__('اقدام کننده')}}</th>
-                {{--                <th class="px-4 text-center">{{__('وضعیت')}}</th>--}}
-            </x-slot>
-            <x-slot name="body">
+        </form>
+        <div class="mt-6 border-t pt-4">
+            <table class="w-full text-right text-sm">
+                <thead>
+                <tr class="bg-gray-100 text-gray-700">
+                    @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده'] as $th)
+                        <th class="px-4 py-3">{{ __($th) }}</th>
+                    @endforeach
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Sample row -->
                 @foreach($tasks as $task)
-                    <tr class="px-4 py-3 border-b text-center">
+                    <tr class="border-t">
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
@@ -232,13 +194,9 @@
                         {{--                        </td>--}}
                     </tr>
                 @endforeach
-            </x-slot>
-        </x-table.table>
-        {{--            <nav--}}
-        {{--                class="flex flex-col md:flex-row mt-14 justify-between items-start md:items-center space-y-3 md:space-y-0 p-4">--}}
-        {{--                {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
-        {{--            </nav>--}}
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    {{--    </x-template>--}}
 </x-app-layout>

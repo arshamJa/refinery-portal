@@ -39,45 +39,51 @@
     <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
         <form method="GET" action="{{route('tasksWithDelay')}}">
             @csrf
-            <div class="grid grid-cols-2 items-end gap-4">
-                <div class="col-span-1 gap-4 grid grid-cols-2">
-                    <div>
-                        <x-input-label value="{{__('تاریخ شروع')}}" class="mb-2"/>
-                        <x-text-input name="start_date"/>
-                    </div>
-                    <div>
-                        <x-input-label value="{{__('تاریخ پایان')}}" class="mb-2"/>
-                        <x-text-input name="end_date"/>
+            <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
+                <!-- Search Input -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                    <x-search-input>
+                        <x-text-input type="text" id="search" name="search"
+                                      class="block ps-10"
+                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                    </x-search-input>
+                </div>
+
+                <!-- Date Inputs (side-by-side) -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
+                            <x-date-input>
+                                <x-text-input id="start_date" name="start_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
+                        <div class="flex-1">
+                            <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
+                            <x-date-input>
+                                <x-text-input id="end_date" name="end_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
                     </div>
                 </div>
-                <div class="relative">
-                    <div
-                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                             fill="currentColor" viewbox="0 0 20 20"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd"
-                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                  clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <x-text-input type="text" name="search" placeholder="جست و جو..."/>
+
+                <!-- Search + Show All Buttons -->
+                <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
+                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                    @if(request()->has('search') || request()->has('start_date'))
+                        <x-view-all-link href="{{route('tasksWithDelay')}}">
+                            {{ __('نمایش همه') }}
+                        </x-view-all-link>
+                    @endif
                 </div>
-            </div>
-            <div class="w-full flex gap-4 items-center pl-4 py-2 mt-1">
-                <button type="submit"
-                        class="inline-flex gap-1 items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
-                    </svg>
-                    {{__('فیلتر')}}
-                </button>
-                <a href="{{route('tasksWithDelay')}}"
-                   class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    {{__('نمایش همه')}}
-                </a>
+                <!-- Export Button under the right group -->
+                <!-- For Completed Tasks With Delay -->
+                <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
+                    <x-export-link href="{{ route('tasks.report.completed.withDelay.download', request()->query()) }}">
+                        {{ __('خروجی Excel') }}
+                    </x-export-link>
+                </div>
             </div>
         </form>
 
@@ -86,19 +92,16 @@
             <thead
                 class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th class="px-4 py-3">{{__('ردیف')}}</th>
-                <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
-                <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
-                <th class="px-4 py-3">{{__('افدام کننده')}}</th>
-                <th class="px-4 py-3">{{__('تاریخ انجام اقدام')}}</th>
-                <th class="px-4 py-3">{{__('تاریخ مهلت اقدام')}}</th>
-                <th class="px-4 py-3">{{__('مدت زمان تاخیر')}}</th>
+                @foreach (['ردیف', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
+                               'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان تاخیر'] as $th)
+                    <th class="px-4 py-3">{{ __($th) }}</th>
+                @endforeach
             </tr>
             </thead>
             <tbody>
             @forelse($tasks as $task)
                 <tr class="px-4 py-3 border-b text-center" wire:key="{{$task->id}}">
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->full_name()}}</td>

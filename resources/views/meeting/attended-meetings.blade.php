@@ -58,19 +58,16 @@
             <thead
                 class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th class="px-4 py-3">{{__('ردیف')}}</th>
-                <th class="px-4 py-3">{{__('موضوع جلسه')}}</th>
-                <th class="px-4 py-3">{{__('دبیر جلسه')}}</th>
-                <th class="px-4 py-3">{{__('تاریخ جلسه')}}</th>
-                <th class="px-4 py-3">{{__('مهلت اقدام')}}</th>
-                <th class="px-4 py-3">{{__('تاریخ انجام اقدام')}}</th>
+                @foreach (['ردیف', 'موضوع جلسه','دبیر جلسه', 'تاریخ جلسه','مهلت اقدام','تاریخ انجام اقدام'] as $th)
+                    <th class="px-4 py-3">{{ __($th) }}</th>
+                @endforeach
                 <th class="px-4 text-center"></th>
             </tr>
             </thead>
             <tbody>
             @forelse($tasks as $task)
                 <tr class="px-4 py-3 border-b text-center">
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
+                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->date}}</td>

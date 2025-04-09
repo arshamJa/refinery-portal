@@ -86,11 +86,11 @@
                         <th scope="row"
                             class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             {{$meeting->title}}
-                            {{--                        @if($meeting->tasks->where('request_task',!null)->value('request_task'))--}}
-                            {{--                            <span class="absolute right-2 top-1/2 -translate-y-1/2 flex h-3 w-3"><span--}}
-                            {{--                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span--}}
-                            {{--                                    class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span></span>--}}
-                            {{--                        @endif--}}
+                                                    @if($meeting->tasks->where('request_task',!null)->value('request_task'))
+                                                        <span class="absolute right-2 top-1/2 -translate-y-1/2 flex h-3 w-3"><span
+                                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span
+                                                                class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span></span>
+                                                    @endif
                         </th>
                         <td class="px-6 py-4">
                             {{$meeting->scriptorium}}
@@ -121,7 +121,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            {{-- Display the "Add Tasks" button based on the condition --}}
+{{--                             Display the "Add Tasks" button based on the condition--}}
                             @if($meeting->is_cancelled == -1 && (!isset($allUsersHaveTasks[$meeting->id]) || $allUsersHaveTasks[$meeting->id] === false))
                                 <a href="{{ route('tasks.create', $meeting->id) }}">
                                     <x-primary-button>
@@ -150,3 +150,4 @@
 
     </div>
 </x-app-layout>
+

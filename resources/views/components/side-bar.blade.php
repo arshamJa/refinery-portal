@@ -22,10 +22,10 @@
                         {{ __('Samael') }}
                     @elseif (auth()->user()->hasRole('ادمین'))
                         {{__('ادمین')}}
-                    @elseif (auth()->user()->hasRole(\App\UserRole::OPERATOR->value))
-                        {{ \App\UserRole::OPERATOR->value }}
-                    @elseif (auth()->user()->hasRole(\App\UserRole::USER->value))
-                        {{ \App\UserRole::USER->value }}
+                    @elseif (auth()->user()->hasRole(UserRole::OPERATOR->value))
+                        {{ UserRole::OPERATOR->value }}
+                    @elseif (auth()->user()->hasRole(UserRole::USER->value))
+                        {{ UserRole::USER->value }}
                     @endif
                 @endif
             </p>

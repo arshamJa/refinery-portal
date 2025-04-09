@@ -20,9 +20,9 @@
     @livewireStyles
     <link rel="stylesheet" href="{{asset('style.css')}}">
     <link rel="stylesheet" href="{{asset('multiSelect.css')}}">
-{{--    <link rel="stylesheet" href="{{asset('richText.css')}}">--}}
-{{--    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>--}}
-{{--    <script src="{{asset('jalali-moment.js')}}" ></script>--}}
+    {{--    <link rel="stylesheet" href="{{asset('richText.css')}}">--}}
+    {{--    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>--}}
+    {{--    <script src="{{asset('jalali-moment.js')}}" ></script>--}}
     <script src="{{asset('flowBiteChart.js')}}"></script>
 </head>
 <body>

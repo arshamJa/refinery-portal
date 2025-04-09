@@ -12,6 +12,9 @@ class MeetingListController extends Controller
 {
     public function index(Request $request)
     {
+
+        $userFullName = auth()->user()->user_info->full_name;
+
         $query = Meeting::with([
             'meetingUsers' => function ($query) {
                 $query->select('meeting_id', 'user_id', 'is_present');
@@ -26,7 +29,7 @@ class MeetingListController extends Controller
                 $query->whereNotNull('request_task')->select('meeting_id', 'request_task');
             }
         ])
-            ->where('scriptorium', auth()->user()->user_info->full_name)
+            ->where('scriptorium', $userFullName)
             ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'reminder', 'is_cancelled']);
         $originalMeetingsCount = $query->count(); // Count before any filtering
 
@@ -53,7 +56,6 @@ class MeetingListController extends Controller
         $allUsersHaveTasks = []; // Initialize the array outside the loop
         foreach ($meetings as $meeting) {
             $userIds = $meeting->meetingUsers->pluck('user_id')->toArray(); // Get user IDs directly from relationship
-
             if (empty($userIds)) {
                 $allUsersHaveTasks[$meeting->id] = false;
             } else {
@@ -75,4 +77,5 @@ class MeetingListController extends Controller
             'filteredMeetingsCount' => $filteredMeetingsCount
             ]);
     }
+
 }

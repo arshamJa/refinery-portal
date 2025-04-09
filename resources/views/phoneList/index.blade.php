@@ -79,7 +79,7 @@
                     @forelse($userInfos as $userInfo)
                         <tr class="py-3 border-b text-center">
                             <td class="py-4 whitespace-no-wrap text-sm leading-5">
-                                {{ $loop->index+1 }}
+                                {{$loop->iteration}}
                             </td>
                             <td class="py-4 whitespace-no-wrap text-sm leading-5">
                                 {{ $userInfo->department->department_name ?? 'بدون واحد'}}
