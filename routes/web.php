@@ -3,9 +3,12 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SendInvitationToReplacementController;
+use App\Livewire\admin\AdminDashboard;
 use App\Livewire\admin\EmployeeAccess;
+use App\Livewire\employee\EmployeeDashboard;
 use App\Livewire\employee\EmployeesOrganization;
 use App\Livewire\Message;
+use App\Livewire\operator\OperatorDashboard;
 use App\Livewire\TranslatePage;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +35,23 @@ Route::middleware('auth')->group(function () {
     Route::view('dashboard', 'dashboard')
         ->middleware(['auth', 'verified'])
         ->name('dashboard');
+
+
+//    Route::middleware(['auth', 'role:ادمین,super_admin'])->group(function () {
+//        Route::get('/admin/dashboard', AdminDashboard::class)->name('dashboard');
+//    });
+//
+//    Route::middleware(['auth', 'role:اپراتور'])->group(function () {
+//        Route::get('/operator/dashboard', OperatorDashboard::class)->name('operator.dashboard');
+//    });
+//
+//    Route::middleware(['auth', 'role:کاربر'])->group(function () {
+//        Route::get('/employee/dashboard', EmployeeDashboard::class)->name('dashboard');
+//    });
+
+
+
+
 
 
     // Employee-Access-Table Route

@@ -27,8 +27,8 @@ Route::middleware(['auth'])->group(function () {
 
 
     // route to participantsTask
-    Route::get('participants/task', [ParticipantsTaskController::class, 'index'])
-        ->name('participants.task');
+//    Route::get('participants/task', [ParticipantsTaskController::class, 'index'])
+//        ->name('participants.task');
 
     // sent tasks by participants to their scriptorium
     Route::get('/tasks/sent', TaskSent::class)->name('task.sent');

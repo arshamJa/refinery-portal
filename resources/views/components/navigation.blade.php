@@ -1,20 +1,16 @@
 <header
     class="absolute top-0 right-0 md:px-12 px-4 md:mr-64 md:border-b left-0 z-50 pt-4 mb-20 flex justify-between items-center">
     <nav class="hidden md:flex items-center gap-x-10 w-full">
-        <x-link.link href="{{route('dashboard')}}" :active="request()->is('dashboard')"
-                     class="text-gray-800 hover:text-blue-500">
+        <x-link.link href="{{route('dashboard')}}" :active="request()->is('dashboard')">
             {{__('داشبورد')}}
         </x-link.link>
-        <x-link.link href="{{route('translate')}}" :active="request()->is('translate')"
-                     class="text-gray-800 hover:text-blue-500">
+        <x-link.link href="{{route('translate')}}" :active="request()->is('translate')">
             {{__('دیکشنری')}}
         </x-link.link>
-        <x-link.link href="{{route('blogs.index')}}" :active="request()->is('blogs')"
-                     class="text-gray-800 hover:text-blue-500">
+        <x-link.link href="{{route('blogs.index')}}" :active="request()->is('blogs')">
             {{__('اخبار و اطلاعیه')}}
         </x-link.link>
-        <x-link.link href="{{route('phone-list.index')}}" :active="request()->is('phone-list')"
-                     class="text-gray-800 hover:text-blue-500">
+        <x-link.link href="{{route('phone-list.index')}}" :active="request()->is('phone-list')">
             {{__('دفترچه تلفنی')}}
         </x-link.link>
     </nav>

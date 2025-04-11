@@ -42,7 +42,6 @@ class MeetingNotification extends Component
             'user.user_info:user_id,full_name'
         ])
             ->where('user_id', auth()->id())
-            ->where('is_present','==' , 0)
             ->where('read_by_user', false)
             ->latest('created_at')
             ->select('id', 'meeting_id', 'user_id', 'is_present', 'reason_for_absent', 'read_by_user')

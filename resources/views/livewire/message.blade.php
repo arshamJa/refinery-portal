@@ -48,7 +48,6 @@
                 </div>
             </div>
         @endcan
-
         <div class="col-span-full mt-8">
             <h2 class="text-lg font-bold text-gray-800 border-b pb-1 mb-4">{{__('نقش عضو جلسه')}}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

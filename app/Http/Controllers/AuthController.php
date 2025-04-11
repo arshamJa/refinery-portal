@@ -32,7 +32,21 @@ class AuthController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
+
+        $user = auth()->user();
+
         return redirect()->intended(route('dashboard'));
+
+//        return match(true) {
+//            $user->hasRole(UserRole::ADMIN->value),
+//            $user->hasRole(UserRole::SUPER_ADMIN->value) => redirect()->route('admin.dashboard'),
+//
+//            $user->hasRole(UserRole::OPERATOR->value) => redirect()->route('operator.dashboard'),
+//
+//            $user->hasRole(UserRole::USER->value) => redirect()->route('employee.dashboard'),
+//
+//            default => abort(403), // Or redirect to a fallback page
+//        };
     }
     public function registrationPage()
     {

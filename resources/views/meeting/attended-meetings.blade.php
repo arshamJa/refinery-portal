@@ -74,13 +74,13 @@
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
                     <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date}}</td>
                     <td class="px-4 py-3">
-                        @if($tasks && !$task->is_completed)
+{{--                        @if($tasks && !$task->is_completed)--}}
                             <a href="{{route('task.list',$task->meeting->id)}}">
                                 <x-primary-button>
                                     {{__('نمایش اقدامات')}}
                                 </x-primary-button>
                             </a>
-                        @endif
+{{--                        @endif--}}
                     </td>
                 </tr>
             @empty

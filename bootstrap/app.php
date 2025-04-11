@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'operatorMiddleware' => \App\Http\Middleware\OperatorMiddleware::class,
             'employeeMiddleware' => \App\Http\Middleware\EmployeeMiddleware::class,
             'sanitizeInputs' => \App\Http\Middleware\SanitizeInputMiddleware::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
 //            \Illuminate\Http\Middleware\TrustHosts::class,
         ]);
 

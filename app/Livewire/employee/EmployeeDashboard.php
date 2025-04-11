@@ -20,9 +20,7 @@ use Nette\Schema\ValidationException;
 class EmployeeDashboard extends Component
 {
 
-    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
-    public $meetingTitle;
-    public $meeting_id;
+    use MeetingsTasks, MessageReceived;
 
 
     #[Computed]
@@ -56,17 +54,6 @@ class EmployeeDashboard extends Component
             ->count();
     }
 
-
-    /**
-     * this is for scriptoriums only
-     */
-//    #[Computed]
-//    public function meetingNotifications()
-//    {
-//        return Meeting::where('scriptorium',auth()->user()->user_info->full_name)
-//            ->where('is_cancelled','-1')
-//            ->get(['title','location','date','time']);
-//    }
     #[Computed]
     public function meetingsSchedule()
     {
@@ -75,52 +62,10 @@ class EmployeeDashboard extends Component
             ->whereRelation('meetingUsers','user_id','=',auth()->user()->id)
             ->get(['title','location','date','time']);
     }
-
     #[Computed]
     public function invitation()
     {
         return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
-    }
-    public function acceptMeeting($meetingId)
-    {
-        $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '-1';
-        $meeting->save();
-        return redirect()->back();
-    }
-
-    public function openModalDelete($meetingId)
-    {
-        $this->meetingTitle = Meeting::where('id',$meetingId)->value('title');
-        $this->meeting_id = $meetingId;
-        $this->dispatch('crud-modal', name: 'delete');
-    }
-    public function denyMeeting($meetingId)
-    {
-        $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '1';
-        $meeting->save();
-        $this->close();
-    }
-    public function accept($meetingId)
-    {
-        MeetingUser::where('user_id', auth()->user()->id)->where('meeting_id', $meetingId)->update([
-            'is_present' => '1'
-        ]);
-        return redirect()->back();
-    }
-
-    public function deny($meetingId)
-    {
-        MeetingUser::where('user_id', auth()->user()->id)->where('meeting_id', $meetingId)->update([
-            'is_present' => '-1'
-        ]);
-        return redirect()->back();
-    }
-    public function close()
-    {
-        $this->dispatch('close-modal');
-        return redirect()->back();
     }
 
 }

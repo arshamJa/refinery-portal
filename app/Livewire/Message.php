@@ -4,13 +4,14 @@ namespace App\Livewire;
 
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Models\Task;
 use App\Traits\MessageReceived;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class Message extends Component
 {
-//    use MessageReceived;
+    use MessageReceived;
 
     public function render()
     {
@@ -26,10 +27,7 @@ class Message extends Component
     #[Computed]
     public function read_by_user()
     {
-        return MeetingUser::whereHas('meeting', function ($query) {
-            $query->where('is_cancelled', '!=', 0);
-        })
-            ->where('user_id', auth()->id())
+        return MeetingUser::where('user_id', auth()->id())
             ->where('read_by_user', false)
             ->count();
     }
@@ -38,16 +36,11 @@ class Message extends Component
     {
         $fullName = auth()->user()->user_info->full_name;
 
-        return \App\Models\Task::whereHas('meeting', function ($query) use ($fullName) {
+        return Task::whereHas('meeting', function ($query) use ($fullName) {
             $query->where('scriptorium', $fullName);
         })
             ->where('is_completed', true)
             ->count();
-    }
-    #[Computed]
-    public function meetingCount()
-    {
-        return Meeting::where('scriptorium', auth()->user()->user_info->full_name)->count();
     }
     #[Computed]
     public function unreadMeetingUsersCount()
@@ -58,6 +51,11 @@ class Message extends Component
                 $query->where('scriptorium', auth()->user()->user_info->full_name);
             })
             ->count();
+    }
+    #[Computed]
+    public function meetingCount()
+    {
+        return Meeting::where('scriptorium', auth()->user()->user_info->full_name)->count();
     }
 
 

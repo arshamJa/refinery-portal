@@ -1,10 +1,7 @@
-@php use App\Models\MeetingUser; @endphp
-
 <div>
-
-    <x-template>
-        something
-{{--        <livewire:operator.phone-list/>--}}
-    </x-template>
-
+    @if(auth()->id() == 3)
+        id = {{auth()->id()}}, operator phone
+    @elseif(auth()->id() == 4)
+        id = {{auth()->id()}}, operator news
+    @endif
 </div>
