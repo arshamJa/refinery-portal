@@ -1,4 +1,4 @@
-@php use App\UserRole; @endphp
+@php use App\Enums\UserRole; @endphp
 <x-app-layout>
     @if (auth()->user()->hasRole(UserRole::ADMIN->value) ||
         auth()->user()->hasRole(UserRole::SUPER_ADMIN->value))

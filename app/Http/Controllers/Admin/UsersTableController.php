@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreNewUserRequest;
+use App\Http\Requests\UpdateNewUserRequest;
 use App\Models\Department;
 use App\Models\Organization;
 use App\Models\Permission;
@@ -11,7 +12,6 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Traits\UserSearchTrait;
-use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Hash;
 class UsersTableController extends Controller
 {
     use UserSearchTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -33,15 +34,20 @@ class UsersTableController extends Controller
         $query = UserInfo::with([
             'user:id,p_code',
             'department:id,department_name',
-            'user.roles:id,name'
+            'user.roles:id,name',
+            'user.permissions:id,name'
         ])
             ->where('full_name', '!=', 'Arsham Jamali')
             ->select(['id', 'user_id', 'department_id', 'full_name', 'n_code', 'position']);
 
+
+         $originalUsersCount = $query->count();
         // Get role list with filtering
         $roles = Role::select(['id', 'name'])
             ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
             ->get();
+
+        $permissions = Permission::select(['id', 'name'])->get();
 
 
         $query = $this->applyUserSearch($request, $query); // Use the trait
@@ -49,10 +55,27 @@ class UsersTableController extends Controller
         // Apply filtering and pagination
         $users = $this->applyUserSearch($request, $query)->paginate(5)->appends($request->except('page'));
 
-        return view('users.index',[
-           'userInfos' => $users , 'roles' => $roles ,
-            'originalUsersCount' => $query->count(),
-            'filteredUsersCount' => $users->total(),
+        // Attach merged permissions to each UserInfo object
+        foreach ($users as $userInfo) {
+            $userModel = $userInfo->user;
+            if ($userModel) {
+                $rolePermissions = $userModel->roles->flatMap->permissions;
+                $directPermissions = $userModel->permissions;
+                $allPermissions = $rolePermissions->merge($directPermissions)->unique('id')->pluck('name');
+                $userInfo->all_permissions = $allPermissions; // Virtual property for Blade
+            } else {
+                $userInfo->all_permissions = collect(); // Empty collection fallback
+            }
+        }
+        $filteredUsersCount = $users->total();
+
+
+        return view('users.index', [
+            'userInfos' => $users,
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'originalUsersCount' => $originalUsersCount,
+            'filteredUsersCount' => $filteredUsersCount,
         ]);
     }
 
@@ -62,15 +85,19 @@ class UsersTableController extends Controller
     public function create()
     {
         Gate::authorize('createNewUser', UserInfo::class);
-        $roles = Role::all();
-        $permissions = Permission::all();
-        return view('users.create' , [
-            'departments' => Department::all(),
+        $user = auth()->user();
+        $roles = Role::select(['id', 'name'])
+            ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
+            ->get();
+        $permissions = Permission::select(['id', 'name'])->get();
+        $departments = Department::select(['id','department_name'])->get();
+
+        return view('users.create', [
+            'departments' => $departments,
             'roles' => $roles,
             'permissions' => $permissions
         ]);
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -106,25 +133,15 @@ class UsersTableController extends Controller
         foreach ($organizations as $organization) {
             $organization->users()->attach($newUser->id);
         }
-        return to_route('users.index')->with('status','کاربر جدید ساخته شد');
+        return to_route('users.index')->with('status', 'کاربر جدید ساخته شد');
     }
+
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-//        $userInfo = UserInfo::findOrFail($id);
-//        Gate::authorize('viewUsers', $userInfo);
-//
-//        $user = User::with('organizations:id,organization_name', 'permissions', 'roles:id,name')
-//            ->findOrFail($userInfo->user_id);
-//
-//        return view('users.show', [
-//            'userInfo' => $userInfo,
-//            'user' => $user,
-//            'userRoles' => $user->roles,
-//        ]);
         $userInfo = UserInfo::findOrFail($id);
         Gate::authorize('viewUsers', $userInfo);
 
@@ -159,7 +176,7 @@ class UsersTableController extends Controller
         $userInfo = UserInfo::with(['user:id,p_code', 'department:id,department_name'])
             ->findOrFail($id);
 
-        Gate::authorize('updateUsers',$userInfo);
+        Gate::authorize('updateUsers', $userInfo);
 
         // Fetch departments and permissions
         $departments = Department::select(['id', 'department_name'])->get();
@@ -169,23 +186,28 @@ class UsersTableController extends Controller
         $user = User::with('roles:id,name', 'permissions:id,name')
             ->findOrFail($userInfo->user_id);
 
+        $roles = Role::select(['id', 'name'])
+            ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
+            ->get();
+
         return view('users.edit', [
             'userInfo' => $userInfo,
             'departments' => $departments,
             'user' => $user,
-            'roles' => $user->roles,
+            'roles' => $roles,
             'permissions' => $permissions,
         ]);
     }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreNewUserRequest $request, string $id)
+    public function update(UpdateNewUserRequest $request, string $id)
     {
-        $request->validated();
+//        $request->validated();
 
         $userInfo = UserInfo::findOrFail($id);
-        Gate::authorize('updateUsers', $userInfo);
+//        Gate::authorize('updateUsers', $userInfo);
 
         $user = User::findOrFail($userInfo->user_id);
 
@@ -195,7 +217,7 @@ class UsersTableController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $role = Role::where('name', $request->role)->firstOrFail();
+        $role = Role::find($request->role);
         // Sync role (only one role in your dropdown)
         if ($request->filled('role')) {
             $user->syncRoles([$role->id]);
@@ -229,73 +251,6 @@ class UsersTableController extends Controller
         }
 
         return redirect()->route('users.index')->with('success', 'کاربر با موفقیت بروزرسانی شد.');
-//        $request->validated();
-//        $userInfo = UserInfo::findOrFail($id);
-//        Gate::authorize('updateUsers', $userInfo);
-//        $user = User::find($userInfo->user_id);
-//
-//        $user->update([
-//            'role' => $request->role, // Make sure roles are synced, not just set
-//            'password' => Hash::make($request->password),
-//            'p_code' => $request->p_code
-//        ]);
-//
-//        // Sync roles and permissions properly (if needed)
-//        $user->syncRoles([$request->role]);
-//        $user->syncPermissions($request->permissions);
-//
-//        $userInfo->update([
-//            'user_id' => $user->id,
-//            'department_id' => $request->departmentId,
-//            'full_name' => $request->full_name,
-//            'work_phone' => $request->work_phone,
-//            'house_phone' => $request->house_phone,
-//            'phone' => $request->phone,
-//            'n_code' => $request->n_code,
-//            'position' => $request->position
-//        ]);
-//
-//        $department = Department::find($request->departmentId);
-//        $organizations = Organization::where('department_id', $department->id)->get();
-//
-//        // Sync user with the organizations
-//        foreach ($organizations as $organization) {
-//            // Use `syncWithoutDetaching` to ensure the pivot is updated correctly
-//            $organization->users()->syncWithoutDetaching([$user->id]);
-//        }
-
-//        $request->validated();
-//        $userInfo = UserInfo::findOrFail($id);
-//        Gate::authorize('updateUsers',$userInfo);
-//        $user = User::find($userInfo->user_id);
-//        $user->role = $request->role;
-//        $user->password = Hash::make($request->password);
-//        $user->p_code = $request->p_code;
-//        $user->save();
-//        $userInfo->user_id = $user->id;
-//        $userInfo->department_id = $request->departmentId;
-//        $userInfo->full_name = $request->full_name;
-//        $userInfo->work_phone = $request->work_phone;
-//        $userInfo->house_phone = $request->house_phone;
-//        $userInfo->phone = $request->phone;
-//        $userInfo->n_code = $request->n_code;
-//        $userInfo->position = $request->position;
-//        $userInfo->save();
-//        $departments = Department::find($request->departmentId);
-//        $organizations = Organization::where('department_id',$departments->id)->get();
-//        foreach ($organizations as $organization){
-//            if (DB::table('organization_user')
-//                ->where('organization_id',$organization->id)
-//                ->where('user_id',$user->id)
-//                ->exists())
-//            {
-//                $organization->users()->updateExistingPivot($user->id, [
-//                    'updated_at' => now(),
-//                ]);
-//            }else{
-//                $organization->users()->attach($user->id);
-//            }
-//        }
     }
 
     /**

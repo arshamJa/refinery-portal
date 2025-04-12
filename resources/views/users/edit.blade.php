@@ -93,7 +93,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
 
                     <div>
-                        @if($userInfo->department->department_name)
+                        @if($userInfo->department?->department_name)
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             {{__('دپارتمان فعلی:')}}
                         </label>

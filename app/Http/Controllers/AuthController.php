@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
-use App\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -32,21 +32,7 @@ class AuthController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-
-        $user = auth()->user();
-
         return redirect()->intended(route('dashboard'));
-
-//        return match(true) {
-//            $user->hasRole(UserRole::ADMIN->value),
-//            $user->hasRole(UserRole::SUPER_ADMIN->value) => redirect()->route('admin.dashboard'),
-//
-//            $user->hasRole(UserRole::OPERATOR->value) => redirect()->route('operator.dashboard'),
-//
-//            $user->hasRole(UserRole::USER->value) => redirect()->route('employee.dashboard'),
-//
-//            default => abort(403), // Or redirect to a fallback page
-//        };
     }
     public function registrationPage()
     {

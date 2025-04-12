@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Models\Department;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserInfo;
-use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 
 class OrgDepManagementController extends Controller
 {
@@ -26,18 +24,32 @@ class OrgDepManagementController extends Controller
 
         $originalUsersCount = (clone $query)->count(); // Clone to get unfiltered count
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->whereHas('user_info.department', function ($department) use ($search) {
-                $department->where('department_name', 'like', '%'.$search.'%');
-            })
-                ->orWhereHas('organizations', function ($org) use ($search) {
-                    $org->where('organization_name', 'like', '%'.$search.'%');
-                })
-                ->orWhereHas('user_info', function ($userInfoQuery) use ($search) {
-                    $userInfoQuery->where('full_name', 'like', '%'.$search.'%');
-                });
+        if (
+            $request->filled('full_name') ||
+            $request->filled('department_name') ||
+            $request->filled('organization')
+        ) {
+            $query->where(function ($q) use ($request) {
+                if ($request->filled('full_name')) {
+                    $q->whereHas('user_info', function ($userInfoQuery) use ($request) {
+                        $userInfoQuery->where('full_name', 'like', '%' . $request->input('full_name') . '%');
+                    });
+                }
+
+                if ($request->filled('department_name')) {
+                    $q->whereHas('user_info.department', function ($departmentQuery) use ($request) {
+                        $departmentQuery->where('department_name', 'like', '%' . $request->input('department_name') . '%');
+                    });
+                }
+
+                if ($request->filled('organization')) {
+                    $q->whereHas('organizations', function ($orgQuery) use ($request) {
+                        $orgQuery->where('organization_name', 'like', '%' . $request->input('organization') . '%');
+                    });
+                }
+            });
         }
+
         $users = $query->paginate(5)->appends(['search' => $request->input('search')]);
         $filteredUsersCount = $users->total();
 

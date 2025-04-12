@@ -81,7 +81,7 @@
             <tbody>
             @forelse($meetings as $meeting)
                 <tr class="px-4 py-3 border-b text-center">
-                    <td class="px-4 py-4">{{$loop->index+1}}</td>
+                    <td class="px-4 py-4">{{ $loop->iteration }}</td>
                     <td class="px-4 py-4">{{$meeting->title}}</td>
                     <td class="px-4 py-4">{{$meeting->scriptorium}}</td>
                     <td class="px-4 py-4">{{$meeting->date}}</td>

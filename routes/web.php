@@ -55,8 +55,8 @@ Route::middleware('auth')->group(function () {
 
 
     // Employee-Access-Table Route
-    Route::get('employee/access', EmployeeAccess::class)
-        ->name('employeeAccess');
+//    Route::get('employee/access', EmployeeAccess::class)
+//        ->name('employeeAccess');
 
     Route::get('/translate', TranslatePage::class)
         ->name('translate')

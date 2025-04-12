@@ -26,7 +26,6 @@
     </nav>
 
     <div class="grid grid-cols-2 gap-4 place-content-around">
-
         <div>
             <div class="grid grid-cols-1 mb-4 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
                 <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,11 +30,24 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        // Default rules
+        $rules = [
             'p_code' => ['required', 'numeric', 'digits:6', 'exists:users,p_code'],
             'password' => ['required', 'string', 'digits:8'],
             'remember' => ['boolean'],
         ];
+
+        if ($this->isSuperAdmin()) {
+            $rules['password'] = ['required', 'string','max:30'];
+            $rules['p_code'] = ['required', 'string','max:30'];
+        }
+
+        return $rules;
+    }
+    protected function isSuperAdmin(): bool
+    {
+        $user = User::where('p_code', $this->input('p_code'))->first();
+        return $user && $user->hasRole(UserRole::SUPER_ADMIN->value);
     }
 
     /**

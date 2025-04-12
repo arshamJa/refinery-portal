@@ -39,7 +39,7 @@
         @endcan
     </nav>
     <!-- Start coding here -->
-    <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
+    <div class="bg-white px-3 relative shadow-md sm:rounded-lg overflow-hidden">
         <form method="GET" action="{{ route('users.index') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 px-3 pt-3">
                 <div>
@@ -63,6 +63,10 @@
                     <x-text-input type="text" name="department_name" id="department_name"/>
                 </div>
                 <div>
+                    <x-input-label for="permission_name">{{ __('نام قابلیت') }}</x-input-label>
+                    <x-text-input type="text" name="permission_name" id="permission_name"/>
+                </div>
+                <div>
                     <x-label for="role">{{ __('نقش') }}</x-label>
                     <select name="role" id="role"
                             class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full">
@@ -82,72 +86,97 @@
             </div>
         </form>
 
-        <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
-            <table class="w-full text-sm text-left mb-6 rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead
-                    class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <div class="pt-4 overflow-x-auto overflow-y-hidden sm:pt-6 bg-white pb-10">
+            <table class="w-full text-sm min-w-[1000px] bg-white mb-6 text-gray-700">
+                <thead class="text-sm text-center text-gray-800 uppercase bg-gray-100">
                 <tr>
-                    @foreach (['ردیف', 'نقش', 'نام و نام خانوادگی', 'کد پرسنلی','کد ملی', 'سمت', 'دپارتمان','قابلیت'] as $th)
-                        <th class="px-4 py-3">{{ __($th) }}</th>
+                    @foreach (['ردیف', 'نقش', 'نام و نام خانوادگی', 'سطح دسترسی', 'کد پرسنلی', 'کد ملی', 'سمت', 'دپارتمان', 'قابلیت'] as $th)
+                        <th class="px-4 py-3 font-semibold">{{ __($th) }}</th>
                     @endforeach
                 </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-center">
                 @forelse($userInfos as $userInfo)
-                    <tr class="px-4 py-3 border-b text-center">
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            {{ $userInfo->user->roles->pluck('name')->implode(', ') }}
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="px-4 py-4 text-sm text-gray-900">{{ ($userInfos->currentPage() - 1) * $userInfos->perPage() + $loop->iteration }}</td>
+
+                        {{-- Roles as colored badges --}}
+                        <td class="px-4 py-4 space-x-1">
+                          <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                           @if($userInfo->user->roles && $userInfo->user->roles->isNotEmpty())
+                                  {{ $userInfo->user->roles->pluck('name')->implode(', ') }}
+                              @else
+                                  {{ __('بدون نقش') }}
+                              @endif
+                          </span>
                         </td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->full_name}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->user->p_code}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->n_code}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$userInfo->position}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+
+                        <td class="px-4 py-4 text-sm text-gray-900">{{ $userInfo->full_name }}</td>
+
+                        {{-- Permissions as green badges --}}
+                        <td class="px-4 py-4 max-w-xs break-words">
+                            @forelse($userInfo->all_permissions as $permission)
+                                <span
+                                    class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full m-0.5">
+                                    {{ $permission }}
+                                </span>
+                            @empty
+                                <span class="text-xs text-gray-400">ندارد</span>
+                            @endforelse
+                        </td>
+
+                        <td class="px-4 py-4 text-sm text-gray-900">{{ $userInfo->user->p_code }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-900">{{ $userInfo->n_code }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-900">{{ $userInfo->position }}</td>
+
+                        <td class="px-4 py-4 text-sm text-gray-900">
                             {{ $userInfo->department->department_name ?? __('دپارتمان وجود ندارد') }}
                         </td>
-                        <td class="px-4 py-4 whitespace-no-wrap flex flex-row justify-center gap-x-2 text-sm leading-5 text-coll-gray-900">
-                            @can('viewUserTable',UserInfo::class)
+
+                        {{-- Action Dropdown --}}
+                        <td class="px-4 py-4 flex justify-center">
+                            @can('viewUserTable', UserInfo::class)
                                 <x-dropdown>
                                     <x-slot name="trigger">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                             class="size-6 hover:cursor-pointer">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                                        </svg>
+                                        <button class="hover:bg-gray-200 rounded-full p-1 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                 class="w-5 h-5 text-gray-600">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                            </svg>
+                                        </button>
                                     </x-slot>
                                     <x-slot name="content">
-                                        <x-dropdown-link
-                                            href="{{route('users.show',$userInfo->id)}}">
-                                            {{__('نمایش')}}
+                                        <x-dropdown-link href="{{ route('users.show', $userInfo->id) }}">
+                                            {{ __('نمایش') }}
                                         </x-dropdown-link>
-                                        <x-dropdown-link
-                                            href="{{route('users.edit',$userInfo->id)}}">
-                                            {{__('ویرایش')}}
+                                        <x-dropdown-link href="{{ route('users.edit', $userInfo->id) }}">
+                                            {{ __('ویرایش') }}
                                         </x-dropdown-link>
-                                        {{--                                    @can('delete',$userInfo)--}}
-                                        <button wire:click="openModalDelete({{$userInfo->id}})"
-                                                class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
-                                            {{__('حذف')}}
+                                        <button wire:click="openModalDelete({{ $userInfo->id }})"
+                                                class="block w-full px-4 py-2 text-start text-sm text-red-600 hover:bg-red-100">
+                                            {{ __('حذف') }}
                                         </button>
-                                        {{--                                    @endcan--}}
                                     </x-slot>
                                 </x-dropdown>
-                        @endcan
+                            @endcan
+                        </td>
                     </tr>
                 @empty
-                    <tr class="px-4 py-3 border-b text-center">
-                        <td colspan="8" class="py-6">
-                            {{__('رکوردی یافت نشد...')}}
+                    <tr class="border-b text-center">
+                        <td colspan="9" class="px-4 py-6 text-gray-400">
+                            {{ __('رکوردی یافت نشد...') }}
                         </td>
                     </tr>
                 @endforelse
                 </tbody>
             </table>
-            <span class="p-2 mx-2">
-                {{ $userInfos->withQueryString()->links(data:['scrollTo'=>false]) }}
-            </span>
+
+            <div class="p-2 mx-2">
+                {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
+            </div>
         </div>
+
     </div>
 </x-app-layout>

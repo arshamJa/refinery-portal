@@ -1,4 +1,4 @@
-@php use App\UserRole; @endphp
+@php use App\Enums\UserRole; @endphp
 <div>
     <div class=" text-sm flex flex-col justify-center items-center mb-4">
         <div>
@@ -58,17 +58,7 @@
                 {{__('لیست سامانه')}}
             </x-link.responsive-link>
         @endif
-
         @can('side-bar-notifications')
-            <x-link.responsive-link href="{{route('organizations')}}"
-                                    :active="request()->is('organizations')" class="flex items-center gap-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
-                </svg>
-                {{__('لیست سامانه')}}
-            </x-link.responsive-link>
             <x-link.responsive-link href="{{route('users.index')}}"
                                     :active="request()->is('users/table')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -88,16 +78,16 @@
                 </svg>
                 {{__('مدیریت سامانه/دپارتمان')}}
             </x-link.responsive-link>
-            <x-link.responsive-link
-                href="{{Illuminate\Support\Facades\URL::signedRoute('employeeAccess')}}"
-                :active="request()->is('employee/access')" class="flex items-center gap-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z"/>
-                </svg>
-                {{__('جدول دسترسی کاربران')}}
-            </x-link.responsive-link>
+{{--            <x-link.responsive-link--}}
+{{--                href="{{Illuminate\Support\Facades\URL::signedRoute('employeeAccess')}}"--}}
+{{--                :active="request()->is('employee/access')" class="flex items-center gap-x-2">--}}
+{{--                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+{{--                     stroke="currentColor" class="size-5">--}}
+{{--                    <path stroke-linecap="round" stroke-linejoin="round"--}}
+{{--                          d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z"/>--}}
+{{--                </svg>--}}
+{{--                {{__('جدول دسترسی کاربران')}}--}}
+{{--            </x-link.responsive-link>--}}
             <x-link.responsive-link href="{{route('role.permission.table')}}"
                                     :active="request()->is('roles/permissions')" class="flex items-center gap-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -105,16 +95,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M10.05 4.575a1.575 1.575 0 1 0-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 0 1 3.15 0v1.5m-3.15 0 .075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 0 1 3.15 0V15M6.9 7.575a1.575 1.575 0 1 0-3.15 0v8.175a6.75 6.75 0 0 0 6.75 6.75h2.018a5.25 5.25 0 0 0 3.712-1.538l1.732-1.732a5.25 5.25 0 0 0 1.538-3.712l.003-2.024a.668.668 0 0 1 .198-.471 1.575 1.575 0 1 0-2.228-2.228 3.818 3.818 0 0 0-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0 1 16.35 15m.002 0h-.002"/>
                 </svg>
-                {{__('مدیریت نقش / دسترسی')}}
-            </x-link.responsive-link>
-            <x-link.responsive-link href="{{route('meeting.report')}}"
-                                    :active="request()->is('meeting/report')" class="flex items-center gap-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"/>
-                </svg>
-                {{__('داشبورد جلسات')}}
+                {{__('مدیریت نقش و دسترسی')}}
             </x-link.responsive-link>
         @endcanany
 

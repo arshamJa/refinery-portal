@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,11 +20,10 @@ class PermissionSeeder extends Seeder
         $superAdminUser = User::find(1);
         if (!$superAdminUser) {
             $superAdminUser = User::create([
-                'password' => Hash::make('Samael'),
-                'p_code' => Hash::make('SamaelProgrammer'),
+                'password' => 'Samael.Programmer',
+                'p_code' => 'Samael',
             ]);
         }
-
         // Create Roles
         $superAdminRole = Role::create(['name' => UserRole::SUPER_ADMIN->value]);
         $adminRole = Role::create(['name' => UserRole::ADMIN->value]);

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Http\Requests\StorePhoneRequest;
 use App\Models\Role;
-use App\Models\User;
 use App\Models\UserInfo;
-use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 

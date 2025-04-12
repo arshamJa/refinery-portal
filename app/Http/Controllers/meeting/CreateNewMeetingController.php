@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\meeting;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\meeting\MeetingStoreRequest;
 use App\Http\Requests\MeetingUpdateRequest;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
-use App\Models\Task;
 use App\Models\User;
 use App\Models\UserInfo;
-use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -70,12 +69,10 @@ class CreateNewMeetingController extends Controller
     public function store(MeetingStoreRequest $request)
     {
         $request->validated();
-        $jalaliNow = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-        $jaYear = $jalaliNow[0];
-        $jaMonth = $jalaliNow[1];
-        $jaDay = $jalaliNow[2];
+        // Convert current Gregorian date to Jalali
+        [$jaYear, $jaMonth, $jaDay] = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
-        // this is for not selecting the past
+        // Prevent selecting past dates
         if ($request->year < $jaYear ||
             ($request->year == $jaYear && $request->month < $jaMonth) ||
             ($request->year == $jaYear && $request->month == $jaMonth && $request->day < $jaDay)
@@ -83,11 +80,8 @@ class CreateNewMeetingController extends Controller
             throw ValidationException::withMessages(['year' => 'تاریخ گذشته نباید باشد']);
         }
 
-        // two lines below will check if the month and day is one digit , which will add 0 before it .
-        $new_month = sprintf("%02d", $request->month);
-        $new_day = sprintf("%02d", $request->day);
-
-        $newDate = $request->year . '/' . $new_month . '/' . $new_day;
+        // Format date correctly
+        $newDate = sprintf('%04d/%02d/%02d', $request->year, $request->month, $request->day);
 
 
         if (Meeting::where('date', $newDate)->where('time', $request->time)->exists()) {
@@ -273,72 +267,6 @@ class CreateNewMeetingController extends Controller
         if (!empty($newMeetingUsers)) {
             MeetingUser::insert($newMeetingUsers);
         }
-//        $request->validated();
-//
-//        $jalaliNow = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-//        $jaYear = $jalaliNow[0];
-//        $jaMonth = $jalaliNow[1];
-//        $jaDay = $jalaliNow[2];
-//
-//        // this is for not selecting the past
-//        if ($request->year < $jaYear ||
-//            ($request->year == $jaYear && $request->month < $jaMonth) ||
-//            ($request->year == $jaYear && $request->month == $jaMonth && $request->day < $jaDay)
-//        ) {
-//            throw ValidationException::withMessages(['year' => 'تاریخ گذشته نباید باشد']);
-//        }
-//
-//        // two lines below will check if the month and day is one digit , which will add 0 before it .
-//        $new_month = sprintf("%02d", $request->month);
-//        $new_day = sprintf("%02d", $request->day);
-//        $newDate = $request->year . '/' . $new_month . '/' . $new_day;
-//
-//        $meeting = Meeting::findOrFail($id);
-//        $holders =  Str::of($request->holders)->split('/[\s,]+/');
-//
-//        if ($meeting->signature && file_exists(public_path('storage/' . $meeting->signature))) {
-//            unlink(public_path('storage/' . $meeting->signature));
-//        }
-//
-//        $new_signature_path = $request->signature->store('signatures','public');
-//
-//        $meeting->title = $request->title;
-//        $meeting->unit_organization = $request->unit_organization;
-//        $meeting->scriptorium = $request->scriptorium;
-//        $meeting->location = $request->location;
-//        $meeting->date = $newDate;
-//        $meeting->time = $request->time;
-//        $meeting->unit_held =  $request->unit_held;
-//        $meeting->treat = $request->treat;
-//        $meeting->guest = $request->guest;
-//        $meeting->applicant = $request->applicant;
-//        $meeting->position_organization = $request->position_organization;
-//        $meeting->signature = $new_signature_path;
-//        $meeting->reminder = $request->reminder;
-//        $meeting->save();
-//        foreach ($holders as $holder){
-//            $meetingUser = MeetingUser::where('meeting_id', $meeting->id)->where('user_id', $holder)->first();
-//            if ($meetingUser) {
-//                $meetingUser->update([
-//                    'user_id' => $holder,
-//                    'is_present' => false,
-//                    'reason_for_absent' => null,
-//                    'read_by_scriptorium' => false,
-//                    'read_by_user' => false,
-//                    'replacement' => null
-//                ]);
-//            } else {
-//                MeetingUser::create([
-//                    'user_id' => $holder,
-//                    'meeting_id' => $meeting->id,
-//                    'is_present' => false,
-//                    'reason_for_absent' => null,
-//                    'read_by_scriptorium' => false,
-//                    'read_by_user' => false,
-//                    'replacement' => null
-//                ]);
-//            }
-//        }
         return to_route('meeting.table')->with('status',' جلسه با موفقیت بروز شد');
     }
 

@@ -76,38 +76,109 @@
             </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mt-6">
-            <h2 class="text-xl flex items-center gap-2 font-semibold mb-4 text-gray-900 dark:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor"
-                     class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
-                </svg>
-                {{__('نمودار اقدامات')}}
-            </h2>
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-4">
-                    <label for="yearSelect"
-                           class="mr-2 text-sm text-gray-700 dark:text-gray-400">{{__('سال :')}}</label>
-                    <select wire:model="currentYear" id="yearSelect" dir="ltr"
-                            class="border w-32 border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200">
-                        @foreach (array_keys($yearData) as $year)
-                            <option value="{{ $year }}">{{ $year }}</option>
-                        @endforeach
-                    </select>
+        <div class="bg-white dark:bg-gray-800 items-center rounded-lg shadow-md p-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8 place-content-around">
+            <div>
+                <div class="grid grid-cols-1 mb-4 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 opacity-20"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل جلسات')}}</span>
+                            </div>
+                            <span class="text-3xl font-bold text-blue-600">{{$this->allMeetings}}</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-300 opacity-20"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold  text-gray-700">{{__('تعداد کل اقدامات')}}</span>
+                            </div>
+                            <span class="text-3xl font-bold text-green-600">{{$this->allTasks}}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <label for="monthSelect"
-                           class="mr-2 text-sm text-gray-700 dark:text-gray-400">{{__('ماه :')}}</label>
-                    <select wire:model="currentMonth" id="monthSelect" dir="ltr"
-                            class="border w-40 border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200">
-                        <option value="0">فروردین - شهریور</option>
-                        <option value="1">مهر - اسفند</option>
-                    </select>
+                <div class="space-y-4 border rounded-md shadow-md p-4">
+                    <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>
+                            <a href="{{route('completedTasks')}}"
+                               class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                                {{__('نمایش')}}
+                            </a>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-[#605C3C] h-2.5 rounded-full"
+                                 style="width:{{$this->tasksOnTimePercentage()}}%;"></div>
+                        </div>
+                        <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksOnTimePercentage()}}%)</div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2 mt-2">
+                            <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>
+                            <a href="{{route('tasksWithDelay')}}"
+                               class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                                {{__('نمایش')}}
+                            </a>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-[#1f4037] h-2.5 rounded-full"
+                                 style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>
+                        </div>
+                        <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksDoneWithDelayPercentage()}}%)
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2 mt-2">
+                            <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>
+                            <a href="{{route('incompleteTasks')}}"
+                               class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
+                                {{__('نمایش')}}
+                            </a>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-[#2C5364] h-2.5 rounded-full"
+                                 style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
+                        </div>
+                        <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksNotDonePercentage()}}%)</div>
+                    </div>
                 </div>
             </div>
-            <div class="w-full rounded-lg" id="bar-chart"></div>
+
+            <div>
+                <h2 class="text-xl flex items-center gap-2 font-semibold mb-4 text-gray-900 dark:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor"
+                         class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
+                    </svg>
+                    {{__('نمودار اقدامات')}}
+                </h2>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-4">
+                        <label for="yearSelect"
+                               class="mr-2 text-sm text-gray-700 dark:text-gray-400">{{__('سال :')}}</label>
+                        <select wire:model="currentYear" id="yearSelect" dir="ltr"
+                                class="border w-32 border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200">
+                            @foreach (array_keys($yearData) as $year)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label for="monthSelect"
+                               class="mr-2 text-sm text-gray-700 dark:text-gray-400">{{__('ماه :')}}</label>
+                        <select wire:model="currentMonth" id="monthSelect" dir="ltr"
+                                class="border w-40 border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200">
+                            <option value="0">فروردین - شهریور</option>
+                            <option value="1">مهر - اسفند</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="w-full rounded-lg" id="bar-chart"></div>
+            </div>
         </div>
     </div>
 

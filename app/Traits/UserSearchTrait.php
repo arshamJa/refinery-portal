@@ -13,7 +13,9 @@ trait UserSearchTrait
             $request->filled('position') ||
             $request->filled('p_code') ||
             $request->filled('department_name') ||
-            $request->filled('role')) {
+            $request->filled('role') ||
+            $request->filled('permission_name'))
+        {
             $query->where(function ($q) use ($request) {
                 if ($request->filled('full_name')) {
                     $q->where('full_name', 'like', '%'.$request->input('full_name').'%');
@@ -34,6 +36,11 @@ trait UserSearchTrait
                 if ($request->filled('department_name')) {
                     $q->orWhereHas('department', function ($department) use ($request) {
                         $department->where('department_name', 'like', '%'.$request->input('department_name').'%');
+                    });
+                }
+                if ($request->filled('permission_name')) { // Handle permission search
+                    $q->orWhereHas('user.permissions', function ($permissionQuery) use ($request) {
+                        $permissionQuery->where('name', 'like', '%'.$request->input('permission_name').'%');
                     });
                 }
             });

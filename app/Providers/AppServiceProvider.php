@@ -2,14 +2,13 @@
 
 namespace App\Providers;
 
+use App\Enums\UserPermission;
+use App\Enums\UserRole;
 use App\Models\User;
 use App\Policies\BlogPolicy;
-use App\Policies\DepartmentOrganizationPolicy;
+use App\Policies\PhoneListPolicy;
 use App\Policies\ProfilePolicy;
 use App\Policies\UserPolicy;
-use App\Policies\PhoneListPolicy;
-use App\UserPermission;
-use App\UserRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;

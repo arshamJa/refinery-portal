@@ -54,10 +54,10 @@
                                 {{ __('Samael') }}
                             @elseif (auth()->user()->hasRole('ادمین'))
                                 {{__('ادمین')}}
-                            @elseif (auth()->user()->hasRole(\App\UserRole::OPERATOR->value))
-                                {{ \App\UserRole::OPERATOR->value }}
-                            @elseif (auth()->user()->hasRole(\App\UserRole::USER->value))
-                                {{ \App\UserRole::USER->value }}
+                            @elseif (auth()->user()->hasRole(\App\Enums\UserRole::OPERATOR->value))
+                                {{ \App\Enums\UserRole::OPERATOR->value }}
+                            @elseif (auth()->user()->hasRole(\App\Enums\UserRole::USER->value))
+                                {{ \App\Enums\UserRole::USER->value }}
                             @endif
                         </p>
                         <p class="my-2 block w-full">{{__('دپارتمان : ')}}{{$department}}</p>

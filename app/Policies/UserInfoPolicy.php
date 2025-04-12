@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use App\Models\UserInfo;
-use App\UserRole;
 
 class UserInfoPolicy
 {

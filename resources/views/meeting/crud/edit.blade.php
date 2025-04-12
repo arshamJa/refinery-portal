@@ -239,10 +239,10 @@
                 <div class="col-span-4">
                     <div class="mb-2">{{ __('لیست مهمان فعلی:') }}</div>
                     <div class="flex flex-wrap gap-2">
-                        @foreach($meeting->guest as $index => $nameGuest)
+                        @foreach($meeting->guest ?? []  as $index => $nameGuest)
                             <div id="guest-{{ $index }}"
                                  class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
-                                <span>{{ $nameGuest }}</span>
+                                <span>{{$nameGuest}}</span>
                                 <button
                                     class="delete-guest bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-full"
                                     data-meeting-id="{{ $meeting->id }}" data-guest-index="{{ $index }}">

@@ -1,4 +1,4 @@
-@php use App\Models\UserInfo; @endphp
+@php use App\Enums\UserRole;use App\Models\UserInfo; @endphp
 <x-app-layout>
 
 
@@ -29,7 +29,7 @@
                         <x-input-label for="work_phone">{{ __('تلفن محل کار') }}</x-input-label>
                         <x-text-input type="text" name="work_phone" id="work_phone"/>
                     </div>
-                    @can('view',UserInfo::class)
+                    @can('viewAny',\App\Models\User::class)
                         <div>
                             <x-input-label for="phone">{{ __('تلفن همراه') }}</x-input-label>
                             <x-text-input type="text" name="phone" id="phone"/>
@@ -38,7 +38,6 @@
                             <x-input-label for="house_phone">{{ __('تلفن منزل') }}</x-input-label>
                             <x-text-input type="text" name="house_phone" id="house_phone"/>
                         </div>
-
                         <div>
                             <x-label for="role">{{ __('نقش') }}</x-label>
                             <select name="role" id="role"
@@ -68,7 +67,7 @@
                         <th class="py-3">{{ __('دپارتمان') }}</th>
                         <th class="py-3">{{ __('نام و نام خانوادگی') }}</th>
                         <th class="py-3">{{ __('تلفن محل کار') }}</th>
-                        @can('view',UserInfo::class)
+                        @can('viewAny',\App\Models\User::class)
                             <th class="py-3">{{ __('تلفن همراه') }}</th>
                             <th class="py-3">{{ __('تلفن منزل') }}</th>
                             <th class="py-3"></th>
@@ -90,7 +89,7 @@
                             <td class="py-4 whitespace-no-wrap text-sm leading-5">
                                 {{ $userInfo->phone }}
                             </td>
-                            @can('view',UserInfo::class)
+                            @can('viewAny',\App\Models\User::class)
                                 <td class="py-4 whitespace-no-wrap text-sm leading-5">
                                     {{ $userInfo->house_phone }}
                                 </td>

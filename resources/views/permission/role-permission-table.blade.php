@@ -20,34 +20,17 @@
                 <li>
                 <span
                     class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                    {{__('جدول مدیریت نقش / تعیین سطح دسترسی')}}
+                    {{__('جدول مدیریت نقش و تعیین سطح دسترسی')}}
                 </span>
                 </li>
             </ol>
         </nav>
 
-        <div class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">{{__('مدیریت نقش')}}</h2>
-            <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
-                <div
-                    class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-                    <div class="relative w-full md:w-3/6">
-                        <div
-                            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                                 fill="currentColor" viewbox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                      clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <input wire:model.live.debounce.500ms="search" type="text" dir="rtl"
-                               placeholder="جست و جو ..."
-                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500">
-                    </div>
-                </div>
-                @can('create',App\Models\Role::class)
+        <div class="pt-4 sm:pt-6 border shadow-md rounded-md">
+            <div class="flex justify-between items-center mb-4 px-4">
+                <h2 class="text-xl font-bold text-gray-800">مدیریت نقش و دسترسی</h2>
+                <input type="text" placeholder="جست‌ و جو ..." class="input input-bordered w-1/3 text-sm" />
+{{--                @can('create',App\Models\Role::class)--}}
                     <a href="{{route('role.create')}}">
                         <x-primary-button>
                             {{__('افزودن نقش')}}
@@ -58,142 +41,150 @@
                             </svg>
                         </x-primary-button>
                     </a>
-                @endcan
+{{--                @endcan--}}
+            </div>
 
-                <div class="pt-4 sm:px-10 sm:pt-6 shadow-md rounded-md">
-                    <table
-                        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead
-                            class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th class="px-4 py-3">{{__('ردیف')}}</th>
-                            <th class="px-4 py-3">{{__('نقش')}}</th>
-                            <th class="px-4 py-3">{{__('لیست دسترسی')}}</th>
-                            <th class="px-4 py-3"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
+            <table class="w-full text-sm text-left rtl:text-right text-gray-600">
+                <thead class="text-sm text-center text-gray-700 uppercase bg-gray-100">
+                <tr>
+                    @foreach (['ردیف', 'نقش', 'لیست دسترسی', 'عملیات'] as $header)
+                        <th class="px-4 py-3">{{ __($header) }}</th>
+                    @endforeach
+                </tr>
+                </thead>
+                <tbody class="text-center">
                         @forelse($roles as $role)
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="px-4 py-4">{{ $loop->iteration  }}</td>
+                        <td class="px-4 py-4 font-medium text-gray-800">{{ $role->name }}</td>
+                        <td class="px-4 py-4 max-w-xl break-words">
+                            @if ($role->permissions->isNotEmpty())
+                                @foreach ($role->permissions->pluck('name') as $permission)
+                                    <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full m-0.5">
+                                {{ $permission }}
+                            </span>
+                                @endforeach
+                            @else
+                                <span class="text-xs text-gray-400">ندارد</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-4">
+                            <div class="flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+                                <a href="{{route('role.edit',$role->id)}}">
+                                    <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
+                                </a>
+                                <form action="{{route('role.destroy',$role->id)}}" method="post">
+                                    @csrf
+                                    @method('delete')
+                                    <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                        @empty
                             <tr class="px-4 py-3 border-b text-center">
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$role->name}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                                    @foreach($role->permissions as $permission)
-                                        {{$permission->name}} ,
-                                    @endforeach
+                                <td colspan="7" class="py-6">
+                                    {{__('رکوردی یافت نشد...')}}
                                 </td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                            </tr>
+                        @endforelse
+                </tbody>
+            </table>
+            <span class="p-2 mx-2">
+                {{$roles->withQueryString()->links(data:['scrollTo'=>false]) }}
+            </span>
+        </div>
+
+
+{{--        <div class="mb-8">--}}
+{{--            <h2 class="text-2xl font-semibold mb-4">{{__('مدیریت نقش')}}</h2>--}}
+{{--            <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">--}}
+{{--                <div--}}
+{{--                    class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">--}}
+{{--                    <div class="relative w-full md:w-3/6">--}}
+{{--                        <div--}}
+{{--                            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">--}}
+{{--                            <svg aria-hidden="true" class="w-5 h-5 text-gray-500"--}}
+{{--                                 fill="currentColor" viewbox="0 0 20 20"--}}
+{{--                                 xmlns="http://www.w3.org/2000/svg">--}}
+{{--                                <path fill-rule="evenodd"--}}
+{{--                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"--}}
+{{--                                      clip-rule="evenodd"/>--}}
+{{--                            </svg>--}}
+{{--                        </div>--}}
+{{--                        <input wire:model.live.debounce.500ms="search" type="text" dir="rtl"--}}
+{{--                               placeholder="جست و جو ..."--}}
+{{--                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500">--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                @can('create',App\Models\Role::class)--}}
+{{--                    <a href="{{route('role.create')}}">--}}
+{{--                        <x-primary-button>--}}
+{{--                            {{__('افزودن نقش')}}--}}
+{{--                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
+{{--                                 stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">--}}
+{{--                                <path stroke-linecap="round" stroke-linejoin="round"--}}
+{{--                                      d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>--}}
+{{--                            </svg>--}}
+{{--                        </x-primary-button>--}}
+{{--                    </a>--}}
+{{--                @endcan--}}
+
+{{--                <div class="pt-4 sm:px-10 sm:pt-6 shadow-md rounded-md">--}}
+{{--                    <table--}}
+{{--                        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">--}}
+{{--                        <thead--}}
+{{--                            class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">--}}
+{{--                        <tr>--}}
+{{--                            <th class="px-4 py-3">{{__('ردیف')}}</th>--}}
+{{--                            <th class="px-4 py-3">{{__('نقش')}}</th>--}}
+{{--                            <th class="px-4 py-3">{{__('لیست دسترسی')}}</th>--}}
+{{--                            <th class="px-4 py-3"></th>--}}
+{{--                        </tr>--}}
+{{--                        </thead>--}}
+{{--                        <tbody>--}}
+{{--                        @forelse($roles as $role)--}}
+{{--                            <tr class="px-4 py-3 border-b text-center">--}}
+{{--                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>--}}
+{{--                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$role->name}}</td>--}}
+{{--                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+{{--                                    @foreach($role->permissions as $permission)--}}
+{{--                                        {{$permission->name}} ,--}}
+{{--                                    @endforeach--}}
+{{--                                </td>--}}
+{{--                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
 {{--                                    <a href="{{route('role.show',$role->id)}}">--}}
 {{--                                        <x-primary-button>{{__('نمایش')}}</x-primary-button>--}}
 {{--                                    </a>--}}
 {{--                                    @if ($authorizedRoles[$role->id])--}}
 {{--                                    @can('update',$role)--}}
-                                        <a href="{{route('role.edit',$role->id)}}">
-                                            <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
-                                        </a>
+{{--                                        <a href="{{route('role.edit',$role->id)}}">--}}
+{{--                                            <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>--}}
+{{--                                        </a>--}}
 {{--                                    @endcan--}}
 {{--                                    @endif--}}
-                                    <form action="{{route('role.destroy',$role->id)}}" method="post">
-                                        @csrf
-                                        @method('delete')
-                                        <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr class="px-4 py-3 border-b text-center">
-                                <td colspan="7" class="py-6">
-                                    {{__('رکوردی یافت نشد...')}}
-                                </td>
-                            </tr>
-                        @endforelse
-                        </tbody>
-                    </table>
-                    <span class="p-2 mx-2">
-                {{$roles->withQueryString()->links(data:['scrollTo'=>false]) }}
-            </span>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <h2 class="text-2xl font-semibold mb-4">{{__('مدیریت سطح دسترسی')}}</h2>
-            <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
-                <div
-                    class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-                    <div class="relative w-full md:w-3/6">
-                        <div
-                            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                                 fill="currentColor" viewbox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                      clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <input wire:model.live.debounce.500ms="search" type="text" dir="rtl"
-                               placeholder="جست و جو ..."
-                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500">
-                    </div>
-                </div>
-                <a href="{{route('permission.create')}}">
-                    <x-primary-button>
-                        {{__('افزودن سطح دسترسی')}}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                        </svg>
-                    </x-primary-button>
-                </a>
-
-                <div class="pt-4 sm:px-10 sm:pt-6  shadow-md rounded-md">
-                    <table
-                        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead
-                            class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th class="px-4 py-3">{{__('ردیف')}}</th>
-                            <th class="px-4 py-3">{{__('دسترسی')}}</th>
-                            <th class="px-4 py-3"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @forelse($permissions as $permission)
-                            <tr class="px-4 py-3 border-b text-center">
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$permission->name}}</td>
-                                <td class="px-4 py-4 whitespace-no-wrap flex flex-row gap-x-2 text-sm leading-5 text-coll-gray-900">
-{{--                                    <a href="{{route('permission.show',$permission->id)}}">--}}
-{{--                                        <x-primary-button>{{__('نمایش')}}</x-primary-button>--}}
-{{--                                    </a>--}}
-                                    <a href="{{route('permission.edit',$permission->id)}}">
-                                        <x-secondary-button>{{__('ویرایش')}}</x-secondary-button>
-                                    </a>
-                                    <form action="{{route('permission.destroy',$permission->id)}}" method="post">
-                                        @csrf
-                                        @method('delete')
-                                        <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr class="px-4 py-3 border-b text-center">
-                                <td colspan="7" class="py-6">
-                                    {{__('رکوردی یافت نشد...')}}
-                                </td>
-                            </tr>
-                        @endforelse
-                        </tbody>
-                    </table>
-                    <span class="p-2 mx-2">
-                    {{$permissions->withQueryString()->links(data:['scrollTo'=>false]) }}
-                    </span>
-                </div>
-            </div>
-        </div>
-
+{{--                                    <form action="{{route('role.destroy',$role->id)}}" method="post">--}}
+{{--                                        @csrf--}}
+{{--                                        @method('delete')--}}
+{{--                                        <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>--}}
+{{--                                    </form>--}}
+{{--                                </td>--}}
+{{--                            </tr>--}}
+{{--                        @empty--}}
+{{--                            <tr class="px-4 py-3 border-b text-center">--}}
+{{--                                <td colspan="7" class="py-6">--}}
+{{--                                    {{__('رکوردی یافت نشد...')}}--}}
+{{--                                </td>--}}
+{{--                            </tr>--}}
+{{--                        @endforelse--}}
+{{--                        </tbody>--}}
+{{--                    </table>--}}
+{{--                    <span class="p-2 mx-2">--}}
+{{--                {{$roles->withQueryString()->links(data:['scrollTo'=>false]) }}--}}
+{{--            </span>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
     </div>
 </x-app-layout>
 

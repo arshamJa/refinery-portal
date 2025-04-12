@@ -20,7 +20,7 @@ class RolePermissionController extends Controller
         // Check if the authenticated user is a super-admin
         if (!$user->hasRole('super-admin')) {
             // If not super-admin, filter out the super-admin role
-            $rolesQuery->where('name', '!=', 'super-admin');
+            $rolesQuery->where('name', '!=', 'super_admin');
         }
         $roles = $rolesQuery->paginate(5);
 //        $authorizedRoles = [];

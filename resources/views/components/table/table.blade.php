@@ -1,5 +1,5 @@
-<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-    <thead class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+<table class="w-full text-center text-sm min-w-[1000px] bg-white mb-6 text-gray-700">
+    <thead class="text-gray-800 bg-gray-100">
         <tr>
             {{$head}}
         </tr>
