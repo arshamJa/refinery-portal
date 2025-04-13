@@ -1,8 +1,8 @@
 <div>
-    <div class="container" dir="ltr">
+    <div class="container">
         <div class="card input-wrapper">
             <div class="from">
-                <span class="heading">From :</span>
+                <span class="heading">از :</span>
                 <div class="dropdown-container" id="input-language">
                     <div class="dropdown-toggle">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -40,7 +40,7 @@
 
         <div class="card output-wrapper">
             <div class="to">
-                <span class="heading">To :</span>
+                <span class="heading">به :</span>
                 <div class="dropdown-container" id="output-language">
                     <div class="dropdown-toggle">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -64,7 +64,6 @@
             <textarea id="output-text" cols="30" rows="10" disabled></textarea>
         </div>
     </div>
-
     @script
     <script>
         const languages = [
@@ -98,7 +97,7 @@
                 const title = option.name + " (" + option.native + ")";
                 li.innerHTML = title;
                 li.dataset.value = option.code;
-                li.classList.add("option");
+                li.classList.add("option", "cursor-pointer", "hover:bg-gray-100", "px-4", "py-2");
                 dropdown.querySelector("ul").appendChild(li);
             });
         }

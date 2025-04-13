@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,9 +18,9 @@ class BlogFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => fake()->randomKey(['1','3']),
-            'title' => $this->faker->sentence,
-            'body' => $this->faker->paragraph
+            'user_id' => User::inRandomOrder()->first()?->id ?? 1,
+            'title' => fake()->sentence(),
+            'body' => fake()->paragraph(5),
         ];
     }
 }

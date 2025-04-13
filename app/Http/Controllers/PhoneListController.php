@@ -91,7 +91,7 @@ class PhoneListController extends Controller
         $userInfo = UserInfo::with(['user', 'department'])
             ->select('id','user_id','department_id','full_name','work_phone','house_phone','phone')
             ->findOrFail($id);
-        Gate::authorize('update', $userInfo);
+//        Gate::authorize('update', $userInfo);
         return view('phoneList.edit',[
             'userInfo' => $userInfo
         ]);
@@ -103,7 +103,7 @@ class PhoneListController extends Controller
     public function update(StorePhoneRequest $request, string $id)
     {
         $userInfo = UserInfo::findOrFail($id);
-        Gate::authorize('update', $userInfo);
+//        Gate::authorize('update', $userInfo);
         $validatedData = $request->validated();
         $userInfo->update([
             'house_phone' => $validatedData['house_phone'],

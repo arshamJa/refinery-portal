@@ -7,13 +7,18 @@
                 <div class="max-w-xl">
                     <section>
                         <div>
-                            <p>
-                                {{__('نام و نام خانوادگی : ')}}{{$userInfo->full_name}}
+                            <p class="text-gray-700 dark:text-gray-300">
+                                {{__('نام و نام خانوادگی : ')}}
+                                <span class="font-medium">
+                                    {{ $userInfo->full_name }}
+                                </span>
                             </p>
-                            <p class="my-4">
-                                {{__('دپارتمان : ')}}{{$userInfo->department?->department_name}}
+                            <p class="text-gray-700 dark:text-gray-300 mt-1 mb-3">
+                                {{__('دپارتمان : ')}}
+                                <span class="font-medium">
+                                    {{ $userInfo->department?->department_name }}
+                                </span>
                             </p>
-
                             <x-input-label for="phone" :value="__('شماره همراه')"/>
                             <x-text-input name="phone" id="phone" maxlength="11"
                                           value="{{$userInfo->phone}}" class="block my-2 w-full"
@@ -29,12 +34,11 @@
                             <x-text-input name="work_phone" id="work_phone" value="{{$userInfo->work_phone}}"
                                           class="block my-2 w-full" type="text" autofocus/>
                             <x-input-error :messages="$errors->get('work_phone')" class="my-2"/>
-
                         </div>
                     </section>
                 </div>
                 <div class="mt-8">
-                    <x-primary-button type="submit">
+                    <x-primary-button type="submit" class="ml-4">
                         {{ __('ذخیره') }}
                     </x-primary-button>
                     <a href="{{route('phone-list.index')}}">
