@@ -9,15 +9,15 @@
             <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
                 <div>
                     <x-input-label for="full_name">{{ __('نام و نام حانوادگی') }}</x-input-label>
-                    <x-text-input type="text" name="full_name" id="full_name"/>
+                    <x-text-input type="text" name="full_name" id="full_name" value="{{ request('full_name') }}"/>
                 </div>
                 <div>
                     <x-input-label for="department_name">{{ __('دپارتمان') }}</x-input-label>
-                    <x-text-input type="text" name="department_name" id="department_name"/>
+                    <x-text-input type="text" name="department_name" id="department_name" value="{{ request('department_name') }}"/>
                 </div>
                 <div>
                     <x-input-label for="organization">{{ __('سامانه') }}</x-input-label>
-                    <x-text-input type="text" name="organization" id="organization"/>
+                    <x-text-input type="text" name="organization" id="organization" value="{{ request('organization') }}"/>
                 </div>
                 <div class="col-span-6 lg:col-span-3 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
                     <x-search-button>{{__('جست و جو')}}</x-search-button>

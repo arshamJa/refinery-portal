@@ -100,8 +100,9 @@ class PhoneListController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StorePhoneRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
+//        dd($request->all());
         $userInfo = UserInfo::findOrFail($id);
 //        Gate::authorize('update', $userInfo);
         $validatedData = $request->validated();

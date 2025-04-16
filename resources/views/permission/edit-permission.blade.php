@@ -36,35 +36,31 @@
             </ol>
         </nav>
 
-        <form action="{{route('permission.update',$permission->id)}}" method="post">
-            @csrf
-            @method('put')
-            <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                {{__('آپدیت سطح دسترسی ')}}
-            </div>
-            <div class="px-6 py-4" dir="rtl">
-                <div class="mt-4 text-sm text-gray-600">
-                    <div class="w-full">
-                        <x-input-label for="permission" :value="__('نقش')"/>
-                        <x-text-input name="permission" value="{{$permission->name}}" id="permission"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('permission')" class="my-2"/>
-                    </div>
+        <div class="max-w-3xl p-4 bg-white shadow-lg rounded-2xl space-y-8">
+            <form action="{{route('permissions.update',$permission->id)}}" method="POST" class="space-y-6">
+                @csrf
+                @method('put')
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">{{__('ویرایش سطح دسترسی ')}}</h2>
+                <div>
+                    <x-input-label for="permission" :value="__('سطح دستزسی')"/>
+                    <x-text-input name="permission" value="{{$permission->name}}" id="permission"
+                                  class="block my-2 w-full" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('permission')" class="my-2"/>
                 </div>
-            </div>
-            <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                <a href="{{route('role.permission.table')}}">
-                    <x-secondary-button>
-                        {{ __('لفو') }}
-                    </x-secondary-button>
-                </a>
-                <x-primary-button type="submit">
-                    {{ __('ثبت') }}
-                </x-primary-button>
-            </div>
-        </form>
 
-
+                <!-- Actions -->
+                <div class="flex justify-between items-center">
+                    <x-primary-button type="submit">
+                        {{ __('بروزرسانی') }}
+                    </x-primary-button>
+                    <a href="{{route('role.permission.table')}}">
+                        <x-secondary-button>
+                            {{ __('لفو') }}
+                        </x-secondary-button>
+                    </a>
+                </div>
+            </form>
+        </div>
 
 
     </div>

@@ -19,6 +19,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
 
+    // Livewire Meeting-Dashboard
+    Route::get('dashboard/meeting',\App\Livewire\MeetingDashboard::class)
+        ->name('dashboard.meeting');
+
+
+
 //    this is for creating new meeting and send invitation to participants
     Route::get('meeting/table', [CreateNewMeetingController::class, 'index'])
         ->name('meeting.table');

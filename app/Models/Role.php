@@ -25,9 +25,15 @@ class Role extends Model
     }
 
     // Helper Functions
-    public function assignPermission(Permission $permission): void
+    public function syncPermissions(array $permissions): self
     {
-        $this->permissions()->attach($permission);
+        // Ensure the relationship is loaded to avoid N+1 issues
+        if (! $this->relationLoaded('permissions')) {
+            $this->load('permissions');
+        }
+        // Sync permission IDs
+        $this->permissions()->sync($permissions);
+        return $this;
     }
     public function removePermission(Permission $permission): void
     {

@@ -2,8 +2,7 @@
 <div>
 
     <div class="grid lg:grid-cols-2 mt-20">
-
-        <div class="p-2 h-3/4">
+        <div class="p-2">
             <x-notifications/>
         </div>
 

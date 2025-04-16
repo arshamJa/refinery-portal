@@ -4,10 +4,10 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
-class TranslatePage extends Component
+class MeetingDashboard extends Component
 {
     public function render()
     {
-        return view('livewire.translate-page');
+        return view('livewire.meeting-dashboard');
     }
 }

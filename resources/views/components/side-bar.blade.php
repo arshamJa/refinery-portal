@@ -47,17 +47,6 @@
 
             {{__('پروفایل')}}
         </x-link.responsive-link>
-        @if(auth()->user()->hasRole(UserRole::OPERATOR->value) || auth()->user()->hasRole(UserRole::USER->value))
-            <x-link.responsive-link href="{{route('employee.organization')}}"
-                                    :active="request()->is('employee/organization')" class="flex items-center gap-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
-                </svg>
-                {{__('لیست سامانه')}}
-            </x-link.responsive-link>
-        @endif
         @can('side-bar-notifications')
             <x-link.responsive-link href="{{route('users.index')}}"
                                     :active="request()->is('users/table')" class="flex items-center gap-x-2">
@@ -67,6 +56,14 @@
                           d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>
                 </svg>
                 {{__('جدول کاربران')}}
+            </x-link.responsive-link>
+            <x-link.responsive-link href="{{route('users.create')}}" :active="request()->is('users/create')" class="flex items-center gap-x-2" >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                {{__('ساخت کاربر جدید')}}
             </x-link.responsive-link>
             <x-link.responsive-link
                 href="{{route('organization.department.manage')}}"
@@ -78,6 +75,9 @@
                 </svg>
                 {{__('مدیریت سامانه/دپارتمان')}}
             </x-link.responsive-link>
+
+
+
 {{--            <x-link.responsive-link--}}
 {{--                href="{{Illuminate\Support\Facades\URL::signedRoute('employeeAccess')}}"--}}
 {{--                :active="request()->is('employee/access')" class="flex items-center gap-x-2">--}}
@@ -97,7 +97,15 @@
                 </svg>
                 {{__('مدیریت نقش و دسترسی')}}
             </x-link.responsive-link>
-        @endcanany
+        @endcan
+
+        <x-link.responsive-link href="{{ route('blogs.create') }}"
+                                :active="request()->is('blogs/create')" class="flex items-center gap-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
+            </svg>
+            {{__(' درج اخبار جدید')}}
+        </x-link.responsive-link>
 
     </li>
 </ul>

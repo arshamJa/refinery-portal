@@ -26,11 +26,8 @@ class BlogController extends Controller
      * Store a newly created resource in storage.
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(StoreBlogRequest $request)
     {
-        dd($request->all());
-
-        Gate::authorize('create-blog');
         $request->validated();
         $blog = Blog::create([
             'user_id' => auth()->user()->id,
@@ -72,7 +69,6 @@ class BlogController extends Controller
      */
     public function edit(string $id)
     {
-        Gate::authorize('update-blog',$id);
         $blog = Blog::find($id);
         $blogImage = BlogImage::where('id',$blog->id)->get();
         return view('blog.edit',['blog' => $blog , 'blogImage' => $blogImage]);
@@ -84,7 +80,6 @@ class BlogController extends Controller
      */
     public function update(StoreBlogRequest $request, string $id)
     {
-        Gate::authorize('update-blog',$id);
         $request->validated();
 
         $blog = Blog::find($id);

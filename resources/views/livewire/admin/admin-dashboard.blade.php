@@ -1,4 +1,8 @@
 <div>
+
+    <div class="p-2">
+            <x-notifications/>
+        </div>
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 

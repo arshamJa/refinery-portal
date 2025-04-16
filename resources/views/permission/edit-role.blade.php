@@ -36,45 +36,49 @@
             </ol>
         </nav>
 
-        <form action="{{route('role.update',$role->id)}}" method="post">
-            @csrf
-            @method('put')
-            <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                {{__('آپدیت نقش ')}}
-            </div>
-            <div class="px-6 py-4" dir="rtl">
-                <div class="mt-4 text-sm text-gray-600">
-                    <div class="w-full">
-                        <x-input-label for="role" :value="__('نقش')"/>
-                        <x-text-input name="role" value="{{$role->name}}" id="role"
-                                      class="block my-2 w-full" type="text" autofocus/>
-                        <x-input-error :messages="$errors->get('role')" class="my-2"/>
-                    </div>
+        <div class="max-w-3xl p-4 bg-white shadow-lg rounded-2xl space-y-8">
+            <form action="{{route('roles.update',$role->id)}}" method="POST" class="space-y-6">
+                @csrf
+                @method('put')
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">{{__('ویرایش نقش ')}}</h2>
+
+                <!-- Role Name -->
+                <div>
+                    <x-input-label for="role" :value="__('نقش')"/>
+                    <x-text-input name="role" value="{{$role->name}}" id="role"
+                                  class="block my-2 w-full" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('role')" class="my-2"/>
                 </div>
-            </div>
-            @foreach($permissions as $permission)
-                <input type="checkbox"
-                       {{ $role->permissions()->where('permissions.id', $permission->id)->exists() ? 'checked' : '' }}
-                       name="permissions[{{ $permission->id }}]"
-                       value="{{ $permission->id }}">
-                {{ $permission->name }}
-                <br>
-            @endforeach
-            <x-input-error :messages="$errors->get('permissions')" class="my-2"/>
 
-            <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                <a href="{{route('role.permission.table')}}">
-                    <x-secondary-button>
-                        {{ __('لفو') }}
-                    </x-secondary-button>
-                </a>
-                <x-primary-button type="submit">
-                    {{ __('ثبت') }}
-                </x-primary-button>
-            </div>
-        </form>
+                <!-- Permissions Checkbox Grid -->
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">{{__('سطوح دسترسی')}}</label>
+{{--                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">--}}
+                        @foreach($permissions as $permission)
+                            <input type="checkbox"
+                                   {{ $role->permissions()->where('permissions.id', $permission->id)->exists() ? 'checked' : '' }}
+                                   name="permissions[{{ $permission->id }}]"
+                                   value="{{ $permission->id }}">
+                            {{ $permission->name }}
+                            <br>
+                        @endforeach
+{{--                    </div>--}}
+                    <x-input-error :messages="$errors->get('permissions')" class="mt-2 text-red-500 text-sm"/>
+                </div>
 
-
+                <!-- Actions -->
+                <div class="flex justify-between items-center">
+                    <x-primary-button type="submit">
+                        {{ __('بروزرسانی') }}
+                    </x-primary-button>
+                    <a href="{{route('role.permission.table')}}">
+                        <x-secondary-button>
+                            {{ __('لفو') }}
+                        </x-secondary-button>
+                    </a>
+                </div>
+            </form>
+        </div>
 
 
     </div>

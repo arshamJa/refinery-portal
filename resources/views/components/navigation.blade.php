@@ -3,15 +3,19 @@
     <nav class="hidden md:flex items-center gap-x-10 w-full">
         <x-link.link href="{{route('dashboard')}}" :active="request()->is('dashboard')">
             {{__('داشبورد')}}
-        </x-link.link>
-        <x-link.link href="{{route('translate')}}" :active="request()->is('translate')">
-            {{__('دیکشنری')}}
-        </x-link.link>
-        <x-link.link href="{{route('blogs.index')}}" :active="request()->is('blogs')">
-            {{__('اخبار و اطلاعیه')}}
-        </x-link.link>
-        <x-link.link href="{{route('phone-list.index')}}" :active="request()->is('phone-list')">
-            {{__('دفترچه تلفنی')}}
+        <span class="mr-2">
+            @if (auth()->check())
+                @if (auth()->user()->hasRole(\App\Enums\UserRole::SUPER_ADMIN->value))
+                    {{ __('Samael') }}
+                @elseif (auth()->user()->hasRole('ادمین'))
+                    {{__('ادمین')}}
+                @elseif (auth()->user()->hasRole(\App\Enums\UserRole::OPERATOR->value))
+                    {{__('اپراتور')}}
+                @elseif (auth()->user()->hasRole(\App\Enums\UserRole::USER->value))
+                    {{__('کارمند')}}
+                @endif
+            @endif
+        </span>
         </x-link.link>
     </nav>
     <div class="md:hidden">

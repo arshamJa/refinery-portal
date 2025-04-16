@@ -2,36 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Http\Requests\PermissionStoreRequest;
 use App\Http\Requests\RoleStoreRequest;
 use App\Models\Permission;
 use App\Models\Role;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class RolePermissionController extends Controller
 {
-    public function table()
+    public function table(Request $request)
     {
         $user = Auth::user();
-        $rolesQuery = Role::with('permissions:id,name');
-        // Check if the authenticated user is a super-admin
-        if (!$user->hasRole('super-admin')) {
-            // If not super-admin, filter out the super-admin role
-            $rolesQuery->where('name', '!=', 'super_admin');
+
+        // Role query builder
+        $roleQuery = Role::with('permissions:id,name');
+
+        if (!$user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            $roleQuery->where('name', '!=', UserRole::SUPER_ADMIN->value);
         }
-        $roles = $rolesQuery->paginate(5);
-//        $authorizedRoles = [];
-//        foreach ($roles as $role) {
-//            $authorizedRoles[$role->id] = Gate::allows('update', $role);
-//        }
-        $permissions = DB::table('permissions')->select('id', 'name')->paginate(5);
+
+        // Filter roles by 'role' input
+        if ($request->filled('role')) {
+            $search = $request->get('role');
+            $roleQuery->where('name', 'like', "%{$search}%");
+        }
+
+        // Filter roles by permission (if needed)
+        if ($request->filled('permission')) {
+            $search = $request->get('permission');
+            $roleQuery->whereHas('permissions', function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        $roles = $roleQuery->paginate(5);
+
+        // Permissions query builder
+        $permissionQuery = Permission::query();
+
+        if ($request->filled('permission')) {
+            $search = $request->get('permission');
+            $permissionQuery->where('name', 'like', "%{$search}%");
+        }
+
+        $permissions = $permissionQuery->paginate(5);
+
         return view('permission.role-permission-table', [
             'roles' => $roles,
             'permissions' => $permissions,
-//            'authorizedRoles' => $authorizedRoles
         ]);
     }
     public function create_role()
@@ -44,15 +66,13 @@ class RolePermissionController extends Controller
     public function store_role(RoleStoreRequest $request)
     {
         $request->validated();
+
         $role = Role::create(['name' => $request->role]);
-        $role->syncPermissions($request->permissions);
+        $permissionIds = array_values($request->permissions ?? []);
+        $role->syncPermissions($permissionIds);
+
         return to_route('role.permission.table')->with('status','نقش جدید اضافه و سطح دسترسی اعمال شد');
     }
-//    public function show_role(string $id)
-//    {
-//        $role = Role::with('permissions:id,name')->findOrFail($id);
-//        return view('permission.show-role',['role'=>$role]);
-//    }
     public function edit_role(string $id)
     {
         $role = Role::findOrFail($id);

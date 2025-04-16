@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-header header="درج اخبار جدید"/>
+{{--    <x-header header="درج اخبار جدید"/>--}}
     <div class="py-12 " dir="rtl">
         <div class="max-w-7xl sm:px-6 lg:px-8 space-y-6">
             <form action="{{route('blogs.store')}}" method="post" enctype="multipart/form-data">
@@ -8,7 +8,7 @@
                     <div class="w-full">
                         <x-input-label for="title" :value="__('عنوان')"/>
                         <x-text-input name="title" id="title" value="{{old('title')}}" class="block my-2 w-full"
-                                      type="text"  autofocus/>
+                                      type="text" autofocus/>
                         <x-input-error :messages="$errors->get('title')" class="mt-2"/>
 
                         <x-input-label for="body" :value="__('متن')" class="mb-2"/>

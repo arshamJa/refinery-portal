@@ -102,6 +102,13 @@ class User extends Authenticatable
         }
         return $this->roles->contains('name', $role);
     }
+    public function hasAnyRoles(array $roles): bool
+    {
+        if (!$this->relationLoaded('roles')) {
+            $this->load('roles');
+        }
+        return $this->roles->pluck('name')->intersect($roles)->isNotEmpty();
+    }
     public function hasPermissionTo($permission): bool
     {
         // Eager load roles before checking permissions

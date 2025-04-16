@@ -15,7 +15,7 @@ use Livewire\Component;
 class AdminDashboard extends Component
 {
 
-    use Organizations;
+    use Organizations,MessageReceived;
 
 
 

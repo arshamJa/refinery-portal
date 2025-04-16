@@ -58,9 +58,6 @@ Route::middleware('auth')->group(function () {
 //    Route::get('employee/access', EmployeeAccess::class)
 //        ->name('employeeAccess');
 
-    Route::get('/translate', TranslatePage::class)
-        ->name('translate')
-        ->can('view-any');
 
     Route::get('message', Message::class)->name('message');
 

@@ -35,7 +35,8 @@ class UsersTableController extends Controller
             'user:id,p_code',
             'department:id,department_name',
             'user.roles:id,name',
-            'user.permissions:id,name'
+            'user.permissions:id,name',
+            'user.roles.permissions:id,name',
         ])
             ->where('full_name', '!=', 'Arsham Jamali')
             ->select(['id', 'user_id', 'department_id', 'full_name', 'n_code', 'position']);
@@ -61,10 +62,16 @@ class UsersTableController extends Controller
             if ($userModel) {
                 $rolePermissions = $userModel->roles->flatMap->permissions;
                 $directPermissions = $userModel->permissions;
-                $allPermissions = $rolePermissions->merge($directPermissions)->unique('id')->pluck('name');
-                $userInfo->all_permissions = $allPermissions; // Virtual property for Blade
+                $allPermissions = $rolePermissions->merge($directPermissions)->unique('id')->pluck('name')->values(); // reset keys
+                $userInfo->all_permissions = $allPermissions; // Virtual property for Blade\
+
+                $userInfo->display_permission = $allPermissions->first();
+                $userInfo->more_permissions_count = max($allPermissions->count() - 1, 0);
+
             } else {
                 $userInfo->all_permissions = collect(); // Empty collection fallback
+                $userInfo->display_permission = null;
+                $userInfo->more_permissions_count = 0;
             }
         }
         $filteredUsersCount = $users->total();

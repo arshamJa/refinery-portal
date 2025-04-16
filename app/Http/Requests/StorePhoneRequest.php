@@ -22,9 +22,21 @@ class StorePhoneRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'work_phone' => 'required|numeric',
-            'house_phone' => 'required|numeric',
-            'phone' => 'required|numeric|digits:11',
+            'phone' => ['required', 'numeric', 'digits:11'],
+            'house_phone' => ['required', 'numeric', 'max:15'],
+            'work_phone' => ['required', 'numeric', 'max:15'],
         ];
+    }
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'phone' => $this->cleanPhone($this->phone),
+            'house_phone' => $this->cleanPhone($this->house_phone),
+            'work_phone' => $this->cleanPhone($this->work_phone),
+        ]);
+    }
+    private function cleanPhone($value): ?string
+    {
+        return $value ? preg_replace('/[^\d+]/', '', $value) : null;
     }
 }
