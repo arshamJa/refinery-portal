@@ -23,7 +23,10 @@ class Role extends Model
     {
         return $this->belongsToMany(User::class);
     }
-
+    public function assignPermission(Permission $permission)
+    {
+        $this->permissions()->attach($permission);
+    }
     // Helper Functions
     public function syncPermissions(array $permissions): self
     {

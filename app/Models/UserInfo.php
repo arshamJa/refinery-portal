@@ -19,8 +19,16 @@ class UserInfo extends Model
         'n_code',
         'full_name',
         'position',
+        'signature'
     ];
 
+
+
+
+    public function getImageUrl()
+    {
+        return url('storage/'.$this->signature);
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

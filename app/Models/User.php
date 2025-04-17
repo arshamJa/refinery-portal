@@ -52,6 +52,18 @@ class User extends Authenticatable
     }
 
 
+    public function getTranslatedRole(): string
+    {
+        return match (true) {
+            $this->hasRole(UserRole::SUPER_ADMIN->value) => __('Samael'),
+            $this->hasRole(UserRole::ADMIN->value) => __('ادمین'),
+            $this->hasRole(UserRole::OPERATOR->value) => __('اپراتور'),
+            $this->hasRole(UserRole::USER->value) => __('کاربر'),
+            default => __('نامشخص'),
+        };
+    }
+
+
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class);
@@ -148,6 +160,12 @@ class User extends Authenticatable
     {
         return $this->permissions()->with('roles.permissions');
     }
+
+
+
+
+
+
 
 
     public function otp(): HasOne

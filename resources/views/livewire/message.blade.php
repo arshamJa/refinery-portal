@@ -58,7 +58,7 @@
                 </a>
                 <a href="{{route('meeting.notification')}}"
                    class="bg-[#FCF7F8] shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2  flex flex-col items-start transition duration-300 ease-in-out p-4 rounded-lg">
-                    <p class="text-sm "> {{__('نتیجه نهایی جلسات')}}</p>
+                    <p class="text-sm "> {{__('وضعیت تشکیل جلسات')}}</p>
                     <p class="text-2xl text-blue-600 font-bold">{{$this->read_by_user}}</p>
                 </a>
             </div>

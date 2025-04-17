@@ -27,7 +27,6 @@ class Meeting extends Model
         'guest',
         'applicant',
         'position_organization',
-        'signature',
         'reminder',
         'is_cancelled'
     ];

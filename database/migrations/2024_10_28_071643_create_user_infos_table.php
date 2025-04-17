@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('n_code');
             $table->string('position');
+            $table->string('signature')->nullable();
             $table->timestamps();
         });
     }

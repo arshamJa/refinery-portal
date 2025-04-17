@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 
+use App\Models\Role;
 use App\Models\UserInfo;
+use Database\Factories\RoleFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -19,7 +21,10 @@ class DatabaseSeeder extends Seeder
 //            'name' => 'Test User',
 //            'email' => 'test@example.com',
 //        ]);
-        $this->call([UserSeeder::class,PermissionSeeder::class]);
+        $this->call([
+            UserSeeder::class,
+            PermissionSeeder::class,
+        ]);
         \App\Models\Blog::factory(10)->create();
         UserInfo::factory(20)->create();
     }

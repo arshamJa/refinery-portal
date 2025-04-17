@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\meeting\MeetingStoreRequest;
 use App\Http\Requests\MeetingUpdateRequest;
+use App\Models\Department;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\User;
@@ -59,7 +60,8 @@ class CreateNewMeetingController extends Controller
                 $roleQuery->whereIn('name', [UserRole::SUPER_ADMIN->value, UserRole::ADMIN->value]);
             });
         })->get(['id', 'user_id', 'full_name']);
-        return view('meeting.crud.create' , ['users' => $users]);
+        $departments = Department::select('id','department_name')->get();
+        return view('meeting.crud.create' , ['users' => $users,'departments'=>$departments]);
     }
 
     /**
@@ -102,8 +104,10 @@ class CreateNewMeetingController extends Controller
                 'guest' => $request->guest,
                 'applicant' => $request->applicant,
                 'position_organization' => $request->position_organization,
-                'signature' => $signature_path,
-                'reminder'  => $request->reminder,
+//                'signature' => $signature_path,
+                'signature' => null,
+//                'reminder'  => $request->reminder,
+                'reminder'  => null,
             ]);
             // Add meeting users in bulk
             $holders = Str::of($request->holders)->explode(',')->map(fn($holder) => [

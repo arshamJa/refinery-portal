@@ -27,7 +27,7 @@ class StoreNewUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => ['bail', 'required'],
+            'role' => ['bail','required', 'exists:roles,id'],
             'permissions' => ['bail', 'required'],
             'full_name' => ['bail', 'required', 'string', 'min:5', 'max:255', new farsi_chs()],
             'p_code' => ['bail', 'required', 'numeric', 'digits:6'],
@@ -35,8 +35,9 @@ class StoreNewUserRequest extends FormRequest
             'phone' => ['bail', 'required', 'digits:11', new PhoneNumberRule()],
             'house_phone' => ['bail', 'required', 'numeric'],
             'work_phone' => ['bail', 'required', 'numeric'],
-            'position' => ['bail', 'required', 'string','max:255',new farsi_chs()],
+            'position' => ['bail', 'required', 'string', 'max:255', new farsi_chs()],
             'departmentId' => ['bail', 'required'],
+            'signature' => ['bail', 'required'],
             'password' => ['bail', 'required', 'numeric', 'digits:8', Rules\Password::defaults()],
         ];
     }

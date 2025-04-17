@@ -43,7 +43,7 @@
     border-top: none;
     max-height: 225px;
     overflow-y: auto;
-    z-index: 1;
+    z-index: 100;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 .open .options{
@@ -74,6 +74,7 @@
 .option{
     padding: 12px;
     cursor: pointer;
+    z-index: 100;
 }
 .all-tags{
     border-bottom: 1px solid #344457;

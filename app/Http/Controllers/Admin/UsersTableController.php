@@ -121,7 +121,14 @@ class UsersTableController extends Controller
 
         // Sync roles and permissions
         $newUser->syncRoles([$validatedData['role']]);
-        $newUser->syncPermissions($validatedData['permissions']);
+
+        $permissions = isset($validatedData['permissions'])
+            ? Permission::whereIn('name', array_keys($validatedData['permissions']))->pluck('id')->toArray()
+            : [];
+        $newUser->syncPermissions($permissions);
+
+
+        $signature_path = $validatedData['signature']->store('signatures','public');
 
         // Create UserInfo record
         $userInfo = UserInfo::create([
@@ -133,6 +140,7 @@ class UsersTableController extends Controller
             'phone' => $validatedData['phone'],
             'n_code' => $validatedData['n_code'],
             'position' => $validatedData['position'],
+            'signature' => $signature_path
         ]);
 
         // Attach organizations to the new user based on the department
