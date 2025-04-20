@@ -7,9 +7,6 @@ Route::middleware('auth')->group(function () {
 
 //    Route::get('phone-list',\App\Livewire\PhoneListPage::class)
 //        ->name('phone-list.index');
-
-
-
     Route::get('phone-list', [PhoneListController::class, 'index'])
         ->name('phone-list.index');
 

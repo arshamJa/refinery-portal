@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 
 class MeetingUser extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable , SoftDeletes;
+
 
     protected $fillable = [
         'user_id',
@@ -20,7 +22,8 @@ class MeetingUser extends Model
         'reason_for_absent',
         'read_by_scriptorium',
         'read_by_user',
-        'replacement'
+        'replacement',
+        'is_guest'
     ];
 
 

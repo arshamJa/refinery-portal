@@ -26,22 +26,20 @@ class MeetingStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required','string','min:5','max:20'],
-            'unit_organization' => ['required','string','min:5','max:30', new farsi_chs()],
+            'title' => ['required','string'],
+            'unit_organization' => ['required','string','min:5', new farsi_chs()],
             'scriptorium' => ['required','string', new farsi_chs()],
-            'location' => ['required','string','min:5','max:30'],
+            'location' => ['required','string'],
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],
             'time' => ['required' , 'date_format:H:i' , new Time()],
-            'unit_held' => ['required','string','min:5','max:30', new farsi_chs()],
+            'unit_held' => ['required','string', new farsi_chs()],
             'treat' => ['required'],
             'guest' => ['nullable'],
             'holders' => ['required'] ,
-            'applicant' => ['required','string','min:5','max:20', new farsi_chs()],
-            'position_organization' => ['required','string','min:5','max:20', new farsi_chs()],
-            'signature' => ['required','file','mimes:jpg,png,jpeg,webp,pdf'],
-            'reminder' => ['required','numeric'],
+            'applicant' => ['required','string', new farsi_chs()],
+            'position_organization' => ['required','string',new farsi_chs()],
         ];
     }
 }

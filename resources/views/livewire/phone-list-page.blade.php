@@ -146,6 +146,7 @@
             </span>
         </div>
     </div>
+
     <x-modal name="update">
         @if($editingId)
             <form wire:submit="updatePhone">

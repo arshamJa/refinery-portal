@@ -12,6 +12,7 @@ use Livewire\Component;
 class Message extends Component
 {
     use MessageReceived;
+    public ?string $search='';
 
     public function render()
     {
@@ -56,6 +57,33 @@ class Message extends Component
     public function meetingCount()
     {
         return Meeting::where('scriptorium', auth()->user()->user_info->full_name)->count();
+    }
+
+
+    #[Computed]
+    public function meetings()
+    {
+        return Meeting::with('meetingUsers')
+            ->where('title', 'like', '%'.$this->search.'%')
+            ->where('scriptorium','=',auth()->user()->user_info->full_name)
+            ->where('is_cancelled','=',-1)
+            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
+            ->paginate(3);
+    }
+
+    #[Computed]
+    public function meetingUsers()
+    {
+        return MeetingUser::with([
+            'meeting:id,title,date,time,is_cancelled',
+            'user:id',
+            'user.user_info:user_id,full_name'
+        ])
+            ->where('user_id', auth()->id())
+            ->where('read_by_user', false)
+            ->latest('created_at')
+            ->select('id', 'meeting_id', 'user_id', 'is_present', 'reason_for_absent', 'read_by_user')
+            ->paginate(5);
     }
 
 

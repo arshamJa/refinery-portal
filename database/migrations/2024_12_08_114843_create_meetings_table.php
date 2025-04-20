@@ -24,8 +24,8 @@ return new class extends Migration
             $table->json('guest'); // this could be multiple
             $table->string('applicant'); // نام درخواست دهنده جلسه
             $table->string('position_organization');
-            $table->string('reminder');
             $table->smallInteger('is_cancelled')->default('0');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

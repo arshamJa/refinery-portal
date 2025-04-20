@@ -19,7 +19,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li class="flex items-center h-full">
-                <a href="{{route('meetingsList')}}"
+                <a href="{{route('dashboard.meeting')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
                     <span>{{__('جدول جلسات')}}</span>
                 </a>
@@ -31,7 +31,7 @@
             <li>
                     <span
                         class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                       {{__('درج اقدامات')}}
+                       {{__('صفحه صورتحساب')}}
                     </span>
             </li>
         </ol>
@@ -41,7 +41,7 @@
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
                 <div><strong>{{__('واحد/کمیته:')}}</strong>{{$meetings->unit_held}}</div>
-                <div><strong>{{__('تهیه کننده:')}}</strong>{{$meetings->scriptorium}}</div>
+                <div><strong>{{__('تهیه کننده(دبیرجلسه):')}}</strong>{{$meetings->scriptorium}}</div>
                 <div><strong>{{__('پیوست:')}}</strong> {{__('پیوست')}}</div>
                 <div><strong>{{__('تاریخ جلسه:')}}</strong>{{$meetings->date}}</div>
                 <div><strong>{{__('زمان جلسه:')}}</strong>{{$meetings->time}}</div>
@@ -173,7 +173,7 @@
             <table class="w-full text-right text-sm">
                 <thead>
                 <tr class="bg-gray-100 text-gray-700">
-                    @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده'] as $th)
+                    @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده','شرح اقدام','تاریخ اقدام',''] as $th)
                         <th class="px-4 py-3">{{ __($th) }}</th>
                     @endforeach
                 </tr>
@@ -186,6 +186,15 @@
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
                         <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                            this is the text that each one has done.
+                        </td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                            the sent date
+                        </td>
+                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                            view button
+                        </td>
                         {{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
                         {{--                               <span--}}
                         {{--                                   class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">--}}

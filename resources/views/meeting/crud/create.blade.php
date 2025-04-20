@@ -132,141 +132,33 @@
         <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
             {{--            Scriptorium Information   --}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-                {{--                <div>--}}
-                {{--                    --}}{{--  make a select dropdown to check one or more of it --}}
-                {{--                    <x-input-label for="unit_organization" :value="__('انتخاب واحد سازمانی')"/>--}}
-                {{--                    <x-text-input name="unit_organization" id="unit_organization"--}}
-                {{--                                  value="{{old('unit_organization')}}"--}}
-                {{--                                  class="block" type="text" autofocus/>--}}
-                {{--                    <x-input-error :messages="$errors->get('unit_organization')"/>--}}
-                {{--                </div>--}}
-
-
-                <div class="custom-select-unit_organization w-full relative">
-                    <x-input-label for="unit_organization" class="mb-2" :value="__('انتخاب واحد سازمانی')"/>
-                    <div
-                        class="select-box-unit_organization flex items-center justify-between flex-wrap gap-1 border border-gray-300 rounded-md px-3 py-2 cursor-pointer bg-white min-h-[42px]">
-                        <input type="text" class="tags_input_unit_organization" name="unit_organization" hidden>
-                        <div
-                            class="selected-options-unit_organization flex flex-wrap gap-1 text-sm text-gray-700"></div>
-                        <div class="ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-600">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div
-                        class="options-unit_organization mt-1 border border-gray-300 bg-white rounded-md shadow-md hidden absolute w-full z-10">
-                        <div
-                            class="option-unit_organization px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
-                            data-value="inside">{{__('درون واحدی')}}</div>
-                        <div
-                            class="option-unit_organization px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
-                            data-value="outside">{{__('درون سازمانی')}}</div>
-                    </div>
-                    <x-input-error :messages="$errors->get('unit_organization')"/>
-                </div>
-
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        unitOrg();
-                    });
-
-                    function unitOrg() {
-                        const wrapper = document.querySelector('.custom-select-unit_organization');
-                        const selectBox = wrapper.querySelector('.select-box-unit_organization');
-                        const optionsBox = wrapper.querySelector('.options-unit_organization');
-                        const options = wrapper.querySelectorAll('.option-unit_organization');
-                        const selectedContainer = wrapper.querySelector('.selected-options-unit_organization');
-                        const inputField = wrapper.querySelector('.tags_input_unit_organization');
-
-                        let selectedValues = [];
-
-                        // Toggle dropdown
-                        selectBox.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            optionsBox.classList.toggle('hidden');
-                        });
-
-                        // Select options
-                        options.forEach(option => {
-                            option.addEventListener('click', () => {
-                                const value = option.getAttribute('data-value');
-                                const label = option.textContent.trim();
-
-                                if (!selectedValues.includes(value)) {
-                                    selectedValues.push(value);
-                                    renderSelected();
-                                }
-                            });
-                        });
-
-                        // Render selected items
-                        function renderSelected() {
-                            selectedContainer.innerHTML = '';
-                            selectedValues.forEach(val => {
-                                const label = getLabel(val);
-
-                                const tag = document.createElement('span');
-                                tag.className = "bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded flex items-center gap-1";
-                                tag.innerHTML = `${label} <button type="button" class="text-blue-600 hover:text-blue-800 text-sm font-bold">&times;</button>`;
-
-                                tag.querySelector('button').addEventListener('click', () => {
-                                    selectedValues = selectedValues.filter(v => v !== val);
-                                    renderSelected();
-                                });
-
-                                selectedContainer.appendChild(tag);
-                            });
-
-                            inputField.value = selectedValues.join(',');
-                        }
-
-                        // Helper to get label from option
-                        function getLabel(value) {
-                            const match = Array.from(options).find(opt => opt.getAttribute('data-value') === value);
-                            return match ? match.textContent.trim() : value;
-                        }
-
-                        // Hide dropdown when clicking outside
-                        document.addEventListener('click', (e) => {
-                            if (!wrapper.contains(e.target)) {
-                                optionsBox.classList.add('hidden');
-                            }
-                        });
-                    }
-                </script>
-
-
-                {{-- make it a select dropdown with one option been selected, it will be filtered based on the above selection--}}
                 <div>
                     <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
                     <x-text-input name="scriptorium" id="scriptorium"
-                                  value="{{old('scriptorium')}}"
+                                  value="{{ old('scriptorium', auth()->user()->full_name() ?? '') }}"
                                   class="block " type="text" autofocus/>
                     <x-input-error :messages="$errors->get('scriptorium')"/>
                 </div>
                 <div>
-                    <x-input-label for="position_organization" :value="__('سمت سازمانی دبیر جلسه')"/>
+                    <x-input-label for="unit_organization" :value="__('واحد سازمانی')"/>
+                    <x-text-input name="unit_organization" id="unit_organization"
+                                  value="{{ old('unit_organization', auth()->user()->user_info->department->department_name ?? '') }}"
+                                  class="block " type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('unit_organization')"/>
+                </div>
+
+                <div>
+                    <x-input-label for="position_organization" :value="__('سمت دبیر جلسه')"/>
                     <x-text-input name="position_organization" id="position_organization"
-                                  value="{{old('position_organization')}}"
+                                  value="{{ old('position_organization', auth()->user()->user_info->position ?? '') }}"
                                   class="block " type="text" autofocus/>
                     <x-input-error :messages="$errors->get('position_organization')"/>
                 </div>
                 <div>
                     <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
-                    <x-select-input name="unit_held" id="unit_held" dir="ltr">
-                        <option value="">...</option>
-                        @foreach($departments as $department)
-                            <option value="{{ $department->id }}"
-                                    @if(old('department', $department_id ?? '') == $department->id) selected @endif>
-                                {{ $department->department_name }}
-                            </option>
-                        @endforeach
-                    </x-select-input>
+                    <x-text-input name="unit_held" id="unit_held"
+                                  value="{{old('applicant')}}"
+                                  class="block" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('unit_held')"/>
                 </div>
             </div>
@@ -322,27 +214,21 @@
                     </div>
                     <x-input-error :messages="$errors->get('holders')"/>
                 </div>
-
                 {{--            Guests--}}
                 <div class="col-span-2">
                     <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">لیست مهمانان</label>
-                        <!-- Checkbox for outer_organization -->
+                        <label class="block mb-2 text-sm font-medium text-gray-700">{{__('لیست مهمانان')}}</label>
                         <div class="flex items-center space-x-4 mb-4">
                             <input type="checkbox" id="outer-organization-checkbox" class="h-4 w-4 text-blue-600"/>
-                            <label for="outer-organization-checkbox"
-                                   class="cursor-pointer text-sm font-medium text-gray-700">درون سازمانی</label>
+                            <label for="outer-organization-checkbox" class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
                         </div>
                         <!-- Table for inner_organization (default table) -->
-                        <div id="inner-organization-table"
-                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
-                            <table id="guests-inner-table"
-                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                        <div id="inner-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
+                            <table id="guests-inner-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-2 text-right">#</th>
                                     <th class="px-4 py-2 text-right">نام و نام خانوادگی</th>
-                                    <th class="px-4 py-2 text-right">نام واحد سازمانی</th>
                                     <th class="px-4 py-2 text-right">واحد سازمانی</th>
                                     <th class="px-4 py-2 text-center">عملیات</th>
                                 </tr>
@@ -353,9 +239,7 @@
                                 <tfoot class="bg-gray-50">
                                 <tr>
                                     <td colspan="5" class="px-4 py-3 text-left">
-                                        <button type="button"
-                                                id="add-inner-guest-btn"
-                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                                        <button type="button" id="add-inner-guest-btn" class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
                                             افزودن مهمان
                                         </button>
                                     </td>
@@ -363,11 +247,10 @@
                                 </tfoot>
                             </table>
                         </div>
+
                         <!-- Table for outer_organization (will appear when checkbox is checked) -->
-                        <div id="outer-organization-table"
-                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
-                            <table id="guests-outer-table"
-                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                        <div id="outer-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
+                            <table id="guests-outer-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-2 text-right">#</th>
@@ -382,9 +265,7 @@
                                 <tfoot class="bg-gray-50">
                                 <tr>
                                     <td colspan="4" class="px-4 py-3 text-left">
-                                        <button type="button"
-                                                id="add-outer-guest-btn"
-                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                                        <button type="button" id="add-outer-guest-btn" class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
                                             افزودن مهمان
                                         </button>
                                     </td>
@@ -395,10 +276,11 @@
                         <x-input-error :messages="$errors->get('guest')" class="mt-2"/>
                     </div>
                 </div>
+
                 <script>
                     // Initialize empty arrays for guests
-                    let innerGuests = [];
-                    let outerGuests = [];
+                    let innerGuests = @json(old('guests.inner', [])); // Use old data if available
+                    let outerGuests = @json(old('guests.outer', [])); // Use old data if available
 
                     // Get references to the DOM elements
                     const innerGuestsTbody = document.getElementById('guests-inner-tbody');
@@ -412,7 +294,7 @@
                     // Function to add a new inner organization guest
                     function addInnerGuest() {
                         const index = innerGuests.length;
-                        const guest = {name: '', organizationName: '', department: ''}; // Default empty values
+                        const guest = {name: '', department: ''}; // Default empty values
                         innerGuests.push(guest);
                         renderInnerGuests(); // Re-render the inner guest table
                     }
@@ -454,12 +336,9 @@
                             const row = document.createElement('tr');
                             row.innerHTML = `
                 <td class="px-4 py-2">${index + 1}</td>
-                <td class="px-4 py-2"><input type="text" value="${guest.name}" class="w-full" placeholder="نام مهمان" onchange="updateInnerGuest(${index}, 'name', this.value)" /></td>
-                <td class="px-4 py-2"><input type="text" value="${guest.organizationName}" class="w-full" placeholder="نام واحد سازمانی" onchange="updateInnerGuest(${index}, 'organizationName', this.value)" /></td>
-                <td class="px-4 py-2"><input type="text" value="${guest.department}" class="w-full" placeholder="واحد سازمانی" onchange="updateInnerGuest(${index}, 'department', this.value)" /></td>
-                <td class="px-4 py-2 text-center">
-                    <button type="button" class="text-red-600" onclick="removeInnerGuest(${index})">×</button>
-                </td>
+                <td class="px-4 py-2"><input type="text" name="guests[inner][${index}][name]" value="${guest.name}" class="w-full" placeholder="نام مهمان" /></td>
+                <td class="px-4 py-2"><input type="text" name="guests[inner][${index}][department]" value="${guest.department}" class="w-full" placeholder="واحد سازمانی" /></td>
+                <td class="px-4 py-2 text-center"><button type="button" class="text-red-600" onclick="removeInnerGuest(${index})">×</button></td>
             `;
                             innerGuestsTbody.appendChild(row);
                         });
@@ -472,11 +351,9 @@
                             const row = document.createElement('tr');
                             row.innerHTML = `
                 <td class="px-4 py-2">${index + 1}</td>
-                <td class="px-4 py-2"><input type="text" value="${guest.name}" class="w-full" placeholder="نام مهمان" onchange="updateOuterGuest(${index}, 'name', this.value)" /></td>
-                <td class="px-4 py-2"><input type="text" value="${guest.companyName}" class="w-full" placeholder="نام شرکت" onchange="updateOuterGuest(${index}, 'companyName', this.value)" /></td>
-                <td class="px-4 py-2 text-center">
-                    <button type="button" class="text-red-600" onclick="removeOuterGuest(${index})">×</button>
-                </td>
+                <td class="px-4 py-2"><input type="text" name="guests[outer][${index}][name]" value="${guest.name}" class="w-full" placeholder="نام مهمان" /></td>
+                <td class="px-4 py-2"><input type="text" name="guests[outer][${index}][companyName]" value="${guest.companyName}" class="w-full" placeholder="نام شرکت" /></td>
+                <td class="px-4 py-2 text-center"><button type="button" class="text-red-600" onclick="removeOuterGuest(${index})">×</button></td>
             `;
                             outerGuestsTbody.appendChild(row);
                         });
@@ -498,43 +375,19 @@
                     // Initial render of tables
                     renderInnerGuests();
                 </script>
+
                 <div class="col-span-1 mt-12">
                     <x-primary-button type="submit">
                         {{ __('ارسال') }}
                     </x-primary-button>
-                    <a href="{{route('dashboard')}}">
+                    <a href="{{route('dashboard.meeting')}}">
                         <x-secondary-button>
                             {{__('لغو')}}
                         </x-secondary-button>
                     </a>
                 </div>
             </div>
-
-
         </div>
-
-
-        {{--        <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">--}}
-        {{--            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 ">--}}
-
-        {{--                <div class="sm:col-span-1">--}}
-        {{--                    <x-input-label for="signature" :value="__('امضا')"/>--}}
-        {{--                    <x-text-input name="signature" id="signature"--}}
-        {{--                                  value="{{old('signature')}}"--}}
-        {{--                                  class="block p-2" type="file" autofocus/>--}}
-        {{--                    <x-input-error :messages="$errors->get('signature')"/>--}}
-        {{--                </div>--}}
-
-        {{--                <div class="sm:col-span-1">--}}
-        {{--                    <x-input-label for="reminder" :value="__('زمان جهت یادآوری (دقیقه)')"/>--}}
-        {{--                    <x-text-input name="reminder" id="reminder"--}}
-        {{--                                  value="{{old('reminder')}}" placeholder="{{__('دقیقه')}}"--}}
-        {{--                                  class="block" type="text" autofocus/>--}}
-        {{--                    <x-input-error :messages="$errors->get('reminder')"/>--}}
-        {{--                </div>--}}
-        {{--            </div>--}}
-        {{--        </div>--}}
-
     </form>
 </x-app-layout>
 

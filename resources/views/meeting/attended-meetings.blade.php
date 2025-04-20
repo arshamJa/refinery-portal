@@ -20,6 +20,7 @@
             <span class="active-breadcrumb">{{__('لیست جلساتی که در آن شرکت کردم')}}</span>
         </li>
     </x-breadcrumb>
+
     <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
         <form method="GET" action="{{ route('attended.meetings') }}" class="mb-4">
             @csrf

@@ -12,8 +12,11 @@ use App\Models\MeetingUser;
 use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use phpDocumentor\Reflection\Types\Null_;
 
 class CreateNewMeetingController extends Controller
 {
@@ -71,6 +74,38 @@ class CreateNewMeetingController extends Controller
     public function store(MeetingStoreRequest $request)
     {
         $request->validated();
+
+        $innerGuests = collect($request->input('guests.inner', []))
+            ->map(function ($guest) {
+                return [
+                    'name' => preg_replace('/\s+/', ' ', trim($guest['name'] ?? '')),
+                    'department' => preg_replace('/\s+/', ' ', trim($guest['department'] ?? '')),
+                ];
+            })
+            ->filter(function ($guest) {
+                return $guest['name'] !== '' || $guest['department'] !== '';
+            })
+            ->values()
+            ->all();
+
+        $outerGuests = collect($request->input('guests.outer', []))
+            ->map(function ($guest) {
+                $name = preg_replace('/\s+/', ' ', trim($guest['name'] ?? ''));
+                $companyName = preg_replace('/\s+/', ' ', trim($guest['companyName'] ?? ''));
+
+                return [
+                    'name' => $name !== '' ? $name : null,
+                    'companyName' => $companyName !== '' ? $companyName : null,
+                ];
+            })
+            ->filter(function ($guest) {
+                return $guest['name'] !== null || $guest['companyName'] !== null;
+            })
+            ->values();
+
+
+
+
         // Convert current Gregorian date to Jalali
         [$jaYear, $jaMonth, $jaDay] = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
@@ -91,7 +126,6 @@ class CreateNewMeetingController extends Controller
                 'time' => 'در این زمان جلسه ثبت شده است'
             ]);
         }else{
-            $signature_path = $request->signature->store('signatures','public');
             $meeting = Meeting::create([
                 'title' => $request->title,
                 'unit_organization' => $request->unit_organization,
@@ -101,24 +135,41 @@ class CreateNewMeetingController extends Controller
                 'time' => $request->time,
                 'unit_held' => $request->unit_held,
                 'treat' => $request->treat,
-                'guest' => $request->guest,
+                'guest' => $outerGuests ?? null,
                 'applicant' => $request->applicant,
                 'position_organization' => $request->position_organization,
-//                'signature' => $signature_path,
-                'signature' => null,
-//                'reminder'  => $request->reminder,
-                'reminder'  => null,
             ]);
-            // Add meeting users in bulk
-            $holders = Str::of($request->holders)->explode(',')->map(fn($holder) => [
-                'user_id' => trim($holder),
-                'meeting_id' => $meeting->id,
-                'created_at'  => now(),
-                'updated_at'  => now(),
-            ])->toArray();
-            MeetingUser::insert($holders);
+
+            $meetingUserRecords = [];
+
+            // 1. Holders
+            $holders = Str::of($request->holders)->explode(',');
+            foreach ($holders as $holder) {
+                $meetingUserRecords[] = [
+                    'user_id' => trim($holder),
+                    'meeting_id' => $meeting->id,
+                    'is_guest' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // 2. Inner Guests
+            foreach ($innerGuests as $guest) {
+                $userInfo = UserInfo::where('full_name', $guest['name'])->first();
+                $meetingUserRecords[] = [
+                    'user_id' => $userInfo?->user_id,
+                    'meeting_id' => $meeting->id,
+                    'is_guest' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            // 3. Insert everything at once
+            MeetingUser::insert($meetingUserRecords);
+
         }
-        return to_route('dashboard')->with('status','جلسه جدبد ساخته و دعوتنامه به اعضا جلسه ارسال شد');
+        return to_route('dashboard.meeting')->with('status','جلسه جدبد ساخته و دعوتنامه به اعضا جلسه ارسال شد');
     }
 
     /**
@@ -302,9 +353,18 @@ class CreateNewMeetingController extends Controller
      */
     public function destroy(string $id)
     {
-        $meeting = Meeting::findOrFail($id);
-        $meeting->meetingUsers()->delete();
-        $meeting->delete();
-        return to_route('meeting.table')->with('status',' جلسه با موفقیت حذف شد');
+        $meeting = Meeting::with('meetingUsers')->findOrFail($id);
+        try {
+            DB::transaction(function () use ($meeting) {
+                // Soft delete related meeting users
+                $meeting->meetingUsers()->delete();
+                // Soft delete the meeting itself
+                $meeting->delete();
+            });
+            return to_route('dashboard.meeting')->with('status',' جلسه با موفقیت حذف شد');
+        } catch (\Exception $e) {
+            return to_route('dashboard.meeting')->with('error', 'خطا در حذف جلسه: ' . $e->getMessage());
+        }
     }
+
 }

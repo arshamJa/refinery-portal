@@ -155,11 +155,9 @@
                     @endforelse
                 </x-slot>
             </x-table.table>
-
             <div class="p-2 mx-2">
                 {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
             </div>
-
         </div>
     </div>
 </x-app-layout>

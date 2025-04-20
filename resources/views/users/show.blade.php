@@ -44,7 +44,7 @@
                 <h2 class="text-xl font-semibold text-gray-800">اطلاعات شخصی</h2>
                 <a href="{{ route('users.edit', $userInfo->id) }}"
                    class="text-sm text-white bg-[#001BC9] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 transition duration-300 ease-in-out px-3 py-2 rounded-md shadow-sm">
-                    ویرایش اطلاعات
+                     ویرایش اطلاعات و دسترسی های کاربر
                 </a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
