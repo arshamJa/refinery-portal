@@ -13,7 +13,6 @@ $maxWidth = [
     '2xl' => 'sm:max-w-2xl',
 ][$maxWidth];
 @endphp
-
 <div
     x-data="{
         show: false,
@@ -78,3 +77,4 @@ $maxWidth = [
         {{$slot}}
     </div>
 </div>
+

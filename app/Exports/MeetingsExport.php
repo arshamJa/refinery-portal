@@ -20,10 +20,30 @@ class MeetingsExport implements FromCollection, WithHeadings
     {
         return $this->meetings->values()->map(function ($meeting, $index) {
             // Get full names of participants
+//            $participants = $meeting->meetingUsers
+//                ->map(fn($mu) => optional($mu->user->user_info)->full_name)
+//                ->filter()
+//                ->join(', ');
+
+//            $participants = $meeting->meetingUsers
+//                ->map(function ($mu) {
+//                    // Check if the user exists and if user_info is available
+//                    return optional($mu->user)->user_info ? optional($mu->user->user_info)->full_name : null;
+//                })
+//                ->filter()  // Filter out null values
+//                ->join(', ');
+
+            // Get full names of participants (including all meeting user info)
             $participants = $meeting->meetingUsers
-                ->map(fn($mu) => optional($mu->user->user_info)->full_name)
-                ->filter()
+                ->map(function ($mu) {
+                    // Ensure there's no null value when accessing user_info
+                    return optional($mu->user)->user_info ? optional($mu->user->user_info)->full_name : null;
+                })
+                ->filter()  // Filter out null values
                 ->join(', ');
+
+
+
 
             // Parse guest field if needed
             $guests = collect(is_array($meeting->guest) ? $meeting->guest : json_decode($meeting->guest, true))

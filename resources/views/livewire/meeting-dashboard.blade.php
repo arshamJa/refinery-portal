@@ -73,98 +73,172 @@
         </div>
     @endcan
 
+    <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
 
-    <div class="pt-4 overflow-x-auto overflow-y-hidden sm:pt-6 pb-16 mb-4 bg-red-600">
-        <x-table.table>
-            <x-slot name="head">
-                @foreach ([
-                       'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','وضعیت جلسه','رویت صورتحساب',''
-                   ] as $th)
-                    <x-table.heading>{{ __($th) }}</x-table.heading>
-                @endforeach
-            </x-slot>
-            <x-slot name="body">
-                @forelse($this->meetings as $meeting)
-                    <x-table.row>
-                        <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
-                        <x-table.cell>{{$meeting->title}}</x-table.cell>
-                        <x-table.cell>{{$meeting->scriptorium}}</x-table.cell>
-                        <x-table.cell>{{$meeting->unit_organization}}</x-table.cell>
-                        <x-table.cell>{{$meeting->date}}</x-table.cell>
-                        <x-table.cell>{{$meeting->time}}</x-table.cell>
-                        <x-table.cell>{{$meeting->location}}</x-table.cell>
-                        <x-table.cell>
-                            @if($meeting->is_cancelled == '0')
-                                <span
-                                    class="inline-block bg-yellow-400 text-xs text-black font-bold px-2 py-1 rounded-full m-0.5">
+        <form wire:submit="filterMeetings"
+              class="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
+            <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
+                <!-- Search Input -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                    <x-search-input>
+                        <x-text-input type="text" id="search" wire:model="search" class="block ps-10"
+                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                    </x-search-input>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="col-span-6 sm:col-span-1">
+                    <x-input-label for="statusFilter" value="{{ __('وضعیت جلسه') }}"/>
+                    <x-select-input id="statusFilter" wire:model="statusFilter">
+                        <option value="">{{__('همه وضعیت‌ها')}}</option>
+                        <option value="0">{{__('در حال بررسی')}}</option>
+                        <option value="1">{{__('جلسه لغو شد')}}</option>
+                        <option value="-1">{{__('جلسه تشکیل می‌شود')}}</option>
+                    </x-select-input>
+                </div>
+
+                <!-- Date Inputs (side-by-side) -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
+                            <x-date-input>
+                                <x-text-input id="start_date" wire:model="start_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
+                        <div class="flex-1">
+                            <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
+                            <x-date-input>
+                                <x-text-input id="end_date" wire:model="end_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search + Show All Buttons -->
+                <div class="col-span-6 lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
+                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                    @if($search || $start_date || $statusFilter !== '')
+                        <x-view-all-link href="{{ route('dashboard.meeting') }}">
+                            {{ __('نمایش همه') }}
+                        </x-view-all-link>
+                    @endif
+                </div>
+
+                <!-- Export Button under the right group -->
+                <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
+                    {{--                    <x-export-link href="{{ route('scriptorium.report.export.excel', request()->query()) }}">--}}
+                    {{--                        {{ __('خروجی Excel') }}--}}
+                    {{--                    </x-export-link>--}}
+{{--                    <x-export-link--}}
+{{--                        href="{{ route('scriptorium.report.export.excel', array_filter([--}}
+{{--        'search' => $search,--}}
+{{--        'start_date' => $start_date,--}}
+{{--        'end_date' => $end_date,--}}
+{{--        'statusFilter' => $statusFilter--}}
+{{--    ])) }}">--}}
+{{--                        {{ __('خروجی Excel') }}--}}
+{{--                    </x-export-link>--}}
+                    <button wire:click="exportExcel" class="btn btn-primary">
+                        {{ __('Export Excel') }}
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="pt-4 overflow-x-auto overflow-y-hidden sm:pt-6 pb-16 mb-4 bg-white">
+            <x-table.table>
+                <x-slot name="head">
+                    @foreach ([
+                           'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','وضعیت جلسه','رویت صورتحساب',''
+                       ] as $th)
+                        <x-table.heading>{{ __($th) }}</x-table.heading>
+                    @endforeach
+                </x-slot>
+                <x-slot name="body">
+                    @forelse($this->meetings as $meeting)
+                        <x-table.row wire:key="meeting-{{ $meeting->id }}">
+                            <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
+                            <x-table.cell>{{$meeting->title}}</x-table.cell>
+                            <x-table.cell>{{$meeting->scriptorium}}</x-table.cell>
+                            <x-table.cell>{{$meeting->unit_organization}}</x-table.cell>
+                            <x-table.cell>{{$meeting->date}}</x-table.cell>
+                            <x-table.cell>{{$meeting->time}}</x-table.cell>
+                            <x-table.cell>{{$meeting->location}}</x-table.cell>
+                            <x-table.cell>
+                                @if($meeting->is_cancelled == '0')
+                                    <span
+                                        class="inline-block bg-yellow-400 text-xs text-black font-bold px-2 py-1 rounded-full m-0.5">
                                     {{__('درحال بررسی...')}}
                                 </span>
-                            @elseif($meeting->is_cancelled == '1')
-                                <span
-                                    class="inline-block bg-[#E96742] text-xs text-white font-bold px-2 py-1 rounded-full m-0.5">
+                                @elseif($meeting->is_cancelled == '1')
+                                    <span
+                                        class="inline-block bg-[#E96742] text-xs text-white font-bold px-2 py-1 rounded-full m-0.5">
                                     {{__('جلسه لغو شد')}}
                                 </span>
-                            @elseif($meeting->is_cancelled == '-1')
-                                <span
-                                    class="inline-block bg-green-500 text-xs text-white font-bold px-2 py-1 rounded-full m-0.5">
+                                @elseif($meeting->is_cancelled == '-1')
+                                    <span
+                                        class="inline-block bg-green-500 text-xs text-white font-bold px-2 py-1 rounded-full m-0.5">
                                     {{__('جلسه تشکیل میشود')}}
                                 </span>
-                            @endif
-                        </x-table.cell>
-                        <x-table.cell>
-                            @if($meeting->is_cancelled == '-1')
-                                <a href="{{route('tasks.create',$meeting->id)}}">
-                                    <x-primary-button>
-                                        {{ __('نمایش') }}
-                                    </x-primary-button>
-                                </a>
-                            @endif
-                        </x-table.cell>
-                        <x-table.cell>
-                            <x-dropdown>
-                                <x-slot name="trigger">
-                                    <button class="hover:bg-gray-200 rounded-full p-1 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                             class="w-5 h-5 text-gray-600">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                                        </svg>
-                                    </button>
-                                </x-slot>
-                                <x-slot name="content">
-                                    <x-dropdown-link wire:click="view({{$meeting->id}})">
-                                        {{ __('نمایش') }}
-                                    </x-dropdown-link>
-                                    @if($meeting->is_cancelled != '1' and $meeting->is_cancelled != '-1')
-                                        <x-dropdown-link href="#">
-                                            {{ __('ویرایش') }}
-                                        </x-dropdown-link>
-                                    @endif
-                                    @if( $meeting->is_cancelled == '0' or $meeting->is_cancelled == '1')
-                                        <button wire:click="deleteMeeting({{$meeting->id}})"
-                                                class="block w-full px-4 py-2 text-start text-sm text-red-600 hover:bg-red-100">
-                                            {{ __('حذف') }}
+                                @endif
+                            </x-table.cell>
+                            <x-table.cell>
+                                @if($meeting->is_cancelled == '-1')
+                                    <a href="{{route('tasks.create',$meeting->id)}}">
+                                        <x-primary-button>
+                                            {{ __('نمایش') }}
+                                        </x-primary-button>
+                                    </a>
+                                @endif
+                            </x-table.cell>
+                            <x-table.cell>
+                                <x-dropdown>
+                                    <x-slot name="trigger">
+                                        <button class="hover:bg-gray-200 rounded-full p-1 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                 class="w-5 h-5 text-gray-600">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                            </svg>
                                         </button>
-                                    @endif
-                                </x-slot>
-                            </x-dropdown>
-                        </x-table.cell>
-                    </x-table.row>
-                @empty
-                    <x-table.row>
-                        <x-table.cell colspan="9" class="py-6">
-                            {{__('رکوردی یافت نشد...')}}
-                        </x-table.cell>
-                    </x-table.row>
-                @endforelse
-            </x-slot>
-        </x-table.table>
-        <span class="p-2 mx-2">
+                                    </x-slot>
+                                    <x-slot name="content">
+                                        <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
+                                            {{ __('نمایش') }}
+                                        </x-dropdown-link>
+                                        @if($meeting->is_cancelled != '1' and $meeting->is_cancelled != '-1')
+                                            <x-dropdown-link href="#">
+                                                {{ __('ویرایش') }}
+                                            </x-dropdown-link>
+                                        @endif
+                                        @if( $meeting->is_cancelled == '0' or $meeting->is_cancelled == '1')
+                                            <button wire:click="deleteMeeting({{$meeting->id}})"
+                                                    class="block w-full px-4 py-2 text-start text-sm text-red-600 hover:bg-red-100">
+                                                {{ __('حذف') }}
+                                            </button>
+                                        @endif
+                                    </x-slot>
+                                </x-dropdown>
+                            </x-table.cell>
+                        </x-table.row>
+                    @empty
+                        <x-table.row>
+                            <x-table.cell colspan="9" class="py-6">
+                                {{__('رکوردی یافت نشد...')}}
+                            </x-table.cell>
+                        </x-table.row>
+                    @endforelse
+                </x-slot>
+            </x-table.table>
+            <span class="p-2 mx-2">
             {{ $this->meetings->withQueryString()->links(data: ['scrollTo' => false]) }}
         </span>
+        </div>
     </div>
-
     <x-modal name="view-meeting-modal" maxWidth="2xl">
         @if ($selectedMeeting)
             <!-- put in here : Authorization Check -->
@@ -176,10 +250,10 @@
 
             <div class="p-6 max-h-[80vh] overflow-y-auto space-y-6 text-sm text-gray-800 dark:text-gray-200">
 
-                {{-- Title --}}
+                {{--                 Title--}}
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $selectedMeeting->title }}</h2>
 
-                {{-- Info grid --}}
+                {{--                 Info grid--}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[15px]">
                     <div><strong>{{__('دبیرجلسه:')}}</strong> {{ $selectedMeeting->scriptorium }}</div>
                     <div><strong>{{__('واحد سازمانی:')}}</strong> {{ $selectedMeeting->unit_organization }}</div>
@@ -195,32 +269,32 @@
                     <div><strong>{{__('درخواست دهنده جلسه:')}}</strong> {{ $selectedMeeting->applicant }}</div>
                 </div>
 
-                {{-- Participants --}}
+                {{--                 Participants--}}
                 <div>
                     <h4 class="text-md font-semibold mb-2">{{__('اعضای جلسه')}}</h4>
                     <ul class="space-y-3">
                         @foreach($selectedMeeting->meetingUsers as $user)
                             @if(!$user->is_guest)
-                                {{--                                 Only show participants (non-guests)--}}
+                                {{--                                                                 Only show participants (non-guests)--}}
                                 <li class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm space-y-1">
                                     <div>
                                         <strong>{{__('نام:')}}</strong> {{ $user->user->user_info->full_name ?? 'N/A' }}
                                     </div>
-                                    {{--                                     Show Department and Position--}}
+                                    {{--                                                                         Show Department and Position--}}
                                     <div>
                                         <strong>{{__('واحد:')}}</strong> {{ $user->user->user_info->department->department_name ?? 'N/A' }}
                                     </div>
-                                    {{--                                    Assuming the department is related to `UserInfo`--}}
+                                    {{--                                                                        Assuming the department is related to `UserInfo`--}}
                                     <div><strong>{{__('سمت:')}}</strong> {{ $user->user->user_info->position ?? 'N/A' }}
                                     </div>
-                                    {{--                                    Assuming the position is related to `UserInfo`--}}
+                                    {{--                                                                        Assuming the position is related to `UserInfo`--}}
                                 </li>
                             @endif
                         @endforeach
                     </ul>
                 </div>
 
-                {{-- Outer Guests --}}
+                {{--                 Outer Guests--}}
                 <div>
                     <h3 class="text-lg font-semibold mt-4 mb-2">{{__('مهمانان برون سازمانی')}}</h3>
                     @if (!empty($guests))
@@ -244,7 +318,7 @@
                     @endif
                 </div>
 
-                {{-- Inner Guests --}}
+                {{--                 Inner Guests--}}
                 <div>
                     <h3 class="text-lg font-semibold mt-4 mb-2">{{ __('مهمانان درون سازمانی') }}</h3>
                     @if (!empty($innerGuests) && $innerGuests->isNotEmpty())
@@ -278,7 +352,7 @@
                 </div>
                 <div class="px-6 py-4" dir="rtl">
                     <div class="mt-4 text-sm text-gray-600">
-                        {{-- Show a bit of meeting info for confirmation --}}
+                        {{--                         Show a bit of meeting info for confirmation--}}
                         <ul class="list-disc list-inside text-sm space-y-2">
                             <li><strong>{{ __('عنوان جلسه:') }}</strong> {{ $selectedMeeting->title }}</li>
                             <li><strong>{{ __('تاریخ:') }}</strong> {{ $selectedMeeting->date }}</li>
@@ -299,36 +373,8 @@
                     </x-secondary-button>
                 </div>
             </form>
-
-
         @endif
     </x-modal>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 </div>
