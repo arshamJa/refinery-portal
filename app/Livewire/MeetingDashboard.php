@@ -138,8 +138,6 @@ class MeetingDashboard extends Component
         return Excel::download(new MeetingsExport($meetings), 'meetings.xlsx');
     }
 
-
-
     public $selectedMeeting;
 
     public function view($id)

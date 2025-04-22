@@ -128,34 +128,24 @@
 
                 <!-- Export Button under the right group -->
                 <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
-                    {{--                    <x-export-link href="{{ route('scriptorium.report.export.excel', request()->query()) }}">--}}
-                    {{--                        {{ __('خروجی Excel') }}--}}
-                    {{--                    </x-export-link>--}}
-{{--                    <x-export-link--}}
-{{--                        href="{{ route('scriptorium.report.export.excel', array_filter([--}}
-{{--        'search' => $search,--}}
-{{--        'start_date' => $start_date,--}}
-{{--        'end_date' => $end_date,--}}
-{{--        'statusFilter' => $statusFilter--}}
-{{--    ])) }}">--}}
-{{--                        {{ __('خروجی Excel') }}--}}
-{{--                    </x-export-link>--}}
-                    <button wire:click="exportExcel" class="btn btn-primary">
-                        {{ __('Export Excel') }}
-                    </button>
+                    <x-export-link wire:click.prevent="exportExcel">
+                        {{ __('خروجی Excel') }}
+                    </x-export-link>
                 </div>
             </div>
 
         </form>
 
-        <div class="pt-4 overflow-x-auto overflow-y-hidden sm:pt-6 pb-16 mb-4 bg-white">
+        <div class="pt-4 w-full overflow-x-auto overflow-y-hidden sm:pt-6 pb-16 mb-4 bg-white">
             <x-table.table>
                 <x-slot name="head">
-                    @foreach ([
-                           'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','وضعیت جلسه','رویت صورتحساب',''
+                    <x-table.row>
+                        @foreach ([
+                           'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','رویت صورتحساب',''
                        ] as $th)
-                        <x-table.heading>{{ __($th) }}</x-table.heading>
-                    @endforeach
+                            <x-table.heading>{{ __($th) }}</x-table.heading>
+                        @endforeach
+                    </x-table.row>
                 </x-slot>
                 <x-slot name="body">
                     @forelse($this->meetings as $meeting)
@@ -168,19 +158,26 @@
                             <x-table.cell>{{$meeting->time}}</x-table.cell>
                             <x-table.cell>{{$meeting->location}}</x-table.cell>
                             <x-table.cell>
+                                <a href="{{route('presentUsers',$meeting->id)}}">
+                                    <x-secondary-button>
+                                        {{__('نمایش')}}
+                                    </x-secondary-button>
+                                </a>
+                            </x-table.cell>
+                            <x-table.cell>
                                 @if($meeting->is_cancelled == '0')
                                     <span
-                                        class="inline-block bg-yellow-400 text-xs text-black font-bold px-2 py-1 rounded-full m-0.5">
+                                        class="block w-full bg-yellow-400 text-xs text-black font-bold  px-4 py-1 rounded-xl m-0.5">
                                     {{__('درحال بررسی...')}}
-                                </span>
+                                    </span>
                                 @elseif($meeting->is_cancelled == '1')
                                     <span
-                                        class="inline-block bg-[#E96742] text-xs text-white font-bold px-2 py-1 rounded-full m-0.5">
+                                        class="block w-full bg-[#E96742] text-xs text-white font-bold  px-4 py-1 rounded-xl m-0.5">
                                     {{__('جلسه لغو شد')}}
                                 </span>
                                 @elseif($meeting->is_cancelled == '-1')
                                     <span
-                                        class="inline-block bg-green-500 text-xs text-white font-bold px-2 py-1 rounded-full m-0.5">
+                                        class="block w-full bg-green-500 text-xs text-white font-bold  px-4 py-1 rounded-xl m-0.5">
                                     {{__('جلسه تشکیل میشود')}}
                                 </span>
                                 @endif
@@ -235,10 +232,12 @@
                 </x-slot>
             </x-table.table>
             <span class="p-2 mx-2">
-            {{ $this->meetings->withQueryString()->links(data: ['scrollTo' => false]) }}
-        </span>
+                    {{ $this->meetings->withQueryString()->links(data: ['scrollTo' => false]) }}
+            </span>
         </div>
     </div>
+
+
     <x-modal name="view-meeting-modal" maxWidth="2xl">
         @if ($selectedMeeting)
             <!-- put in here : Authorization Check -->

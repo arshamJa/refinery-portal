@@ -36,6 +36,29 @@
             </li>
         </ol>
     </nav>
+
+    @php
+        $tasks = [
+            [
+                'body' => 'خلاصه مذاکرات و تصمیماتی که باید انجام شود.',
+                'time_out' => '1404/04/20',
+                'users' => [
+                    ['name' => 'استاد پویان اریسباران', 'action_description' => 'ارسال ایمیل', 'sent_date' => '1404/04/21'],
+                    ['name' => 'فیلا واعظ‌زاده', 'action_description' => 'تکمیل گزارش', 'sent_date' => '1404/04/22'],
+                    ['name' => 'پانوبه معارف', 'action_description' => 'بررسی مدارک', 'sent_date' => '1404/04/23'],
+                ]
+            ],
+            [
+                'body' => 'جلسه هماهنگی پروژه جدید.',
+                'time_out' => '1404/04/25',
+                'users' => [
+                    ['name' => 'طللا عالی', 'action_description' => 'تنظیم صورتجلسه', 'sent_date' => '1404/04/26'],
+                    ['name' => 'خانم شیردخت حسابی', 'action_description' => 'ارسال برای تیم مالی', 'sent_date' => '1404/04/27'],
+                ]
+            ]
+        ];
+    @endphp
+
     <div class="p-6 max-w-6xl bg-white rounded-2xl shadow-md space-y-6">
         <form action="{{route('tasks.store', $meetings->id)}}" method="post" enctype="multipart/form-data">
             @csrf
@@ -160,7 +183,7 @@
                     <x-primary-button type="submit">
                         {{ __('ارسال') }}
                     </x-primary-button>
-                    <a href="{{route('meetingsList')}}">
+                    <a href="{{route('dashboard.meeting')}}">
                         <x-secondary-button>
                             {{__('لغو')}}
                         </x-secondary-button>
@@ -169,43 +192,87 @@
             </div>
 
         </form>
-        <div class="mt-6 border-t pt-4">
-            <table class="w-full text-right text-sm">
-                <thead>
-                <tr class="bg-gray-100 text-gray-700">
-                    @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده','شرح اقدام','تاریخ اقدام',''] as $th)
-                        <th class="px-4 py-3">{{ __($th) }}</th>
-                    @endforeach
+
+
+
+    <table class="w-full text-right text-sm">
+        <thead>
+        <tr class="bg-gray-100 text-gray-700">
+            <th class="px-4 py-3">ردیف</th>
+            <th class="px-4 py-3">خلاصه مذاکرات و تصمیمات اتخاذ شده</th>
+            <th class="px-4 py-3">مهلت اقدام</th>
+            <th class="px-4 py-3">اقدام کننده</th>
+            <th class="px-4 py-3">شرح اقدام</th>
+            <th class="px-4 py-3">تاریخ انجام اقدام</th>
+            <th class="px-4 py-3"></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach ($tasks as $index => $task)
+            @foreach ($task['users'] as $userIndex => $user)
+                <tr class="border-t">
+                    @if ($userIndex === 0)
+                        <td class="px-4 py-4" rowspan="{{ count($task['users']) }}">{{ $index + 1 }}</td>
+                        <td class="px-4 py-4" rowspan="{{ count($task['users']) }}">{{ $task['body'] }}</td>
+                        <td class="px-4 py-4" rowspan="{{ count($task['users']) }}">{{ $task['time_out'] }}</td>
+                    @endif
+                    <td class="px-4 py-4">{{ $user['name'] }}</td>
+                    <td class="px-4 py-4">{{ $user['action_description'] }}</td>
+                    <td class="px-4 py-4">{{ $user['sent_date'] }}</td>
+                    <td class="px-4 py-4">
+                        <x-primary-button>
+                            نمایش
+                        </x-primary-button>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                <!-- Sample row -->
-                @foreach($tasks as $task)
-                    <tr class="border-t">
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            this is the text that each one has done.
-                        </td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            the sent date
-                        </td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            view button
-                        </td>
-                        {{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
-                        {{--                               <span--}}
-                        {{--                                   class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">--}}
-                        {{--                                   {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}--}}
-                        {{--                               </span>--}}
-                        {{--                        </td>--}}
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </div>
+            @endforeach
+        @endforeach
+        </tbody>
+    </table>
+
     </div>
+
+
+
+
+
+{{--        <div class="mt-6 border-t pt-4">--}}
+{{--            <table class="w-full text-right text-sm">--}}
+{{--                <thead>--}}
+{{--                <tr class="bg-gray-100 text-gray-700">--}}
+{{--                    @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده','شرح اقدام','تاریخ اقدام',''] as $th)--}}
+{{--                        <th class="px-4 py-3">{{ __($th) }}</th>--}}
+{{--                    @endforeach--}}
+{{--                </tr>--}}
+{{--                </thead>--}}
+{{--                <tbody>--}}
+{{--                <!-- Sample row -->--}}
+{{--                @foreach($tasks as $task)--}}
+{{--                    <tr class="border-t">--}}
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->index+1}}</td>--}}
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->body}}</td>--}}
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>--}}
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->user->user_info->full_name}}</td>--}}
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+{{--                            this is the text that each one has done.--}}
+{{--                        </td>--}}
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+{{--                            the sent date--}}
+{{--                        </td>--}}
+{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+{{--                            view button--}}
+{{--                        </td>--}}
+{{--                        --}}{{--                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">--}}
+{{--                        --}}{{--                               <span--}}
+{{--                        --}}{{--                                   class="{{$task->is_completed ? 'bg-green-600' : 'bg-red-600'}} text-gray-100 rounded-md p-2">--}}
+{{--                        --}}{{--                                   {{$task->is_completed ? 'انجام شد' : 'انجام نشده'}}--}}
+{{--                        --}}{{--                               </span>--}}
+{{--                        --}}{{--                        </td>--}}
+{{--                    </tr>--}}
+{{--                @endforeach--}}
+{{--                </tbody>--}}
+{{--            </table>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 
 </x-app-layout>
