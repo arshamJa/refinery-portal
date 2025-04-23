@@ -22,8 +22,10 @@ class PhoneListController extends Controller
         $query = UserInfo::with([
             'user.roles:id,name',
             'department:id,department_name',
-        ])->select('id', 'user_id', 'department_id', 'full_name', 'work_phone', 'house_phone', 'phone')
-            ->whereHas('user.roles', fn ($q) => $q->where('name', '!=', UserRole::SUPER_ADMIN->value));
+        ])
+            ->whereDoesntHave('user.roles', fn ($q) => $q->where('name', UserRole::SUPER_ADMIN->value))
+            ->select('id', 'user_id', 'department_id', 'full_name', 'work_phone', 'house_phone', 'phone');
+
 
         $originalUsersCount = $query->count();
 

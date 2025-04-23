@@ -25,6 +25,7 @@ class PresentUsers extends Component
     {
         return MeetingUser::with('user','meeting')
             ->where('meeting_id',$this->meetingId)
+            ->where('is_guest',0)
             ->get(['meeting_id','user_id','is_present','reason_for_absent','replacement']);
     }
 
@@ -49,7 +50,7 @@ class PresentUsers extends Component
     #[Computed]
     public function not_sent()
     {
-        return MeetingUser::where('meeting_id',$this->meetingId)->where('is_present',0)->count();
+        return MeetingUser::where('meeting_id',$this->meetingId)->where('is_present',0)->where('is_guest',0)->count();
     }
 
     public function acceptMeeting($meetingId)

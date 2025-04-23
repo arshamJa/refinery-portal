@@ -37,7 +37,7 @@ class EmployeeDashboard extends Component
 
         $newDate = $jaYear . '/' . $new_month . '/' . $new_day;
 
-        return Meeting::where('date',$newDate)->get();
+        return Meeting::where('date',$newDate)->where('is_cancelled','-1')->get();
     }
 
 

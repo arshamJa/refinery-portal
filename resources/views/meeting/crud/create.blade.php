@@ -33,19 +33,22 @@
                         </span>
             </li>
         </ol>
-        <a href="{{route('meeting.table')}}">
-            <x-primary-button>{{__('جدول جلسات')}}</x-primary-button>
-        </a>
+        {{--        <a href="{{route('meeting.table')}}">--}}
+        {{--            <x-primary-button>{{__('جدول جلسات')}}</x-primary-button>--}}
+        {{--        </a>--}}
     </nav>
     <form action="{{route('meeting.store')}}" method="post" enctype="multipart/form-data">
         @csrf
 
 
-        <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
-            {{--            Meeting Information   --}}
+        <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
+{{--                        Meeting Information--}}
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
+                    {{ __('بخش اطلاعات جلسه') }}
+                </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
 
-                {{--                Meeting Title--}}
+{{--                                Meeting Title--}}
                 <div>
                     <x-input-label for="title" :value="__('موضوع جلسه')"/>
                     <x-text-input name="title" id="title"
@@ -53,7 +56,7 @@
                                   type="text" autofocus/>
                     <x-input-error :messages="$errors->get('title')"/>
                 </div>
-                {{--                Meeting Location--}}
+{{--                                Meeting Location--}}
                 <div>
                     <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
                     <x-text-input name="location" id="location"
@@ -61,7 +64,7 @@
                                   class="block " type="text" autofocus/>
                     <x-input-error :messages="$errors->get('location')"/>
                 </div>
-                {{--                Treating--}}
+{{--                                Treating--}}
                 <div>
                     <x-input-label for="treat" :value="__('پذیرایی')"/>
                     <label for="yes">
@@ -76,7 +79,7 @@
                 </div>
             </div>
 
-            {{--            Time & Date--}}
+{{--                        Time & Date--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 ">
                 <div>
                     <x-input-label for="year" :value="__('سال')"/>
@@ -126,12 +129,19 @@
                     <x-input-error :messages="$errors->get('time')"/>
                 </div>
             </div>
-        </div>
 
 
-        <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
-            {{--            Scriptorium Information   --}}
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 border-b pb-2">
+                {{ __('بخش دبیرجلسه') }}
+            </h2>
+{{--                        Scriptorium Information--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
+                <div>
+                    <x-input-label for="boss" :value="__('نام رئیس جلسه')"/>
+                    <x-text-input name="boss" id="boss" value="{{old('boss')}}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('boss')"/>
+                </div>
                 <div>
                     <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
                     <x-text-input name="scriptorium" id="scriptorium"
@@ -161,8 +171,6 @@
                                   class="block" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('unit_held')"/>
                 </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
                 <div>
                     <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
                     <x-text-input name="applicant" id="applicant"
@@ -171,12 +179,13 @@
                     <x-input-error :messages="$errors->get('applicant')"/>
                 </div>
             </div>
-        </div>
 
 
-        <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 border-b pb-2">
+                {{ __('بخش اعضا و مهمان') }}
+            </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
-                {{--            Participants Information   --}}
+{{--                            Participants Information--}}
                 <div class="col-span-2">
                     <x-input-label for="holders" class="mb-2"
                                    :value="__('انتخاب اعضای جلسه یا حاضرین در جلسه')"/>
@@ -214,17 +223,20 @@
                     </div>
                     <x-input-error :messages="$errors->get('holders')"/>
                 </div>
-                {{--            Guests--}}
+{{--                            Guests--}}
                 <div class="col-span-2">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-700">{{__('لیست مهمانان')}}</label>
                         <div class="flex items-center space-x-4 mb-4">
                             <input type="checkbox" id="outer-organization-checkbox" class="h-4 w-4 text-blue-600"/>
-                            <label for="outer-organization-checkbox" class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
+                            <label for="outer-organization-checkbox"
+                                   class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
                         </div>
                         <!-- Table for inner_organization (default table) -->
-                        <div id="inner-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
-                            <table id="guests-inner-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                        <div id="inner-organization-table"
+                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
+                            <table id="guests-inner-table"
+                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-2 text-right">#</th>
@@ -239,7 +251,8 @@
                                 <tfoot class="bg-gray-50">
                                 <tr>
                                     <td colspan="5" class="px-4 py-3 text-left">
-                                        <button type="button" id="add-inner-guest-btn" class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                                        <button type="button" id="add-inner-guest-btn"
+                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
                                             افزودن مهمان
                                         </button>
                                     </td>
@@ -249,8 +262,10 @@
                         </div>
 
                         <!-- Table for outer_organization (will appear when checkbox is checked) -->
-                        <div id="outer-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
-                            <table id="guests-outer-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                        <div id="outer-organization-table"
+                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
+                            <table id="guests-outer-table"
+                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-2 text-right">#</th>
@@ -265,7 +280,8 @@
                                 <tfoot class="bg-gray-50">
                                 <tr>
                                     <td colspan="4" class="px-4 py-3 text-left">
-                                        <button type="button" id="add-outer-guest-btn" class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                                        <button type="button" id="add-outer-guest-btn"
+                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
                                             افزودن مهمان
                                         </button>
                                     </td>

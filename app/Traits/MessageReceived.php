@@ -24,11 +24,11 @@ trait MessageReceived
             ->where('read_by_user', false)
             ->count();
 
-        $sentTaskCount = Task::whereHas('meeting', function ($query) use ($fullName) {
-            $query->where('scriptorium', $fullName);
-        })
-            ->where('is_completed', true)
-            ->count();
+//        $sentTaskCount = Task::whereHas('meeting', function ($query) use ($fullName) {
+//            $query->where('scriptorium', $fullName);
+//        })
+//            ->where('is_completed', true)
+//            ->count();
 
         $unreadMeetingUsersCount = MeetingUser::where('is_present', '!=', '0')
             ->where('read_by_scriptorium', false)
@@ -37,7 +37,9 @@ trait MessageReceived
             })
             ->count();
 
-        return $invitationCount + $readByUserCount + $sentTaskCount + $unreadMeetingUsersCount;
+        return $invitationCount + $readByUserCount +
+//            $sentTaskCount +
+            $unreadMeetingUsersCount;
     }
 
 

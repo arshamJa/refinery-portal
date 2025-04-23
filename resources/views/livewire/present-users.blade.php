@@ -60,55 +60,66 @@
             <li>
                     <span
                         class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                       {{__('اسامی اعضای جلسه')}}
+                       {{__('وضعیت شرکت کنندگان در جلسه')}}
                     </span>
             </li>
     </x-breadcrumb>
-    <div class="bg-white p-6 rounded-2xl shadow-md space-y-6 max-w-4xl">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-            <div class="bg-gray-800 text-white p-4 rounded-lg">
-                <span>{{ __('تعداد ثبت نشده:') }}</span>
-                <div class="font-bold text-lg">{{$this->not_sent}}</div>
+
+    <div class="bg-white p-8 rounded-2xl shadow-lg space-y-8 max-w-4xl">
+        <!-- Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+            <div class="bg-gray-900 text-white p-6 rounded-xl space-y-2">
+                <span class="text-sm font-medium">{{ __('تعداد ثبت نشده:') }}</span>
+                <div class="text-2xl font-bold">{{$this->not_sent}}</div>
             </div>
-            <div class="bg-green-600 text-white p-4 rounded-lg">
-                <span>{{ __('تعداد حاضرین:') }}</span>
-                <div class="font-bold text-lg">{{$this->present}}</div>
+            <div class="bg-emerald-600 text-white p-6 rounded-xl space-y-2">
+                <span class="text-sm font-medium">{{ __('تعداد قبول کنندگان:') }}</span>
+                <div class="text-2xl font-bold">{{$this->present}}</div>
             </div>
-            <div class="bg-red-600 text-white p-4 rounded-lg">
-                <span>{{ __('تعداد غایبین:') }}</span>
-                <div class="font-bold text-lg">{{$this->absent}}</div>
+            <div class="bg-rose-600 text-white p-6 rounded-xl space-y-2">
+                <span class="text-sm font-medium">{{ __('تعداد رد کنندگان:') }}</span>
+                <div class="text-2xl font-bold">{{$this->absent}}</div>
             </div>
         </div>
 
-        <div class="space-y-4 text-sm text-gray-700 rtl:text-right">
+        <!-- Names Section -->
+        <div class="text-sm text-gray-700 rtl:text-right space-y-6">
+            <!-- Not Sent -->
             <div>
-                <p class="font-semibold">{{ __('اسامی ثبت نشده:') }}</p>
-                <div class="text-gray-600">
+                <p class="font-semibold text-base mb-2">{{ __('اسامی ثبت نشده:') }}</p>
+                <div class="flex flex-wrap gap-2 text-gray-600">
                     @foreach($this->meetingUsers->where('is_present',0) as $user)
-                        {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }} -
+                        <span class="bg-gray-100 rounded-full px-3 py-1">
+                            {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
+                        </span>
                     @endforeach
                 </div>
             </div>
 
+            <!-- Present -->
             <div>
-                <p class="font-semibold">{{ __('اسامی حاضرین:') }}</p>
-                <div class="italic text-gray-600">
-                    @foreach($this->meetingUsers->where('is_present',1) as $user)
-                        {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }} -
+                <p class="font-semibold text-base mb-2">{{ __('اسامی قبول کنندگان:') }}</p>
+                <div class="flex flex-wrap gap-2 text-green-700">
+                    @foreach($this->meetingUsers->where('is_present', 1) as $user)
+                        <span class="bg-green-100 rounded-full px-3 py-1">{{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}</span>
                     @endforeach
                 </div>
             </div>
 
+            <!-- Absent with Reason -->
             <div>
-                <p class="font-semibold">{{ __('اسامی غایبین به همراه دلیل:') }}</p>
-                <div class="italic text-gray-600 space-y-2">
-                    @foreach($this->meetingUsers->where('is_present',-1) as $user)
-                        <div>
-                            {{ UserInfo::where('user_id',$user->user_id)->value('full_name') }}:
-                            <span>{{ $user->reason_for_absent }}</span>
+                <p class="font-semibold text-base mb-2">{{ __('اسامی رد کنندگان به همراه دلیل:') }}</p>
+                <div class="space-y-4">
+                    @foreach($this->meetingUsers->where('is_present', -1) as $user)
+                        <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                            <p class="text-red-700 font-medium">
+                                {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
+                            </p>
+                            <p class="text-sm text-gray-700 mt-1">{{ $user->reason_for_absent }}</p>
                             @if($user->replacement)
-                                <br>
-                                <span class="text-sm text-indigo-600">{{ __('جانشین اینجانب = ') }}{{ $user->replacementName() }}</span>
+                                <p class="text-sm text-indigo-600 mt-2">
+                                    {{ __('جانشین اینجانب = ') }}<strong>{{ $user->replacementName() }}</strong>
+                                </p>
                             @endif
                         </div>
                     @endforeach
@@ -116,17 +127,24 @@
             </div>
         </div>
 
+        <!-- Buttons -->
         @if($this->meeting == '0')
-            <div class="flex justify-end gap-4 pt-4 border-t border-gray-200">
-                <x-primary-button wire:click="acceptMeeting({{$meetingId}})">
+            <div class="flex justify-end gap-4 pt-6 border-t border-gray-200">
+                <x-primary-button wire:click="acceptMeeting({{ $meetingId }})">
                     {{ __('تایید جلسه') }}
                 </x-primary-button>
-               <x-danger-button wire:click="openModalDeny({{$meetingId}})">
-                   {{ __('لغو جلسه') }}
-               </x-danger-button>
+
+                <x-danger-button wire:click="openModalDeny({{ $meetingId }})">
+                    {{ __('لغو جلسه') }}
+                </x-danger-button>
             </div>
         @endif
+
     </div>
+
+
+
+
 </div>
 
 

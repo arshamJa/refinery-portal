@@ -21,6 +21,7 @@ class Meeting extends Model
         'title',
         'unit_organization',
         'scriptorium',
+        'boss',
         'location',
         'date',
         'time',

@@ -6,6 +6,7 @@ use App\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends Model
 {
@@ -14,17 +15,17 @@ class Task extends Model
 
     protected $fillable = [
         'meeting_id',
-        'user_id',
+//        'user_id',
         'body',
-        'sent_date',
+//        'sent_date',
         'time_out',
-        'is_completed',
-        'request_task'
+//        'is_completed',
+//        'request_task'
     ];
-    public function user():BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+//    public function user():BelongsTo
+//    {
+//        return $this->belongsTo(User::class);
+//    }
     public function full_name()
     {
         return UserInfo::where('user_id',$this->user_id)->value('full_name');
@@ -33,4 +34,16 @@ class Task extends Model
     {
         return $this->belongsTo(Meeting::class);
     }
+
+
+
+    public function taskUsers():HasMany
+    {
+        return $this->hasMany(TaskUser::class)->chaperone();
+    }
+
+
+
+
+
 }

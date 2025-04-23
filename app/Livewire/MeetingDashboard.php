@@ -157,7 +157,7 @@ class MeetingDashboard extends Component
         ])
             ->select(
                 'id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time',
-                'unit_held', 'treat', 'applicant', 'position_organization', 'guest'
+                'unit_held', 'treat', 'applicant', 'position_organization', 'guest','boss'
             )
             ->findOrFail($id);
         $this->dispatch('crud-modal', name: 'view-meeting-modal');

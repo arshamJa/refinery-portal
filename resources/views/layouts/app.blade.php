@@ -26,7 +26,7 @@
 </head>
 <body>
 {{--<livewire:layout.navigation/>--}}
-<div dir="rtl" x-data="{ open: true }">
+<div dir="rtl" x-data="{ open: true }" x-cloak>
     <!-- Top Navigation Bar -->
     <x-navigation/>
 

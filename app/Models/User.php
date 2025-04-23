@@ -52,6 +52,19 @@ class User extends Authenticatable
     }
 
 
+    public function taskUsers():HasMany
+    {
+        return $this->hasMany(TaskUser::class)->chaperone();
+    }
+
+
+//    public function tasks():HasMany
+//    {
+//        return $this->hasMany(Task::class)->chaperone();
+//    }
+
+
+
     public function getTranslatedRole(): string
     {
         return match (true) {
@@ -179,10 +192,6 @@ class User extends Authenticatable
     public function user_info() : HasOne
     {
         return $this->hasOne(UserInfo::class)->chaperone();
-    }
-    public function tasks():HasMany
-    {
-        return $this->hasMany(Task::class)->chaperone();
     }
     public function meetingUsers():HasMany
     {

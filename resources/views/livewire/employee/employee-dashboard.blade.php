@@ -5,7 +5,6 @@
         <div class="p-2">
             <x-notifications/>
         </div>
-
         <div class="px-8 overflow-y-auto h-3/4">
             @if ($this->getMeetingsToday->isNotEmpty())
                 <h1 class="text-xl text-[#4332BD] font-bold mb-6 text-center">{{__('لیست جلسات امروز')}}</h1>

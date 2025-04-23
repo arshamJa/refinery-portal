@@ -16,12 +16,13 @@ return new class extends Migration
             $table->string('title'); // موضوع جلسه
             $table->string('unit_organization'); // واحد سازمانی
             $table->string('scriptorium'); // نام دبیر جلسه
+            $table->string('boss');
             $table->string('location');
             $table->string('date');
             $table->string('time');
             $table->string('unit_held'); // واحد برگزار کننده
             $table->string('treat'); // پذیرایی
-            $table->json('guest'); // this could be multiple
+            $table->json('guest')->default(null); // this could be multiple
             $table->string('applicant'); // نام درخواست دهنده جلسه
             $table->string('position_organization');
             $table->smallInteger('is_cancelled')->default('0');

@@ -17,6 +17,12 @@
             @endif
         </span>
         </x-link.link>
+
+        <x-link.link href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}" :active="request()->is('profile')">
+            {{__('پروفایل')}}
+        </x-link.link>
+
+
     </nav>
     <div class="md:hidden">
         <button @click="open = !open"
