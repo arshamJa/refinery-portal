@@ -248,6 +248,7 @@ return [
         'month' => 'ماه',
         'day' => 'روز',
         'permissions' => 'سطح دسترسی',
+        'taskBody' => 'شرح اقدام'
     ],
 
 ];

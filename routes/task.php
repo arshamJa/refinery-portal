@@ -61,8 +61,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/tasks', TaskManagementTable::class)
         ->name('tasks.index');
 
-    Route::get('/tasks/create/{meeting}', [TaskManagementController::class, 'create'])
+//    Route::get('/tasks/create/{meeting}', [TaskManagementController::class, 'create'])
+//        ->name('tasks.create');
+
+    Route::get('/tasks/create/{meeting}', \App\Livewire\CreateTask::class)
         ->name('tasks.create');
+
+
+
 
     Route::post('/tasks/{meetingId}', [TaskManagementController::class, 'store'])->name('tasks.store');
 

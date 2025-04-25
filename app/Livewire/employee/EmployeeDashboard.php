@@ -24,20 +24,19 @@ class EmployeeDashboard extends Component
 
 
     #[Computed]
-    public function getMeetingsToday()
+    public function getTodaysMeeting()
     {
 
-        $jalaliNow = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-        $jaYear = $jalaliNow[0];
-        $jaMonth = $jalaliNow[1];
-        $jaDay = $jalaliNow[2];
+        // Convert current Gregorian date to Jalali
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
-        $new_month = sprintf("%02d", $jaMonth);
-        $new_day = sprintf("%02d", $jaDay);
+        $newDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
 
-        $newDate = $jaYear . '/' . $new_month . '/' . $new_day;
-
-        return Meeting::where('date',$newDate)->where('is_cancelled','-1')->get();
+        return Meeting::where('date',$newDate)
+            ->where('is_cancelled','-1')
+            ->select('id','title','date','time','location')
+            ->orderBy('time', 'asc')
+            ->get();
     }
 
 

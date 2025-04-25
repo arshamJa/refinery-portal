@@ -18,10 +18,7 @@ use Livewire\WithPagination;
 class OperatorDashboard extends Component
 {
 
-    use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks, MessageReceived;
-
-    public $meetingTitle;
-    public $meeting_id;
+    use MeetingsTasks, MessageReceived;
 
 
 
@@ -30,51 +27,20 @@ class OperatorDashboard extends Component
         return view('livewire.operator.operator-dashboard');
     }
 
+
     #[Computed]
-    public function invitation()
+    public function getTodaysMeeting()
     {
-        return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
-    }
 
-    public function acceptMeeting($meetingId)
-    {
-        $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '-1';
-        $meeting->save();
-        return redirect()->back();
-    }
+        // Convert current Gregorian date to Jalali
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
-    public function openModalDelete($meetingId)
-    {
-        $this->meetingTitle = Meeting::where('id',$meetingId)->value('title');
-        $this->meeting_id = $meetingId;
-        $this->dispatch('crud-modal', name: 'delete');
-    }
-    public function denyMeeting($meetingId)
-    {
-        $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '1';
-        $meeting->save();
-        $this->close();
-    }
-    public function accept($meetingId)
-    {
-        MeetingUser::where('user_id', auth()->user()->id)->where('meeting_id', $meetingId)->update([
-            'is_present' => '1'
-        ]);
-        return redirect()->back();
-    }
+        $newDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
 
-    public function deny($meetingId)
-    {
-        MeetingUser::where('user_id', auth()->user()->id)->where('meeting_id', $meetingId)->update([
-            'is_present' => '-1'
-        ]);
-        return redirect()->back();
-    }
-    public function close()
-    {
-        $this->dispatch('close-modal');
-        return redirect()->back();
+        return Meeting::where('date',$newDate)
+            ->where('is_cancelled','-1')
+            ->select('id','title','date','time','location')
+            ->orderBy('time', 'asc')
+            ->get();
     }
 }

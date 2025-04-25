@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('sent_date')->nullable();
             $table->boolean('is_completed')->default(false);
-            $table->string('request_task')->nullable();
+            $table->text('body_task')->nullable();
+            $table->text('request_task')->nullable();
             $table->timestamps();
         });
     }

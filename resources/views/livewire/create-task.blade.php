@@ -1,6 +1,5 @@
-@php use App\Models\UserInfo;use Carbon\Carbon; @endphp
-<x-app-layout>
-    <x-sessionMessage name="status"/>
+@php use Illuminate\Support\Str; @endphp
+<div>
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -39,24 +38,25 @@
 
     <div class="p-6 max-w-6xl bg-white rounded-2xl shadow-md space-y-6">
 
-        <form action="{{route('tasks.store', $meetings->id)}}" method="post" enctype="multipart/form-data">
-            @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-                <div><strong>{{__('واحد/کمیته:')}}</strong>{{$meetings->unit_held}}</div>
-                <div><strong>{{__('تهیه کننده(دبیرجلسه):')}}</strong>{{$meetings->scriptorium}}</div>
-                <div><strong>{{__('رئیس جلسه:')}}</strong>{{$meetings->boss}}</div>
-                <div><strong>{{__('پیوست:')}}</strong> {{__('پیوست')}}</div>
-                <div><strong>{{__('تاریخ جلسه:')}}</strong>{{$meetings->date}}</div>
-                <div><strong>{{__('زمان جلسه:')}}</strong>{{$meetings->time}}</div>
-                <div><strong>{{__('مکان جلسه:')}}</strong>{{$meetings->location}}</div>
-                <div class="col-span-2"><strong>{{__('موضوع جلسه:')}}</strong> {{$meetings->title}}</div>
-                <div class="col-span-2 mb-2"><strong>{{__('حاضرین:')}}</strong>
-                    @foreach ($employees as $employee)
-                        {{ $employee->user->user_info->full_name }} -
-                    @endforeach
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+            <div><strong>{{__('واحد/کمیته:')}}</strong>{{$this->meetings->unit_held}}</div>
+            <div><strong>{{__('تهیه کننده(دبیرجلسه):')}}</strong>{{$this->meetings->scriptorium}}</div>
+            <div><strong>{{__('رئیس جلسه:')}}</strong>{{$this->meetings->boss}}</div>
+            <div><strong>{{__('پیوست:')}}</strong> {{__('پیوست')}}</div>
+            <div><strong>{{__('تاریخ جلسه:')}}</strong>{{$this->meetings->date}}</div>
+            <div><strong>{{__('زمان جلسه:')}}</strong>{{$this->meetings->time}}</div>
+            <div><strong>{{__('مکان جلسه:')}}</strong>{{$this->meetings->location}}</div>
+            <div><strong>{{__('موضوع جلسه:')}}</strong> {{$this->meetings->title}}</div>
+            <div class="col-span-2 mb-2"><strong>{{__('حاضرین:')}}</strong>
+                @foreach ($this->employees as $employee)
+                    {{ $employee->user->user_info->full_name }} -
+                @endforeach
             </div>
+        </div>
 
+        @if ($this->allUsersHaveTasks)
+        <form action="{{route('tasks.store', $this->meetings->id)}}" method="post" enctype="multipart/form-data">
+            @csrf
             <div class="border-t pt-6 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -88,7 +88,7 @@
                                     </button>
                                 </div>
                                 <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                                @foreach($employees as $employee)
+                                @foreach($this->employees as $employee)
                                     <div class="option" data-value="{{$employee->user_id}}">
                                         {{ $employee->user->user_info->full_name }}
                                     </div>
@@ -171,49 +171,99 @@
                     </a>
                 </div>
             </div>
-
         </form>
+        @else
+            <p class="border-t pt-2">{{ __('تمامی اقدامات برای اعضای جلسه ثبت شده است.') }}</p>
+        @endif
 
-{{--        <livewire:create-task :meeting="$meetings->id" />--}}
-
-        {{--        <div class="overflow-x-auto rounded-xl border border-gray-300 shadow-sm">--}}
-{{--            <table class="w-full text-right text-sm border-collapse">--}}
-{{--                <thead class="bg-gray-100 text-gray-700">--}}
-{{--                <tr>--}}
-{{--                    <th class="px-4 py-3 border-b border-gray-400">ردیف</th>--}}
-{{--                    <th class="px-4 py-3 border-b border-gray-400">خلاصه مذاکرات و تصمیمات اتخاذ شده</th>--}}
-{{--                    <th class="px-4 py-3 border-b border-gray-400">مهلت اقدام</th>--}}
-{{--                    <th class="px-4 py-3 border-b border-gray-400">اقدام کننده</th>--}}
-{{--                    <th class="px-4 py-3 border-b border-gray-400">شرح اقدام</th>--}}
-{{--                    <th class="px-4 py-3 border-b border-gray-400">تاریخ انجام اقدام</th>--}}
-{{--                    <th class="px-4 py-3 border-b border-gray-400"></th>--}}
-{{--                </tr>--}}
-{{--                </thead>--}}
-{{--                <tbody class="divide-y divide-gray-300">--}}
-{{--                @foreach ($tasks as $index => $task)--}}
-{{--                    @foreach ($task->taskUsers as $userIndex => $taskUser)--}}
-{{--                        <tr class="bg-white hover:bg-gray-50 transition">--}}
-{{--                            @if ($userIndex === 0)--}}
-{{--                                <td class="px-4 py-4 align-top" rowspan="{{ $task->taskUsers->count() }}">{{ $index + 1 }}</td>--}}
-{{--                                <td class="px-4 py-4 border-r border-gray-300 align-top" rowspan="{{ $task->taskUsers->count() }}">{{ $task->body }}</td>--}}
-{{--                                <td class="px-4 py-4 border-r border-gray-300 align-top" rowspan="{{ $task->taskUsers->count() }}">{{ $task->time_out }}</td>--}}
-{{--                            @endif--}}
-{{--                            <td class="px-4 py-4 border-r border-gray-300">{{ $taskUser->user->user_info->full_name ?? '---' }}</td>--}}
-{{--                            <td class="px-4 py-4 border-r border-gray-300">{{ $taskUser->request_task ?? '---' }}</td>--}}
-{{--                            <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                                {{ $taskUser->sent_date ?? '---' }}--}}
-{{--                            </td>--}}
-{{--                            <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                                <x-primary-button>--}}
-{{--                                    نمایش--}}
-{{--                                </x-primary-button>--}}
-{{--                            </td>--}}
-{{--                        </tr>--}}
-{{--                    @endforeach--}}
-{{--                @endforeach--}}
-{{--                </tbody>--}}
-{{--            </table>--}}
-{{--        </div>--}}
+        <div class="overflow-x-auto rounded-xl border border-gray-300 shadow-sm">
+            <table class="w-full text-right text-sm border-collapse">
+                <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                    <th class="px-4 py-3 border-b border-gray-400">ردیف</th>
+                    <th class="px-4 py-3 border-b border-gray-400">خلاصه مذاکرات و تصمیمات اتخاذ شده</th>
+                    <th class="px-4 py-3 border-b border-gray-400">مهلت اقدام</th>
+                    <th class="px-4 py-3 border-b border-gray-400">اقدام کننده</th>
+                    <th class="px-4 py-3 border-b border-gray-400">شرح اقدام</th>
+                    <th class="px-4 py-3 border-b border-gray-400">تاریخ انجام اقدام</th>
+                    <th class="px-4 py-3 border-b border-gray-400"></th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-300">
+                @foreach ($this->tasks as $index => $task)
+                    @foreach ($task->taskUsers as $userIndex => $taskUser)
+                        <tr class="bg-white hover:bg-gray-50 transition">
+                            @if ($userIndex === 0)
+                                <td class="px-4 py-4 align-top"
+                                    rowspan="{{ $task->taskUsers->count() }}">{{ $index + 1 }}</td>
+                                <td class="px-4 py-4 border-r border-gray-300 align-top"
+                                    rowspan="{{ $task->taskUsers->count() }}">{{ $task->body }}</td>
+                                <td class="px-4 py-4 border-r border-gray-300 align-top"
+                                    rowspan="{{ $task->taskUsers->count() }}">{{ $task->time_out }}</td>
+                            @endif
+                            <td class="px-4 py-4 border-r border-gray-300">{{ $taskUser->user->user_info->full_name ?? '---' }}</td>
+                            <td class="px-4 py-4 border-r border-gray-300 truncate">
+                                {{ Str::words($taskUser->body_task ?? '---' , 10 , '...')}}
+                            </td>
+                            <td class="px-4 py-4 border-r border-gray-300">
+                                {{ $taskUser->sent_date ?? '---' }}
+                            </td>
+                            {{--                                @if($taskUser->user->user_info->full_name === auth()->user()->user_info->full_name)--}}
+                            <td class="px-4 py-4 border-r border-gray-300">
+                                <x-primary-button wire:click="showTaskDetails({{ $taskUser->id }})">
+                                    نمایش
+                                </x-primary-button>
+                            </td>
+                            {{--                                @endif--}}
+                        </tr>
+                    @endforeach
+                @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
-</x-app-layout>
+    <x-modal name="view-task-details-modal" maxWidth="4xl">
+        @if ($selectedTask)
+            <form wire:submit="submitTaskForm({{$selectedTask->id}})">
+                <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
+
+                    {{-- Title --}}
+                    <div class="border-b pb-4">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                            {{ __('جزئیات') }}
+                        </h2>
+                    </div>
+
+                    {{-- Task Information --}}
+                    <div class="grid grid-cols-1 gap-4">
+                        <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
+                    </div>
+
+                    {{-- Meeting Information --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <x-meeting-info label="{{ __('اقدام کننده') }}" :value="$taskName"/>
+                    </div>
+
+                    {{-- Task Body Textarea --}}
+                    <div>
+                        <x-input-label for="taskBody" :value="__('شرح اقدام شما')" class="mb-2"/>
+                        <textarea wire:model="taskBody" id="taskBody" rows="4"
+                                  class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
+                    </textarea>
+                        <x-input-error :messages="$errors->get('taskBody')"/>
+                    </div>
+
+                    {{-- Submit --}}
+                    <div class="pt-4">
+                        <x-primary-button type="submit">
+                            {{ __('ثبت') }}
+                        </x-primary-button>
+                    </div>
+
+                </div>
+            </form>
+        @endif
+    </x-modal>
+
+</div>

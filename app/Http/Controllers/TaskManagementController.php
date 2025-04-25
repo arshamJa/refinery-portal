@@ -29,21 +29,33 @@ class TaskManagementController extends Controller
      */
     public function create(string $meeting)
     {
-        $meetings = Meeting::find($meeting);
 
-        $employees = MeetingUser::with('user.user_info') // Eager load user and userInfo
-        ->where('meeting_id', $meeting)
+        $meetings = Meeting::select('id', 'title','unit_organization','scriptorium','boss',
+            'date', 'time','location','unit_held','applicant','position_organization')
+            ->findOrFail($meeting);
+
+
+        // Select specific columns from MeetingUser and related user.user_info
+        $employees = MeetingUser::select('id', 'user_id', 'meeting_id','is_present')
+            ->with([
+                'user:id', // assuming 'user_id' is in MeetingUser
+                'user.user_info:id,user_id,full_name' // only needed fields from user_info
+            ])
+            ->where('meeting_id', $meeting)
             ->get();
 
 
-        // Eager load user and userInfo
-        $tasks = Task::with('taskUsers')
+        // Select specific columns from Task and eager load specific columns from TaskUser
+        $tasks = Task::select('id', 'meeting_id', 'body', 'time_out')
+            ->with([
+                'taskUsers' => function ($query) {
+                    $query->select('id', 'task_id', 'user_id', 'sent_date', 'is_completed', 'request_task', 'body_task');
+                }
+            ])
             ->where('meeting_id', $meeting)
             ->get();
 
         $taskUsers = TaskUser::all();
-
-
 
         return view('task.create' , [
             'meetings' => $meetings,
@@ -106,19 +118,10 @@ class TaskManagementController extends Controller
             TaskUser::create([
                 'task_id' => $task->id,
                 'user_id' => $initiator,
-                'sent_date' => null,
                 'is_completed' => false,
                 'request_task' => null,
             ]);
         }
-
-
-
-
-
-
-
-
 
         return to_route('tasks.create',$meeting)->with('status','درج اقدام انجام شد');
     }

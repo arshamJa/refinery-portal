@@ -27,41 +27,41 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <x-create-link href="{{route('meeting.create')}}">{{__('ایجاد جلسه جدید')}}</x-create-link>
                 {{--                <a href="{{route('meetingsList')}}"--}}
-{{--                   class="bg-[#FCF7F8]  hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-{{--                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-{{--                         stroke="currentColor" class="size-5">--}}
-{{--                        <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                              d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>--}}
-{{--                    </svg>--}}
-{{--                    <h3 class="text-sm font-semibold"> {{__('لیست جلسات در حال برگزاری')}}</h3>--}}
-{{--                </a>--}}
-{{--                <a href="{{route('scriptorium.report')}}"--}}
-{{--                   class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-{{--                    <span class="flex items-center gap-x-2">--}}
-{{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-{{--                             stroke="currentColor" class="size-5">--}}
-{{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                  d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>--}}
-{{--                        </svg>--}}
-{{--                        <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>--}}
-{{--                    </span>--}}
-{{--                </a>--}}
+                {{--                   class="bg-[#FCF7F8]  hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
+                {{--                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+                {{--                         stroke="currentColor" class="size-5">--}}
+                {{--                        <path stroke-linecap="round" stroke-linejoin="round"--}}
+                {{--                              d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>--}}
+                {{--                    </svg>--}}
+                {{--                    <h3 class="text-sm font-semibold"> {{__('لیست جلسات در حال برگزاری')}}</h3>--}}
+                {{--                </a>--}}
+                {{--                <a href="{{route('scriptorium.report')}}"--}}
+                {{--                   class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
+                {{--                    <span class="flex items-center gap-x-2">--}}
+                {{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+                {{--                             stroke="currentColor" class="size-5">--}}
+                {{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
+                {{--                                  d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>--}}
+                {{--                        </svg>--}}
+                {{--                        <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>--}}
+                {{--                    </span>--}}
+                {{--                </a>--}}
 
 
-{{--                <a href="{{route('attended.meetings')}}"--}}
-{{--                   class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">--}}
-{{--                    <span class="flex items-center gap-x-2">--}}
-{{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-{{--                             stroke="currentColor" class="size-5">--}}
-{{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                  d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"/>--}}
-{{--                        </svg>--}}
-{{--                        <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>--}}
-{{--                    </span>--}}
-{{--                    --}}{{--                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">--}}
-{{--                    --}}{{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
-{{--                    --}}{{--                </span>--}}
-{{--                </a>--}}
+                {{--                <a href="{{route('attended.meetings')}}"--}}
+                {{--                   class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">--}}
+                {{--                    <span class="flex items-center gap-x-2">--}}
+                {{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+                {{--                             stroke="currentColor" class="size-5">--}}
+                {{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
+                {{--                                  d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"/>--}}
+                {{--                        </svg>--}}
+                {{--                        <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>--}}
+                {{--                    </span>--}}
+                {{--                    --}}{{--                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">--}}
+                {{--                    --}}{{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
+                {{--                    --}}{{--                </span>--}}
+                {{--                </a>--}}
             </div>
         </div>
     @endcan
@@ -127,13 +127,13 @@
                 </div>
             </div>
         </form>
-        <div class="pt-4 w-full overflow-x-auto overflow-y-hidden sm:pt-6 pb-16 mb-4 bg-white">
+        <div class="pt-4 w-full overflow-x-auto overflow-y-hidden sm:pt-6 mb-4 bg-white">
             <x-table.table>
                 <x-slot name="head">
                     <x-table.row>
                         @foreach ([
-                           'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','رویت صورتجلسه',''
-                       ] as $th)
+                                'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','رویت صورتجلسه',''
+                            ] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
                     </x-table.row>
@@ -148,13 +148,19 @@
                             <x-table.cell>{{$meeting->date}}</x-table.cell>
                             <x-table.cell>{{$meeting->time}}</x-table.cell>
                             <x-table.cell>{{$meeting->location}}</x-table.cell>
-                            <x-table.cell>
-                                <a href="{{route('presentUsers',$meeting->id)}}">
-                                    <x-secondary-button>
-                                        {{__('نمایش')}}
-                                    </x-secondary-button>
-                                </a>
-                            </x-table.cell>
+                            @if(auth()->user()->user_info->full_name === $meeting->scriptorium)
+                                <x-table.cell>
+                                    <a href="{{route('presentUsers',$meeting->id)}}">
+                                        <x-secondary-button>
+                                            {{__('نمایش')}}
+                                        </x-secondary-button>
+                                    </a>
+                                </x-table.cell>
+                            @else
+                                <x-table.cell>
+                                    {{__('---')}}
+                                </x-table.cell>
+                            @endif
                             <x-table.cell>
                                 @if($meeting->is_cancelled == '0')
                                     <span
@@ -203,11 +209,12 @@
                                                 {{ __('ویرایش') }}
                                             </x-dropdown-link>
                                         @endif
-{{--                                        @if( $meeting->is_cancelled == '0' or $meeting->is_cancelled == '1')--}}
-                                        <x-dropdown-link wire:click.prevent="deleteMeeting({{$meeting->id}})" class="text-red-600 ">
+                                        {{--                                        @if( $meeting->is_cancelled == '0' or $meeting->is_cancelled == '1')--}}
+                                        <x-dropdown-link wire:click.prevent="deleteMeeting({{$meeting->id}})"
+                                                         class="text-red-600 ">
                                             {{ __('حذف') }}
                                         </x-dropdown-link>
-{{--                                        @endif--}}
+                                        {{--                                        @endif--}}
                                     </x-slot>
                                 </x-dropdown>
                             </x-table.cell>
@@ -245,16 +252,17 @@
                 </div>
                 {{-- Meeting Info --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[15px]">
-                    <x-meeting-info label="{{ __('دبیرجلسه') }}" :value="$selectedMeeting->scriptorium" />
-                    <x-meeting-info label="{{ __('رئیس جلسه') }}" :value="$selectedMeeting->boss" />
-                    <x-meeting-info label="{{ __('واحد سازمانی') }}" :value="$selectedMeeting->unit_organization" />
-                    <x-meeting-info label="{{ __('سمت دبیرجلسه') }}" :value="$selectedMeeting->position_organization" />
-                    <x-meeting-info label="{{ __('مکان') }}" :value="$selectedMeeting->location" />
-                    <x-meeting-info label="{{ __('تاریخ') }}" :value="$selectedMeeting->date" />
-                    <x-meeting-info label="{{ __('زمان') }}" :value="$selectedMeeting->time" />
-                    <x-meeting-info label="{{ __('کمیته یا واحد برگزار کننده') }}" :value="$selectedMeeting->unit_held" />
-                    <x-meeting-info label="{{ __('پذیرایی') }}" :value="$selectedMeeting->treat ? 'دارد' : 'ندارد'" />
-                    <x-meeting-info label="{{ __('درخواست دهنده') }}" :value="$selectedMeeting->applicant" />
+                    <x-meeting-info label="{{ __('دبیرجلسه') }}" :value="$selectedMeeting->scriptorium"/>
+                    <x-meeting-info label="{{ __('رئیس جلسه') }}" :value="$selectedMeeting->boss"/>
+                    <x-meeting-info label="{{ __('واحد سازمانی') }}" :value="$selectedMeeting->unit_organization"/>
+                    <x-meeting-info label="{{ __('سمت دبیرجلسه') }}" :value="$selectedMeeting->position_organization"/>
+                    <x-meeting-info label="{{ __('مکان') }}" :value="$selectedMeeting->location"/>
+                    <x-meeting-info label="{{ __('تاریخ') }}" :value="$selectedMeeting->date"/>
+                    <x-meeting-info label="{{ __('زمان') }}" :value="$selectedMeeting->time"/>
+                    <x-meeting-info label="{{ __('کمیته یا واحد برگزار کننده') }}"
+                                    :value="$selectedMeeting->unit_held"/>
+                    <x-meeting-info label="{{ __('پذیرایی') }}" :value="$selectedMeeting->treat ? 'دارد' : 'ندارد'"/>
+                    <x-meeting-info label="{{ __('درخواست دهنده') }}" :value="$selectedMeeting->applicant"/>
                 </div>
 
                 {{-- Participants --}}
@@ -265,7 +273,7 @@
                             <x-meeting-card
                                 :name="$user->user->user_info->full_name ?? 'N/A'"
                                 :unit="$user->user->user_info->department->department_name ?? 'N/A'"
-                                :position="$user->user->user_info->position ?? 'N/A'" />
+                                :position="$user->user->user_info->position ?? 'N/A'"/>
                         @endforeach
                     </div>
                 </div>
@@ -300,7 +308,7 @@
                                 <x-meeting-card
                                     :name="$user->user->user_info->full_name ?? 'N/A'"
                                     :unit="$user->user->user_info->department->department_name ?? 'N/A'"
-                                    :position="$user->user->user_info->position ?? 'N/A'" />
+                                    :position="$user->user->user_info->position ?? 'N/A'"/>
                             @endforeach
                         </div>
                     @else

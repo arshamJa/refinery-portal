@@ -15,6 +15,7 @@ class TaskUser extends Model
          'user_id',
          'sent_date',
          'is_completed',
+         'body_task',
          'request_task',
      ];
 

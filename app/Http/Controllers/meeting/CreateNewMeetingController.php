@@ -60,9 +60,10 @@ class CreateNewMeetingController extends Controller
     {
         $users = UserInfo::whereHas('user', function ($query) {
             $query->whereDoesntHave('roles', function ($roleQuery) {
-                $roleQuery->whereIn('name', [UserRole::SUPER_ADMIN->value, UserRole::ADMIN->value]);
+                $roleQuery->where('name', UserRole::SUPER_ADMIN->value);
             });
         })->get(['id', 'user_id', 'full_name']);
+
         $departments = Department::select('id','department_name')->get();
         return view('meeting.crud.create' , ['users' => $users,'departments'=>$departments]);
     }
