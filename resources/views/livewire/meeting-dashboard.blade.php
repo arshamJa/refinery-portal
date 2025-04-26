@@ -164,23 +164,29 @@
                             <x-table.cell>
                                 @if($meeting->is_cancelled == '0')
                                     <span
-                                        class="block w-full bg-yellow-400 text-xs text-black font-bold  px-4 py-1 rounded-xl m-0.5">
-                                    {{__('درحال بررسی...')}}
+                                        class="block w-full bg-yellow-400 text-xs text-gray-800 font-medium px-3 py-1 rounded-lg m-1">
+                                        {{ __('درحال بررسی...') }}
                                     </span>
                                 @elseif($meeting->is_cancelled == '1')
                                     <span
-                                        class="block w-full bg-[#E96742] text-xs text-white font-bold  px-4 py-1 rounded-xl m-0.5">
-                                    {{__('جلسه لغو شد')}}
-                                </span>
+                                        class="block w-full bg-red-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                        {{ __('جلسه لغو شد') }}
+                                    </span>
                                 @elseif($meeting->is_cancelled == '-1')
                                     <span
-                                        class="block w-full bg-green-500 text-xs text-white font-bold  px-4 py-1 rounded-xl m-0.5">
-                                    {{__('جلسه تشکیل میشود')}}
-                                </span>
+                                        class="block w-full bg-green-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                        {{ __('جلسه تشکیل میشود') }}
+                                    </span>
+                                @elseif($meeting->is_cancelled == '2')
+                                    <span
+                                        class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg shadow-sm m-1">
+                                        {{ __('جلسه خاتمه یافت') }}
+                                    </span>
                                 @endif
+
                             </x-table.cell>
                             <x-table.cell>
-                                @if($meeting->is_cancelled == '-1')
+                                @if($meeting->is_cancelled == '-1' || $meeting->is_cancelled == '2')
                                     <a href="{{route('tasks.create',$meeting->id)}}">
                                         <x-primary-button>
                                             {{ __('نمایش') }}

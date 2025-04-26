@@ -4,7 +4,7 @@
         <div class="p-2">
             <x-notifications/>
         </div>
-        <div class="px-8 py-6 rounded-xl h-[600px] overflow-y-auto space-y-6">
+        <div class="px-8 pb-6 pt-2 rounded-xl h-[600px] overflow-y-auto space-y-6">
             @if ($this->getTodaysMeeting->isNotEmpty())
                 <h1 class="text-2xl font-semibold text-[#4332BD] text-center mb-4">
                     {{ __('لیست جلسات امروز') }}
@@ -50,8 +50,15 @@
                     @endforeach
                 </div>
             @else
-                <div class="text-center text-gray-500 mt-12">
-                    <p>{{ __('هیچ جلسه‌ای برای امروز ثبت نشده است.') }}</p>
+                <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-200 text-center">
+                    <div class="flex flex-col items-center space-y-4 text-gray-500">
+                        <div class="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </div>
+                        <p class="text-sm font-medium">{{ __('هیچ جلسه‌ای برای امروز ثبت نشده است.') }}</p>
+                    </div>
                 </div>
             @endif
         </div>
