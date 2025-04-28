@@ -14,6 +14,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/task/list/{meeting}', TaskList::class)->name('task.list');
 
+
+    // this is my task table
+    Route::get('my/task/table',\App\Livewire\MyTasks::class)
+        ->name('my.task.table');
+
+
     // Route to Export for all 3 Tasks
     Route::get('tasks/report/completed/download', [TasksReportController::class, 'downloadCompletedTasksExcel'])
         ->name('tasks.report.completed.download');

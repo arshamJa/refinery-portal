@@ -3,6 +3,7 @@
 namespace App\Livewire\employee;
 
 
+use App\Enums\MeetingStatus;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\User;
@@ -33,7 +34,7 @@ class EmployeeDashboard extends Component
         $newDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
 
         return Meeting::where('date',$newDate)
-            ->where('is_cancelled','-1')
+            ->where('status',MeetingStatus::IS_NOT_CANCELLED->value)
             ->select('id','title','date','time','location')
             ->orderBy('time', 'asc')
             ->get();

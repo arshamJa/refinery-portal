@@ -2,19 +2,20 @@
 
 namespace App\Livewire;
 
+use App\Enums\MeetingStatus;
 use App\Models\Meeting;
-use App\Models\MeetingUser;
-use App\Models\Task;
 use App\Models\TaskUser;
-use App\Models\User;
-use App\Models\UserInfo;
-use Exception;
+use App\Models\TaskUserFile;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+
 
 class CreateTask extends Component
 {
+    use WithFileUploads;
+
     public $meeting;
     public $taskBody;
     public $selectedTask = '';
@@ -22,6 +23,9 @@ class CreateTask extends Component
     protected $loadedMeeting;
     protected $loadedEmployees;
     protected $loadedTasks;
+    public $fileUpload = [];
+    public $selectedTaskFiles = [];
+
 
 
 
@@ -34,7 +38,6 @@ class CreateTask extends Component
                 'meetingUsers.user.user_info:id,user_id,full_name',
                 'tasks.taskUsers.user.user_info:id,user_id,full_name',
             ])
-                ->where('deleted_at',null)
                 ->findOrFail($this->meeting);
         }
         return $this->loadedMeeting;
@@ -52,7 +55,10 @@ class CreateTask extends Component
     public function tasks()
     {
         if (!$this->loadedTasks) {
-            $this->loadedTasks = $this->meetings()->tasks;
+            $this->loadedTasks = $this->meetings()->tasks()->with([
+                'taskUsers.user.user_info',
+                'taskUsers.taskUserFiles',
+            ])->get();
         }
         return $this->loadedTasks;
     }
@@ -94,6 +100,7 @@ class CreateTask extends Component
     {
         $this->validate([
             'taskBody' => ['required', 'string', 'min:5'],
+            'fileUpload' => ['nullable']
         ]);
 
         list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
@@ -102,13 +109,25 @@ class CreateTask extends Component
 
         $body = Str::deduplicate($this->taskBody);
 
-        TaskUser::where('id', $taskUserId)
+        $taskUser = TaskUser::where('id', $taskUserId)
             ->where('user_id', auth()->id())
-            ->update([
-                'sent_date' => $newTime,
-                'is_completed' => true,
-                'body_task' => $body,
-            ]);
+            ->firstOrFail();
+
+        $taskUser->update([
+            'sent_date' => $newTime,
+            'is_completed' => true,
+            'body_task' => $body,
+        ]);
+        if (!empty($this->fileUpload)) {
+            foreach ($this->fileUpload as $file) {
+                $path = $file->store('task_files', 'public');
+                TaskUserFile::create([
+                    'task_user_id' => $taskUser->id,
+                    'file_path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                ]);
+            }
+        }
 
         return back()->with('status', 'اقدام با موفقیت ثبت شد');
     }
@@ -120,26 +139,8 @@ class CreateTask extends Component
 
     public function finishMeeting($meeting_id)
     {
-        Meeting::where('id', $meeting_id)->update(['is_cancelled' => '2']);
+        Meeting::where('id', $meeting_id)->update(['status' => MeetingStatus::IS_FINISHED->value]);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -256,7 +257,7 @@ class CreateTask extends Component
 
 //    public function finishMeeting($meeting_id)
 //    {
-//        $meeting = Meeting::where('id',$meeting_id)->update(['is_cancelled' => '2']);
+//        $meeting = Meeting::where('id',$meeting_id)->update(['status' => '2']);
 //
 //    }
 

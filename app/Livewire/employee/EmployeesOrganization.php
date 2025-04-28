@@ -19,8 +19,6 @@ class EmployeesOrganization extends Component
     {
         return view('livewire.employee.employees-organization');
     }
-
-
     public ?string $search ='';
     #[Computed]
     public function organizationUsers()

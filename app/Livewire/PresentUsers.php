@@ -32,7 +32,7 @@ class PresentUsers extends Component
     #[Computed]
     public function meeting()
     {
-        return Meeting::where('id',$this->meetingId)->value('is_cancelled');
+        return Meeting::where('id',$this->meetingId)->value('status');
     }
 
     #[Computed]
@@ -56,7 +56,7 @@ class PresentUsers extends Component
     public function acceptMeeting($meetingId)
     {
         $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '-1';
+        $meeting->status = '-1';
         $meeting->save();
         return redirect()->back()->with('status','جلسه با موفقیت تایید نهایی شد');
     }
@@ -70,7 +70,7 @@ class PresentUsers extends Component
     public function denyMeeting($meetingId)
     {
         $meeting = Meeting::find($meetingId);
-        $meeting->is_cancelled = '1';
+        $meeting->status = '1';
         $meeting->save();
         $this->dispatch('close-modal');
         return redirect()->back()->with('status','جلسه با موفقیت لفو نهایی شد');

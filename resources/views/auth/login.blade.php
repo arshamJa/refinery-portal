@@ -3,12 +3,21 @@
 
         <form action="{{route('login.store')}}" method="post" dir="rtl">
             @csrf
-            <!-- Email Address -->
+
+
+            <!-- Title -->
+            <div class="text-center mb-2">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('ورود به پورتال') }}</h2>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('لطفاً اطلاعات خود را وارد کنید') }}</p>
+            </div>
+
+            <!-- Personal Code -->
             <div>
                 <x-input-label for="p_code" :value="__('کدپرسنلی')" />
                 <x-text-input name="p_code" class="mt-2" autofocus/>
                 <x-input-error :messages="$errors->get('p_code')" class="mt-2" />
             </div>
+
             <!-- Password -->
             <div x-data="{ show: true }">
                 <x-input-label for="p_code" class="mt-2" :value="__('رمز')" />
@@ -29,6 +38,7 @@
                 </div>
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
+
             <!-- Remember Me -->
             <div class="flex items-center justify-between mt-4">
                 <label for="remember" class="inline-flex items-center">
@@ -40,14 +50,22 @@
                     {{ __('فراموشی رمز؟') }}
                 </a>
             </div>
-            <div class="flex flex-col justify-center items-center gap-y-4">
-                <button type="submit" class="w-full items-center px-4 py-2 bg-blue-950 dark:bg-gray-200 border border-transparent rounded-full mt-4 font-semibold text-sm text-white dark:text-gray-800 uppercase hover:bg-blue-900 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-100" >
+
+            <!-- Submit Button -->
+            <div class="my-3">
+                <button type="submit" class="w-full px-4 py-3 text-[#F5F0F1] bg-[#4332BD] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 border border-transparent rounded-md font-semibold text-sm uppercase transition ease-in-out duration-300">
                     {{ __('ورود') }}
                 </button>
-                <a href="{{route('register')}}" class="text-red-600  hover:underline">
-                    {{__('ثبت نام')}}
-                </a>
             </div>
+
+            <!-- Sign Up Link -->
+            <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ __('حساب کاربری ندارید؟') }}
+                    <a href="{{ route('register') }}" class="text-red-500 hover:underline">{{ __('ثبت نام') }}</a>
+                </p>
+            </div>
+
         </form>
 
 </x-guest-layout>

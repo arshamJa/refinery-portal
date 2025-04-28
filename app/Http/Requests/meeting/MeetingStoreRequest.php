@@ -26,21 +26,21 @@ class MeetingStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required','string'],
-            'unit_organization' => ['required','string','min:5', new farsi_chs()],
-            'scriptorium' => ['required','string', new farsi_chs()],
-            'boss' => ['required','string', new farsi_chs()],
-            'location' => ['required','string'],
+            'title' => ['required','string','max:255'],
+            'unit_organization' => ['required','string','min:5','max:255', new farsi_chs()],
+            'scriptorium' => ['required','string','max:255', new farsi_chs()],
+            'boss' => ['required','max:255'],
+            'location' => ['required','string','max:255'],
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],
-            'time' => ['required' , 'date_format:H:i' , new Time()],
-            'unit_held' => ['required','string', new farsi_chs()],
+            'time' => ['required', new Time()],
+            'unit_held' => ['required','string','max:255', new farsi_chs()],
             'treat' => ['required'],
-            'guest' => ['nullable'],
+            'guest' => ['nullable','string'],
             'holders' => ['required'] ,
-            'applicant' => ['required','string', new farsi_chs()],
-            'position_organization' => ['required','string',new farsi_chs()],
+            'applicant' => ['required','string','max:255', new farsi_chs()],
+            'position_organization' => ['required','string','max:255',new farsi_chs()],
         ];
     }
 }

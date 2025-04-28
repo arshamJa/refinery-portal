@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\operator;
+namespace App\Livewire\employee;
 
 use App\Models\Blog;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -24,7 +24,7 @@ class News extends Component
 
     public function render()
     {
-        return view('livewire.operator.news');
+        return view('livewire.employee.news');
     }
     #[Computed]
     public function blogs()

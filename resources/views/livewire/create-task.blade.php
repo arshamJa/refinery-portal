@@ -1,4 +1,4 @@
-@php use Illuminate\Support\Str; @endphp
+@php use App\Enums\MeetingStatus;use Illuminate\Support\Str; @endphp
 <div>
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -184,7 +184,7 @@
         <div class="overflow-x-auto rounded-xl border border-gray-300 shadow-sm">
             <table class="w-full text-right text-sm border-collapse">
                 <thead class="bg-gray-100 text-gray-700">
-                @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام',''] as $th)
+                @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده',''] as $th)
                     <th class="px-4 py-3 border-b border-gray-400">{{ __($th) }}</th>
                 @endforeach
                 </thead>
@@ -214,6 +214,22 @@
                                     </x-primary-button>
                                 </td>
                             @endif
+
+                            <td class="px-4 py-4 border-r border-gray-300">
+                                @if ($taskUser->taskUserFiles->isNotEmpty())
+                                    <div class="flex flex-col gap-2">
+                                        @foreach ($taskUser->taskUserFiles as $file)
+                                            <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
+                                               class="text-blue-600 hover:underline text-xs truncate">
+                                                📄 {{ $file->original_name }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-gray-400 text-xs">بدون فایل</span>
+                                @endif
+                            </td>
+
                         </tr>
                     @endforeach
                 @endforeach
@@ -221,7 +237,7 @@
             </table>
 
         </div>
-        @if (auth()->user()->user_info->full_name === $this->meetings->scriptorium && $this->meetings->is_cancelled != '2')
+        @if (auth()->user()->user_info->full_name === $this->meetings->scriptorium && $this->meetings->status == MeetingStatus::IS_IN_PROGRESS->value)
             <button wire:click="showFinalCheck({{ $this->meetings->id}})"
                     class="flex justify-center gap-3 items-center bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-xl shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -237,7 +253,7 @@
 
     <x-modal name="view-task-details-modal" maxWidth="4xl">
         @if ($selectedTask)
-            <form wire:submit="submitTaskForm({{$selectedTask->id}})">
+            <form wire:submit="submitTaskForm({{$selectedTask->id}})" enctype="multipart/form-data">
                 <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
 
                     {{-- Title --}}
@@ -264,6 +280,18 @@
                                   class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
                     </textarea>
                         <x-input-error :messages="$errors->get('taskBody')"/>
+                    </div>
+
+                    {{-- File Upload --}}
+                    <div>
+                        <x-input-label for="fileUpload" :value="__('آپلود فایل مرتبط')" class="mb-2"/>
+                        <input wire:model="fileUpload" type="file" id="fileUpload" multiple
+                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                           file:rounded-full file:border-0
+                           file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700
+                           hover:file:bg-blue-100"/>
+                        <x-input-error :messages="$errors->get('fileUpload')"/>
                     </div>
 
                     {{-- Submit --}}

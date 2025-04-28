@@ -58,11 +58,13 @@ class CreateNewMeetingController extends Controller
      */
     public function create()
     {
-        $users = UserInfo::whereHas('user', function ($query) {
+        $users = UserInfo::with('department:id,department_name')
+            ->whereHas('user', function ($query) {
             $query->whereDoesntHave('roles', function ($roleQuery) {
                 $roleQuery->where('name', UserRole::SUPER_ADMIN->value);
             });
-        })->get(['id', 'user_id', 'full_name']);
+        })->select('id', 'user_id', 'full_name', 'department_id', 'position')
+            ->get();
 
         $departments = Department::select('id','department_name')->get();
         return view('meeting.crud.create' , ['users' => $users,'departments'=>$departments]);
@@ -105,21 +107,27 @@ class CreateNewMeetingController extends Controller
             ->values();
 
 
-
-
         // Convert current Gregorian date to Jalali
-        [$jaYear, $jaMonth, $jaDay] = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
         // Prevent selecting past dates
-        if ($request->year < $jaYear ||
-            ($request->year == $jaYear && $request->month < $jaMonth) ||
-            ($request->year == $jaYear && $request->month == $jaMonth && $request->day < $jaDay)
+        if ($request->year < $ja_year ||
+            ($request->year == $ja_year && $request->month < $ja_month) ||
+            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day)
         ) {
             throw ValidationException::withMessages(['year' => 'تاریخ گذشته نباید باشد']);
         }
 
         // Format date correctly
         $newDate = sprintf('%04d/%02d/%02d', $request->year, $request->month, $request->day);
+
+        $bossName = UserInfo::where('user_id',$request->boss)->value('full_name');
+
+
+        // normalized time
+        $time = $request->time;
+        list($hour, $minute) = explode(':', $time);
+        $normalizedTime = sprintf('%02d:%02d', $hour, $minute);
 
 
         if (Meeting::where('date', $newDate)->where('time', $request->time)->exists()) {
@@ -131,10 +139,10 @@ class CreateNewMeetingController extends Controller
                 'title' => $request->title,
                 'unit_organization' => $request->unit_organization,
                 'scriptorium' => $request->scriptorium,
-                'boss' => $request->boss ,
+                'boss' => $bossName,
                 'location' => $request->location,
                 'date' => $newDate,
-                'time' => $request->time,
+                'time' => $normalizedTime,
                 'unit_held' => $request->unit_held,
                 'treat' => $request->treat,
                 'guest' => $outerGuests ?? null,
@@ -239,13 +247,14 @@ class CreateNewMeetingController extends Controller
     public function update(MeetingUpdateRequest $request, string $id)
     {
         $request->validated();
+
         // Convert current Gregorian date to Jalali
-        [$jaYear, $jaMonth, $jaDay] = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
         // Prevent selecting past dates
-        if ($request->year < $jaYear ||
-            ($request->year == $jaYear && $request->month < $jaMonth) ||
-            ($request->year == $jaYear && $request->month == $jaMonth && $request->day < $jaDay)
+        if ($request->year < $ja_year ||
+            ($request->year == $ja_year && $request->month < $ja_month) ||
+            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day)
         ) {
             throw ValidationException::withMessages(['year' => 'تاریخ گذشته نباید باشد']);
         }

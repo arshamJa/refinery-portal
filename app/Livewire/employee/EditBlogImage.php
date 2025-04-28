@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\operator;
+namespace App\Livewire\employee;
 
 use App\Models\BlogImage;
 use Livewire\Attributes\Computed;
@@ -10,7 +10,7 @@ class EditBlogImage extends Component
 {
     public function render()
     {
-        return view('livewire.operator.edit-blog-image');
+        return view('livewire.employee.edit-blog-image');
     }
     public $blog;
 

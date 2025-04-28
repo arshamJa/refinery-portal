@@ -50,9 +50,11 @@ class MeetingsExport implements FromCollection, WithHeadings
                 ->filter()
                 ->join(', ');
 
+
             return [
                 'ردیف' => $index + 1,
                 'نام دبیر' => $meeting->scriptorium,
+                'نام رئیس جلسه' => $meeting->boss,
                 'واحد سازمانی' => $meeting->unit_organization,
                 'موضوع جلسه' => $meeting->title,
                 'تاریخ برگزاری' => $meeting->date,
@@ -69,7 +71,7 @@ class MeetingsExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'ردیف', 'نام دبیر', 'واحد سازمانی', 'موضوع جلسه', 'تاریخ برگزاری', 'مکان','زمان',
+            'ردیف', 'نام دبیر','نام رئیس جلسه' , 'واحد سازمانی', 'موضوع جلسه', 'تاریخ برگزاری', 'مکان','زمان',
             'سمت سازمانی', 'واحد برگزار کننده', 'درخواست دهنده جلسه', 'اعضای جلسه', 'مهمان',
         ];
     }

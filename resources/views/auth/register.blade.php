@@ -1,8 +1,12 @@
 <x-guest-layout>
-    <img id="background" class="absolute -z-50 -left-20 top-0 max-w-[877px]"
-         src="https://laravel.com/assets/img/welcome/background.svg"/>
+    <img id="background" class="absolute -z-50 -left-20 top-0 max-w-[877px]" src="https://laravel.com/assets/img/welcome/background.svg"/>
     <form action="{{route('register.store')}}" method="post" dir="rtl">
         @csrf
+        <!-- Title -->
+        <div class="text-center mb-2">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('فرم ثبت نام') }}</h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('لطفاً اطلاعات خود را وارد کنید') }}</p>
+        </div>
         <!-- Full Name -->
         <div>
             <x-input-label for="full_name" :value="__('نام و نام خانوادگی')"/>
@@ -67,18 +71,23 @@
             </div>
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2"/>
         </div>
-        <div class="flex flex-col justify-center items-center gap-y-4">
-            <button type="submit"
-                    class="w-full items-center px-4 py-2 bg-blue-950 dark:bg-gray-200 border border-transparent rounded-full mt-4 font-semibold text-sm text-white dark:text-gray-800 uppercase hover:bg-blue-900 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+
+        <!-- Submit Button -->
+        <div class="my-3">
+            <button type="submit" class="w-full px-4 py-3 text-[#F5F0F1] bg-[#4332BD] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 border border-transparent rounded-md font-semibold text-sm uppercase transition ease-in-out duration-300">
                 {{ __('ثبت نام') }}
             </button>
-            <p>
+        </div>
+
+        <!-- Sign Up Link -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{__('قبلا ثبت نام کردی؟ ')}}
-                <a href="{{route('login')}}"
-                   class="text-red-600 hover:underline ">
-                    {{__('ورود')}}
-                </a>
+                <a href="{{route('login')}}" class="text-red-500 hover:underline">{{ __('ورود') }}</a>
             </p>
         </div>
+
     </form>
+
+
 </x-guest-layout>

@@ -1,3 +1,4 @@
+@php use App\Enums\MeetingStatus; @endphp
 <div>
     <x-breadcrumb>
         <li class="flex items-center h-full">
@@ -22,10 +23,19 @@
             </span>
         </li>
     </x-breadcrumb>
-    @can('create-meeting')
+
         <div class="mb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @can('create-meeting')
                 <x-create-link href="{{route('meeting.create')}}">{{__('ایجاد جلسه جدید')}}</x-create-link>
+                @endcan
+                <a href="{{route('my.task.table')}}"
+                   class="inline-flex items-center gap-2 px-5 py-4 rounded-xl text-white bg-gradient-to-r from-[#FF6F61] to-[#4C6EF5] transition-all duration-300 ease-in-out shadow-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
+                    <span class="text-sm font-medium">
+                      {{__('اقدامات من')}}
+                    </span>
+                </a>
+
                 {{--                <a href="{{route('meetingsList')}}"--}}
                 {{--                   class="bg-[#FCF7F8]  hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
                 {{--                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
@@ -64,10 +74,9 @@
                 {{--                </a>--}}
             </div>
         </div>
-    @endcan
 
-    <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
 
+    <div class="pt-4 px-6 sm:pt-6 border shadow-md rounded-md">
         <form wire:submit="filterMeetings"
               class="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
             <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
@@ -85,9 +94,11 @@
                     <x-input-label for="statusFilter" value="{{ __('وضعیت جلسه') }}"/>
                     <x-select-input id="statusFilter" wire:model="statusFilter">
                         <option value="">{{__('همه وضعیت‌ها')}}</option>
-                        <option value="0">{{__('در حال بررسی')}}</option>
-                        <option value="1">{{__('جلسه لغو شد')}}</option>
-                        <option value="-1">{{__('جلسه تشکیل می‌شود')}}</option>
+                        <option value="{{MeetingStatus::PENDING->value}}">{{__('در حال بررسی دعوتنامه')}}</option>
+                        <option value="{{MeetingStatus::IS_CANCELLED->value}}">{{__('لغو شد')}}</option>
+                        <option value="{{MeetingStatus::IS_NOT_CANCELLED->value}}">{{__('تشکیل می‌شود')}}</option>
+                        <option value="{{MeetingStatus::IS_IN_PROGRESS->value}}">{{__('در حال برگزاری')}}</option>
+                        <option value="{{MeetingStatus::IS_FINISHED->value}}">{{__('خاتمه یافت')}}</option>
                     </x-select-input>
                 </div>
 
@@ -127,12 +138,12 @@
                 </div>
             </div>
         </form>
-        <div class="pt-4 w-full overflow-x-auto overflow-y-hidden sm:pt-6 mb-4 bg-white">
+        <div class=" w-full overflow-x-auto overflow-y-hidden  mb-4 pb-12">
             <x-table.table>
                 <x-slot name="head">
                     <x-table.row>
                         @foreach ([
-                                'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','رویت صورتجلسه',''
+                                'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','','رویت صورتجلسه',''
                             ] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
@@ -162,31 +173,54 @@
                                 </x-table.cell>
                             @endif
                             <x-table.cell>
-                                @if($meeting->is_cancelled == '0')
-                                    <span
-                                        class="block w-full bg-yellow-400 text-xs text-gray-800 font-medium px-3 py-1 rounded-lg m-1">
-                                        {{ __('درحال بررسی...') }}
-                                    </span>
-                                @elseif($meeting->is_cancelled == '1')
-                                    <span
-                                        class="block w-full bg-red-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
-                                        {{ __('جلسه لغو شد') }}
-                                    </span>
-                                @elseif($meeting->is_cancelled == '-1')
-                                    <span
-                                        class="block w-full bg-green-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
-                                        {{ __('جلسه تشکیل میشود') }}
-                                    </span>
-                                @elseif($meeting->is_cancelled == '2')
-                                    <span
-                                        class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg shadow-sm m-1">
-                                        {{ __('جلسه خاتمه یافت') }}
-                                    </span>
-                                @endif
+                                @switch($meeting->status)
 
+                                    @case(MeetingStatus::IS_CANCELLED->value)
+                                        <span
+                                            class="block w-full bg-red-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                            {{ __('جلسه لغو شد') }}
+                                        </span>
+                                        @break
+
+                                    @case(MeetingStatus::IS_NOT_CANCELLED->value)
+                                        <span
+                                            class="block w-full bg-green-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                            {{ __('جلسه برگزار میشود') }}
+                                        </span>
+                                        @break
+
+
+                                    @case(MeetingStatus::IS_IN_PROGRESS->value)
+                                            <span
+                                                class="block w-full bg-blue-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                                    {{ __('جلسه درحال برگزاری است') }}
+                                                </span>
+                                        @break
+
+                                    @case(MeetingStatus::IS_FINISHED->value)
+                                        <span
+                                            class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg shadow-sm m-1">
+                                            {{ __('جلسه خاتمه یافت') }}
+                                        </span>
+                                        @break
+                                    @default
+                                        <span
+                                            class="block w-full bg-yellow-400 text-xs text-gray-800 font-medium px-3 py-1 rounded-lg m-1">
+                                                {{ __('درحال بررسی دعوتنامه') }}
+                                            </span>
+
+                                @endswitch
+                            </x-table.cell>
+                            <!-- Start Meeting Button (New Column) -->
+                            <x-table.cell>
+                                @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED->value)
+                                    <button wire:click="startMeeting({{ $meeting->id }})" class="text-sm px-3 py-1 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 rounded-lg shadow-md hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 focus:outline-none transform hover:scale-105 transition-all duration-200">
+                                        {{ __('شروع جلسه') }}
+                                    </button>
+                                @endif
                             </x-table.cell>
                             <x-table.cell>
-                                @if($meeting->is_cancelled == '-1' || $meeting->is_cancelled == '2')
+                                @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED->value || $meeting->status == MeetingStatus::IS_IN_PROGRESS->value || $meeting->status == MeetingStatus::IS_FINISHED->value)
                                     <a href="{{route('tasks.create',$meeting->id)}}">
                                         <x-primary-button>
                                             {{ __('نمایش') }}
@@ -210,17 +244,17 @@
                                         <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                             {{ __('نمایش') }}
                                         </x-dropdown-link>
-                                        @if($meeting->is_cancelled != '1' and $meeting->is_cancelled != '-1')
+                                        @if($meeting->status != MeetingStatus::IS_CANCELLED->value and $meeting->status != MeetingStatus::IS_NOT_CANCELLED->value)
                                             <x-dropdown-link href="#">
                                                 {{ __('ویرایش') }}
                                             </x-dropdown-link>
                                         @endif
-                                        {{--                                        @if( $meeting->is_cancelled == '0' or $meeting->is_cancelled == '1')--}}
+                                        @if($meeting->status == MeetingStatus::PENDING->value or $meeting->status == MeetingStatus::IS_CANCELLED->value)
                                         <x-dropdown-link wire:click.prevent="deleteMeeting({{$meeting->id}})"
                                                          class="text-red-600 ">
                                             {{ __('حذف') }}
                                         </x-dropdown-link>
-                                        {{--                                        @endif--}}
+                                        @endif
                                     </x-slot>
                                 </x-dropdown>
                             </x-table.cell>
@@ -252,14 +286,28 @@
 
             <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-8">
                 {{-- Meeting Title --}}
-                <div class="border-b pb-4">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $selectedMeeting->title }}</h2>
-                    <p class="text-sm text-gray-500 mt-1">{{ __('جزئیات جلسه') }}</p>
+                <div class="flex items-center justify-between border-b pb-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $selectedMeeting->title }}</h2>
+                        <p class="text-sm text-gray-500 mt-2">{{ __('جزئیات جلسه') }}</p>
+                    </div>
+                    <!-- Close Button with X Icon -->
+                    <button
+                        class="text-gray-500 hover:text-gray-900 dark:hover:text-white focus:outline-none"
+                        x-on:click="$dispatch('close')"
+                        aria-label="Close modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+
                 </div>
+
                 {{-- Meeting Info --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[15px]">
-                    <x-meeting-info label="{{ __('دبیرجلسه') }}" :value="$selectedMeeting->scriptorium"/>
                     <x-meeting-info label="{{ __('رئیس جلسه') }}" :value="$selectedMeeting->boss"/>
+                    <x-meeting-info label="{{ __('دبیرجلسه') }}" :value="$selectedMeeting->scriptorium"/>
                     <x-meeting-info label="{{ __('واحد سازمانی') }}" :value="$selectedMeeting->unit_organization"/>
                     <x-meeting-info label="{{ __('سمت دبیرجلسه') }}" :value="$selectedMeeting->position_organization"/>
                     <x-meeting-info label="{{ __('مکان') }}" :value="$selectedMeeting->location"/>
@@ -268,7 +316,7 @@
                     <x-meeting-info label="{{ __('کمیته یا واحد برگزار کننده') }}"
                                     :value="$selectedMeeting->unit_held"/>
                     <x-meeting-info label="{{ __('پذیرایی') }}" :value="$selectedMeeting->treat ? 'دارد' : 'ندارد'"/>
-                    <x-meeting-info label="{{ __('درخواست دهنده') }}" :value="$selectedMeeting->applicant"/>
+                    <x-meeting-info label="{{ __('نام درخواست دهنده') }}" :value="$selectedMeeting->applicant"/>
                 </div>
 
                 {{-- Participants --}}

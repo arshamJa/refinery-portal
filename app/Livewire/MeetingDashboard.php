@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\MeetingStatus;
 use App\Exports\MeetingsExport;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
@@ -92,13 +93,8 @@ class MeetingDashboard extends Component
             'meetingUsers.user.user_info:id,user_id,full_name',
             'meetingUsers.user.user_info.department:id,department_name',
         ])
-            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'is_cancelled',
-                'position_organization', // Make sure to include this
-                'unit_held', // Make sure to include this
-                'applicant', // Make sure to include this
-
-
-                ])
+            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'boss','location', 'date', 'time', 'status',
+                'position_organization', 'unit_held', 'applicant'])
             ->when(!empty($search), function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
@@ -109,7 +105,7 @@ class MeetingDashboard extends Component
                         ->orWhere('time', 'like', "%{$search}%");
                 });
             })
-            ->when($statusFilter !== '', fn($query) => $query->where('is_cancelled', $statusFilter))
+            ->when($statusFilter !== '', fn($query) => $query->where('status', $statusFilter))
             ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
                 $query->dateRange($startDate, $endDate);  // Assuming dateRange is a scope or method for filtering dates
             });
@@ -131,7 +127,7 @@ class MeetingDashboard extends Component
                 'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,read_by_scriptorium,read_by_user,replacement',
                 'meetingUsers.user:id',
                 'meetingUsers.user.user_info:id,user_id,full_name,department_id',
-                'meetingUsers.user.user_info.department:id,department_name'
+                'meetingUsers.user.user_info.department:id,department_name',
             ])
             ->get();  // Get all relevant data including meeting users and their associated info
         // Export the filtered meetings to Excel
@@ -149,17 +145,16 @@ class MeetingDashboard extends Component
                     'read_by_scriptorium', 'read_by_user', 'replacement'
                 )
                     ->with([
-                        'user:id',
-                        'user.user_info:id,user_id,full_name,position,department_id',
-                        'user.user_info.department:id,department_name',
+                        'user.user_info.department'
                     ]);
             }
         ])
             ->select(
                 'id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time',
-                'unit_held', 'treat', 'applicant', 'position_organization', 'guest','boss'
+                'unit_held', 'treat', 'applicant', 'position_organization', 'guest', 'boss'
             )
             ->findOrFail($id);
+
         $this->dispatch('crud-modal', name: 'view-meeting-modal');
     }
 
@@ -169,6 +164,13 @@ class MeetingDashboard extends Component
         $this->selectedMeeting = Meeting::select('id', 'title', 'date', 'time')
             ->findOrFail($id);
         $this->dispatch('crud-modal', name: 'delete-meeting-modal');
+    }
+
+    public function startMeeting($id)
+    {
+        Meeting::where('id', $id)->update([
+            'status' => MeetingStatus::IS_IN_PROGRESS->value,
+        ]);
     }
 
 }

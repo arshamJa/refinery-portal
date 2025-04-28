@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function (){
 
-    Route::get('blogs', \App\Livewire\operator\News::class)
+    Route::get('blogs', \App\Livewire\employee\News::class)
         ->name('blogs.index');
 
     Route::get('blogs/create',[BlogController::class,'create'])

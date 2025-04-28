@@ -136,12 +136,84 @@
             </h2>
 {{--                        Scriptorium Information--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-                <div>
-                    <x-input-label for="boss" :value="__('نام رئیس جلسه')"/>
-                    <x-text-input name="boss" id="boss" value="{{old('boss')}}"
-                                  class="block" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('boss')"/>
+{{--                <div>--}}
+{{--                    <x-input-label for="boss" :value="__('نام رئیس جلسه')"/>--}}
+{{--                    <x-text-input name="boss" id="boss" value="{{old('boss')}}"--}}
+{{--                                  class="block" type="text" autofocus/>--}}
+{{--                    <x-input-error :messages="$errors->get('boss')"/>--}}
+{{--                </div>--}}
+                <div x-data="dropdown()" class="relative w-full col-span-2" x-init="initOptions({{ $users }})">
+                    <x-input-label for="boss" class="mb-2" :value="__('رئیس جلسه')"/>
+
+                    <!-- Dropdown Button -->
+                    <button type="button" @click="open = !open" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-left text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+                        <span class="text-right w-full" x-text="selected ? selected.full_name + ' - ' + (selected.department ? selected.department.department_name : 'No department') + ' - ' + selected.position : '...'"></span>
+                        <!-- Down Arrow Icon -->
+                        <svg x-show="!open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                        <svg x-show="open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="open" @click.away="open = false" class="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
+                        <!-- Search Input -->
+                        <div class="px-4 py-2">
+                            <input type="text" x-model="search" placeholder="جست و جو" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <!-- Dropdown Options -->
+                        <ul class="space-y-1">
+                            <!-- Null Option -->
+                            <li @click="select(null)" class="px-4 py-2 text-gray-600 hover:bg-blue-50 cursor-pointer rounded-lg">
+                                <span>...</span>
+                            </li>
+
+                            <!-- User List -->
+                            <template x-for="user in filteredOptions" :key="user.id">
+                                <li @click="select(user)" class="px-4 py-2 text-gray-700 hover:bg-blue-50 cursor-pointer rounded-lg">
+                                    <span x-text="user.full_name + ' - ' + (user.department ? user.department.department_name : 'No department') + ' - ' + user.position"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <!-- Hidden input to store the selected user's ID -->
+                    <input type="hidden" name="boss" x-bind:value="selected ? selected.id : ''">
+
+                    <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
+
+                    <script>
+                        function dropdown() {
+                            return {
+                                open: false,
+                                search: '',
+                                selected: null,
+                                options: [],
+                                initOptions(data) {
+                                    this.options = data;
+                                },
+                                select(user) {
+                                    this.selected = user;
+                                    this.open = false;
+                                    this.search = '';
+                                },
+                                get filteredOptions() {
+                                    if (!this.search) return this.options;
+                                    return this.options.filter(user =>
+                                        user.full_name.toLowerCase().includes(this.search.toLowerCase()) ||
+                                        (user.department && user.department.department_name.toLowerCase().includes(this.search.toLowerCase())) ||
+                                        (user.position && user.position.toLowerCase().includes(this.search.toLowerCase()))
+                                    );
+                                }
+                            }
+                        }
+                    </script>
                 </div>
+
+
                 <div>
                     <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
                     <x-text-input name="scriptorium" id="scriptorium"
@@ -178,6 +250,7 @@
                                   class="block" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('applicant')"/>
                 </div>
+
             </div>
 
 

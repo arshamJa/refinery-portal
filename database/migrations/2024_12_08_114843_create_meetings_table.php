@@ -22,10 +22,10 @@ return new class extends Migration
             $table->string('time');
             $table->string('unit_held'); // واحد برگزار کننده
             $table->string('treat'); // پذیرایی
-            $table->json('guest')->default(null); // this could be multiple
+            $table->json('guest')->nullable(); // this could be multiple
             $table->string('applicant'); // نام درخواست دهنده جلسه
             $table->string('position_organization');
-            $table->smallInteger('is_cancelled')->default('0');
+            $table->smallInteger('status')->default(\App\Enums\MeetingStatus::PENDING->value);
             $table->softDeletes();
             $table->timestamps();
         });
