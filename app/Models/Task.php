@@ -15,17 +15,9 @@ class Task extends Model
 
     protected $fillable = [
         'meeting_id',
-//        'user_id',
         'body',
-//        'sent_date',
         'time_out',
-//        'is_completed',
-//        'request_task'
     ];
-//    public function user():BelongsTo
-//    {
-//        return $this->belongsTo(User::class);
-//    }
     public function full_name()
     {
         return UserInfo::where('user_id',$this->user_id)->value('full_name');
@@ -34,16 +26,8 @@ class Task extends Model
     {
         return $this->belongsTo(Meeting::class);
     }
-
-
-
     public function taskUsers():HasMany
     {
         return $this->hasMany(TaskUser::class)->chaperone();
     }
-
-
-
-
-
 }

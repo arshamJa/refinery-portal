@@ -30,7 +30,7 @@ class PresentUsers extends Component
     }
 
     #[Computed]
-    public function meeting()
+    public function meetingStatus()
     {
         return Meeting::where('id',$this->meetingId)->value('status');
     }

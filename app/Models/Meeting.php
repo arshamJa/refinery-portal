@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\MeetingStatus;
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,6 +34,7 @@ class Meeting extends Model
 
     protected $casts = [
         'guest' => 'array',
+        'status' => MeetingStatus::class
     ];
     protected function guest(): Attribute
     {

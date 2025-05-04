@@ -41,7 +41,7 @@ class MeetingDashboard extends Component
 //        $query = Meeting::with([
 //            'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,read_by_scriptorium,read_by_user,replacement'
 //        ])
-//            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'is_cancelled']);
+//            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'task_status']);
 //
 //        // Trimmed values
 //        $search = trim($this->search);
@@ -60,7 +60,7 @@ class MeetingDashboard extends Component
 //        }
 //
 //        if ($this->statusFilter !== '') {
-//            $query->where('is_cancelled', $this->statusFilter);
+//            $query->where('task_status', $this->statusFilter);
 //        }
 //
 //        if (!empty($startDate) && !empty($endDate)) {

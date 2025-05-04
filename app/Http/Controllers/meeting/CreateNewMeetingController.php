@@ -124,11 +124,9 @@ class CreateNewMeetingController extends Controller
         $bossName = UserInfo::where('user_id',$request->boss)->value('full_name');
 
 
-        // normalized time
-        $time = $request->time;
-        list($hour, $minute) = explode(':', $time);
-        $normalizedTime = sprintf('%02d:%02d', $hour, $minute);
-
+        $request->merge([
+            'time' => str_contains($request->time, ':') ? $request->time : sprintf('%02d:00', intval($request->time))
+        ]);
 
         if (Meeting::where('date', $newDate)->where('time', $request->time)->exists()) {
             throw ValidationException::withMessages([
@@ -142,7 +140,7 @@ class CreateNewMeetingController extends Controller
                 'boss' => $bossName,
                 'location' => $request->location,
                 'date' => $newDate,
-                'time' => $normalizedTime,
+                'time' => $request->time,
                 'unit_held' => $request->unit_held,
                 'treat' => $request->treat,
                 'guest' => $outerGuests ?? null,

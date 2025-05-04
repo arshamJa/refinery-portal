@@ -36,20 +36,20 @@
     </x-breadcrumb>
 
     <div class="pt-4 px-6 sm:pt-6 border shadow-md rounded-md">
-        <form wire:submit=""
+        <form wire:submit="applyFilters"
               class="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
-            <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
+            <div class="grid gap-4 px-3 w-full sm:px-0 lg:grid-cols-6 items-end">
                 <!-- Search Input -->
                 <div class="col-span-6 sm:col-span-3 lg:col-span-2">
                     <x-input-label for="search" value="{{ __('جست و جو') }}"/>
                     <x-search-input>
-                        <x-text-input type="text" id="search" wire:model="search" class="block ps-10"
+                        <x-text-input type="text" id="search"  wire:model.debounce="search" class="block ps-10"
                                       placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
                     </x-search-input>
                 </div>
 
                 <!-- Status Filter -->
-                <div class="col-span-6 sm:col-span-1">
+                <div class="col-span-6 sm:col-span-1 ">
                     <x-input-label for="statusFilter" value="{{ __('وضعیت اقدامات') }}"/>
                     <x-select-input id="statusFilter" wire:model="statusFilter">
                         <option value="">{{__('همه وضعیت‌ها')}}</option>
@@ -60,13 +60,13 @@
 
 
                 <!-- Search + Show All Buttons -->
-                <div class="col-span-6 lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
+                <div class="col-span-6 lg:col-span-3 flex justify-start md:justify-end flex-row gap-4 mt-4 lg:mt-0">
                     <x-search-button>{{ __('جست و جو') }}</x-search-button>
-{{--                    @if($search !== '')--}}
-                        <x-view-all-link href="{{ route('dashboard.meeting') }}">
+                    @if($search !== '' || $statusFilter !== null)
+                        <x-view-all-link href="{{ route('my.task.table') }}">
                             {{ __('نمایش همه') }}
                         </x-view-all-link>
-{{--                    @endif--}}
+                    @endif
                 </div>
 
             </div>
@@ -88,8 +88,8 @@
                             <x-table.cell>{{ ($this->taskUsers->currentPage() - 1) * $this->taskUsers->perPage() + $loop->iteration }}</x-table.cell>
                             <x-table.cell>{{ $taskUser->task->meeting->title ?? '-' }}</x-table.cell>
                             <x-table.cell>{{ $taskUser->task->time_out ?? '-' }}</x-table.cell>
-                            <x-table.cell>{{ Str::words($taskUser->body_task ?? '---' , 10 , '...')}}</x-table.cell>
-                            <x-table.cell>{{ $taskUser->sent_date ?? '-' }}</x-table.cell>
+                            <x-table.cell>{{ Str::words($taskUser->body_task ?? '---' , 5 , '...')}}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
                             <x-table.cell>
                                 <a href="{{route('tasks.create', $taskUser->task->meeting->id )}}">
                                     <x-secondary-button>

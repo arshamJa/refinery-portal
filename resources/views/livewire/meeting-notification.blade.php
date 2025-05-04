@@ -37,6 +37,7 @@
         {{--                <x-primary-button>{{__('مشاهده جدول جلسات')}}</x-primary-button>--}}
         {{--            </a>--}}
     </x-breadcrumb>
+
     @foreach($this->meetingUsers as $meetingUser)
         <div class="bg-teal-50 dark:bg-teal-800/30 mb-4 rounded-lg p-4 shadow-sm max-w-4xl">
             <div class="flex items-start gap-3">

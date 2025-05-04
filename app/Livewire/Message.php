@@ -40,7 +40,7 @@ class Message extends Component
         return Task::whereHas('meeting', function ($query) use ($fullName) {
             $query->where('scriptorium', $fullName);
         })
-            ->where('is_completed', true)
+            ->where('status', true)
             ->count();
     }
     #[Computed]
@@ -66,8 +66,8 @@ class Message extends Component
         return Meeting::with('meetingUsers')
             ->where('title', 'like', '%'.$this->search.'%')
             ->where('scriptorium','=',auth()->user()->user_info->full_name)
-            ->where('is_cancelled','=',-1)
-            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','is_cancelled'])
+            ->where('status','=',-1)
+            ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','status'])
             ->paginate(3);
     }
 
@@ -75,7 +75,7 @@ class Message extends Component
     public function meetingUsers()
     {
         return MeetingUser::with([
-            'meeting:id,title,date,time,is_cancelled',
+            'meeting:id,title,date,time,status',
             'user:id',
             'user.user_info:user_id,full_name'
         ])

@@ -128,7 +128,7 @@
         </div>
 
         <!-- Buttons -->
-        @if($this->meeting == '0')
+        @if($this->meetingStatus == \App\Enums\MeetingStatus::PENDING)
             <div class="flex justify-end gap-4 pt-6 border-t border-gray-200">
                 <x-primary-button wire:click="acceptMeeting({{ $meetingId }})">
                     {{ __('تایید جلسه') }}

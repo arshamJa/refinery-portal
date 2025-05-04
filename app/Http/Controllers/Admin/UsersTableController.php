@@ -219,7 +219,7 @@ class UsersTableController extends Controller
      */
     public function update(UpdateNewUserRequest $request, string $id)
     {
-//        $request->validated();
+        $request->validated();
 
         $userInfo = UserInfo::findOrFail($id);
 //        Gate::authorize('updateUsers', $userInfo);
@@ -229,8 +229,9 @@ class UsersTableController extends Controller
         // Update user basic info
         $user->update([
             'p_code' => $request->p_code,
-            'password' => Hash::make($request->password),
+            'password' => $request->filled('password') ? $request->password : '12345678'
         ]);
+
 
         $role = Role::find($request->role);
         // Sync role (only one role in your dropdown)
@@ -244,7 +245,7 @@ class UsersTableController extends Controller
         // Update user info
         $userInfo->update([
             'user_id' => $user->id,
-            'department_id' => $request->departmentId,
+            'department_id' => $request->department,
             'full_name' => $request->full_name,
             'work_phone' => $request->work_phone,
             'house_phone' => $request->house_phone,

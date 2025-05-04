@@ -37,7 +37,7 @@ class MeetingInvitation extends Component
     public function meetingUsers()
     {
         return MeetingUser::with([
-            'meeting:id,title,scriptorium,date,time,is_cancelled',
+            'meeting:id,title,scriptorium,date,time,status',
         ])
             ->where('user_id', auth()->id())
             ->orderByDesc('created_at')

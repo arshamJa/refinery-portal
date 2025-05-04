@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\ParticipantsTaskController;
 use App\Http\Controllers\Reports\TasksReportController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskManagementController;
 use App\Livewire\TaskList;
 use App\Livewire\TaskManagementTable;
@@ -12,7 +13,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/tasks/create/{meeting}', \App\Livewire\CreateTask::class)
+        ->name('tasks.create');
+
     Route::get('/task/list/{meeting}', TaskList::class)->name('task.list');
+
+
+    // this is the route for each user to sent their task
+    Route::post('/tasks/{taskUser}/submit', [TaskController::class, 'submitTaskForm'])->name('tasks.submit');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/delete-file/{fileId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
+
+
+    Route::post('/tasks/deny/{taskUserId}', [TaskController::class, 'denyTask'])->name('deny.task');
+
+
+
+
+
 
 
     // this is my task table
@@ -70,8 +88,7 @@ Route::middleware(['auth'])->group(function () {
 //    Route::get('/tasks/create/{meeting}', [TaskManagementController::class, 'create'])
 //        ->name('tasks.create');
 
-    Route::get('/tasks/create/{meeting}', \App\Livewire\CreateTask::class)
-        ->name('tasks.create');
+
 
 
 

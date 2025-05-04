@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,11 +16,13 @@ class TaskUser extends Model
          'task_id',
          'user_id',
          'sent_date',
-         'is_completed',
+         'task_status',
          'body_task',
          'request_task',
      ];
-
+    protected $casts = [
+        'task_status' => TaskStatus::class,
+    ];
 
     public function task():BelongsTo
     {

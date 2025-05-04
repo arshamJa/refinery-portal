@@ -98,7 +98,7 @@
                         $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
                     @endphp
                     <x-input-label for="month" :value="__('ماه')"/>
-                    <x-select-input name="month" id="year" dir="ltr">
+                    <x-select-input name="month" id="month" dir="ltr">
                         <option value="">...ماه</option>
                         @for ($i = 1; $i <= 12; $i++)
                             <option value="{{ $i }}" @if(old('month', $month ?? '') == $i) selected @endif>
@@ -110,7 +110,7 @@
                 </div>
                 <div>
                     <x-input-label for="day" :value="__('روز')"/>
-                    <x-select-input name="day" id="year" dir="ltr">
+                    <x-select-input name="day" id="day" dir="ltr">
                         <option value="">...روز</option>
                         @for($i = 1; $i <= 31; $i++)
                             <option value="{{$i}}" @if(old('day', $day ?? '') == $i) selected @endif>

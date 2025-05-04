@@ -3,9 +3,12 @@
 namespace App\Livewire;
 
 use App\Enums\MeetingStatus;
+use App\Enums\TaskStatus;
 use App\Models\Meeting;
 use App\Models\TaskUser;
 use App\Models\TaskUserFile;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -23,9 +26,12 @@ class CreateTask extends Component
     protected $loadedMeeting;
     protected $loadedEmployees;
     protected $loadedTasks;
-    public $fileUpload = [];
+    public $fileUpload;
     public $selectedTaskFiles = [];
 
+
+    public $taskUserId;
+    public $taskUser;
 
 
 
@@ -42,11 +48,12 @@ class CreateTask extends Component
         }
         return $this->loadedMeeting;
     }
+
     #[Computed]
     public function employees()
     {
         if (!$this->loadedEmployees) {
-            $this->loadedEmployees = $this->meetings()->meetingUsers;
+            $this->loadedEmployees = $this->meetings()->meetingUsers->where('is_guest',false);
         }
         return $this->loadedEmployees;
     }
@@ -84,6 +91,16 @@ class CreateTask extends Component
         return view('livewire.create-task');
     }
 
+    #[Computed]
+    public function presentUsers()
+    {
+        return $this->employees->filter(function ($employee) {
+            return $employee->is_present; // Adjust this to match your actual logic
+        })->map(function ($employee) {
+            return $employee->user;
+        });
+    }
+
     public function showTaskDetails($taskUserId)
     {
         $taskUser = TaskUser::with([
@@ -96,42 +113,17 @@ class CreateTask extends Component
         $this->dispatch('crud-modal', name: 'view-task-details-modal');
     }
 
-    public function submitTaskForm($taskUserId)
+    public function openUpdateModal($taskUserId)
     {
-        $this->validate([
-            'taskBody' => ['required', 'string', 'min:5'],
-            'fileUpload' => ['nullable']
-        ]);
+        $this->selectedTask = TaskUser::with('taskUserFiles')->findOrFail($taskUserId);
+        // Ensure the user is the owner
+        abort_unless( $this->selectedTask->user_id === auth()->id(), 403);
+        $this->taskBody = $this->selectedTask->body_task; // preload body
+        $this->selectedTaskFiles = $this->selectedTask->taskUserFiles; // preload existing files
 
-        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $this->dispatch('crud-modal', name:'edit-task-details-modal');
 
-        $newTime = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
-
-        $body = Str::deduplicate($this->taskBody);
-
-        $taskUser = TaskUser::where('id', $taskUserId)
-            ->where('user_id', auth()->id())
-            ->firstOrFail();
-
-        $taskUser->update([
-            'sent_date' => $newTime,
-            'is_completed' => true,
-            'body_task' => $body,
-        ]);
-        if (!empty($this->fileUpload)) {
-            foreach ($this->fileUpload as $file) {
-                $path = $file->store('task_files', 'public');
-                TaskUserFile::create([
-                    'task_user_id' => $taskUser->id,
-                    'file_path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
-                ]);
-            }
-        }
-
-        return back()->with('status', 'اقدام با موفقیت ثبت شد');
     }
-
     public function showFinalCheck()
     {
         $this->dispatch('crud-modal', name: 'final-check');
@@ -140,127 +132,69 @@ class CreateTask extends Component
     public function finishMeeting($meeting_id)
     {
         Meeting::where('id', $meeting_id)->update(['status' => MeetingStatus::IS_FINISHED->value]);
+        $this->dispatch('close-modal');
+        session()->flash('status', 'اقدام با موفقیت ثبت شد');
     }
 
 
 
 
-//    #[Computed]
-//    public function meetings()
-//    {
-//        return Meeting::where('deleted_at',null)->findOrFail($this->meeting);
-//    }
-//
-//    #[Computed]
-//    public function employees()
-//    {
-//        return MeetingUser::with('user.user_info:id,user_id,full_name') // Only fetch necessary columns
-//        ->where('meeting_id', $this->meeting)
-//            ->select('id','meeting_id','user_id','is_present')
-//            ->get();
-//
-//    }
-
-
-//    #[Computed]
-//    public function allUsersHaveTasks()
-//    {
-//        // Get the meeting ID directly
-//        $meetingId = $this->meetings()->id;
-//
-//        // Get the count of users associated with the meeting
-//        $userIdsCount = $this->meetings()->meetingUsers->count();
-//
-//        if ($userIdsCount === 0) {
-//            return false; // If no users are associated with the meeting, return false immediately
-//        }
-//
-//        // Get the count of users who have tasks assigned for this meeting
-//        $usersWithTasksCount = TaskUser::whereHas('task', function ($query) use ($meetingId) {
-//            $query->where('meeting_id', $meetingId); // Ensure the task is related to this meeting
-//        })
-//            ->distinct() // Ensure distinct user IDs
-//            ->count('user_id'); // Count distinct user IDs
-//
-//        // Check if all users have tasks by comparing counts
-//        return $usersWithTasksCount === $userIdsCount;
-//    }
-
-//    #[Computed]
-//    public function tasks()
-//    {
-//        // Eager load user and userInfo
-//        return Task::with([
-//            'taskUsers' => function ($query) {
-//                $query->select('id','task_id', 'user_id', 'sent_date', 'is_completed', 'request_task','body_task');
-//            },
-//            'taskUsers.user.user_info:id,user_id,full_name'
-//        ])
-//            ->where('meeting_id', $this->meeting)
-//            ->select('id', 'meeting_id', 'body', 'time_out')
-//            ->get();
-//    }
-
-//    public function render()
-//    {
-//        return view('livewire.create-task');
-//    }
 
 
 
-//    public function showTaskDetails($taskUserId)
-//    {
-//        $taskUser = TaskUser::with([
-//            'task:id,body,meeting_id',
-//        ])
-//            ->select('id', 'task_id', 'user_id', 'sent_date', 'is_completed', 'body_task', 'request_task')
-//            ->findOrFail($taskUserId);
-//
-//        $this->selectedTask = $taskUser;
-//        $this->taskName = $taskUser->user->user_info->full_name;
-//        $this->dispatch('crud-modal', name: 'view-task-details-modal');
-//    }
 
 
-//    public function submitTaskForm($taskUserId)
-//    {
-//        $this->validate([
-//            'taskBody' => ['required', 'string', 'min:5'],
-//        ]);
-//
-//        // Convert current Gregorian date to Jalali
-//        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-//
-//        $newTime = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
-//
-//        $body = Str::deduplicate($this->taskBody);
-//
-//        TaskUser::where('id', $taskUserId)
-//            ->where('user_id', auth()->id()) // auth()->user()->id is fine too
-//            ->update([
-//                'sent_date' => $newTime,
-//                'is_completed' => true,
-//                'body_task' => $body,
-//            ]);
-//
-//        return back()->with('status', 'Task submitted successfully.');
-//    }
+    /**
+     * @throws AuthorizationException
+     */
+    public function acceptTask($taskUserId)
+    {
+        $taskUser = TaskUser::findOrFail($taskUserId);
+        $this->authorize('acceptOrDeny',$taskUser);
+        $taskUser->task_status = TaskStatus::ACCEPTED->value;
+        $taskUser->save();
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function openDenyModal($taskUserId)
+    {
+        $taskUser = TaskUser::findOrFail($taskUserId);
+        $this->authorize('acceptOrDeny', $taskUser);
+        $this->taskUserId = $taskUserId;
+        $this->dispatch('crud-modal', name: 'deny-task');
+    }
 
 
-//    public function showFinalCheck($meeting_id)
-//    {
-//        $meeting = Meeting::select('id', 'title')
-//        ->findOrFail($meeting_id);
-//
-//        $this->dispatch('crud-modal', name: 'final-check');
-//    }
+    public $request_task;
+    /**
+     * @throws AuthorizationException
+     */
+    public function denyTask($taskUserId)
+    {
+        $this->validate([
+            'request_task' => 'required|string|max:1000',
+        ]);
 
-//    public function finishMeeting($meeting_id)
-//    {
-//        $meeting = Meeting::where('id',$meeting_id)->update(['status' => '2']);
-//
-//    }
+        // Find the TaskUser model
+        $taskUser = TaskUser::findOrFail($taskUserId);
 
+        // Update the task's status and reason
+        $taskUser->status = TaskStatus::DENIED->value;
+        $taskUser->request_task = $this->request_task;  // Save the reason
+        $taskUser->save();
 
+        // Optionally, you can send a success message back
+        session()->flash('status', 'Task was denied and reason recorded.');
+
+        // Dispatch an event to close the modal (optional, depending on your logic)
+        $this->dispatch('close-modal');
+    }
+
+    public function editTaskByScriptorium($taskUserId)
+    {
+        dd($taskUserId);
+    }
 
 }

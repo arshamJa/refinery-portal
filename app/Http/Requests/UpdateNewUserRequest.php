@@ -35,7 +35,7 @@ class UpdateNewUserRequest extends FormRequest
             'house_phone' => ['bail', 'required', 'numeric'],
             'work_phone' => ['bail', 'required', 'numeric'],
             'position' => ['bail', 'required', 'string','max:255',new farsi_chs()],
-            'departmentId' => ['bail', 'nullable'],
+            'department' => ['required'],
             'password' => ['bail', 'nullable', 'numeric', 'digits:8', Rules\Password::defaults()],
         ];
     }

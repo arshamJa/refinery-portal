@@ -24,7 +24,7 @@ class MeetingNotification extends Component
 //    public function meetingUsers()
 //    {
 //        return MeetingUser::with([
-//            'meeting:id,title,unit_organization,location,scriptorium,date,time,is_cancelled',
+//            'meeting:id,title,unit_organization,location,scriptorium,date,time,status',
 //            'user:id',
 //            'user.user_info:user_id,full_name'
 //        ])
@@ -37,7 +37,7 @@ class MeetingNotification extends Component
     public function meetingUsers()
     {
         return MeetingUser::with([
-            'meeting:id,title,date,time,is_cancelled',
+            'meeting:id,title,date,time,status',
             'user:id',
             'user.user_info:user_id,full_name'
         ])

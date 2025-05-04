@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExportPDFController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SendInvitationToReplacementController;
 use App\Livewire\admin\AdminDashboard;
@@ -23,6 +24,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+
+
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');

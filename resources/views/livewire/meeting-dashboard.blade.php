@@ -24,56 +24,56 @@
         </li>
     </x-breadcrumb>
 
-        <div class="mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @can('create-meeting')
+    <div class="mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            @can('create-meeting')
                 <x-create-link href="{{route('meeting.create')}}">{{__('ایجاد جلسه جدید')}}</x-create-link>
-                @endcan
-                <a href="{{route('my.task.table')}}"
-                   class="inline-flex items-center gap-2 px-5 py-4 rounded-xl text-white bg-gradient-to-r from-[#FF6F61] to-[#4C6EF5] transition-all duration-300 ease-in-out shadow-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
+            @endcan
+            <a href="{{route('my.task.table')}}"
+               class="inline-flex items-center gap-2 px-5 py-4 rounded-xl text-white bg-gradient-to-r from-[#FF6F61] to-[#4C6EF5] transition-all duration-300 ease-in-out shadow-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
                     <span class="text-sm font-medium">
                       {{__('اقدامات من')}}
                     </span>
-                </a>
+            </a>
 
-                {{--                <a href="{{route('meetingsList')}}"--}}
-                {{--                   class="bg-[#FCF7F8]  hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-                {{--                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-                {{--                         stroke="currentColor" class="size-5">--}}
-                {{--                        <path stroke-linecap="round" stroke-linejoin="round"--}}
-                {{--                              d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>--}}
-                {{--                    </svg>--}}
-                {{--                    <h3 class="text-sm font-semibold"> {{__('لیست جلسات در حال برگزاری')}}</h3>--}}
-                {{--                </a>--}}
-                {{--                <a href="{{route('scriptorium.report')}}"--}}
-                {{--                   class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-                {{--                    <span class="flex items-center gap-x-2">--}}
-                {{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-                {{--                             stroke="currentColor" class="size-5">--}}
-                {{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
-                {{--                                  d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>--}}
-                {{--                        </svg>--}}
-                {{--                        <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>--}}
-                {{--                    </span>--}}
-                {{--                </a>--}}
+            {{--                <a href="{{route('meetingsList')}}"--}}
+            {{--                   class="bg-[#FCF7F8]  hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
+            {{--                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+            {{--                         stroke="currentColor" class="size-5">--}}
+            {{--                        <path stroke-linecap="round" stroke-linejoin="round"--}}
+            {{--                              d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>--}}
+            {{--                    </svg>--}}
+            {{--                    <h3 class="text-sm font-semibold"> {{__('لیست جلسات در حال برگزاری')}}</h3>--}}
+            {{--                </a>--}}
+            {{--                <a href="{{route('scriptorium.report')}}"--}}
+            {{--                   class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
+            {{--                    <span class="flex items-center gap-x-2">--}}
+            {{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+            {{--                             stroke="currentColor" class="size-5">--}}
+            {{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
+            {{--                                  d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>--}}
+            {{--                        </svg>--}}
+            {{--                        <h3 class="text-sm font-semibold"> {{__('گزارش جلسات تشکیل شده')}}</h3>--}}
+            {{--                    </span>--}}
+            {{--                </a>--}}
 
 
-                {{--                <a href="{{route('attended.meetings')}}"--}}
-                {{--                   class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">--}}
-                {{--                    <span class="flex items-center gap-x-2">--}}
-                {{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
-                {{--                             stroke="currentColor" class="size-5">--}}
-                {{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
-                {{--                                  d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"/>--}}
-                {{--                        </svg>--}}
-                {{--                        <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>--}}
-                {{--                    </span>--}}
-                {{--                    --}}{{--                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">--}}
-                {{--                    --}}{{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
-                {{--                    --}}{{--                </span>--}}
-                {{--                </a>--}}
-            </div>
+            {{--                <a href="{{route('attended.meetings')}}"--}}
+            {{--                   class="bg-[#FCF7F8] flex justify-between gap-2 hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  transition duration-300 ease-in-out p-4 rounded-lg">--}}
+            {{--                    <span class="flex items-center gap-x-2">--}}
+            {{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"--}}
+            {{--                             stroke="currentColor" class="size-5">--}}
+            {{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
+            {{--                                  d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"/>--}}
+            {{--                        </svg>--}}
+            {{--                        <h3 class="text-sm font-semibold"> {{__('جلساتی که در آن شرکت کردم')}}</h3>--}}
+            {{--                    </span>--}}
+            {{--                    --}}{{--                <span class="rounded-md p-1 bg-gray-400 text-white py-1 px-2.5">--}}
+            {{--                    --}}{{--                    {{\App\Models\Task::where('user_id',auth()->user()->id)->where('is_completed',false)->count()}}--}}
+            {{--                    --}}{{--                </span>--}}
+            {{--                </a>--}}
         </div>
+    </div>
 
 
     <div class="pt-4 px-6 sm:pt-6 border shadow-md rounded-md">
@@ -132,10 +132,28 @@
 
                 <!-- Export Button under the right group -->
                 <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
-                    <x-export-link wire:click.prevent="exportExcel">
-                        {{ __('خروجی Excel') }}
+                    <x-export-link wire:click.prevent="exportExcel" wire:loading.attr="disabled"
+                                   class="relative">
+                        {{-- Spinner while loading --}}
+                        <svg wire:loading wire:target="exportExcel"
+                             class="animate-spin h-5 w-5 mr-2 text-white"
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor"
+                                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                        </svg>
+                        {{-- Button Text --}}
+                        <span wire:loading.remove wire:target="exportExcel">
+                            {{ __('خروجی Excel') }}
+                        </span>
+                        <span wire:loading wire:target="exportExcel">
+                            {{ __('در حال دریافت...') }}
+                        </span>
                     </x-export-link>
                 </div>
+
+
             </div>
         </form>
         <div class=" w-full overflow-x-auto overflow-y-hidden  mb-4 pb-12">
@@ -143,7 +161,7 @@
                 <x-slot name="head">
                     <x-table.row>
                         @foreach ([
-                                'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','','رویت صورتجلسه',''
+                                'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','رویت صورتجلسه',''
                             ] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
@@ -175,14 +193,14 @@
                             <x-table.cell>
                                 @switch($meeting->status)
 
-                                    @case(MeetingStatus::IS_CANCELLED->value)
+                                    @case(MeetingStatus::IS_CANCELLED)
                                         <span
                                             class="block w-full bg-red-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
                                             {{ __('جلسه لغو شد') }}
                                         </span>
                                         @break
 
-                                    @case(MeetingStatus::IS_NOT_CANCELLED->value)
+                                    @case(MeetingStatus::IS_NOT_CANCELLED)
                                         <span
                                             class="block w-full bg-green-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
                                             {{ __('جلسه برگزار میشود') }}
@@ -190,14 +208,14 @@
                                         @break
 
 
-                                    @case(MeetingStatus::IS_IN_PROGRESS->value)
-                                            <span
-                                                class="block w-full bg-blue-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                    @case(MeetingStatus::IS_IN_PROGRESS)
+                                        <span
+                                            class="block w-full bg-blue-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
                                                     {{ __('جلسه درحال برگزاری است') }}
                                                 </span>
                                         @break
 
-                                    @case(MeetingStatus::IS_FINISHED->value)
+                                    @case(MeetingStatus::IS_FINISHED)
                                         <span
                                             class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg shadow-sm m-1">
                                             {{ __('جلسه خاتمه یافت') }}
@@ -213,14 +231,12 @@
                             </x-table.cell>
                             <!-- Start Meeting Button (New Column) -->
                             <x-table.cell>
-                                @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED->value)
-                                    <button wire:click="startMeeting({{ $meeting->id }})" class="text-sm px-3 py-1 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 rounded-lg shadow-md hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 focus:outline-none transform hover:scale-105 transition-all duration-200">
+                                @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED)
+                                    <button wire:click="startMeeting({{ $meeting->id }})"
+                                            class="text-sm px-3 py-1 text-white bg-pink-600 hover:ring-2 hover:ring-pink-800 hover:ring-offset-2 rounded-lg transition-all duration-300">
                                         {{ __('شروع جلسه') }}
                                     </button>
-                                @endif
-                            </x-table.cell>
-                            <x-table.cell>
-                                @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED->value || $meeting->status == MeetingStatus::IS_IN_PROGRESS->value || $meeting->status == MeetingStatus::IS_FINISHED->value)
+                                @elseif($meeting->status == MeetingStatus::IS_IN_PROGRESS || $meeting->status == MeetingStatus::IS_FINISHED)
                                     <a href="{{route('tasks.create',$meeting->id)}}">
                                         <x-primary-button>
                                             {{ __('نمایش') }}
@@ -244,16 +260,16 @@
                                         <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                             {{ __('نمایش') }}
                                         </x-dropdown-link>
-                                        @if($meeting->status != MeetingStatus::IS_CANCELLED->value and $meeting->status != MeetingStatus::IS_NOT_CANCELLED->value)
+                                        @if($meeting->status != MeetingStatus::IS_CANCELLED and $meeting->status != MeetingStatus::IS_NOT_CANCELLED)
                                             <x-dropdown-link href="#">
                                                 {{ __('ویرایش') }}
                                             </x-dropdown-link>
                                         @endif
-                                        @if($meeting->status == MeetingStatus::PENDING->value or $meeting->status == MeetingStatus::IS_CANCELLED->value)
-                                        <x-dropdown-link wire:click.prevent="deleteMeeting({{$meeting->id}})"
-                                                         class="text-red-600 ">
-                                            {{ __('حذف') }}
-                                        </x-dropdown-link>
+                                        @if($meeting->status == MeetingStatus::PENDING or $meeting->status == MeetingStatus::IS_CANCELLED)
+                                            <x-dropdown-link wire:click.prevent="deleteMeeting({{$meeting->id}})"
+                                                             class="text-red-600 ">
+                                                {{ __('حذف') }}
+                                            </x-dropdown-link>
                                         @endif
                                     </x-slot>
                                 </x-dropdown>
@@ -261,7 +277,7 @@
                         </x-table.row>
                     @empty
                         <x-table.row>
-                            <x-table.cell colspan="10" class="py-6">
+                            <x-table.cell colspan="11" class="py-6">
                                 {{__('رکوردی یافت نشد...')}}
                             </x-table.cell>
                         </x-table.row>

@@ -16,10 +16,12 @@ class OrgDepManagementController extends Controller
     {
         $query = User::with([
             'user_info:id,department_id,user_id,full_name',
-            'organizations:id,organization_name', // Eager load organization names
-            'user_info.department:id,department_name' // Eager load department name for user_info
-        ])->whereNull('deleted_at')
-            ->whereHas('roles', fn ($q) => $q->where('name', '!=', UserRole::SUPER_ADMIN->value))
+            'organizations:id,organization_name',
+            'user_info.department:id,department_name'
+        ])
+            ->whereDoesntHave('roles', fn ($q) =>
+            $q->where('name', UserRole::SUPER_ADMIN->value)
+            )
             ->select('id');
 
         $originalUsersCount = (clone $query)->count(); // Clone to get unfiltered count
