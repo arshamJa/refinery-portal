@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('task_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('time_out')->nullable();
             $table->string('sent_date')->nullable();
-            $table->string('task_status')->default(\App\Enums\TaskStatus::PENDING->value);
+            $table->smallInteger('task_status')->default(\App\Enums\TaskStatus::PENDING->value);
             $table->text('body_task')->nullable();
             $table->text('request_task')->nullable();
             $table->timestamps();

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Enums\MeetingStatus;
 use App\Enums\TaskStatus;
 use App\Models\Meeting;
+use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\TaskUserFile;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -30,8 +31,8 @@ class CreateTask extends Component
     public $selectedTaskFiles = [];
 
 
-    public $taskUserId;
-    public $taskUser;
+    public $taskUserId = '';
+//    public $taskUser;
 
 
 
@@ -137,22 +138,15 @@ class CreateTask extends Component
     }
 
 
-
-
-
-
-
-
-
     /**
      * @throws AuthorizationException
      */
-    public function acceptTask($taskUserId)
+    public function acceptTask($taskId)
     {
-        $taskUser = TaskUser::findOrFail($taskUserId);
-        $this->authorize('acceptOrDeny',$taskUser);
-        $taskUser->task_status = TaskStatus::ACCEPTED->value;
-        $taskUser->save();
+//        $this->authorize('acceptOrDeny',$taskId);
+        TaskUser::where('task_id',$taskId)->where('user_id',auth()->user()->id)->update([
+            'task_status' => TaskStatus::ACCEPTED->value
+        ]);
     }
 
     /**
@@ -161,40 +155,85 @@ class CreateTask extends Component
     public function openDenyModal($taskUserId)
     {
         $taskUser = TaskUser::findOrFail($taskUserId);
-        $this->authorize('acceptOrDeny', $taskUser);
-        $this->taskUserId = $taskUserId;
+//        $this->authorize('acceptOrDeny', $taskUser);
+        $this->taskUserId = $taskUser->id;
         $this->dispatch('crud-modal', name: 'deny-task');
     }
 
 
     public $request_task;
-    /**
-     * @throws AuthorizationException
-     */
-    public function denyTask($taskUserId)
+    public function denyTask()
     {
         $this->validate([
             'request_task' => 'required|string|max:1000',
         ]);
 
         // Find the TaskUser model
-        $taskUser = TaskUser::findOrFail($taskUserId);
+        $taskUser = TaskUser::findOrFail($this->taskUserId);
 
         // Update the task's status and reason
-        $taskUser->status = TaskStatus::DENIED->value;
+        $taskUser->task_status = TaskStatus::DENIED;
         $taskUser->request_task = $this->request_task;  // Save the reason
         $taskUser->save();
 
-        // Optionally, you can send a success message back
-        session()->flash('status', 'Task was denied and reason recorded.');
-
-        // Dispatch an event to close the modal (optional, depending on your logic)
         $this->dispatch('close-modal');
     }
+    public $userName ,$day ,$month,$year,$body;
 
-    public function editTaskByScriptorium($taskUserId)
+    public function openModalScriptorium($taskUserId)
     {
-        dd($taskUserId);
+        $taskUser = TaskUser::findOrFail($taskUserId);
+        $this->taskUserId = $taskUser->id;
+        $this->userName = $taskUser->user->user_info->full_name;
+        $this->dispatch('crud-modal', name: 'edit-by-scriptorium');
     }
+
+    public function updateTask()
+    {
+        $taskUser = TaskUser::findOrFail($this->taskUserId);
+        $oldTask  = Task::findOrFail($taskUser->task_id);
+
+        $normalizedOldBody = $this->normalizeText($oldTask->body);
+        $normalizedNewBody = $this->normalizeText($this->body);
+
+        $newTimeOut = sprintf("%04d/%02d/%02d", $this->year, $this->month, $this->day);
+
+        $bodyChanged = $normalizedOldBody !== $normalizedNewBody;
+        $timeOutChanged = $taskUser->time_out !== $newTimeOut;
+
+        if (!$bodyChanged && !$timeOutChanged) {
+            session()->flash('message', 'هیچ تغییری اعمال نشد.');
+            $this->dispatch('close-modal', name: 'edit-by-scriptorium');
+            return;
+        }
+
+        if ($bodyChanged) {
+            $newTask = Task::create([
+                'meeting_id' => $oldTask->meeting_id,
+                'body' => $normalizedNewBody,
+            ]);
+            $taskUser->task_id = $newTask->id;
+        }
+
+        if ($timeOutChanged || $bodyChanged) {
+            $taskUser->time_out = $newTimeOut;
+            $taskUser->task_status = TaskStatus::PENDING;
+            $taskUser->request_task = null;
+            $taskUser->save();
+        }
+
+        session()->flash('message', 'شرح وظیفه یا مهلت اقدام بروزرسانی شد.');
+        $this->dispatch('close-modal', name: 'edit-by-scriptorium');
+    }
+
+    protected function normalizeText($text)
+    {
+        $text = preg_replace('/\s+/', ' ', trim($text));
+        $words = explode(' ', $text);
+        $uniqueWords = array_unique($words);
+        return implode(' ', $uniqueWords);
+    }
+
+
 
 }

@@ -14,13 +14,7 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('meeting_id');
-//            $table->foreignId('user_id');
-//            $table->string('title');
             $table->longText('body');
-            $table->string('time_out'); // مهلت ارسال
-//            $table->boolean('is_completed')->default(false);
-//            $table->string('sent_date')->nullable();
-//            $table->longText('request_task')->nullable();
             $table->timestamps();
         });
     }

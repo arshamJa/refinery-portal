@@ -46,10 +46,10 @@ class TaskManagementController extends Controller
 
 
         // Select specific columns from Task and eager load specific columns from TaskUser
-        $tasks = Task::select('id', 'meeting_id', 'body', 'time_out')
+        $tasks = Task::select('id', 'meeting_id', 'body')
             ->with([
                 'taskUsers' => function ($query) {
-                    $query->select('id', 'task_id', 'user_id', 'sent_date', 'is_completed', 'request_task', 'body_task');
+                    $query->select('id', 'task_id', 'user_id','time_out','sent_date', 'is_completed', 'request_task', 'body_task');
                 }
             ])
             ->where('meeting_id', $meeting)
@@ -103,14 +103,15 @@ class TaskManagementController extends Controller
         $new_day = sprintf("%02d", $request->day);
         $newTime = $request->year . '/' . $new_month . '/' . $new_day;
 
-        $body = Str::deduplicate($request->body);
+        $body = Str::of($request->body)
+            ->squish()           // Squish to remove unnecessary spaces
+            ->deduplicate();     // Remove duplicate words
         $initiators = Str::of($request->holders)->split('/[\s,]+/');
 
 
         $task = Task::create([
             'meeting_id' => $meeting,
-            'body' => $body,
-            'time_out' => $newTime
+            'body' => $body
         ]);
 
 
@@ -118,6 +119,7 @@ class TaskManagementController extends Controller
             TaskUser::create([
                 'task_id' => $task->id,
                 'user_id' => $initiator,
+                'time_out' => $newTime,
                 'is_completed' => false,
                 'request_task' => null,
             ]);

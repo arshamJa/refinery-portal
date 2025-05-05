@@ -17,17 +17,15 @@ class TaskUserPolicy
     // Helper method to check if the task is not empty for `body_task` and `sent_date`
     private function areFieldsNotEmpty(TaskUser $taskUser): bool
     {
-        return isset($taskUser->sent_date) && isset($taskUser->body_task) &&
-            !empty(trim($taskUser->sent_date)) && !empty(trim($taskUser->body_task));
+        return !empty(trim($taskUser->sent_date)) &&
+            !empty(trim($taskUser->body_task));
     }
     // Helper method to check if the task is empty for `body_task` and `time_out`
     private function areFieldsEmpty(TaskUser $taskUser): bool
     {
-        return isset($taskUser->task->time_out) && isset($taskUser->body_task) &&
-            empty(trim($taskUser->body_task)) && empty(trim($taskUser->task->time_out));
+        return empty(trim($taskUser->body_task)) &&
+            empty(trim($taskUser->sent_date));
     }
-
-
     public function acceptOrDeny(User $user, TaskUser $taskUser): bool
     {
         return $user->id === $taskUser->user_id &&
@@ -41,7 +39,7 @@ class TaskUserPolicy
         $isScriptorium = $user->user_info->full_name === $taskUser->task->meeting->scriptorium;
 
         // Check if the task's time_out has passed
-        $isAfterTimeOut = $todayDate >= $taskUser->task->time_out;
+        $isAfterTimeOut = $todayDate >= $taskUser->time_out;
 
         return $isScriptorium &&
             trim($taskUser->body_task) === '' &&
@@ -58,7 +56,7 @@ class TaskUserPolicy
         // Return true if all conditions are met
         return $user->id === $taskUser->user_id &&
             $taskUser->task_status === TaskStatus::ACCEPTED &&
-            $todayDate <= $taskUser->task->time_out &&
+            $todayDate <= $taskUser->time_out &&
             $areFieldsEmpty;
     }
 
@@ -70,7 +68,7 @@ class TaskUserPolicy
         // Return true if all conditions are met
         return $user->id === $taskUser->user_id &&
             $taskUser->task_status === TaskStatus::ACCEPTED &&
-            $todayDate <= $taskUser->task->time_out &&
+            $todayDate <= $taskUser->time_out &&
             $areFieldsNotEmpty;
     }
 

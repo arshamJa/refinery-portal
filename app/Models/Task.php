@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MeetingStatus;
 use App\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,7 @@ class Task extends Model
         'body',
         'time_out',
     ];
+
     public function full_name()
     {
         return UserInfo::where('user_id',$this->user_id)->value('full_name');

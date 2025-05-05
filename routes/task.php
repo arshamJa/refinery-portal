@@ -93,7 +93,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    Route::post('/tasks/{meetingId}', [TaskManagementController::class, 'store'])->name('tasks.store');
+//    Route::post('/tasks/{meetingId}', [TaskManagementController::class, 'store'])->name('tasks.store');
 
     Route::post('tasks/{meeting}', [TaskManagementController::class, 'store'])->name('tasks.store');
 
@@ -108,15 +108,15 @@ Route::middleware(['auth'])->group(function () {
 
 //    Route::get('/tasks/create',[TaskManagementController::class,'create'])->name('tasks.create');
 
-    Route::get('/tasks/{task}', [TaskManagementController::class, 'show'])->name('tasks.show');
+//    Route::get('/tasks/{task}', [TaskManagementController::class, 'show'])->name('tasks.show');
 
-    Route::post('/tasks/{task}', [TaskManagementController::class, 'complete'])->name('tasks.complete');
+//    Route::post('/tasks/{task}', [TaskManagementController::class, 'complete'])->name('tasks.complete');
 
 //    Route::get('/tasks/{task}/edit', [TaskManagementController::class, 'edit'])->name('tasks.edit');
 
-    Route::patch('/tasks/{task}', [TaskManagementController::class, 'update'])->name('tasks.update');
+//    Route::patch('/tasks/{task}', [TaskManagementController::class, 'update'])->name('tasks.update');
 
-    Route::delete('/tasks/{task}', [TaskManagementController::class, 'destroy'])->name('tasks.destroy');
+//    Route::delete('/tasks/{task}', [TaskManagementController::class, 'destroy'])->name('tasks.destroy');
 
 });
 

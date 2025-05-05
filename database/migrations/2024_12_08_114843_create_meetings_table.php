@@ -25,7 +25,7 @@ return new class extends Migration
             $table->json('guest')->nullable(); // this could be multiple
             $table->string('applicant'); // نام درخواست دهنده جلسه
             $table->string('position_organization');
-            $table->string('status')->default(\App\Enums\MeetingStatus::PENDING->value);
+            $table->integer('status')->default(\App\Enums\MeetingStatus::PENDING->value);
             $table->softDeletes();
             $table->timestamps();
         });

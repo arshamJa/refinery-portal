@@ -16,6 +16,7 @@ class TaskUser extends Model
          'task_id',
          'user_id',
          'sent_date',
+         'time_out',
          'task_status',
          'body_task',
          'request_task',

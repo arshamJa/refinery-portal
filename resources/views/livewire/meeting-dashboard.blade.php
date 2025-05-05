@@ -260,7 +260,7 @@
                                         <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                             {{ __('نمایش') }}
                                         </x-dropdown-link>
-                                        @if($meeting->status != MeetingStatus::IS_CANCELLED and $meeting->status != MeetingStatus::IS_NOT_CANCELLED)
+                                        @if($meeting->status != MeetingStatus::IS_CANCELLED and $meeting->status != MeetingStatus::IS_NOT_CANCELLED and  auth()->user()->user_info->full_name === $meeting->scriptorium)
                                             <x-dropdown-link href="#">
                                                 {{ __('ویرایش') }}
                                             </x-dropdown-link>
