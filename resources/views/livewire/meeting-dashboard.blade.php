@@ -260,14 +260,15 @@
                                         <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                             {{ __('نمایش') }}
                                         </x-dropdown-link>
-                                        @if($meeting->status != MeetingStatus::IS_CANCELLED and $meeting->status != MeetingStatus::IS_NOT_CANCELLED and  auth()->user()->user_info->full_name === $meeting->scriptorium)
+                                        @if($meeting->status === MeetingStatus::IS_IN_PROGRESS && auth()->user()->user_info->full_name === $meeting->scriptorium)
                                             <x-dropdown-link href="#">
                                                 {{ __('ویرایش') }}
                                             </x-dropdown-link>
                                         @endif
-                                        @if($meeting->status == MeetingStatus::PENDING or $meeting->status == MeetingStatus::IS_CANCELLED)
-                                            <x-dropdown-link wire:click.prevent="deleteMeeting({{$meeting->id}})"
-                                                             class="text-red-600 ">
+                                        @if(( $meeting->status == MeetingStatus::PENDING || $meeting->status == MeetingStatus::IS_CANCELLED ) &&
+                                            auth()->user()->user_info->full_name === $meeting->scriptorium)
+                                            <x-dropdown-link wire:click.prevent="deleteMeeting({{ $meeting->id }})"
+                                                             class="text-red-600">
                                                 {{ __('حذف') }}
                                             </x-dropdown-link>
                                         @endif

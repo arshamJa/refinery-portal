@@ -92,125 +92,125 @@
             </div>
         </div>
         {{--        --}}{{--            @if (!$this->allUsersHaveTasks )--}}
-        {{--        @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium )--}}
-        <form action="{{route('tasks.store', $this->meetings->id)}}" method="post" enctype="multipart/form-data">
-            @csrf
-            <div class="border-t pt-6 space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <x-input-label for="holders" class="mb-2"
-                                       :value="__('اقدام کننده')"/>
-                        <div class="custom-select">
-                            <div class="select-box">
-                                <input type="text" class="tags_input" multiple name="holders" hidden>
-                                <div class="selected-options"></div>
-                                <div class="arrow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5"
-                                         stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="options">
-                                <div class="option-search-tags">
-                                    <input type="text" class="search-tags" placeholder="جست و جو ...">
-                                    <button type="button" class="clear">
+        @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium )
+            <form action="{{route('tasks.store', $this->meetings->id)}}" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="border-t pt-6 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label for="holders" class="mb-2"
+                                           :value="__('اقدام کننده')"/>
+                            <div class="custom-select">
+                                <div class="select-box">
+                                    <input type="text" class="tags_input" multiple name="holders" hidden>
+                                    <div class="selected-options"></div>
+                                    <div class="arrow">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5"
                                              stroke="currentColor" class="size-4">
                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M6 18 18 6M6 6l12 12"/>
+                                                  d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
                                         </svg>
-                                    </button>
-                                </div>
-                                <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                                @foreach($this->employees as $employee)
-                                    <div class="option" data-value="{{$employee->user_id}}">
-                                        {{ $employee->user->user_info->full_name }}
                                     </div>
-                                @endforeach
-                                <div class="no-result-message" style="display:none;">No result match</div>
+                                </div>
+                                <div class="options">
+                                    <div class="option-search-tags">
+                                        <input type="text" class="search-tags" placeholder="جست و جو ...">
+                                        <button type="button" class="clear">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="1.5"
+                                                 stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M6 18 18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
+                                    @foreach($this->employees as $employee)
+                                        <div class="option" data-value="{{$employee->user_id}}">
+                                            {{ $employee->user->user_info->full_name }}
+                                        </div>
+                                    @endforeach
+                                    <div class="no-result-message" style="display:none;">No result match</div>
+                                </div>
+                            </div>
+                            <x-input-error :messages="$errors->get('holders')" class="my-2"/>
+                        </div>
+
+                        <div>
+                            <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
+                            <div class="flex gap-2">
+                                <div class="w-full">
+                                    <div class="flex items-center gap-1">
+                                        <select name="year" id="year" dir="ltr"
+                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                            <option value="">{{__(':سال')}}</option>
+                                            @for($i = 1404; $i <= 1430; $i++)
+                                                <option value="{{$i}}" @if (old('year') == $i) selected @endif>
+                                                    {{$i}}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('year')" class="my-2"/>
+                                </div>
+                                <div class="w-full">
+                                    <div class="flex items-center gap-1">
+                                        @php
+                                            $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+                                        @endphp
+                                        <select name="month" id="month" dir="ltr"
+                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                            <option value="">{{__(':ماه')}}</option>
+                                            @for ($i = 1; $i <= 12; $i++)
+                                                <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
+                                                    {{ $persian_months[$i - 1] }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('month')" class="my-2"/>
+                                </div>
+                                <div class="w-full">
+                                    <div class="flex items-center gap-1">
+                                        <select name="day" id="day" dir="ltr"
+                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                            <option value="">{{__(':روز')}}</option>
+                                            @for($i = 1; $i <= 31; $i++)
+                                                <option value="{{$i}}" @if (old('day') == $i) selected @endif>
+                                                    {{$i}}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('day')" class="my-2"/>
+                                </div>
                             </div>
                         </div>
-                        <x-input-error :messages="$errors->get('holders')" class="my-2"/>
                     </div>
 
                     <div>
-                        <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
-                        <div class="flex gap-2">
-                            <div class="w-full">
-                                <div class="flex items-center gap-1">
-                                    <select name="year" id="year" dir="ltr"
-                                            class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                        <option value="">{{__(':سال')}}</option>
-                                        @for($i = 1404; $i <= 1430; $i++)
-                                            <option value="{{$i}}" @if (old('year') == $i) selected @endif>
-                                                {{$i}}
-                                            </option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <x-input-error :messages="$errors->get('year')" class="my-2"/>
-                            </div>
-                            <div class="w-full">
-                                <div class="flex items-center gap-1">
-                                    @php
-                                        $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                                    @endphp
-                                    <select name="month" id="month" dir="ltr"
-                                            class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                        <option value="">{{__(':ماه')}}</option>
-                                        @for ($i = 1; $i <= 12; $i++)
-                                            <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
-                                                {{ $persian_months[$i - 1] }}
-                                            </option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <x-input-error :messages="$errors->get('month')" class="my-2"/>
-                            </div>
-                            <div class="w-full">
-                                <div class="flex items-center gap-1">
-                                    <select name="day" id="day" dir="ltr"
-                                            class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                        <option value="">{{__(':روز')}}</option>
-                                        @for($i = 1; $i <= 31; $i++)
-                                            <option value="{{$i}}" @if (old('day') == $i) selected @endif>
-                                                {{$i}}
-                                            </option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <x-input-error :messages="$errors->get('day')" class="my-2"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" class="mb-2"/>
-                    <textarea type="text" name="body" rows="4"
-                              class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" class="mb-2"/>
+                        <textarea type="text" name="body" rows="4"
+                                  class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                             {{old('body')}}
                         </textarea>
-                    <x-input-error :messages="$errors->get('body')" class="mt-2"/>
-                </div>
+                        <x-input-error :messages="$errors->get('body')" class="mt-2"/>
+                    </div>
 
-                <div class="flex space-x-2 rtl:space-x-reverse">
-                    <x-primary-button type="submit">
-                        {{ __('ارسال') }}
-                    </x-primary-button>
-                    <a href="{{route('dashboard.meeting')}}">
-                        <x-secondary-button>
-                            {{__('لغو')}}
-                        </x-secondary-button>
-                    </a>
+                    <div class="flex space-x-2 rtl:space-x-reverse">
+                        <x-primary-button type="submit">
+                            {{ __('ارسال') }}
+                        </x-primary-button>
+                        <a href="{{route('dashboard.meeting')}}">
+                            <x-secondary-button>
+                                {{__('لغو')}}
+                            </x-secondary-button>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        </form>
-        {{--        @endif--}}
+            </form>
+        @endif
 
         <script>
             function printTable() {
@@ -227,7 +227,7 @@
 
         @media print {
             body {
-                font-family: "Vazir", sans-serif;
+                font-family: "Vazir", Arial, sans-serif;
                 direction: rtl;
                 margin: 30px;
                 font-size: 12px;
@@ -362,159 +362,6 @@
                     <th class="px-4 py-3 border-b border-gray-400  @if ($loop->last) screen-only @endif">{{ __($th) }}</th>
                 @endforeach
                 </thead>
-{{--                <tbody class="divide-y divide-gray-300">--}}
-{{--                @foreach ($this->tasks as $index => $task)--}}
-{{--                    @foreach ($task->taskUsers as $userIndex => $taskUser)--}}
-{{--                        <tr class="bg-white hover:bg-gray-50 transition">--}}
-{{--                            @if ($userIndex === 0)--}}
-{{--                                <td class="px-4 py-4 align-top"--}}
-{{--                                    rowspan="{{ $task->taskUsers->count() }}">{{ $index + 1 }}</td>--}}
-{{--                                <td class="px-4 py-4 border-r border-gray-300 align-top"--}}
-{{--                                    rowspan="{{ $task->taskUsers->count() }}">{{ $task->body }}</td>--}}
-{{--                                <td class="px-4 py-4 border-r border-gray-300 align-top"--}}
-{{--                                    rowspan="{{ $task->taskUsers->count() }}">{{ $taskUser->time_out }}</td>--}}
-{{--                            @endif--}}
-{{--                            <td class="px-4 py-4 border-r border-gray-300">{{ $taskUser->user->user_info->full_name ?? '---' }}</td>--}}
-
-{{--                            --}}{{--   <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                            --}}{{--   <span class="screen-only truncate">{{ Str::words($taskUser->body_task ?? '---', 3, '...') }}</span>--}}
-{{--                            --}}{{--   <span class="print-only hidden">{{ $taskUser->body_task ?? '---' }}</span>--}}
-{{--                            --}}{{--   </td>--}}
-
-{{--                            <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                                @php--}}
-{{--                                    // Get today's Jalali date for comparison--}}
-{{--                                    list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));--}}
-{{--                                    $todayDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);--}}
-
-{{--                                    // Check if the task's time_out has passed--}}
-{{--                                    $isAfterTimeOut = $todayDate >= $taskUser->time_out;--}}
-{{--                                @endphp--}}
-{{--                                @if(!$isAfterTimeOut)--}}
-{{--                                    @if($taskUser->body_task && $taskUser->body_task !== '---')--}}
-{{--                                        <div x-data="{ expanded: false }" class="screen-only">--}}
-
-{{--                                            <!-- Truncated preview -->--}}
-{{--                                            <div x-show="!expanded"--}}
-{{--                                                 class="truncate">--}}
-{{--                                                {{ Str::words($taskUser->body_task, 5, '...') }}--}}
-{{--                                            </div>--}}
-
-{{--                                            <!-- Full text -->--}}
-{{--                                            <div x-show="expanded"--}}
-{{--                                                 class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">--}}
-{{--                                                {{ $taskUser->body_task }}--}}
-{{--                                            </div>--}}
-
-{{--                                            <!-- Toggle button -->--}}
-{{--                                            <button @click="expanded = !expanded"--}}
-{{--                                                    class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">--}}
-{{--                                                <template x-if="!expanded">--}}
-{{--                                                <span class="flex items-center">--}}
-{{--                                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"--}}
-{{--                                                         stroke-width="2"--}}
-{{--                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">--}}
-{{--                                                        <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                                              d="M19 9l-7 7-7-7"></path>--}}
-{{--                                                    </svg>--}}
-{{--                                                    نمایش بیشتر--}}
-{{--                                                </span>--}}
-{{--                                                </template>--}}
-{{--                                                <template x-if="expanded">--}}
-{{--                                                <span class="flex items-center">--}}
-{{--                                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"--}}
-{{--                                                         stroke-width="2"--}}
-{{--                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">--}}
-{{--                                                        <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                                              d="M5 15l7-7 7 7"></path>--}}
-{{--                                                    </svg>--}}
-{{--                                                    نمایش کمتر--}}
-{{--                                                </span>--}}
-{{--                                                </template>--}}
-{{--                                            </button>--}}
-
-{{--                                            <!-- Print-only full version -->--}}
-{{--                                            <span class="print-only hidden">{{ $taskUser->body_task }}</span>--}}
-{{--                                        </div>--}}
-{{--                                    @else--}}
-{{--                                        <span>---</span>--}}
-{{--                                    @endif--}}
-{{--                                @else--}}
-{{--                                    <!-- Display a message if the time has passed -->--}}
-{{--                                    <div class="mt-2 text-sm text-gray-400">--}}
-{{--                                        {{ __('مهلت اقدام به پایان رسیده است') }}--}}
-{{--                                    </div>--}}
-{{--                                @endif--}}
-{{--                            </td>--}}
-{{--                            <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                                {{ $taskUser->sent_date ?? '---' }}--}}
-{{--                            </td>--}}
-
-{{--                            <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                                @if ($taskUser->taskUserFiles->isNotEmpty())--}}
-{{--                                    <div class="flex flex-col gap-2 screen-only">--}}
-{{--                                        @foreach ($taskUser->taskUserFiles as $file)--}}
-{{--                                            <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"--}}
-{{--                                               class="text-blue-600 hover:underline text-xs truncate">--}}
-{{--                                                📄 {{ $file->original_name }}--}}
-{{--                                            </a>--}}
-{{--                                        @endforeach--}}
-{{--                                    </div>--}}
-{{--                                    --}}{{-- Print View: Only say "با فایل" --}}
-{{--                                    <div class="print-only hidden">{{ __('دارای فایل') }}</div>--}}
-{{--                                @else--}}
-{{--                                    <span class="text-gray-400 text-xs">{{__('بدون فایل')}}</span>--}}
-{{--                                @endif--}}
-
-{{--                            </td>--}}
-
-{{--                            <td class="px-4 py-4 border-r border-gray-300 text-center screen-only">--}}
-
-{{--                                --}}{{-- Show Accept/Deny buttons only if not completed and assigned to current user --}}
-{{--                                @can('acceptOrDeny', $taskUser)--}}
-{{--                                    @if ($taskUser->task_status === TaskStatus::PENDING)--}}
-{{--                                        <div class="flex gap-2 justify-center">--}}
-{{--                                            <x-primary-button wire:click="acceptTask({{ $task->id }})">--}}
-{{--                                                {{ __('تایید') }}--}}
-{{--                                            </x-primary-button>--}}
-{{--                                            <x-danger-button wire:click="openDenyModal({{ $taskUser->id }})">--}}
-{{--                                                {{ __('رد') }}--}}
-{{--                                            </x-danger-button>--}}
-{{--                                        </div>--}}
-{{--                                    @elseif ($taskUser->task_status === TaskStatus::DENIED)--}}
-{{--                                        <div class="text-center text-gray-500">--}}
-{{--                                            {{ __('درخواست به دبیرجلسه ارسال شده است.') }}--}}
-{{--                                        </div>--}}
-{{--                                    @endif--}}
-{{--                                @endcan--}}
-
-{{--                                --}}{{-- Scriptorium can edit each task for the users --}}
-{{--                                @can('scriptoriumCanEdit', $taskUser)--}}
-{{--                                    <x-secondary-button wire:click="openModalScriptorium({{$taskUser->id}})">--}}
-{{--                                        {{ __('ویرایش') }}--}}
-{{--                                    </x-secondary-button>--}}
-{{--                                @endcan--}}
-{{--                                --}}{{-- Each user can write and update their task --}}
-{{--                                @can('writeTask', $taskUser)--}}
-{{--                                    <x-primary-button class="px-3 py-2"--}}
-{{--                                                      wire:click="showTaskDetails({{ $taskUser->id }})">--}}
-{{--                                        {{ __('انجام اقدام') }}--}}
-{{--                                    </x-primary-button>--}}
-{{--                                @endcan--}}
-{{--                                @can('updateTask', $taskUser)--}}
-{{--                                    <x-secondary-button wire:click="openUpdateModal({{$taskUser->id}})">--}}
-{{--                                        {{ __('ویرایش اقدام') }}--}}
-{{--                                    </x-secondary-button>--}}
-{{--                                @endcan--}}
-
-
-{{--                            </td>--}}
-
-
-{{--                        </tr>--}}
-{{--                    @endforeach--}}
-{{--                @endforeach--}}
-{{--                </tbody>--}}
                 <tbody class="divide-y divide-gray-300">
                 @foreach ($this->tasks as $index => $task)
                     @foreach ($task->taskUsers as $userIndex => $taskUser)
@@ -547,37 +394,42 @@
 
                                 @if(!$isAfterTimeOut)
                                     @if($taskUser->body_task && $taskUser->body_task !== '---')
+                                        {{-- Visible only on screen: toggle logic --}}
                                         <div x-data="{ expanded: false }" class="screen-only">
                                             <div x-show="!expanded" class="truncate">
                                                 {{ Str::words($taskUser->body_task, 5, '...') }}
                                             </div>
-                                            <div x-show="expanded" class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">
+                                            <div x-show="expanded"
+                                                 class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">
                                                 {{ $taskUser->body_task }}
                                             </div>
                                             <button @click="expanded = !expanded"
                                                     class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">
                                                 <template x-if="!expanded">
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
-                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            </svg>
-                                            نمایش بیشتر
-                                        </span>
+                                                    <span class="flex items-center">
+                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                                             stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M19 9l-7 7-7-7"></path>
+                                                        </svg>
+                                                        نمایش بیشتر
+                                                    </span>
                                                 </template>
                                                 <template x-if="expanded">
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
-                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            </svg>
-                                            نمایش کمتر
-                                        </span>
+                                                    <span class="flex items-center">
+                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                                             stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M5 15l7-7 7 7"></path>
+                                                        </svg>
+                                                        نمایش کمتر
+                                                    </span>
                                                 </template>
                                             </button>
-                                            <span class="print-only hidden">{{ $taskUser->body_task }}</span>
+                                        </div>
+                                        {{-- Visible only in print --}}
+                                        <div class="print-only hidden">
+                                            {{ $taskUser->body_task }}
                                         </div>
                                     @else
                                         <span>---</span>
@@ -610,7 +462,8 @@
                             </td>
 
                             <td class="px-4 py-4 border-r border-gray-300 text-center screen-only">
-                                @if ($taskUser->task_status === TaskStatus::PENDING)
+                                {{--                                @can('acceptOrDeny',$taskUser)--}}
+                                @if (auth()->id() === $taskUser->user_id && $taskUser->task_status === TaskStatus::PENDING)
                                     <div class="flex gap-2 justify-center">
                                         <x-primary-button wire:click="acceptTask({{ $task->id }})">
                                             {{ __('تایید') }}
@@ -619,19 +472,20 @@
                                             {{ __('رد') }}
                                         </x-danger-button>
                                     </div>
-                                @elseif ($taskUser->task_status === TaskStatus::DENIED)
+                                @elseif($taskUser->task_status === TaskStatus::DENIED)
                                     <div class="text-center text-gray-500">
                                         {{ __('درخواست به دبیرجلسه ارسال شده است.') }}
                                     </div>
                                 @endif
-
+                                {{--                                @endcan--}}
                                 @can('scriptoriumCanEdit', $taskUser)
                                     <x-secondary-button wire:click="openModalScriptorium({{$taskUser->id}})">
                                         {{ __('ویرایش') }}
                                     </x-secondary-button>
                                 @endcan
                                 @can('writeTask', $taskUser)
-                                    <x-primary-button class="px-3 py-2" wire:click="showTaskDetails({{ $taskUser->id }})">
+                                    <x-primary-button class="px-3 py-2"
+                                                      wire:click="showTaskDetails({{ $taskUser->id }})">
                                         {{ __('انجام اقدام') }}
                                     </x-primary-button>
                                 @endcan
@@ -645,7 +499,6 @@
                     @endforeach
                 @endforeach
                 </tbody>
-
             </table>
         </div>
 
@@ -675,24 +528,27 @@
             </div>
         @endif
 
-        @if (auth()->user()->user_info->full_name === $this->meetings->scriptorium && $this->meetings->status == MeetingStatus::IS_IN_PROGRESS)
-            <div class="flex justify-between">
-                <button wire:click="showFinalCheck({{ $this->meetings->id}})"
-                        class="flex justify-center gap-3 items-center bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-xl shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/>
-                    </svg>
-                    {{ __('خاتمه جلسه') }}
-                </button>
-            </div>
+        @if (auth()->user()->user_info->full_name === $this->meetings->scriptorium)
+            @if( $this->meetings->status == MeetingStatus::IS_IN_PROGRESS)
+                <div class="flex justify-between">
+                    <button wire:click="showFinalCheck({{ $this->meetings->id}})"
+                            class="flex justify-center gap-3 items-center bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-xl shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/>
+                        </svg>
+                        {{ __('خاتمه جلسه') }}
+                    </button>
+                </div>
+            @endif
+            <!-- Print Button -->
+            <button onclick="printTable()"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+                {{__('چاپ صوتجلسه')}}
+            </button>
         @endif
-        <!-- Print Button -->
-        <button onclick="printTable()"
-                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-            {{__('چاپ صوتجلسه')}}
-        </button>
+
     </div>
 
 
@@ -701,12 +557,12 @@
             <form method="POST" action="{{ route('tasks.submit', $selectedTask->id) }}" enctype="multipart/form-data">
                 @csrf
                 <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
-                    Title
+                    {{--                    Titl--}}
                     <div class="border-b pb-4">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('جزئیات') }}</h2>
                     </div>
 
-                    Task Info
+                    {{--                    Task Info--}}
                     <div class="grid grid-cols-1 gap-4">
                         <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
                     </div>
@@ -715,7 +571,7 @@
                         <x-meeting-info label="{{ __('اقدام کننده') }}" :value="$taskName"/>
                     </div>
 
-                    Task Body
+                    {{--                    Task Body--}}
                     <div>
                         <x-input-label for="taskBody" :value="__('شرح اقدام شما')" class="mb-2"/>
                         <textarea name="taskBody" id="taskBody" rows="4"
@@ -724,7 +580,7 @@
                         <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                     </div>
 
-                    File Upload
+                    {{--                    File Upload--}}
                     <div>
                         <x-input-label for="fileUpload" :value="__('آپلود فایل مرتبط')" class="mb-2"/>
                         <input type="file" name="fileUpload[]" id="fileUpload" multiple
@@ -737,7 +593,7 @@
                         <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                     </div>
 
-                    Submit Buttons
+                    {{--                    Submit Buttons--}}
                     <div class="pt-4 flex justify-between gap-2">
                         <button type="submit"
                                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
@@ -755,65 +611,67 @@
 
     <x-modal name="edit-task-details-modal" maxWidth="4xl" :closable="false">
         @if ($selectedTask)
-            <form method="POST" action="{{ route('tasks.update', $selectedTask->id) }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('tasks.update', $selectedTask->id) }}" enctype="multipart/form-data"
+                  class="text-sm text-gray-800">
                 @csrf
                 @method('PUT')
 
-                <!-- Modal Header -->
-                <div class="px-6 pt-6 pb-2 border-b">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-800">{{ __('ویرایش اقدام') }}</h2>
                     <button type="button"
                             x-on:click="show = false"
-                            class="absolute top-4 left-4 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
-                        ×
+                            class="text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+                        &times;
                     </button>
-                    <h2 class="text-2xl font-semibold text-gray-800">{{ __('ویرایش اقدام') }}</h2>
                 </div>
 
-                <!-- Modal Content -->
-                <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto text-gray-800 text-sm">
+                <!-- Body -->
+                <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
 
-                    <!-- Task Info -->
+                    <!-- Info Summary -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
-                        <x-meeting-info label="{{ __('اقدام کننده') }}"
-                                        :value="$selectedTask->user->user_info->full_name"/>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p class="text-xs text-gray-500 mb-1">{{ __('خلاصه مذاکره') }}</p>
+                            <p class="font-medium">{{ $selectedTask->task->body }}</p>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p class="text-xs text-gray-500 mb-1">{{ __('اقدام کننده') }}</p>
+                            <p class="font-medium">{{ $selectedTask->user->user_info->full_name }}</p>
+                        </div>
                     </div>
 
                     <!-- Task Body -->
                     <div>
-                        <x-input-label for="taskBody" :value="__('شرح اقدام شما')" class="mb-2"/>
-                        <textarea name="taskBody" id="taskBody" rows="5"
-                                  class="w-full text-sm p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        <x-input-label for="taskBody" :value="__('شرح اقدام شما')" class="mb-1"/>
+                        <textarea name="taskBody" id="taskBody" rows="6"
+                                  class="w-full p-4 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm resize-none"
                                   placeholder="شرح اقدام خود را وارد کنید...">{{ old('taskBody', $selectedTask->body_task) }}</textarea>
                         @error('taskBody')
-                        <div class="text-red-500 text-xs mt-1">{{ $message }}</div>
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- File Upload -->
                     <div>
-                        <x-input-label for="fileUpload" :value="__('آپلود فایل جدید (در صورت نیاز)')" class="mb-2"/>
+                        <x-input-label for="fileUpload" :value="__('آپلود فایل جدید (در صورت نیاز)')" class="mb-1"/>
                         <input type="file" name="fileUpload[]" id="fileUpload" multiple
-                               class="block w-full text-sm file:mr-4 file:py-2 file:px-4
-                           file:rounded-md file:border-0
-                           file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700
-                           hover:file:bg-blue-100">
+                               class="block w-full text-sm file:px-4 file:py-2 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 file:font-semibold hover:file:bg-blue-100"/>
                         @error('fileUpload.*')
-                        <div class="text-red-500 text-xs mt-1">{{ $message }}</div>
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Uploaded Files -->
+                    <!-- Existing Files -->
                     @if (!empty($selectedTaskFiles))
-                        <div class="space-y-2">
-                            <x-input-label :value="__('فایل‌های آپلود شده قبلی')"/>
-                            <ul class="space-y-1">
+                        <div>
+                            <x-input-label :value="__('فایل‌های آپلود شده قبلی')" class="mb-2"/>
+                            <div class="grid gap-2">
                                 @foreach ($selectedTaskFiles as $file)
-                                    <li id="file-{{ $file->id }}"
-                                        class="flex items-center justify-between bg-gray-100 px-3 py-2 rounded shadow-sm">
+                                    <div id="file-{{ $file->id }}"
+                                         class="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md shadow-sm">
                                         <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
-                                           class="text-blue-600 text-xs hover:underline truncate">
+                                           class="text-blue-600 text-xs hover:underline truncate w-4/5">
                                             📄 {{ $file->original_name }}
                                         </a>
                                         <button type="button"
@@ -821,25 +679,29 @@
                                                 data-file-id="{{ $file->id }}">
                                             {{ __('حذف') }}
                                         </button>
-                                    </li>
+                                    </div>
                                 @endforeach
-                            </ul>
+                            </div>
                         </div>
                     @endif
                 </div>
 
-                <!-- Modal Actions -->
-                <div class="px-6 py-4 bg-gray-50 border-t flex justify-between">
-                    <x-primary-button type="submit">
+                <!-- Footer -->
+                <div class="flex justify-between items-center px-6 py-4 bg-gray-50 border-t border-gray-200">
+                    <x-primary-button type="submit" class="px-5 py-2 text-sm">
                         {{ __('به‌روزرسانی') }}
                     </x-primary-button>
-                    <x-danger-button type="button" x-on:click="$dispatch('close')">
-                        {{ __('لغو') }}
-                    </x-danger-button>
+                    <a href="{{route('tasks.create',$selectedTask->task->meeting_id)}}">
+                        <x-secondary-button type="button" class="px-4 py-2 text-sm">
+                            {{ __('لغو') }}
+                        </x-secondary-button>
+                    </a>
+
                 </div>
             </form>
         @endif
     </x-modal>
+
 
     <script>
         $(document).ready(function () {
@@ -952,7 +814,7 @@
 
             {{-- Date Fields --}}
             <div class="space-y-2">
-                <x-input-label :value="__('مهلت اقدام')" />
+                <x-input-label :value="__('مهلت اقدام')"/>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {{-- Year --}}
                     <div>
@@ -963,7 +825,7 @@
                                 <option value="{{ $i }}">{{ $i }}</option>
                             @endfor
                         </select>
-                        <x-input-error :messages="$errors->get('year')" class="mt-1" />
+                        <x-input-error :messages="$errors->get('year')" class="mt-1"/>
                     </div>
 
                     {{-- Month --}}
@@ -978,7 +840,7 @@
                                 <option value="{{ $index + 1 }}">{{ $name }}</option>
                             @endforeach
                         </select>
-                        <x-input-error :messages="$errors->get('month')" class="mt-1" />
+                        <x-input-error :messages="$errors->get('month')" class="mt-1"/>
                     </div>
 
                     {{-- Day --}}
@@ -990,18 +852,18 @@
                                 <option value="{{ $i }}">{{ $i }}</option>
                             @endfor
                         </select>
-                        <x-input-error :messages="$errors->get('day')" class="mt-1" />
+                        <x-input-error :messages="$errors->get('day')" class="mt-1"/>
                     </div>
                 </div>
             </div>
 
             {{-- Task Summary --}}
             <div>
-                <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" />
+                <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')"/>
                 <textarea wire:model="body" rows="5"
                           class="w-full text-sm mt-1 p-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300">
                 </textarea>
-                <x-input-error :messages="$errors->get('body')" class="mt-1" />
+                <x-input-error :messages="$errors->get('body')" class="mt-1"/>
             </div>
 
             {{-- Submit Button --}}

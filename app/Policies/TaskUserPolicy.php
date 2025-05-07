@@ -68,7 +68,7 @@ class TaskUserPolicy
         // Return true if all conditions are met
         return $user->id === $taskUser->user_id &&
             $taskUser->task_status === TaskStatus::ACCEPTED &&
-            $todayDate <= $taskUser->time_out &&
+            $todayDate < $taskUser->time_out &&
             $areFieldsNotEmpty;
     }
 
