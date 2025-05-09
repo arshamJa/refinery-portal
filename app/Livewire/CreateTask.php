@@ -10,8 +10,11 @@ use App\Models\TaskUser;
 use App\Models\TaskUserFile;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -21,20 +24,19 @@ class CreateTask extends Component
     use WithFileUploads;
 
     public $meeting;
-    public $taskBody;
+    public $taskBody,$taskUserId = '';
+    public $files = [];
+
     public $selectedTask = '';
     public $taskName;
-    protected $loadedMeeting;
-    protected $loadedEmployees;
-    protected $loadedTasks;
-    public $fileUpload;
+    protected $loadedMeeting,$loadedEmployees,$loadedTasks;
+
     public $selectedTaskFiles = [];
 
 
-    public $taskUserId = '';
-//    public $taskUser;
-
-
+    public $userName;
+    public $day,$month,$year,$body;
+    public $request_task;
 
     #[Computed]
     public function meetings()
@@ -102,6 +104,7 @@ class CreateTask extends Component
         });
     }
 
+
     public function showTaskDetails($taskUserId)
     {
         $taskUser = TaskUser::with([
@@ -114,6 +117,53 @@ class CreateTask extends Component
         $this->dispatch('crud-modal', name: 'view-task-details-modal');
     }
 
+    /**
+     * @throws ValidationException
+     */
+    public function submitTaskForm($selectedTaskId)
+    {
+        $validated = Validator::make(
+            ['taskBody' => $this->taskBody, 'files' => $this->files],
+            ['taskBody' => 'required|string|min:5', 'files.*' => 'nullable|file|max:2048|mimes:jpeg,png,pdf,docx,xlsx'],
+            [
+                'taskBody.required' => 'فیلد شرح اقدام شما اجباری است.',
+                'taskBody.min' => 'شرح اقدام باید حداقل ۵ کاراکتر باشد.',
+                'files.*.file' => 'هر فایل باید یک فایل معتبر باشد.',
+                'files.*.max' => 'حداکثر حجم فایل 2 مگابایت است.',
+                'files.*.mimes' => 'فرمت فایل باید یکی از jpeg, png, pdf, docx, xlsx باشد.'
+            ]
+        )->validate();
+
+        $taskBody = Str::of(strip_tags($this->taskBody))->squish();
+
+
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $newTime = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
+
+        $taskUser = TaskUser::where('id', $selectedTaskId)
+            ->where('user_id', auth()->user()->id)
+            ->firstOrFail();
+
+        $taskUser->update([
+            'sent_date' => $newTime,
+            'is_completed' => true,
+            'body_task' => $taskBody,
+        ]);
+
+        if (!empty($this->files)) {
+            foreach ($this->files as $file) {
+                $path = $file->store('task_files', 'public');
+                TaskUserFile::create([
+                    'task_user_id' => $taskUser->id,
+                    'file_path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                ]);
+            }
+        }
+
+        session()->flash('message', 'اقدام با موفقیت ثبت شد.');
+        $this->dispatch('close-modal');
+    }
     public function openUpdateModal($taskUserId)
     {
         $this->selectedTask = TaskUser::with('taskUserFiles')->findOrFail($taskUserId);
@@ -161,24 +211,31 @@ class CreateTask extends Component
     }
 
 
-    public $request_task;
+    /**
+     * @throws ValidationException
+     */
     public function denyTask()
     {
-        $this->validate([
-            'request_task' => 'required|string|max:1000',
-        ]);
+
+        $validated = Validator::make(
+            ['request_task' => $this->request_task],
+            ['request_task' => 'required|min:3'],
+            ['required' => 'فیلد دلیل رد خلاصه مذاکره اجباری است.', 'min' => 'دلیل رد باید حداقل ۳ کاراکتر باشد.']
+        )->validate();
+
+        $request_task = Str::of(strip_tags($this->request_task))->squish();
 
         // Find the TaskUser model
         $taskUser = TaskUser::findOrFail($this->taskUserId);
 
         // Update the task's status and reason
         $taskUser->task_status = TaskStatus::DENIED;
-        $taskUser->request_task = $this->request_task;  // Save the reason
+        $taskUser->request_task = $validated['request_task'];  // Save the reason
         $taskUser->save();
-
+        session()->flash('message', 'وظیفه با موفقیت رد شد.');
         $this->dispatch('close-modal');
     }
-    public $userName ,$day ,$month,$year,$body;
+
 
     public function openModalScriptorium($taskUserId)
     {
@@ -188,15 +245,40 @@ class CreateTask extends Component
         $this->dispatch('crud-modal', name: 'edit-by-scriptorium');
     }
 
+
+    /**
+     * @throws ValidationException
+     */
     public function updateTask()
     {
-        $taskUser = TaskUser::findOrFail($this->taskUserId);
+
+        $validated = Validator::make(
+            ['year' => $this->year, 'month' => $this->month, 'day' => $this->day, 'body' => $this->body],
+            ['year' => 'required', 'month' => 'required', 'day' => 'required', 'body' => 'required|min:3'],
+            [
+                'year.required' => 'فیلد سال اجباری است.',
+                'month.required' => 'فیلد ماه اجباری است.',
+                'day.required' => 'فیلد روز اجباری است.',
+                'body.required' => 'فیلد خلاصه مذاکرات اجباری است.',
+                'body.min' => 'خلاصه مذاکرات باید حداقل ۳ کاراکتر باشد.'
+            ]
+        )->validate();
+
+        // Sanitize the inputs before validation
+        $year = trim($this->year);
+        $month = trim($this->month);
+        $day = trim($this->day);
+        $body  = Str::of(strip_tags($this->body))->squish();
+
+
+
+        $taskUser = TaskUser::with('task')->findOrFail($this->taskUserId);
         $oldTask  = Task::findOrFail($taskUser->task_id);
 
         $normalizedOldBody = $this->normalizeText($oldTask->body);
-        $normalizedNewBody = $this->normalizeText($this->body);
+        $normalizedNewBody = $this->normalizeText($body);
 
-        $newTimeOut = sprintf("%04d/%02d/%02d", $this->year, $this->month, $this->day);
+        $newTimeOut = sprintf("%04d/%02d/%02d", $year, $month, $day);
 
         $bodyChanged = $normalizedOldBody !== $normalizedNewBody;
         $timeOutChanged = $taskUser->time_out !== $newTimeOut;
@@ -210,19 +292,20 @@ class CreateTask extends Component
         if ($bodyChanged) {
             $newTask = Task::create([
                 'meeting_id' => $oldTask->meeting_id,
-                'body' => $normalizedNewBody,
+                'body' => $body,
             ]);
             $taskUser->task_id = $newTask->id;
         }
 
         if ($timeOutChanged || $bodyChanged) {
-            $taskUser->time_out = $newTimeOut;
-            $taskUser->task_status = TaskStatus::PENDING;
-            $taskUser->request_task = null;
-            $taskUser->save();
+            $taskUser->update([
+                'time_out' => $newTimeOut,
+                'task_status' => TaskStatus::PENDING,
+                'request_task' => null
+            ]);
         }
 
-        session()->flash('message', 'شرح وظیفه یا مهلت اقدام بروزرسانی شد.');
+        session()->flash('status', 'ویرایش انجام شد');
         $this->dispatch('close-modal', name: 'edit-by-scriptorium');
     }
 

@@ -1,8 +1,28 @@
 @php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use Illuminate\Support\Str; @endphp
 <div>
 
+
     @if (session('status'))
-        <x-sessionMessage name="status"/>
+        <div
+            x-data="{ showMessage: true }" x-show="showMessage" x-transition x-cloak
+            x-init="setTimeout(() => showMessage = false, 4000)"
+            dir="rtl"
+            class="fixed top-5 right-5 z-[99] max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
+            <div class="flex p-4">
+                <div class="shrink-0">
+                    <svg class="shrink-0 size-4 text-teal-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16"
+                         height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"></path>
+                    </svg>
+                </div>
+                <div class="ms-3">
+                    <p class="text-sm text-gray-700 dark:text-neutral-400">
+                        {{ session('status') }}
+                    </p>
+                </div>
+            </div>
+        </div>
     @endif
 
     <nav class="flex justify-between mb-4 mt-20">
@@ -240,58 +260,61 @@
                             @endphp
 
                             {{-- Removed the column for شرح اقدام in print version --}}
-                                <td class="px-4 py-4 border-r border-gray-300 no-print">
-                                    @if(!$isAfterTimeOut)
-                                        @if($taskUser->body_task && $taskUser->body_task !== '---')
-                                            <!-- Content visible only on the page (screen-only) -->
-                                            <div x-data="{ expanded: false }" class="screen-only">
-                                                <div x-show="!expanded" class="truncate">
-                                                    {{ Str::words($taskUser->body_task, 5, '...') }}
-                                                </div>
-                                                <div x-show="expanded" class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">
-                                                    {{ $taskUser->body_task }}
-                                                </div>
-                                                <button @click="expanded = !expanded" class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">
-                                                    <template x-if="!expanded">
+                            <td class="px-4 py-4 border-r border-gray-300 no-print">
+                                @if(!$isAfterTimeOut)
+                                    @if($taskUser->body_task && $taskUser->body_task !== '---')
+                                        <!-- Content visible only on the page (screen-only) -->
+                                        <div x-data="{ expanded: false }" class="screen-only">
+                                            <div x-show="!expanded" class="truncate">
+                                                {{ Str::words($taskUser->body_task, 5, '...') }}
+                                            </div>
+                                            <div x-show="expanded"
+                                                 class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">
+                                                {{ $taskUser->body_task }}
+                                            </div>
+                                            <button @click="expanded = !expanded"
+                                                    class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">
+                                                <template x-if="!expanded">
                                                     <span class="no-print flex items-center">
-                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                                             stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M19 9l-7 7-7-7"></path>
                                                         </svg>
                                                         {{__('نمایش بیشتر')}}
                                                     </span>
-                                                                                </template>
-                                                                                <template x-if="expanded">
+                                                </template>
+                                                <template x-if="expanded">
                                                     <span class="no-print flex items-center">
-                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path>
+                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                                             stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M5 15l7-7 7 7"></path>
                                                         </svg>
                                                         {{__('نمایش کمتر')}}
                                                     </span>
-                                                    </template>
-                                                </button>
-                                            </div>
-                                            <!-- Content only for printing (always visible in print) -->
-                                            <div class="task-card print-only" style="display: none;">
-                                             {{ $taskUser->body_task }}
-                                            </div>
-                                        @else
-                                            <span>---</span>
-                                        @endif
-                                    @else
-                                        <div class="mt-2 text-sm text-gray-400">
-                                            {{ __('مهلت اقدام به پایان رسیده است') }}
+                                                </template>
+                                            </button>
                                         </div>
+                                        <!-- Content only for printing (always visible in print) -->
                                         <div class="task-card print-only" style="display: none;">
-                                            {{ __('پاسخی از سمت اقدام کننده در مهلت مقرر صورت نگرفت') }}
+                                            {{ $taskUser->body_task }}
                                         </div>
+                                    @else
+                                        <span>---</span>
                                     @endif
-                                </td>
+                                @else
+                                    <div class="mt-2 text-sm text-gray-400">
+                                        {{ __('مهلت اقدام به پایان رسیده است') }}
+                                    </div>
+                                    <div class="task-card print-only" style="display: none;">
+                                        {{ __('پاسخی از سمت اقدام کننده در مهلت مقرر صورت نگرفت') }}
+                                    </div>
+                                @endif
+                            </td>
 
 
-
-
-
-                                <td class="px-4 py-4 border-r border-gray-300">
+                            <td class="px-4 py-4 border-r border-gray-300">
                                 {{ $taskUser->sent_date ?? '---' }}
                             </td>
 
@@ -401,51 +424,33 @@
     </div>
 
 
-    <x-modal name="view-task-details-modal" maxWidth="4xl">
+    <x-modal name="view-task-details-modal" maxWidth="4xl" :closable="false">
         @if ($selectedTask)
-            <form method="POST" action="{{ route('tasks.submit', $selectedTask->id) }}" enctype="multipart/form-data">
-                @csrf
+            <form wire:submit="submitTaskForm({{ $selectedTask->id}})" enctype="multipart/form-data">
                 <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
-                    {{--                    Titl--}}
                     <div class="border-b pb-4">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('جزئیات') }}</h2>
                     </div>
 
-                    {{--                    Task Info--}}
                     <div class="grid grid-cols-1 gap-4">
                         <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <x-meeting-info label="{{ __('اقدام کننده') }}" :value="$taskName"/>
-                    </div>
-
-                    {{--                    Task Body--}}
-                    <div>
+                    <div class="mt-4">
                         <x-input-label for="taskBody" :value="__('شرح اقدام شما')" class="mb-2"/>
-                        <textarea name="taskBody" id="taskBody" rows="4"
-                                  class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">{{ old('taskBody') }}</textarea>
-                        @error('taskBody')
-                        <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
+                        <textarea wire:model.defer="taskBody" id="taskBody" rows="4"
+                                  class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300"></textarea>
+                        <x-input-error :messages="$errors->get('taskBody')"/>
                     </div>
 
-                    {{--                    File Upload--}}
-                    <div>
-                        <x-input-label for="fileUpload" :value="__('آپلود فایل مرتبط')" class="mb-2"/>
-                        <input type="file" name="fileUpload[]" id="fileUpload" multiple
-                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                   file:rounded-full file:border-0
-                   file:text-sm file:font-semibold
-                   file:bg-blue-50 file:text-blue-700
-                   hover:file:bg-blue-100"/>
-                        @error('fileUpload.*')
-                        <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
+                    <div class="mt-4">
+                        <x-input-label for="files" :value="__('آپلود فایل مرتبط')" class="mb-2"/>
+                        <input type="file" wire:model="files" multiple class="w-full text-sm text-gray-500"/>
+                        <x-input-error :messages="$errors->get('files')"/>
                     </div>
 
-                    {{--                    Submit Buttons--}}
                     <div class="pt-4 flex justify-between gap-2">
-                        <button type="submit"
-                                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                             {{ __('ثبت') }}
                         </button>
                         <button type="button" x-on:click="$dispatch('close')"
@@ -614,7 +619,7 @@
 
 
     @if($this->meetings->status === MeetingStatus::IS_IN_PROGRESS)
-        <x-modal name="final-check">
+        <x-modal name="final-check" :closable="false">
             <form wire:submit="finishMeeting({{$this->meetings->id}})">
                 <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
                     <h2 class="text-2xl font-bold text-gray-800">{{ __('آیا تایید نهایی این جلسه مطمئن هستید؟') }}</h2>
@@ -634,13 +639,13 @@
         </x-modal>
     @endif
 
-    <x-modal name="deny-task">
+    <x-modal name="deny-task" :closable="false">
         <form wire:submit="denyTask">
             <div class="px-6 py-4">
                 <label for="request_task" class="block text-sm font-medium text-gray-700 mb-2">
                     {{ __('دلیل رد خلاصه مذاکره') }}
                 </label>
-                <textarea wire:model="request_task" id="request_task" rows="4"
+                <textarea wire:model.defer="request_task" id="request_task" rows="4"
                           class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
             </textarea>
                 <x-input-error :messages="$errors->get('request_task')"/>
@@ -657,67 +662,77 @@
         </form>
     </x-modal>
 
-    <x-modal name="edit-by-scriptorium">
-        <form wire:submit="updateTask" class="space-y-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">ویرایش وظیفه: {{ $userName }}</h2>
-
-            {{-- Date Fields --}}
-            <div class="space-y-2">
-                <x-input-label :value="__('مهلت اقدام')"/>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {{-- Year --}}
-                    <div>
-                        <select wire:model="year" id="year"
-                                class="w-full text-sm bg-white border rounded-md border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300">
-                            <option value="">{{ __('سال') }}</option>
-                            @for($i = 1404; $i <= 1430; $i++)
-                                <option value="{{ $i }}">{{ $i }}</option>
-                            @endfor
-                        </select>
-                        <x-input-error :messages="$errors->get('year')" class="mt-1"/>
+    <x-modal name="edit-by-scriptorium" :closable="false">
+        <form wire:submit="updateTask">
+            <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
+                <h2 class="text-2xl font-bold text-gray-800">ویرایش وظیفه: {{ $userName }}</h2>
+            </div>
+            <div class="px-6 py-4">
+                <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
+                <div class="flex gap-2">
+                    <div class="w-full">
+                        <div class="flex items-center gap-1">
+                            <select wire:model.defer="year" id="year" dir="ltr"
+                                    class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                <option value="">{{__(':سال')}}</option>
+                                @for($i = 1404; $i <= 1430; $i++)
+                                    <option value="{{$i}}" @if (old('year') == $i) selected @endif>
+                                        {{$i}}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
                     </div>
-
-                    {{-- Month --}}
-                    <div>
-                        @php
-                            $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                        @endphp
-                        <select wire:model="month" id="month"
-                                class="w-full text-sm bg-white border rounded-md border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300">
-                            <option value="">{{ __('ماه') }}</option>
-                            @foreach($persian_months as $index => $name)
-                                <option value="{{ $index + 1 }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('month')" class="mt-1"/>
+                    <div class="w-full">
+                        <div class="flex items-center gap-1">
+                            @php
+                                $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+                            @endphp
+                            <select wire:model.defer="month" id="month" dir="ltr"
+                                    class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                <option value="">{{__(':ماه')}}</option>
+                                @for ($i = 1; $i <= 12; $i++)
+                                    <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
+                                        {{ $persian_months[$i - 1] }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
                     </div>
-
-                    {{-- Day --}}
-                    <div>
-                        <select wire:model="day" id="day"
-                                class="w-full text-sm bg-white border rounded-md border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300">
-                            <option value="">{{ __('روز') }}</option>
-                            @for($i = 1; $i <= 31; $i++)
-                                <option value="{{ $i }}">{{ $i }}</option>
-                            @endfor
-                        </select>
-                        <x-input-error :messages="$errors->get('day')" class="mt-1"/>
+                    <div class="w-full">
+                        <div class="flex items-center gap-1">
+                            <select wire:model.defer="day" id="day" dir="ltr"
+                                    class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                <option value="">{{__(':روز')}}</option>
+                                @for($i = 1; $i <= 31; $i++)
+                                    <option value="{{$i}}" @if (old('day') == $i) selected @endif>
+                                        {{$i}}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {{-- Task Summary --}}
-            <div>
-                <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')"/>
-                <textarea wire:model="body" rows="5"
-                          class="w-full text-sm mt-1 p-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300">
+            <div class="px-6 py-4">
+                <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" class="mb-2"/>
+                <textarea type="text" wire:model.defer="body" rows="4"
+                          class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                            {{old('body')}}
                 </textarea>
-                <x-input-error :messages="$errors->get('body')" class="mt-1"/>
+                <x-input-error :messages="$errors->get('year')" class="my-2"/>
+                <x-input-error :messages="$errors->get('month')" class="my-2"/>
+                <x-input-error :messages="$errors->get('day')" class="my-2"/>
+                <x-input-error :messages="$errors->get('body')" class="mt-2"/>
             </div>
 
-            {{-- Submit Button --}}
-            <div class="flex justify-end">
-                <x-primary-button class="px-6 py-2">{{ __('بروزرسانی') }}</x-primary-button>
+            <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
+                <x-primary-button type="submit">
+                    {{ __('بروزرسانی') }}
+                </x-primary-button>
+                <x-cancel-button x-on:click="$dispatch('close')">
+                    {{ __('انصراف') }}
+                </x-cancel-button>
             </div>
         </form>
     </x-modal>

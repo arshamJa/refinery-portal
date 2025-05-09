@@ -20,7 +20,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     // this is the route for each user to sent their task
-    Route::post('/tasks/{taskUser}/submit', [TaskController::class, 'submitTaskForm'])->name('tasks.submit');
+//    Route::post('/tasks/{taskUser}/submit', [TaskController::class, 'submitTaskForm'])->name('tasks.submit');
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/delete-file/{fileId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
 
