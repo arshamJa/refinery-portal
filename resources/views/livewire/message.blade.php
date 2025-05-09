@@ -351,6 +351,7 @@
     {{--    </div>--}}
 
 
+
     <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white p-4">
         <table class="w-full text-sm text-gray-700 text-right rtl:text-right">
             <thead class="bg-gray-50 text-gray-600 border-b text-sm font-semibold">
@@ -359,7 +360,7 @@
                 <th class="px-4 py-3">فرستنده</th>
                 <th class="px-4 py-3">متن</th>
                 <th class="px-4 py-3">اقدام شما</th>
-                <th class="px-4 py-3">وضعیت</th>
+                <th class="px-4 py-3">{{__('وضعیت جلسه')}}</th>
                 <th class="px-4 py-3">عملیات</th>
 
             </tr>
@@ -367,7 +368,7 @@
             @foreach($this->meetingUsers as $meetingUser)
                 <tbody class="divide-y divide-gray-100">
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3">دعوت به جلسه</td>
+                    <td class="px-4 py-3">{{__('دعوت به جلسه')}}</td>
                     <td class="px-4 py-3">{{ $meetingUser->meeting->scriptorium }}</td>
                     <td class="px-4 py-3">
                         <p class="text-sm text-gray-600">
@@ -395,8 +396,7 @@
                         @if($meetingUser->is_present())
                             {{ __('شما دعوت به این جلسه را') }} <span class="text-green-700">{{ __('پذیرفتید') }}</span>
                         @elseif($meetingUser->is_absent())
-                            {{ __('شما دعوت به این جلسه را') }} <span
-                                class="text-red-600 font-bold">{{ __('نپذیرفتید') }}</span>
+                            {{ __('شما دعوت به این جلسه را') }} <span class="text-red-600 font-bold">{{ __('نپذیرفتید') }}</span>
                             @if($meetingUser->replacement)
                                 {{ __('و آقا/خانم') }} <span
                                     class="text-green-700">{{ $meetingUser?->replacementName() }}</span>
@@ -468,10 +468,44 @@
     </div>
 
 
+    <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white p-4">
+        <table class="w-full text-sm text-gray-700 text-right rtl:text-right">
+            <thead class="bg-gray-50 text-gray-600 border-b text-sm font-semibold">
+            <tr>
+                <th class="px-4 py-3">نوع پیام</th>
+                <th class="px-4 py-3">فرستنده</th>
+                <th class="px-4 py-3">متن</th>
+                <th class="px-4 py-3">اقدام شما</th>
+                <th class="px-4 py-3">{{__('وضعیت جلسه')}}</th>
+                <th class="px-4 py-3">عملیات</th>
+
+            </tr>
+            </thead>
+            @foreach($this->taskUsers as $taskUser)
+                <tbody class="divide-y divide-gray-100">
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3">{{__('صورتجلسه')}}</td>
+                    <td class="px-4 py-3">{{ $taskUser->task->meeting->scriptorium ?? 'N/A' }}</td>
+                    <td class="px-4 py-3">
+                        <p class="text-sm text-gray-600">
+                            {{ $taskUser->task->body }}
+                        </p>
+                    </td>
+
+                    <td class="px-4 py-3">
+                        <button>X</button>
+                    </td>
+                </tr>
+                </tbody>
+            @endforeach
+        </table>
+
+    </div>
+
     <x-modal name="deny">
         @if($meetingId)
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
-                {{-- Header --}}
+{{--                 Header--}}
                 <div class="sm:flex sm:items-center mb-4 border-b pb-3">
                     <div
                         class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
@@ -490,7 +524,7 @@
                     </div>
                 </div>
 
-                {{-- Denial Reason --}}
+{{--                 Denial Reason--}}
                 <div>
                     <x-input-label for="body" :value="__('دلیل رد درخواست')" class="mb-2"/>
                     <textarea wire:model="body"
@@ -500,36 +534,40 @@
                 </div>
             </div>
 
-            {{-- Replacement Section --}}
+{{--             Replacement Section--}}
             <div class="border-t p-4 space-y-3">
-                <p>{{ __('در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:') }}</p>
+                <input type="checkbox" wire:model="checkBox" class="mr-2">
+                <span>در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:</span>
 
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model="checkBox">
-                    <label class="text-sm">
-                        {{ __('در جلسه نمی‌توانم شرکت کنم ولی جانشین این جانب، آقا/خانم') }}
-                    </label>
-                    <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"
-                           class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                </div>
-                <div class="flex items-center gap-2">
-                    <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>
-                    <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"
-                           class="w-40 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                    <span>{{ __('در جلسه مذکور شرکت می‌نماید.') }}</span>
+                <div class="space-y-3" x-show="$wire.checkBox">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm">
+                            {{ __('در جلسه نمی‌توانم شرکت کنم ولی جانشین این جانب، آقا/خانم') }}
+                        </label>
+                        <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"
+                               class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                     </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>
+                        <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"
+                               class="w-40 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        <span>{{ __('در جلسه مذکور شرکت می‌نماید.') }}</span>
+                    </div>
+                    <x-input-error :messages="$errors->get('full_name')" class="mt-2"/>
+                    <x-input-error :messages="$errors->get('p_code')" class="mt-2"/>
                 </div>
 
-                {{-- Error List --}}
-                @if ($errors->any())
-                    <ul class="text-sm text-red-600 dark:text-red-400 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                @endif
+{{--                 Error List--}}
+{{--                @if ($errors->any())--}}
+{{--                    <ul class="text-sm text-red-600 dark:text-red-400 space-y-1">--}}
+{{--                        @foreach ($errors->all() as $error)--}}
+{{--                            <li>{{ $error }}</li>--}}
+{{--                        @endforeach--}}
+{{--                    </ul>--}}
+{{--                @endif--}}
             </div>
 
-            {{-- Footer Buttons --}}
+{{--             Footer Buttons--}}
             <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
                 <x-primary-button wire:click="deny({{ $meetingId }})">
                     {{ __('تایید') }}
@@ -538,8 +576,50 @@
                     {{ __('لغو') }}
                 </x-secondary-button>
             </div>
+{{--            <div class="space-y-4">--}}
+{{--                <!-- Reason for Absence (Always Required) -->--}}
+{{--                <div>--}}
+{{--                    <label for="body" class="block text-sm font-medium text-gray-700">دلیل رد درخواست</label>--}}
+{{--                    <textarea wire:model.defer="body" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>--}}
+{{--                    @error('body')--}}
+{{--                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>--}}
+{{--                    @enderror--}}
+{{--                </div>--}}
+
+{{--                <!-- Replacement Section (Visible Only If Checkbox is Checked) -->--}}
+{{--                <div>--}}
+{{--                    <label class="flex items-center">--}}
+{{--                    --}}
+{{--                    </label>--}}
+{{--                </div>--}}
+
+{{--               --}}
+{{--                    <div>--}}
+{{--                        <label for="full_name" class="block text-sm font-medium text-gray-700">نام و نام خانوادگی</label>--}}
+{{--                        <input type="text" wire:model.defer="full_name" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">--}}
+{{--                        @error('full_name')--}}
+{{--                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>--}}
+{{--                        @enderror--}}
+{{--                    </div>--}}
+
+{{--                    <div>--}}
+{{--                        <label for="p_code" class="block text-sm font-medium text-gray-700">کد پرسنلی</label>--}}
+{{--                        <input type="text" wire:model.defer="p_code" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">--}}
+{{--                        @error('p_code')--}}
+{{--                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>--}}
+{{--                        @enderror--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+
+{{--            <!-- Submit Button -->--}}
+{{--            <div class="mt-4">--}}
+{{--                <button wire:click="deny({{ $meetingId }})" class="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700">--}}
+{{--                    تایید--}}
+{{--                </button>--}}
+{{--            </div>--}}
+
         @endif
     </x-modal>
-
 
 </div>

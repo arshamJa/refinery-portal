@@ -10,7 +10,7 @@ use Livewire\Attributes\Computed;
 trait MessageReceived
 {
     #[Computed]
-    public function messages()
+    public function messagesNotification()
     {
         $user = auth()->user();
         $userId = $user->id;

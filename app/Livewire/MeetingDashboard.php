@@ -27,6 +27,7 @@ class MeetingDashboard extends Component
 
     public $search = '';
     public $statusFilter = '';
+    public $scriptoriumFilter = '';
     public $start_date;
     public $end_date;
     public function filterMeetings()
@@ -38,43 +39,13 @@ class MeetingDashboard extends Component
     #[Computed]
     public function meetings()
     {
-//        $query = Meeting::with([
-//            'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,read_by_scriptorium,read_by_user,replacement'
-//        ])
-//            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time', 'task_status']);
-//
-//        // Trimmed values
-//        $search = trim($this->search);
-//        $startDate = trim($this->start_date);
-//        $endDate = trim($this->end_date);
-//
-//        if (!empty($search)) {
-//            $query->where(function ($q) use ($search) {
-//                $q->where('title', 'like', '%' . $search . '%')
-//                    ->orWhere('unit_organization', 'like', '%' . $search . '%')
-//                    ->orWhere('scriptorium', 'like', '%' . $search . '%')
-//                    ->orWhere('location', 'like', '%' . $search . '%')
-//                    ->orWhere('date', 'like', '%' . $search . '%')
-//                    ->orWhere('time', 'like', '%' . $search . '%');
-//            });
-//        }
-//
-//        if ($this->statusFilter !== '') {
-//            $query->where('task_status', $this->statusFilter);
-//        }
-//
-//        if (!empty($startDate) && !empty($endDate)) {
-//            $query->whereBetween('date', [$startDate, $endDate]);
-//        }
-//
-//        return $query->paginate(5);
-
         // Get the filters passed via request or Livewire properties
         $filters = [
             'search' => $this->search,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
-            'statusFilter' => $this->statusFilter
+            'statusFilter' => $this->statusFilter,
+            'scriptoriumFilter' => $this->scriptoriumFilter
         ];
         return $this->baseFilteredMeetingQuery($filters)->paginate(5);
     }
@@ -86,6 +57,7 @@ class MeetingDashboard extends Component
         $startDate = trim($filters['start_date'] ?? '');  // Get the start date value
         $endDate = trim($filters['end_date'] ?? '');  // Get the end date value
         $statusFilter = $filters['statusFilter'] ?? '';  // Get the status filter value
+        $scriptoriumFilter = $filters['scriptoriumFilter'] ?? 'all';
 
         return Meeting::with([
             'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,read_by_scriptorium,read_by_user,replacement',
@@ -93,8 +65,10 @@ class MeetingDashboard extends Component
             'meetingUsers.user.user_info:id,user_id,full_name',
             'meetingUsers.user.user_info.department:id,department_name',
         ])
-            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'boss','location', 'date', 'time', 'status',
-                'position_organization', 'unit_held', 'applicant'])
+            ->select([
+                'id', 'title', 'unit_organization', 'scriptorium', 'boss', 'location',
+                'date', 'time', 'status', 'position_organization', 'unit_held', 'applicant'
+            ])
             ->when(!empty($search), function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
@@ -108,9 +82,12 @@ class MeetingDashboard extends Component
             ->when($statusFilter !== '', fn($query) => $query->where('status', $statusFilter))
             ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
                 $query->dateRange($startDate, $endDate);  // Assuming dateRange is a scope or method for filtering dates
+            })
+//            this mine comes from the select value
+            ->when($scriptoriumFilter === 'mine', function ($query) {
+                $query->where('scriptorium', auth()->user()->user_info->full_name); // Assuming the scriptorium is the authenticated user's name
             });
     }
-
     public function exportExcel()
     {
         // Get the filters from the request
@@ -118,7 +95,8 @@ class MeetingDashboard extends Component
             'search' => $this->search,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
-            'statusFilter' => $this->statusFilter
+            'statusFilter' => $this->statusFilter,
+            'scriptoriumFilter' => $this->scriptoriumFilter
         ];
 
         // Get the filtered meetings based on the provided filters
@@ -129,7 +107,7 @@ class MeetingDashboard extends Component
                 'meetingUsers.user.user_info:id,user_id,full_name,department_id',
                 'meetingUsers.user.user_info.department:id,department_name',
             ])
-            ->get();  // Get all relevant data including meeting users and their associated info
+            ->get();// Get all relevant data including meeting users and their associated info
         // Export the filtered meetings to Excel
         return Excel::download(new MeetingsExport($meetings), 'meetings.xlsx');
     }

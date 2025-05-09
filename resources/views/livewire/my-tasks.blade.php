@@ -76,7 +76,7 @@
                 <x-slot name="head">
                     <x-table.row>
                         @foreach ([
-                                'ردیف','موضوع جلسه','مهلت انجام اقدام','شرح اقدام','تاریخ ارسال اقدام','',''
+                                'ردیف','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','شرح اقدام','تاریخ ارسال اقدام','',''
                             ] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
@@ -87,6 +87,11 @@
                         <x-table.row wire:key="task-{{ $taskUser->id }}">
                             <x-table.cell>{{ ($this->taskUsers->currentPage() - 1) * $this->taskUsers->perPage() + $loop->iteration }}</x-table.cell>
                             <x-table.cell>{{ $taskUser->task->meeting->title ?? '-' }}</x-table.cell>
+
+                            <x-table.cell>
+                                {{ Str::words($taskUser->task->body?? '---' , 5 , '...')}}
+                            </x-table.cell>
+
                             <x-table.cell>{{ $taskUser->task->time_out ?? '-' }}</x-table.cell>
                             <x-table.cell>{{ Str::words($taskUser->body_task ?? '---' , 5 , '...')}}</x-table.cell>
                             <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
@@ -97,8 +102,6 @@
                                     </x-secondary-button>
                                 </a>
                             </x-table.cell>
-
-
                             <x-table.cell>
                                 <x-primary-button wire:click.prevent="view({{$taskUser->id}})">
                                     {{ __('نمایش جزئیات') }}

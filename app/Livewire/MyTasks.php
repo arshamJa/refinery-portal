@@ -67,7 +67,7 @@ class MyTasks extends Component
     {
         return TaskUser::with([
             'user:id',
-            'task:id,meeting_id,time_out',
+            'task:id,meeting_id,body',
             'task.meeting:id,title'
         ])
             ->where('user_id', auth()->id())
@@ -87,7 +87,7 @@ class MyTasks extends Component
             ->when($this->statusFilter !== null, function ($query) {
                 $query->where('is_completed', $this->statusFilter);
             })
-            ->select('id', 'task_id', 'user_id', 'sent_date', 'is_completed', 'body_task', 'request_task')
+            ->select('id', 'task_id', 'user_id', 'sent_date', 'task_status', 'body_task', 'request_task')
             ->paginate(5);
     }
 }

@@ -1,5 +1,10 @@
 @php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use Illuminate\Support\Str; @endphp
 <div>
+
+    @if (session('status'))
+        <x-sessionMessage name="status"/>
+    @endif
+
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -53,45 +58,28 @@
                     @break
             @endswitch
         </div>
-        {{--        <div id="meeting-info" class="meeting-info-grid text-gray-700 text-sm print:text-[12px] print:leading-[1.4]">--}}
-        {{--            <div><strong>{{ __('واحد/کمیته:') }}</strong><span>{{ $this->meetings->unit_held }}</span></div>--}}
-        {{--            <div><strong>{{ __('تهیه کننده(دبیرجلسه):') }}</strong><span>{{ $this->meetings->scriptorium }}</span></div>--}}
-        {{--            <div><strong>{{ __('رئیس جلسه:') }}</strong><span>{{ $this->meetings->boss }}</span></div>--}}
-        {{--            <div><strong>{{ __('پیوست:') }}</strong><span>{{ __('پیوست') }}</span></div>--}}
-        {{--            <div><strong>{{ __('تاریخ جلسه:') }}</strong><span>{{ $this->meetings->date }}</span></div>--}}
-        {{--            <div><strong>{{ __('زمان جلسه:') }}</strong><span>{{ $this->meetings->time }}</span></div>--}}
-        {{--            <div><strong>{{ __('مکان جلسه:') }}</strong><span>{{ $this->meetings->location }}</span></div>--}}
-        {{--            <div><strong>{{ __('موضوع جلسه:') }}</strong><span>{{ $this->meetings->title }}</span></div>--}}
-        {{--            <div class="col-span-2 print:inline print:mb-0">--}}
-        {{--                <strong>{{ __('حاضرین:') }}</strong>--}}
-        {{--                <span>--}}
-        {{--            @foreach ($this->employees as $employee)--}}
-        {{--                        {{ $employee->user->user_info->full_name }}{{ !$loop->last ? ' -' : '' }}--}}
-        {{--                    @endforeach--}}
-        {{--        </span>--}}
-        {{--            </div>--}}
-        {{--        </div>--}}
         <div id="meeting-info"
              class="grid grid-cols-2 gap-x-6 gap-y-2 bg-gray-50 border border-gray-300 rounded-md p-4 text-gray-700 text-sm print:text-[16px] print:leading-[1.4] print:grid print:grid-cols-2 print:gap-2 print:border print:border-gray-400">
-            <div><strong>{{ __('واحد/کمیته:') }}</strong> <span>{{ $this->meetings->unit_held }}</span></div>
-            <div><strong>{{ __('تهیه کننده(دبیرجلسه):') }}</strong> <span>{{ $this->meetings->scriptorium }}</span>
+            <div><strong>{{ __('واحد/کمیته: ') }}</strong><span>{{ $this->meetings->unit_held }}</span></div>
+            <div><strong>{{ __('تهیه کننده(دبیرجلسه): ') }}</strong><span>{{ $this->meetings->scriptorium }}</span>
             </div>
-            <div><strong>{{ __('رئیس جلسه:') }}</strong> <span>{{ $this->meetings->boss }}</span></div>
-            <div><strong>{{ __('پیوست:') }}</strong> <span>{{ __('پیوست') }}</span></div>
-            <div><strong>{{ __('تاریخ جلسه:') }}</strong> <span>{{ $this->meetings->date }}</span></div>
-            <div><strong>{{ __('زمان جلسه:') }}</strong> <span>{{ $this->meetings->time }}</span></div>
-            <div><strong>{{ __('مکان جلسه:') }}</strong> <span>{{ $this->meetings->location }}</span></div>
-            <div><strong>{{ __('موضوع جلسه:') }}</strong> <span>{{ $this->meetings->title }}</span></div>
-            <div class="col-span-2 print:col-span-2">
-                <strong>{{ __('حاضرین:') }}</strong>
+            <div><strong>{{ __('رئیس جلسه: ') }}</strong><span>{{ $this->meetings->boss }}</span></div>
+            <div>
+                <strong>{{ __('پیوست: ') }}</strong><span>{{ $this->meetings->tasks->flatMap->taskUsers->flatMap->taskUserFiles->count() === 1 ? 'دارد' : 'ندارد' }}</span>
+            </div>
+            <div><strong>{{ __('تاریخ جلسه: ') }}</strong><span>{{ $this->meetings->date }}</span></div>
+            <div><strong>{{ __('زمان جلسه: ') }}</strong><span>{{ $this->meetings->time }}</span></div>
+            <div><strong>{{ __('مکان جلسه: ') }}</strong><span>{{ $this->meetings->location }}</span></div>
+            <div><strong>{{ __('موضوع جلسه: ') }}</strong><span>{{ $this->meetings->title }}</span></div>
+            <div class="col-span-2 print:col-span-2"><strong>{{ __('حاضرین: ') }}</strong>
                 <span>
-            @foreach ($this->employees as $employee)
+                    @foreach ($this->employees as $employee)
                         {{ $employee->user->user_info->full_name }}{{ !$loop->last ? ' -' : '' }}
                     @endforeach
-        </span>
+                </span>
             </div>
         </div>
-        {{--        --}}{{--            @if (!$this->allUsersHaveTasks )--}}
+        {{--        @if (!$this->allUsersHaveTasks )--}}
         @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium )
             <form action="{{route('tasks.store', $this->meetings->id)}}" method="post" enctype="multipart/form-data">
                 @csrf
@@ -211,155 +199,16 @@
                 </div>
             </form>
         @endif
+        {{--        @endif--}}
 
-        <script>
-            function printTable() {
-                const meetingInfo = document.getElementById("meeting-info")?.innerHTML || '';
-                const table = document.getElementById("task-table").outerHTML;
-                const signatureSection = document.getElementById("signature-section")?.innerHTML || '';
-                const printWindow = window.open('', '', 'height=500,width=800');
-                printWindow.document.write('<html><head><title>Print Table</title>');
-                printWindow.document.write('<style>');
-                printWindow.document.write(`
-                @media screen {
-                    .print-only { display: none !important; }
-                }
-
-        @media print {
-            body {
-                font-family: "Vazir", Arial, sans-serif;
-                direction: rtl;
-                margin: 30px;
-                font-size: 12px;
-                color: #000;
-            }
-            button, .no-print, .print-hidden, .screen-only {
-                display: none !important;
-            }
-            .print-only {
-                display: inline !important;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 0;
-            }
-            th, td {
-                border: 1px solid #ccc;
-                padding: 6px 10px;
-                text-align: right;
-                vertical-align: top;
-            }
-            th {
-                background-color: #f5f5f5;
-                font-weight: bold;
-            }
-            h1, h3 {
-                text-align: center;
-                margin: 0 0 20px 0;
-                font-size: 18px;
-            }
-            .meeting-info-grid {
-              display: grid !important;
-              grid-template-columns: repeat(2, 1fr) !important;
-              gap: 2px 10px !important; /* smaller vertical gap */
-              margin-bottom: 12px !important;
-              background-color: #fafafa !important;
-              border: 1px solid #ccc !important;
-              border-radius: 4px !important;
-              padding: 8px !important;
-              direction: rtl !important;
-              font-size: 14px !important; /* slightly bigger but not overflowing */
-              color: #000 !important;
-            }
-
-            .meeting-info-grid div {
-              display: grid !important;
-              grid-template-columns: auto 1fr !important;
-              align-items: start !important;
-              gap: 4px !important;
-              white-space: normal !important; /* allow wrapping */
-              overflow-wrap: anywhere !important; /* break long words if needed */
-            }
-
-            .meeting-info-grid strong,
-            .meeting-info-grid span {
-              display: inline !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              line-height: 1.5 !important;
-            }
-            .meeting-info-grid div:last-child span {
-              white-space: normal !important;         /* allow wrapping if needed */
-              word-break: break-word !important;      /* break long names if no space */
-              display: block !important;
-              width: 100% !important;
-            }
-
-            .meeting-info-grid div:last-child {
-              grid-column: span 2 !important;         /* make it span the full grid width */
-            }
-
-            td a {
-                text-decoration: none;
-                color: #007bff;
-                white-space: pre-wrap;
-            }
-            .signature-section {
-                margin-top: 40px;
-                page-break-before: always;
-            }
-            .signature-card {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-            }
-            .signature-card img {
-                width: 40px;
-                height: 40px;
-                object-fit: contain;
-            }
-            .signature-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                gap: 12px;
-            }
-        }
-
-`);
-                printWindow.document.write('</style>');
-                printWindow.document.write('</head><body>');
-                printWindow.document.write('<h1>صورتجلسه</h1>');
-
-                // Add the meeting info container before the table
-                if (meetingInfo) {
-                    printWindow.document.write('<div class="meeting-info-grid">');
-                    printWindow.document.write(meetingInfo);
-                    printWindow.document.write('</div>');
-                }
-
-                // Add the table
-                printWindow.document.write(table);
-
-                if (signatureSection) {
-                    printWindow.document.write('<div class="signature-section">');
-                    printWindow.document.write(signatureSection);
-                    printWindow.document.write('</div>');
-                }
-                printWindow.document.write('</body></html>');
-                printWindow.document.close();
-                printWindow.print();
-            }
-        </script>
 
         <div class="overflow-x-auto rounded-xl border border-gray-300 shadow-sm">
             <table id="task-table" class="w-full text-right text-sm border-collapse">
                 <thead class="bg-gray-100 text-gray-700">
-                @foreach (['ردیف', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده','عملیات'] as $th)
-                    <th class="px-4 py-3 border-b border-gray-400  @if ($loop->last) screen-only @endif">{{ __($th) }}</th>
+                @foreach (['#', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده','عملیات'] as $th)
+                    <th class="px-4 py-3 border-b border-gray-400 @if ($loop->last) screen-only @endif @if ($loop->index === 4) no-print @endif">
+                        {{ __($th) }}
+                    </th>
                 @endforeach
                 </thead>
                 <tbody class="divide-y divide-gray-300">
@@ -379,69 +228,70 @@
                                 {{ $taskUser->time_out }}
                             </td>
 
-                            <td class="px-4 py-4 border-r border-gray-300">
+                            <td class="px-4 py-4 border-r border-gray-300" data-username="true">
                                 {{ $taskUser->user->user_info->full_name ?? '---' }}
                             </td>
 
                             {{-- Action description --}}
-                            <td class="px-4 py-4 border-r border-gray-300">
-                                {{-- your action rendering logic stays unchanged --}}
-                                @php
-                                    list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-                                    $todayDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
-                                    $isAfterTimeOut = $todayDate >= $taskUser->time_out;
-                                @endphp
+                            @php
+                                list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+                                $todayDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
+                                $isAfterTimeOut = $todayDate >= $taskUser->time_out;
+                            @endphp
 
-                                @if(!$isAfterTimeOut)
-                                    @if($taskUser->body_task && $taskUser->body_task !== '---')
-                                        {{-- Visible only on screen: toggle logic --}}
-                                        <div x-data="{ expanded: false }" class="screen-only">
-                                            <div x-show="!expanded" class="truncate">
-                                                {{ Str::words($taskUser->body_task, 5, '...') }}
-                                            </div>
-                                            <div x-show="expanded"
-                                                 class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">
-                                                {{ $taskUser->body_task }}
-                                            </div>
-                                            <button @click="expanded = !expanded"
-                                                    class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">
-                                                <template x-if="!expanded">
-                                                    <span class="flex items-center">
-                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
-                                                             stroke-width="2" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                  d="M19 9l-7 7-7-7"></path>
+                            {{-- Removed the column for شرح اقدام in print version --}}
+                                <td class="px-4 py-4 border-r border-gray-300 no-print">
+                                    @if(!$isAfterTimeOut)
+                                        @if($taskUser->body_task && $taskUser->body_task !== '---')
+                                            <!-- Content visible only on the page (screen-only) -->
+                                            <div x-data="{ expanded: false }" class="screen-only">
+                                                <div x-show="!expanded" class="truncate">
+                                                    {{ Str::words($taskUser->body_task, 5, '...') }}
+                                                </div>
+                                                <div x-show="expanded" class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">
+                                                    {{ $taskUser->body_task }}
+                                                </div>
+                                                <button @click="expanded = !expanded" class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">
+                                                    <template x-if="!expanded">
+                                                    <span class="no-print flex items-center">
+                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                                                         </svg>
-                                                        نمایش بیشتر
+                                                        {{__('نمایش بیشتر')}}
                                                     </span>
-                                                </template>
-                                                <template x-if="expanded">
-                                                    <span class="flex items-center">
-                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
-                                                             stroke-width="2" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                  d="M5 15l7-7 7 7"></path>
+                                                                                </template>
+                                                                                <template x-if="expanded">
+                                                    <span class="no-print flex items-center">
+                                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path>
                                                         </svg>
-                                                        نمایش کمتر
+                                                        {{__('نمایش کمتر')}}
                                                     </span>
-                                                </template>
-                                            </button>
-                                        </div>
-                                        {{-- Visible only in print --}}
-                                        <div class="print-only hidden">
-                                            {{ $taskUser->body_task }}
-                                        </div>
+                                                    </template>
+                                                </button>
+                                            </div>
+                                            <!-- Content only for printing (always visible in print) -->
+                                            <div class="task-card print-only" style="display: none;">
+                                             {{ $taskUser->body_task }}
+                                            </div>
+                                        @else
+                                            <span>---</span>
+                                        @endif
                                     @else
-                                        <span>---</span>
+                                        <div class="mt-2 text-sm text-gray-400">
+                                            {{ __('مهلت اقدام به پایان رسیده است') }}
+                                        </div>
+                                        <div class="task-card print-only" style="display: none;">
+                                            {{ __('پاسخی از سمت اقدام کننده در مهلت مقرر صورت نگرفت') }}
+                                        </div>
                                     @endif
-                                @else
-                                    <div class="mt-2 text-sm text-gray-400">
-                                        {{ __('مهلت اقدام به پایان رسیده است') }}
-                                    </div>
-                                @endif
-                            </td>
+                                </td>
 
-                            <td class="px-4 py-4 border-r border-gray-300">
+
+
+
+
+                                <td class="px-4 py-4 border-r border-gray-300">
                                 {{ $taskUser->sent_date ?? '---' }}
                             </td>
 
@@ -457,12 +307,12 @@
                                     </div>
                                     <div class="print-only hidden">{{ __('دارای فایل') }}</div>
                                 @else
-                                    <span class="text-gray-400 text-xs">{{__('بدون فایل')}}</span>
+                                    <span class="text-gray-400 print-only text-xs">{{__('بدون فایل')}}</span>
                                 @endif
                             </td>
 
                             <td class="px-4 py-4 border-r border-gray-300 text-center screen-only">
-                                {{--                                @can('acceptOrDeny',$taskUser)--}}
+                                {{--  @can('acceptOrDeny',$taskUser)--}}
                                 @if (auth()->id() === $taskUser->user_id && $taskUser->task_status === TaskStatus::PENDING)
                                     <div class="flex gap-2 justify-center">
                                         <x-primary-button wire:click="acceptTask({{ $task->id }})">
@@ -472,12 +322,8 @@
                                             {{ __('رد') }}
                                         </x-danger-button>
                                     </div>
-                                @elseif($taskUser->task_status === TaskStatus::DENIED)
-                                    <div class="text-center text-gray-500">
-                                        {{ __('درخواست به دبیرجلسه ارسال شده است.') }}
-                                    </div>
                                 @endif
-                                {{--                                @endcan--}}
+                                {{--  @endcan--}}
                                 @can('scriptoriumCanEdit', $taskUser)
                                     <x-secondary-button wire:click="openModalScriptorium({{$taskUser->id}})">
                                         {{ __('ویرایش') }}
@@ -500,6 +346,8 @@
                 @endforeach
                 </tbody>
             </table>
+
+            <script src="{{ asset('js/printTable.js') }}"></script>
         </div>
 
 
@@ -547,6 +395,7 @@
                     class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
                 {{__('چاپ صوتجلسه')}}
             </button>
+
         @endif
 
     </div>

@@ -136,12 +136,6 @@
             </h2>
 {{--                        Scriptorium Information--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-{{--                <div>--}}
-{{--                    <x-input-label for="boss" :value="__('نام رئیس جلسه')"/>--}}
-{{--                    <x-text-input name="boss" id="boss" value="{{old('boss')}}"--}}
-{{--                                  class="block" type="text" autofocus/>--}}
-{{--                    <x-input-error :messages="$errors->get('boss')"/>--}}
-{{--                </div>--}}
                 <div x-data="dropdown()" class="relative w-full col-span-2" x-init="initOptions({{ $users }})">
                     <x-input-label for="boss" class="mb-2" :value="__('رئیس جلسه')"/>
 

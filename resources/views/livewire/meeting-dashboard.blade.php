@@ -102,6 +102,14 @@
                     </x-select-input>
                 </div>
 
+                <div class="col-span-6 sm:col-span-1">
+                    <x-input-label for="scriptoriumFilter" value="{{ __('نوع نمایش') }}"/>
+                    <x-select-input id="scriptoriumFilter" wire:model="scriptoriumFilter">
+                        <option value="all">{{__('همه جلسات')}}</option>
+                        <option value="mine">{{__('جلسات من')}}</option>
+                    </x-select-input>
+                </div>
+
                 <!-- Date Inputs (side-by-side) -->
                 <div class="col-span-6 sm:col-span-3 lg:col-span-2">
                     <div class="flex flex-col sm:flex-row gap-4">
@@ -123,7 +131,7 @@
                 <!-- Search + Show All Buttons -->
                 <div class="col-span-6 lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
                     <x-search-button>{{ __('جست و جو') }}</x-search-button>
-                    @if($search || $start_date || $statusFilter !== '')
+                    @if($search || $start_date || $statusFilter !== '' || $scriptoriumFilter !== '')
                         <x-view-all-link href="{{ route('dashboard.meeting') }}">
                             {{ __('نمایش همه') }}
                         </x-view-all-link>
@@ -260,7 +268,7 @@
                                         <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                             {{ __('نمایش') }}
                                         </x-dropdown-link>
-                                        @if($meeting->status === MeetingStatus::IS_IN_PROGRESS && auth()->user()->user_info->full_name === $meeting->scriptorium)
+                                        @if($meeting->status === MeetingStatus::PENDING && auth()->user()->user_info->full_name === $meeting->scriptorium)
                                             <x-dropdown-link href="#">
                                                 {{ __('ویرایش') }}
                                             </x-dropdown-link>

@@ -20,7 +20,7 @@
         <h3 class="text-sm font-semibold">  {{__('پیغام های دریافتی')}}</h3>
         <span wire:poll.visible.60s
               class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-            {{$this->messages()}}
+            {{$this->messagesNotification()}}
         </span>
     </x-notification-link>
 
