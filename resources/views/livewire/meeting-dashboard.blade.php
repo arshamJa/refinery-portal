@@ -103,7 +103,7 @@
                 </div>
 
                 <div class="col-span-6 sm:col-span-1">
-                    <x-input-label for="scriptoriumFilter" value="{{ __('نوع نمایش') }}"/>
+                    <x-input-label for="scriptoriumFilter" value="{{ __('دبیرجلسات') }}"/>
                     <x-select-input id="scriptoriumFilter" wire:model="scriptoriumFilter">
                         <option value="all">{{__('همه جلسات')}}</option>
                         <option value="mine">{{__('جلسات من')}}</option>
@@ -164,12 +164,12 @@
 
             </div>
         </form>
-        <div class=" w-full overflow-x-auto overflow-y-hidden  mb-4 pb-12">
+        <div class="w-full overflow-x-auto overflow-y-hidden mb-4 pb-12">
             <x-table.table>
                 <x-slot name="head">
                     <x-table.row>
                         @foreach ([
-                                'ردیف','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','مشاهده اعضا','وضعیت جلسه','رویت صورتجلسه',''
+                                '#','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','رد/تایید(جلسه)','وضعیت جلسه','اتاق جلسه','قابلیت'
                             ] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
@@ -215,7 +215,6 @@
                                         </span>
                                         @break
 
-
                                     @case(MeetingStatus::IS_IN_PROGRESS)
                                         <span
                                             class="block w-full bg-blue-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
@@ -225,7 +224,7 @@
 
                                     @case(MeetingStatus::IS_FINISHED)
                                         <span
-                                            class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg shadow-sm m-1">
+                                            class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg m-1">
                                             {{ __('جلسه خاتمه یافت') }}
                                         </span>
                                         @break
@@ -241,15 +240,15 @@
                             <x-table.cell>
                                 @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED)
                                     <button wire:click="startMeeting({{ $meeting->id }})"
-                                            class="text-sm px-3 py-1 text-white bg-pink-600 hover:ring-2 hover:ring-pink-800 hover:ring-offset-2 rounded-lg transition-all duration-300">
+                                            class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-pink-500 text-white hover:bg-pink-600 hover:outline-none hover:ring-2 hover:ring-pink-500 hover:ring-offset-2">
                                         {{ __('شروع جلسه') }}
                                     </button>
                                 @elseif($meeting->status == MeetingStatus::IS_IN_PROGRESS || $meeting->status == MeetingStatus::IS_FINISHED)
-                                    <a href="{{route('tasks.create',$meeting->id)}}">
-                                        <x-primary-button>
-                                            {{ __('نمایش') }}
-                                        </x-primary-button>
+                                    <a href="{{route('tasks.create',$meeting->id)}}" class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-neutral-600 text-white hover:bg-neutral-700 hover:outline-none hover:ring-2 hover:ring-neutral-500 hover:ring-offset-2">
+                                        {{ __('نمایش صورتجلسه') }}
                                     </a>
+                                @else
+                                    {{__('---')}}
                                 @endif
                             </x-table.cell>
                             <x-table.cell>

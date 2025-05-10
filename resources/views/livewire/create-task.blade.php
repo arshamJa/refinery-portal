@@ -369,7 +369,6 @@
                 @endforeach
                 </tbody>
             </table>
-
             <script src="{{ asset('js/printTable.js') }}"></script>
         </div>
 
@@ -423,10 +422,10 @@
 
     </div>
 
-
+    {{--    this one has wire:target--}}
     <x-modal name="view-task-details-modal" maxWidth="4xl" :closable="false">
         @if ($selectedTask)
-            <form wire:submit="submitTaskForm({{ $selectedTask->id}})" enctype="multipart/form-data">
+            <form wire:submit.prevent="submitTaskForm({{ $selectedTask->id}})" enctype="multipart/form-data">
                 <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
                     <div class="border-b pb-4">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('جزئیات') }}</h2>
@@ -446,13 +445,23 @@
                     <div class="mt-4">
                         <x-input-label for="files" :value="__('آپلود فایل مرتبط')" class="mb-2"/>
                         <input type="file" wire:model="files" multiple class="w-full text-sm text-gray-500"/>
+                        <div wire:loading wire:target="files" class="text-blue-500 text-sm mt-2">{{ __('در حال آپلود فایل...') }}</div>
                         <x-input-error :messages="$errors->get('files')"/>
                     </div>
 
                     <div class="pt-4 flex justify-between gap-2">
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        <x-primary-button type="submit"
+                                          wire:target="submitTaskForm"
+                                          wire:loading.attr="disabled"
+                                          wire:loading.class="opacity-50">
+                        <span wire:loading.remove wire:target="submitTaskForm">
                             {{ __('ثبت') }}
-                        </button>
+                        </span>
+                        <span wire:loading wire:target="submitTaskForm" class="ml-2">
+                            {{ __('در حال ثبت...') }}
+                        </span>
+                        </x-primary-button>
+
                         <button type="button" x-on:click="$dispatch('close')"
                                 class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
                             {{ __('لغو') }}
@@ -476,7 +485,7 @@
                     <button type="button"
                             x-on:click="show = false"
                             class="text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
-                        &times;
+                        X
                     </button>
                 </div>
 
@@ -546,11 +555,10 @@
                         {{ __('به‌روزرسانی') }}
                     </x-primary-button>
                     <a href="{{route('tasks.create',$selectedTask->task->meeting_id)}}">
-                        <x-secondary-button type="button" class="px-4 py-2 text-sm">
-                            {{ __('لغو') }}
-                        </x-secondary-button>
+                        <x-cancel-button>
+                            {{ __('انصراف') }}
+                        </x-cancel-button>
                     </a>
-
                 </div>
             </form>
         @endif
@@ -640,26 +648,33 @@
     @endif
 
     <x-modal name="deny-task" :closable="false">
-        <form wire:submit="denyTask">
-            <div class="px-6 py-4">
-                <label for="request_task" class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ __('دلیل رد خلاصه مذاکره') }}
-                </label>
-                <textarea wire:model.defer="request_task" id="request_task" rows="4"
-                          class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+        @if ($selectedTask)
+            <form wire:submit="denyTask">
+                <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
+                    <div class="grid grid-cols-1 gap-4">
+                        <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
+                    </div>
+                    <div>
+                        <label for="request_task" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ __('دلیل رد خلاصه مذاکره') }}
+                        </label>
+                        <textarea wire:model.defer="request_task" id="request_task" rows="4"
+                                  class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
             </textarea>
-                <x-input-error :messages="$errors->get('request_task')"/>
-            </div>
+                        <x-input-error :messages="$errors->get('request_task')"/>
+                    </div>
 
-            <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                <x-primary-button type="submit">
-                    {{ __('تایید') }}
-                </x-primary-button>
-                <x-cancel-button x-on:click="$dispatch('close')">
-                    {{ __('انصراف') }}
-                </x-cancel-button>
-            </div>
-        </form>
+                </div>
+                <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
+                    <x-primary-button type="submit">
+                        {{ __('ثبت') }}
+                    </x-primary-button>
+                    <x-cancel-button x-on:click="$dispatch('close')">
+                        {{ __('انصراف') }}
+                    </x-cancel-button>
+                </div>
+            </form>
+        @endif
     </x-modal>
 
     <x-modal name="edit-by-scriptorium" :closable="false">

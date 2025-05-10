@@ -199,14 +199,15 @@ class CreateTask extends Component
         ]);
     }
 
-    /**
-     * @throws AuthorizationException
-     */
+
+
     public function openDenyModal($taskUserId)
     {
-        $taskUser = TaskUser::findOrFail($taskUserId);
-//        $this->authorize('acceptOrDeny', $taskUser);
-        $this->taskUserId = $taskUser->id;
+        $taskUser = TaskUser::with([
+            'task:id,body,meeting_id',
+            'user.user_info:id,user_id,full_name'
+        ])->findOrFail($taskUserId);
+        $this->selectedTask = $taskUser;
         $this->dispatch('crud-modal', name: 'deny-task');
     }
 
