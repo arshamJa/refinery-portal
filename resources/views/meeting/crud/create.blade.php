@@ -39,16 +39,14 @@
     </nav>
     <form action="{{route('meeting.store')}}" method="post" enctype="multipart/form-data">
         @csrf
-
-
         <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
-{{--                        Meeting Information--}}
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
-                    {{ __('بخش اطلاعات جلسه') }}
-                </h2>
+            {{--                        Meeting Information--}}
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
+                {{ __('بخش اطلاعات جلسه') }}
+            </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
 
-{{--                                Meeting Title--}}
+                {{--                                Meeting Title--}}
                 <div>
                     <x-input-label for="title" :value="__('موضوع جلسه')"/>
                     <x-text-input name="title" id="title"
@@ -56,7 +54,7 @@
                                   type="text" autofocus/>
                     <x-input-error :messages="$errors->get('title')"/>
                 </div>
-{{--                                Meeting Location--}}
+                {{--                                Meeting Location--}}
                 <div>
                     <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
                     <x-text-input name="location" id="location"
@@ -64,7 +62,7 @@
                                   class="block " type="text" autofocus/>
                     <x-input-error :messages="$errors->get('location')"/>
                 </div>
-{{--                                Treating--}}
+                {{--                                Treating--}}
                 <div>
                     <x-input-label for="treat" :value="__('پذیرایی')"/>
                     <label for="yes">
@@ -79,7 +77,7 @@
                 </div>
             </div>
 
-{{--                        Time & Date--}}
+            {{--                        Time & Date--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 ">
                 <div>
                     <x-input-label for="year" :value="__('سال')"/>
@@ -134,77 +132,61 @@
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 border-b pb-2">
                 {{ __('بخش دبیرجلسه') }}
             </h2>
-{{--                        Scriptorium Information--}}
+            {{--                        Scriptorium Information--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-                <div x-data="dropdown()" class="relative w-full col-span-2" x-init="initOptions({{ $users }})">
+                <div x-data="dropdown()" class="relative w-full col-span-2"
+                     x-init="initOptions({{ $users }}, '{{ old('boss') }}')">
                     <x-input-label for="boss" class="mb-2" :value="__('رئیس جلسه')"/>
 
                     <!-- Dropdown Button -->
-                    <button type="button" @click="open = !open" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-left text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
-                        <span class="text-right w-full" x-text="selected ? selected.full_name + ' - ' + (selected.department ? selected.department.department_name : 'No department') + ' - ' + selected.position : '...'"></span>
+                    <button type="button" @click="open = !open"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-left text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+                        <span class="text-right w-full"
+                              x-text="selected ? selected.full_name + ' - ' + (selected.department ? selected.department.department_name : 'No department') + ' - ' + selected.position : '...'"></span>
                         <!-- Down Arrow Icon -->
-                        <svg x-show="!open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        <svg x-show="!open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 9l-7 7-7-7"></path>
                         </svg>
-                        <svg x-show="open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                        <svg x-show="open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M5 15l7-7 7 7"></path>
                         </svg>
                     </button>
-
                     <!-- Dropdown Menu -->
-                    <div x-show="open" @click.away="open = false" class="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
+                    <div x-show="open" @click.away="open = false"
+                         class="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
                         <!-- Search Input -->
                         <div class="px-4 py-2">
-                            <input type="text" x-model="search" placeholder="جست و جو" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" x-model="search" placeholder="جست و جو"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
 
                         <!-- Dropdown Options -->
                         <ul class="space-y-1">
                             <!-- Null Option -->
-                            <li @click="select(null)" class="px-4 py-2 text-gray-600 hover:bg-blue-50 cursor-pointer rounded-lg">
+                            <li @click="select(null)"
+                                class="px-4 py-2 text-gray-600 hover:bg-blue-50 cursor-pointer rounded-lg">
                                 <span>...</span>
                             </li>
 
                             <!-- User List -->
                             <template x-for="user in filteredOptions" :key="user.id">
-                                <li @click="select(user)" class="px-4 py-2 text-gray-700 hover:bg-blue-50 cursor-pointer rounded-lg">
-                                    <span x-text="user.full_name + ' - ' + (user.department ? user.department.department_name : 'No department') + ' - ' + user.position"></span>
+                                <li @click="select(user)"
+                                    class="px-4 py-2 text-gray-700 hover:bg-blue-50 cursor-pointer rounded-lg">
+                                    <span
+                                        x-text="user.full_name + ' - ' + (user.department ? user.department.department_name : 'No department') + ' - ' + user.position"></span>
                                 </li>
                             </template>
                         </ul>
                     </div>
-
                     <!-- Hidden input to store the selected user's ID -->
-                    <input type="hidden" name="boss" x-bind:value="selected ? selected.id : ''">
-
+                    <input type="hidden" name="boss" x-bind:value="selected ? selected.id : '{{ old('boss') }}'">
+                    <!-- Show Laravel validation error message if any -->
                     <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
-
-                    <script>
-                        function dropdown() {
-                            return {
-                                open: false,
-                                search: '',
-                                selected: null,
-                                options: [],
-                                initOptions(data) {
-                                    this.options = data;
-                                },
-                                select(user) {
-                                    this.selected = user;
-                                    this.open = false;
-                                    this.search = '';
-                                },
-                                get filteredOptions() {
-                                    if (!this.search) return this.options;
-                                    return this.options.filter(user =>
-                                        user.full_name.toLowerCase().includes(this.search.toLowerCase()) ||
-                                        (user.department && user.department.department_name.toLowerCase().includes(this.search.toLowerCase())) ||
-                                        (user.position && user.position.toLowerCase().includes(this.search.toLowerCase()))
-                                    );
-                                }
-                            }
-                        }
-                    </script>
+                    <script src="{{ asset('js/bossScriptorium-dropdown.js') }}" defer></script>
                 </div>
 
 
@@ -252,14 +234,15 @@
                 {{ __('بخش اعضا و مهمان') }}
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
-{{--                            Participants Information--}}
+                {{--                            Participants Information--}}
                 <div class="col-span-2">
                     <x-input-label for="holders" class="mb-2"
                                    :value="__('انتخاب اعضای جلسه یا حاضرین در جلسه')"/>
                     <div class="custom-select">
                         <div class="select-box">
-                            <input type="text" class="tags_input" multiple name="holders" hidden>
-                            <div class="selected-options"></div>
+                            <!-- The selected values will be stored in the "holders" input -->
+                            <input type="text" class="tags_input" multiple name="holders" hidden
+                                   value="{{ is_array(old('holders')) ? implode(',', old('holders')) : old('holders') }}">                            <div class="selected-options"></div>
                             <div class="arrow">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5"
@@ -288,22 +271,20 @@
                             <div class="no-result-message" style="display:none;">No result match</div>
                         </div>
                     </div>
-                    <x-input-error :messages="$errors->get('holders')"/>
+                    <x-input-error :messages="$errors->get('holders')" />
                 </div>
-{{--                            Guests--}}
+
+                {{--                            Guests--}}
                 <div class="col-span-2">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-700">{{__('لیست مهمانان')}}</label>
                         <div class="flex items-center space-x-4 mb-4">
                             <input type="checkbox" id="outer-organization-checkbox" class="h-4 w-4 text-blue-600"/>
-                            <label for="outer-organization-checkbox"
-                                   class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
+                            <label for="outer-organization-checkbox" class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
                         </div>
                         <!-- Table for inner_organization (default table) -->
-                        <div id="inner-organization-table"
-                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
-                            <table id="guests-inner-table"
-                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                        <div id="inner-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
+                            <table id="guests-inner-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-2 text-right">#</th>
@@ -329,10 +310,8 @@
                         </div>
 
                         <!-- Table for outer_organization (will appear when checkbox is checked) -->
-                        <div id="outer-organization-table"
-                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
-                            <table id="guests-outer-table"
-                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                        <div id="outer-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
+                            <table id="guests-outer-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-2 text-right">#</th>
@@ -358,107 +337,11 @@
                         </div>
                         <x-input-error :messages="$errors->get('guest')" class="mt-2"/>
                     </div>
+                    <div id="guests-data"
+                         data-inner-guests="{{ json_encode(old('guests.inner', [])) }}"
+                         data-outer-guests="{{ json_encode(old('guests.outer', [])) }}">
+                    </div>
                 </div>
-
-                <script>
-                    // Initialize empty arrays for guests
-                    let innerGuests = @json(old('guests.inner', [])); // Use old data if available
-                    let outerGuests = @json(old('guests.outer', [])); // Use old data if available
-
-                    // Get references to the DOM elements
-                    const innerGuestsTbody = document.getElementById('guests-inner-tbody');
-                    const outerGuestsTbody = document.getElementById('guests-outer-tbody');
-                    const addInnerGuestBtn = document.getElementById('add-inner-guest-btn');
-                    const addOuterGuestBtn = document.getElementById('add-outer-guest-btn');
-                    const outerOrganizationCheckbox = document.getElementById('outer-organization-checkbox');
-                    const innerOrganizationTable = document.getElementById('inner-organization-table');
-                    const outerOrganizationTable = document.getElementById('outer-organization-table');
-
-                    // Function to add a new inner organization guest
-                    function addInnerGuest() {
-                        const index = innerGuests.length;
-                        const guest = {name: '', department: ''}; // Default empty values
-                        innerGuests.push(guest);
-                        renderInnerGuests(); // Re-render the inner guest table
-                    }
-
-                    // Function to add a new outer organization guest
-                    function addOuterGuest() {
-                        const index = outerGuests.length;
-                        const guest = {name: '', companyName: ''}; // Default empty values
-                        outerGuests.push(guest);
-                        renderOuterGuests(); // Re-render the outer guest table
-                    }
-
-                    // Function to remove an inner organization guest by index
-                    function removeInnerGuest(index) {
-                        innerGuests.splice(index, 1);
-                        renderInnerGuests();
-                    }
-
-                    // Function to remove an outer organization guest by index
-                    function removeOuterGuest(index) {
-                        outerGuests.splice(index, 1);
-                        renderOuterGuests();
-                    }
-
-                    // Function to update an inner organization guest's data
-                    function updateInnerGuest(index, field, value) {
-                        innerGuests[index][field] = value;
-                    }
-
-                    // Function to update an outer organization guest's data
-                    function updateOuterGuest(index, field, value) {
-                        outerGuests[index][field] = value;
-                    }
-
-                    // Function to render all inner organization guests as table rows
-                    function renderInnerGuests() {
-                        innerGuestsTbody.innerHTML = '';
-                        innerGuests.forEach((guest, index) => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                <td class="px-4 py-2">${index + 1}</td>
-                <td class="px-4 py-2"><input type="text" name="guests[inner][${index}][name]" value="${guest.name}" class="w-full" placeholder="نام مهمان" /></td>
-                <td class="px-4 py-2"><input type="text" name="guests[inner][${index}][department]" value="${guest.department}" class="w-full" placeholder="واحد سازمانی" /></td>
-                <td class="px-4 py-2 text-center"><button type="button" class="text-red-600" onclick="removeInnerGuest(${index})">×</button></td>
-            `;
-                            innerGuestsTbody.appendChild(row);
-                        });
-                    }
-
-                    // Function to render all outer organization guests as table rows
-                    function renderOuterGuests() {
-                        outerGuestsTbody.innerHTML = '';
-                        outerGuests.forEach((guest, index) => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                <td class="px-4 py-2">${index + 1}</td>
-                <td class="px-4 py-2"><input type="text" name="guests[outer][${index}][name]" value="${guest.name}" class="w-full" placeholder="نام مهمان" /></td>
-                <td class="px-4 py-2"><input type="text" name="guests[outer][${index}][companyName]" value="${guest.companyName}" class="w-full" placeholder="نام شرکت" /></td>
-                <td class="px-4 py-2 text-center"><button type="button" class="text-red-600" onclick="removeOuterGuest(${index})">×</button></td>
-            `;
-                            outerGuestsTbody.appendChild(row);
-                        });
-                    }
-
-                    // Event listener for adding guests
-                    addInnerGuestBtn.addEventListener('click', addInnerGuest);
-                    addOuterGuestBtn.addEventListener('click', addOuterGuest);
-
-                    // Toggle the visibility of the outer organization table based on checkbox
-                    outerOrganizationCheckbox.addEventListener('change', () => {
-                        if (outerOrganizationCheckbox.checked) {
-                            outerOrganizationTable.classList.remove('hidden');
-                        } else {
-                            outerOrganizationTable.classList.add('hidden');
-                        }
-                    });
-
-                    // Initial render of tables
-                    renderInnerGuests();
-                </script>
-
                 <div class="col-span-1 mt-12">
                     <x-primary-button type="submit">
                         {{ __('ارسال') }}
@@ -472,5 +355,6 @@
             </div>
         </div>
     </form>
+    <script src="{{ asset('js/createGuest.js') }}"></script>
 </x-app-layout>
 

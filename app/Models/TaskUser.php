@@ -38,4 +38,8 @@ class TaskUser extends Model
     {
         return $this->hasMany(TaskUserFile::class);
     }
+    public function full_name()
+    {
+        return UserInfo::where('user_id',$this->user_id)->value('full_name');
+    }
 }

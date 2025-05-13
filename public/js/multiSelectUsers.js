@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const customSelects = document.querySelectorAll(".custom-select");
 
+    // Function to update the selected options display
     function updateSelectedOptions(customSelect) {
         const selectedOptions = Array.from(customSelect.querySelectorAll(".option.active"))
             .filter(option => option !== customSelect.querySelector(".option.all-tags")).map(function (option) {
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         customSelect.querySelector(".tags_input").value = selectedValues.join(', ');
+
         let tagsHTML = "";
         if (selectedOptions.length === 0) {
             tagsHTML = '<span class="placeholder">...</span>';
@@ -24,16 +26,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
             selectedOptions.forEach(function (option, index) {
                 if (index < maxTagsToShow) {
-                    tagsHTML += '<span class="tag">'+option.text+'<span class="remove-tag" data-value="'+option.value+'">&times;</span></span>';
+                    tagsHTML += '<span class="tag">' + option.text + '<span class="remove-tag" data-value="' + option.value + '">&times;</span></span>';
                 } else {
                     additionalTagsCount++;
                 }
             });
 
             if (additionalTagsCount > 0) {
-                tagsHTML += '<span class="tag">+'+additionalTagsCount+'</span>';
+                tagsHTML += '<span class="tag">+' + additionalTagsCount + '</span>';
             }
         }
+
         customSelect.querySelector(".selected-options").innerHTML = tagsHTML;
     }
 
@@ -44,6 +47,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const options = customSelect.querySelectorAll(".option");
         const allTagsOption = customSelect.querySelector(".option.all-tags");
         const clearButton = customSelect.querySelector(".clear");
+
+        // Pre-select old values (if any)
+        const oldValues = customSelect.querySelector(".tags_input").value.split(',').map(val => val.trim());
+        options.forEach(function (option) {
+            if (oldValues.includes(option.getAttribute("data-value"))) {
+                option.classList.add("active");
+            }
+        });
 
         allTagsOption.addEventListener("click", function () {
             const isActive = allTagsOption.classList.contains("active");
@@ -62,72 +73,51 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             noResultMessage.style.display = "none";
         });
-        document.querySelector(".search-tags").addEventListener('keyup', function () {
-            const filter = this.value.toUpperCase();
-            const items = document.querySelectorAll(".option");
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                const text = item.textContent || item.innerText;
-                if (text.toUpperCase().indexOf(filter) > -1) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            }
-        });
-    });
 
-    customSelects.forEach(function (customSelect) {
-        const options = customSelect.querySelectorAll(".option");
+        searchInput.addEventListener('keyup', function () {
+            const filter = this.value.toUpperCase();
+            const items = customSelect.querySelectorAll(".option");
+            items.forEach(function (item) {
+                const text = item.textContent || item.innerText;
+                item.style.display = text.toUpperCase().indexOf(filter) > -1 ? '' : 'none';
+            });
+        });
+
         options.forEach(function (option) {
             option.addEventListener("click", function () {
                 option.classList.toggle("active");
                 updateSelectedOptions(customSelect);
             });
         });
-    });
 
-    document.addEventListener("click", function (event) {
-        const removeTag = event.target.closest(".remove-tag");
-        if (removeTag) {
-            const customSelect = removeTag.closest(".custom-select");
-            const valueToRemove = removeTag.getAttribute("data-value");
-            const optionToRemove = customSelect.querySelector(".option[data-value='"+valueToRemove+"']");
-            optionToRemove.classList.remove("active");
-            const otherSelectedOptions = customSelect.querySelectorAll(".option.active:not(.all-tags)");
-            const allTagsOption = customSelect.querySelector(".option.all-tags");
-
-            if (otherSelectedOptions.length === 0) {
-                allTagsOption.classList.remove("active");
-            }
-            updateSelectedOptions(customSelect);
-        }
-    });
-    const selectBoxes = document.querySelectorAll(".select-box");
-    selectBoxes.forEach(function (selectBox) {
-        selectBox.addEventListener("click", function (event) {
-            if (!event.target.closest(".tag")) {
-                selectBox.parentNode.classList.toggle("open");
+        document.addEventListener("click", function (event) {
+            const removeTag = event.target.closest(".remove-tag");
+            if (removeTag) {
+                const customSelect = removeTag.closest(".custom-select");
+                const valueToRemove = removeTag.getAttribute("data-value");
+                const optionToRemove = customSelect.querySelector(".option[data-value='" + valueToRemove + "']");
+                optionToRemove.classList.remove("active");
+                updateSelectedOptions(customSelect);
             }
         });
-    });
 
-    document.addEventListener("click", function (event) {
-        if (!event.target.closest(".custom-select") && !event.target.classList.contains("remove-tag")) {
-            customSelects.forEach(function (customSelect) {
-                customSelect.classList.remove("open");
+        const selectBoxes = customSelect.querySelectorAll(".select-box");
+        selectBoxes.forEach(function (selectBox) {
+            selectBox.addEventListener("click", function (event) {
+                if (!event.target.closest(".tag")) {
+                    selectBox.parentNode.classList.toggle("open");
+                }
             });
-        }
-    });
-
-    function resetCustomSelects() {
-        customSelects.forEach(function (customSelect) {
-            customSelect.querySelector(".option.active").forEach(function (option) {
-                option.classList.remove("active");
-            });
-            customSelect.querySelector(".option.all-tags").classList.remove("active");
-            updateSelectedOptions(customSelect);
         });
-    }
-    updateSelectedOptions(customSelects[0]);
+
+        document.addEventListener("click", function (event) {
+            if (!event.target.closest(".custom-select") && !event.target.classList.contains("remove-tag")) {
+                customSelects.forEach(function (customSelect) {
+                    customSelect.classList.remove("open");
+                });
+            }
+        });
+
+        updateSelectedOptions(customSelect);
+    });
 });

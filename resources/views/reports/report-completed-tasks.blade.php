@@ -34,7 +34,8 @@
             </li>
         </ol>
     </nav>
-    <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
+
+    <div class="pt-4 px-6 sm:pt-6 border shadow-md rounded-md">
         <form method="GET" action="{{route('completedTasks')}}">
             @csrf
             <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
@@ -84,39 +85,37 @@
                 </div>
             </div>
         </form>
-
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead
-                class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                @foreach (['ردیف', 'موضوع جلسه','دبیر جلسه', 'اقدام کننده',
-                              'تاریخ انجام اقدام','تاریخ مهلت اقدام'] as $th)
-                    <th class="px-4 py-3">{{ __($th) }}</th>
-                @endforeach
-            </tr>
-            </thead>
-            <tbody>
-            @forelse($tasks as $task)
-                <tr class="px-4 py-3 border-b text-center" wire:key="{{$task->id}}">
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->full_name()}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
-                </tr>
-            @empty
-                <tr class="border-b dark:border-gray-700">
-                    <th colspan="8"
-                        class="text-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                        {{__('رکوردی یافت نشد ...')}}
-                    </th>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-        <span class="p-2 mx-2">
-            {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
+        <div class="w-full overflow-x-hidden mb-4 mt-4 pb-12">
+            <x-table.table>
+                <x-slot name="head">
+                    <x-table.row>
+                        @foreach (['#', 'موضوع جلسه','دبیر جلسه', 'اقدام کننده', 'تاریخ انجام اقدام','تاریخ مهلت اقدام'] as $th)
+                            <x-table.heading>{{ __($th) }}</x-table.heading>
+                        @endforeach
+                    </x-table.row>
+                </x-slot>
+                <x-slot name="body">
+                    @forelse($taskUsers as $taskUser)
+                        <x-table.row wire:key="taskUser-{{ $taskUser->id }}">
+                            <x-table.cell>{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->task->meeting->title }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->task->meeting->scriptorium }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->full_name() }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->sent_date }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
+                        </x-table.row>
+                    @empty
+                        <x-table.row>
+                            <x-table.cell colspan="6" class="py-6 text-center">
+                                {{ __('رکوردی یافت نشد ...') }}
+                            </x-table.cell>
+                        </x-table.row>
+                    @endforelse
+                </x-slot>
+            </x-table.table>
+            <span class="p-2 mx-2">
+            {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
         </span>
+        </div>
     </div>
 </x-app-layout>

@@ -1,9 +1,8 @@
-
-    function printTable() {
+function printTable() {
     const meetingInfo = document.getElementById("meeting-info")?.innerHTML || '';
     const table = document.getElementById("task-table").outerHTML;
     const signatureSection = document.getElementById("signature-section")?.innerHTML || '';
-    const logo ='<img src="/fajrgam-b.png" alt="Logo">';
+    const logo = '<img src="/fajrgam-b.png" alt="Logo">';
     const printWindow = window.open('', '', 'height=500,width=800');
     printWindow.document.write('<html><head><title>پرینت صورتجلسه</title>');
     printWindow.document.write('<style>');
@@ -128,10 +127,10 @@
 
     // Add the meeting info container before the table
     if (meetingInfo) {
-    printWindow.document.write('<div class="meeting-info-grid">');
-    printWindow.document.write(meetingInfo);
-    printWindow.document.write('</div>');
-}
+        printWindow.document.write('<div class="meeting-info-grid">');
+        printWindow.document.write(meetingInfo);
+        printWindow.document.write('</div>');
+    }
 
     // Add the table
     printWindow.document.write(table);
@@ -142,39 +141,40 @@
     // Collect all rows and group tasks by user
     const taskMap = {};
     document.querySelectorAll("#task-table tbody tr").forEach(row => {
-    const taskBody = row.querySelector(".print-only")?.innerText.trim();
-    const userName = row.querySelector("td[data-username]")?.innerText.trim() || "نام کاربر ناشناس";
+        const taskBody = row.querySelector(".print-only")?.innerText.trim();
+        const userName = row.querySelector("td[data-username]")?.innerText.trim() || "نام کاربر ناشناس";
 
-    if (taskBody && userName && taskBody !== '---' && taskBody !== '' && taskBody !== 'بدون فایل') {
-    if (!taskMap[userName]) {
-    taskMap[userName] = [];
-}
-    taskMap[userName].push(taskBody);
-}
-});
+        if (taskBody && userName && taskBody !== '---' && taskBody !== '' && taskBody !== 'بدون فایل') {
+            if (!taskMap[userName]) {
+                taskMap[userName] = [];
+            }
+            taskMap[userName].push(taskBody);
+        }
+    });
 
     // Write each user's tasks in the print window
     Object.keys(taskMap).forEach(userName => {
-    printWindow.document.write(`<div class="task-card">`);
-    printWindow.document.write(`<strong>${userName}</strong>`);
-    taskMap[userName].forEach(task => {
-    printWindow.document.write(`<p>- ${task}</p>`);
-});
-    printWindow.document.write('</div>');
-});
+        printWindow.document.write(`<div class="task-card">`);
+        printWindow.document.write(`<strong>${userName}</strong>`);
+        taskMap[userName].forEach(task => {
+            printWindow.document.write(`<p>- ${task}</p>`);
+        });
+        printWindow.document.write('</div>');
+    });
+
 
     printWindow.document.write('</div>');
 
     if (signatureSection) {
-    printWindow.document.write('<div class="signature-section">');
-    printWindow.document.write(signatureSection);
-    printWindow.document.write('</div>');
-}
+        printWindow.document.write('<div class="signature-section">');
+        printWindow.document.write(signatureSection);
+        printWindow.document.write('</div>');
+    }
 
     printWindow.document.write('</body></html>');
     printWindow.document.close();
     setTimeout(() => {
-    printWindow.print();
-}, 1000); // Wait 1 second before printing
+        printWindow.print();
+    }, 1000); // Wait 1 second before printing
 }
 

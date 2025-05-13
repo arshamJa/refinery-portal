@@ -27,7 +27,17 @@
     <div class="mb-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             @can('create-meeting')
-                <x-create-link href="{{route('meeting.create')}}">{{__('ایجاد جلسه جدید')}}</x-create-link>
+                <a href="{{route('meeting.create')}}"
+                   class="inline-flex items-center  gap-2 px-5 py-4 rounded-xl text-white bg-gradient-to-r from-[#4332BD] to-[#6B5CFF] hover:from-[#3624A7] hover:to-[#5949F6] transition-all duration-300 ease-in-out shadow-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 4.5v15m7.5-7.5h-15"/>
+                    </svg>
+                    <span class="text-sm font-medium">
+                        {{__('ایجاد جلسه جدید')}}
+                    </span>
+                </a>
             @endcan
             <a href="{{route('my.task.table')}}"
                class="inline-flex items-center gap-2 px-5 py-4 rounded-xl text-white bg-gradient-to-r from-[#FF6F61] to-[#4C6EF5] transition-all duration-300 ease-in-out shadow-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
@@ -147,9 +157,9 @@
                              class="animate-spin h-5 w-5 mr-2 text-white"
                              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10"
-                                    stroke="currentColor" stroke-width="4" />
+                                    stroke="currentColor" stroke-width="4"/>
                             <path class="opacity-75" fill="currentColor"
-                                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
                         </svg>
                         {{-- Button Text --}}
                         <span wire:loading.remove wire:target="exportExcel">
@@ -164,12 +174,12 @@
 
             </div>
         </form>
-        <div class="w-full overflow-x-auto overflow-y-hidden mb-4 pb-12">
+        <div class="w-full overflow-x-auto overflow-y-hidden mb-4 pb-12" wire:poll.visible.60s>
             <x-table.table>
                 <x-slot name="head">
                     <x-table.row>
                         @foreach ([
-                                '#','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','رد/تایید(جلسه)','وضعیت جلسه','اتاق جلسه','قابلیت'
+                                '#','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','مکان','رد/تایید(جلسه)','وضعیت جلسه','اتاق جلسه','مشاهده اعضا'
                             ] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
@@ -198,6 +208,7 @@
                                     {{__('---')}}
                                 </x-table.cell>
                             @endif
+
                             <x-table.cell>
                                 @switch($meeting->status)
 
@@ -238,19 +249,21 @@
                             </x-table.cell>
                             <!-- Start Meeting Button (New Column) -->
                             <x-table.cell>
-                                @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED)
+                                @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED && auth()->user()->user_info->full_name === $meeting->scriptorium)
                                     <button wire:click="startMeeting({{ $meeting->id }})"
                                             class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-pink-500 text-white hover:bg-pink-600 hover:outline-none hover:ring-2 hover:ring-pink-500 hover:ring-offset-2">
                                         {{ __('شروع جلسه') }}
                                     </button>
                                 @elseif($meeting->status == MeetingStatus::IS_IN_PROGRESS || $meeting->status == MeetingStatus::IS_FINISHED)
-                                    <a href="{{route('tasks.create',$meeting->id)}}" class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-neutral-600 text-white hover:bg-neutral-700 hover:outline-none hover:ring-2 hover:ring-neutral-500 hover:ring-offset-2">
+                                    <a href="{{route('tasks.create',$meeting->id)}}"
+                                       class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-neutral-600 text-white hover:bg-neutral-700 hover:outline-none hover:ring-2 hover:ring-neutral-500 hover:ring-offset-2">
                                         {{ __('نمایش صورتجلسه') }}
                                     </a>
                                 @else
                                     {{__('---')}}
                                 @endif
                             </x-table.cell>
+
                             <x-table.cell>
                                 <x-dropdown>
                                     <x-slot name="trigger">
@@ -268,7 +281,7 @@
                                             {{ __('نمایش') }}
                                         </x-dropdown-link>
                                         @if($meeting->status === MeetingStatus::PENDING && auth()->user()->user_info->full_name === $meeting->scriptorium)
-                                            <x-dropdown-link href="#">
+                                            <x-dropdown-link href="{{route('meeting.edit',$meeting->id)}}">
                                                 {{ __('ویرایش') }}
                                             </x-dropdown-link>
                                         @endif

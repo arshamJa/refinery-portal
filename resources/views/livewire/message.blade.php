@@ -1,6 +1,6 @@
 @php use App\Enums\MeetingStatus;use App\Models\MeetingUser; @endphp
 @php use App\Models\Meeting; @endphp
-<div wire:poll.visible.60s>
+<div>
     <x-breadcrumb>
         <li class="flex items-center h-full">
             <a href="{{route('dashboard')}}"
@@ -25,487 +25,134 @@
         </li>
     </x-breadcrumb>
 
-
-    <div x-data="{ selectedType: 'all' }"
-         class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white p-4">
-        <!-- Dropdown for message type filter -->
-        <div class="mb-4">
-            <label for="messageType" class="font-semibold text-gray-700">فیلتر نوع پیام:</label>
-            <select id="messageType" x-model="selectedType" class="ml-2 border rounded-md p-1">
-                <option value="all">همه</option>
-                <option value="invitation">دعوت‌نامه</option>
-                <option value="assigned_task">وظیفه محول‌شده</option>
-            </select>
-        </div>
-
-        <table class="w-full text-sm text-gray-700 text-right rtl:text-right">
-            <thead class="bg-gray-50 text-gray-600 border-b text-sm font-semibold">
-            <tr>
-                <th class="px-4 py-3">نوع</th>
-                <th class="px-4 py-3">فرستنده</th>
-                <th class="px-4 py-3">عنوان</th>
-                <th class="px-4 py-3">تاریخ</th>
-                <th class="px-4 py-3">ساعت</th>
-                <th class="px-4 py-3">متن</th>
-                <th class="px-4 py-3">محول به</th>
-                <th class="px-4 py-3">اقدام شما</th>
-                <th class="px-4 py-3">وضعیت</th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-            <!-- Invitation Message -->
-            <tr x-show="selectedType === 'all' || selectedType === 'invitation'" x-data="{ status: '', reason: '' }"
-                class="hover:bg-gray-50">
-                <td class="px-4 py-3">دعوت‌نامه</td>
-                <td class="px-4 py-3">Scriptorium</td>
-                <td class="px-4 py-3">جلسه تیم توسعه</td>
-                <td class="px-4 py-3">1403/02/05</td>
-                <td class="px-4 py-3">13:00</td>
-                <td class="px-4 py-3">دعوت به جلسه برنامه‌ریزی محصول</td>
-                <td class="px-4 py-3">سارا رحیمی</td>
-                <td class="px-4 py-3">
-                    <button @click="status = 'accepted'; reason=''" class="text-green-600 hover:underline mr-2">قبول
-                    </button>
-                    <button @click="status = 'denied'" class="text-red-600 hover:underline">رد</button>
-                </td>
-                <td class="px-4 py-3">
-                    <template x-if="status === 'accepted'">
-                        <span class="text-green-600 font-semibold">پذیرفته شد</span>
-                    </template>
-                    <template x-if="status === 'denied'">
-                        <div class="flex flex-col gap-1">
-                            <input x-model="reason" type="text" placeholder="دلیل رد"
-                                   class="w-full text-sm border rounded px-2 py-1"/>
-                            <span class="text-red-600 font-semibold">رد شد</span>
-                        </div>
-                    </template>
-                </td>
-            </tr>
-
-            <!-- Assigned Task -->
-            <tr x-show="selectedType === 'all' || selectedType === 'assigned_task'" x-data="{ status: '', reason: '' }"
-                class="hover:bg-gray-50">
-                <td class="px-4 py-3">وظیفه محول‌شده</td>
-                <td class="px-4 py-3">Scriptorium</td>
-                <td class="px-4 py-3">تهیه گزارش</td>
-                <td class="px-4 py-3">1403/02/03</td>
-                <td class="px-4 py-3">16:00</td>
-                <td class="px-4 py-3">ارسال گزارش عملکرد ماهانه</td>
-                <td class="px-4 py-3">رضا خالقی</td>
-                <td class="px-4 py-3">
-                    <button @click="status = 'accepted'; reason=''" class="text-green-600 hover:underline mr-2">قبول
-                    </button>
-                    <button @click="status = 'denied'" class="text-red-600 hover:underline">رد</button>
-                </td>
-                <td class="px-4 py-3">
-                    <template x-if="status === 'accepted'">
-                        <span class="text-green-600 font-semibold">پذیرفته شد</span>
-                    </template>
-                    <template x-if="status === 'denied'">
-                        <div class="flex flex-col gap-1">
-                            <input x-model="reason" type="text" placeholder="دلیل رد"
-                                   class="w-full text-sm border rounded px-2 py-1"/>
-                            <span class="text-red-600 font-semibold">رد شد</span>
-                        </div>
-                    </template>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
-
-    {{--        <table class="w-full text-sm text-gray-700 text-center rtl:text-right">--}}
-    {{--        <thead class="bg-gray-50 text-gray-600 border-b text-sm font-semibold">--}}
-    {{--        <tr>--}}
-    {{--            <th class="px-4 py-3">نوع پیام</th>--}}
-    {{--            <th class="px-4 py-3">ارسال‌کننده</th>--}}
-    {{--            <th class="px-4 py-3">عنوان</th>--}}
-    {{--            <th class="px-4 py-3">تاریخ ارسال</th>--}}
-    {{--            <th class="px-4 py-3">زمان ارسال</th>--}}
-    {{--            <th class="px-4 py-3">وضعیت جلسه</th>--}}
-    {{--        </tr>--}}
-    {{--        </thead>--}}
-    {{--        <tbody class="divide-y divide-gray-100">--}}
-    {{--         Loop for Invitations--}}
-    {{--        @foreach($this->meetingUsers as $meetingUser)--}}
-    {{--            <tr class="hover:bg-gray-50 odd:bg-gray-50">--}}
-    {{--                <td class="px-4 py-3">دعوت به جلسه</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->scriptorium }}</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->title }}</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->date }}</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->time }}</td>--}}
-    {{--                <td class="px-4 py-3">--}}
-    {{--                    @if($meetingUser->is_present())--}}
-    {{--                        پذیرفته شد--}}
-    {{--                    @elseif($meetingUser->is_absent())--}}
-    {{--                        رد شد--}}
-    {{--                        @if($meetingUser->replacement)--}}
-    {{--                            - جانشین: {{ $meetingUser?->replacementName() }}--}}
-    {{--                        @endif--}}
-    {{--                    @else--}}
-    {{--                        در انتظار پاسخ--}}
-    {{--                    @endif--}}
-    {{--                </td>--}}
-    {{--            </tr>--}}
-    {{--        @endforeach--}}
-
-    {{--         Loop for Notifications --}}
-    {{--        @foreach($this->meetingUsers as $meetingUser)--}}
-    {{--            <tr class="hover:bg-gray-50 odd:bg-gray-50">--}}
-    {{--                <td class="px-4 py-3">وضعیت جلسه</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->scriptorium }}</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->title }}</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->date }}</td>--}}
-    {{--                <td class="px-4 py-3">{{ $meetingUser->meeting->time }}</td>--}}
-    {{--                <td class="px-4 py-3">--}}
-    {{--                    @if($meetingUser->meeting->status == '1')--}}
-    {{--                        لغو شده--}}
-    {{--                    @elseif($meetingUser->meeting->status == '-1')--}}
-    {{--                        برگزار می‌شود--}}
-    {{--                    @else--}}
-    {{--                        در حال بررسی--}}
-    {{--                    @endif--}}
-    {{--                </td>--}}
-    {{--            </tr>--}}
-    {{--        @endforeach--}}
-
-    {{--         Loop for Tasks --}}
-    {{--        @foreach($this->meetings as $meeting)--}}
-    {{--            @foreach($meeting->tasks as $task)--}}
-    {{--                <tr class="hover:bg-gray-50 odd:bg-gray-50">--}}
-    {{--                    <td class="px-4 py-3">اقدام</td>--}}
-    {{--                    <td class="px-4 py-3">{{ $task->full_name() }}</td>--}}
-    {{--                    <td class="px-4 py-3">{{ $meeting->title }}</td>--}}
-    {{--                    <td class="px-4 py-3">{{ $task->sent_date }}</td>--}}
-    {{--                    <td class="px-4 py-3">{{ \Illuminate\Support\Str::limit($task->time_out, 5, '') }}</td>--}}
-    {{--                    <td class="px-4 py-3">ارسال شد</td>--}}
-    {{--                </tr>--}}
-    {{--            @endforeach--}}
-    {{--        @endforeach--}}
-    {{--        </tbody>--}}
-    {{--    </table>--}}
-
-
-
-
-    {{--    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white rounded-xl shadow-md max-w-4xl">--}}
-
-    {{--        @can('create-meeting')--}}
-    {{--            <div class="col-span-full mb-8">--}}
-    {{--                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">--}}
-    {{--                    <a href="{{route('invitations.result')}}"--}}
-    {{--                       class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 text-black shadow flex flex-col gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-    {{--                        <p class="text-sm "> {{__('پاسخ اعضای جلسه به دعوتنامه های ارسالی')}}</p>--}}
-    {{--                        @if($this->meetingCount > 0)--}}
-    {{--                            <p class="text-2xl text-blue-600 font-bold">--}}
-    {{--                                {{ $this->unreadMeetingUsersCount }}--}}
-    {{--                            </p>--}}
-    {{--                        @endif--}}
-    {{--                    </a>--}}
-    {{--                    <a href="{{route('task.sent')}}"--}}
-    {{--                       class="bg-[#FCF7F8] shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 flex flex-col items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-    {{--                        <p class="text-sm "> {{__('اقدامات ارسال شده به دبیرجلسه')}}</p>--}}
-    {{--                        <p class="text-2xl text-blue-600 font-bold">{{$this->sentTaskCount}}</p>--}}
-    {{--                    </a>--}}
-    {{--                </div>--}}
-    {{--            </div>--}}
-    {{--        @endcan--}}
-    {{--        <div class="col-span-full mt-8">--}}
-    {{--            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">--}}
-    {{--                <a href="{{route('meeting.invitation')}}"--}}
-    {{--                   class="bg-[#FCF7F8] shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2  flex flex-col items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-    {{--                    <p class="text-sm ">{{__('لیست جلساتی که دعوت شده اید')}}</p>--}}
-    {{--                    <p class="text-2xl text-blue-600 font-bold">{{$this->invitation}}</p>--}}
-    {{--                </a>--}}
-    {{--                <a href="{{route('meeting.notification')}}"--}}
-    {{--                   class="bg-[#FCF7F8] shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2  flex flex-col items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
-    {{--                    <p class="text-sm "> {{__('وضعیت تشکیل جلسات')}}</p>--}}
-    {{--                    <p class="text-2xl text-blue-600 font-bold">{{$this->read_by_user}}</p>--}}
-    {{--                </a>--}}
-    {{--            </div>--}}
-    {{--        </div>--}}
-    {{--    </div>--}}
-
-
-    {{--    <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white p-4">--}}
-    {{--        <table class="w-full text-sm text-gray-700 text-right rtl:text-right">--}}
-    {{--            <thead class="bg-gray-50 text-gray-600 border-b text-sm font-semibold">--}}
-    {{--            <tr>--}}
-    {{--                <th class="px-4 py-3">عنوان جلسه</th>--}}
-    {{--                <th class="px-4 py-3">تاریخ</th>--}}
-    {{--                <th class="px-4 py-3">زمان</th>--}}
-    {{--                <th class="px-4 py-3">فرستنده</th>--}}
-    {{--                <th class="px-4 py-3">اقدام شما</th>--}}
-    {{--                <th class="px-4 py-3">وضعیت</th>--}}
-    {{--                <th class="px-4 py-3">جانشین</th>--}}
-    {{--                <th class="px-4 py-3">اعلان</th>--}}
-    {{--            </tr>--}}
-    {{--            </thead>--}}
-    {{--            <tbody class="divide-y divide-gray-100">--}}
-    {{--            @foreach($this->meetingUsers as $meetingUser)--}}
-    {{--                <tr class="hover:bg-gray-50">--}}
-    {{--                    <td class="px-4 py-3">--}}
-    {{--                        <div class="flex items-center gap-2">--}}
-    {{--                            <div class="shrink-0">--}}
-    {{--                                <span class="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">--}}
-    {{--                                    @if($meetingUser->meeting->is_present == 1)--}}
-    {{--                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 text-green-600">--}}
-    {{--                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>--}}
-    {{--                                        </svg>--}}
-    {{--                                    @else--}}
-    {{--                                        <svg class="shrink-0 size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">--}}
-    {{--                                            <circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path>--}}
-    {{--                                        </svg>--}}
-    {{--                                    @endif--}}
-    {{--                                </span>--}}
-    {{--                            </div>--}}
-    {{--                            <span>{{ $meetingUser->meeting->title }}</span>--}}
-    {{--                        </div>--}}
-    {{--                    </td>--}}
-    {{--                    <td class="px-4 py-3">{{ $meetingUser->meeting->date }}</td>--}}
-    {{--                    <td class="px-4 py-3">{{ $meetingUser->meeting->time }}</td>--}}
-    {{--                    <td class="px-4 py-3 font-bold">{{ $meetingUser->meeting->scriptorium }}</td>--}}
-    {{--                    <td class="px-4 py-3">--}}
-    {{--                        @if(!$meetingUser->is_present() && !$meetingUser->is_absent())--}}
-    {{--                            <div class="flex gap-2">--}}
-    {{--                                <button wire:click="accept({{ $meetingUser->meeting_id }})" class="px-3 py-1.5 mb-2 bg-gray-800 border border-transparent rounded-md text-sm text-white">--}}
-    {{--                                    {{ ('قبول') }}--}}
-    {{--                                </button>--}}
-    {{--                                <button wire:click="openModalDeny({{ $meetingUser->meeting_id }})" class="px-3 py-1.5 mb-2 bg-red-600 border border-transparent rounded-md text-sm text-white">--}}
-    {{--                                    {{ ('رد') }}--}}
-    {{--                                </button>--}}
-    {{--                            </div>--}}
-    {{--                        @endif--}}
-    {{--                    </td>--}}
-    {{--                    <td class="px-4 py-3 text-sm">--}}
-    {{--                        @if($meetingUser->is_present())--}}
-    {{--                            <span class="text-green-700">{{ __('پذیرفتید') }}</span>--}}
-    {{--                        @elseif($meetingUser->is_absent())--}}
-    {{--                            <span class="text-red-600 font-bold">{{ __('نپذیرفتید') }}</span>--}}
-    {{--                        @endif--}}
-    {{--                    </td>--}}
-    {{--                    <td class="px-4 py-3 text-sm">--}}
-    {{--                        @if($meetingUser->replacement)--}}
-    {{--                            <span class="text-green-700">{{ $meetingUser->replacementName() }}</span>--}}
-    {{--                        @endif--}}
-    {{--                    </td>--}}
-    {{--                    <!-- Notification Column -->--}}
-    {{--                    <td class="px-4 py-3">--}}
-    {{--                        <div class="bg-teal-50 dark:bg-teal-800/30 mb-4 rounded-lg p-4 shadow-sm max-w-4xl">--}}
-    {{--                            <div class="flex items-start gap-3">--}}
-    {{--                                <div>--}}
-    {{--                                    <span class="inline-flex items-center justify-center size-10 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-800 dark:border-teal-900 dark:bg-teal-800 dark:text-teal-400">--}}
-    {{--                                        @if($meetingUser->meeting->is_present == 1)--}}
-    {{--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="shrink-0 size-4 text-green-600">--}}
-    {{--                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>--}}
-    {{--                                            </svg>--}}
-    {{--                                        @else--}}
-    {{--                                            <svg class="shrink-0 size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">--}}
-    {{--                                                <circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path>--}}
-    {{--                                            </svg>--}}
-    {{--                                        @endif--}}
-    {{--                                    </span>--}}
-    {{--                                </div>--}}
-    {{--                                <div class="w-full">--}}
-    {{--                                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ $meetingUser->meeting->title }}</h3>--}}
-    {{--                                    <div class="mt-1 text-sm text-gray-700 dark:text-neutral-300 flex justify-between items-center">--}}
-    {{--                                        <span>--}}
-    {{--                                            {{ 'این جلسه که در تاریخ ' }}--}}
-    {{--                                            <span class="font-bold">{{ $meetingUser->meeting->date }}</span>--}}
-    {{--                                            {{ __('و در ساعت') }}--}}
-    {{--                                            <span class="font-bold">{{ $meetingUser->meeting->time }}</span>--}}
-    {{--                                            @if($meetingUser->meeting->is_present == '1')--}}
-    {{--                                                {{ __('که اینجانب قبول کردید، ') }}--}}
-    {{--                                            @elseif($meetingUser->meeting->is_present == '-1')--}}
-    {{--                                                {{ __('که اینجانب رد کردید، ') }}--}}
-    {{--                                            @endif--}}
-    {{--                                            @if($meetingUser->meeting->status == \App\Enums\MeetingStatus::IS_CANCELLED->value)--}}
-    {{--                                                <span class="font-bold">{{ __('لغو شد') }}</span>--}}
-    {{--                                            @elseif($meetingUser->meeting->status == \App\Enums\MeetingStatus::IS_NOT_CANCELLED->value)--}}
-    {{--                                                <span class="font-bold">{{ __('برگزار میشود') }}</span>--}}
-    {{--                                            @elseif($meetingUser->meeting->status == \App\Enums\MeetingStatus::PENDING->value)--}}
-    {{--                                                <span class="font-bold">{{ __('در حال بررسی است') }}</span>--}}
-    {{--                                            @elseif($meetingUser->meeting->status == \App\Enums\MeetingStatus::IS_IN_PROGRESS->value)--}}
-    {{--                                                <span class="font-bold">{{ __('در حال برگزاری است') }}</span>--}}
-    {{--                                            @elseif($meetingUser->meeting->status == \App\Enums\MeetingStatus::IS_FINISHED->value)--}}
-    {{--                                                <span class="font-bold">{{ __('جلسه خاتمه یافت') }}</span>--}}
-    {{--                                            @endif--}}
-    {{--                                        </span>--}}
-    {{--                                        <x-primary-button wire:click="markNotification({{ $meetingUser->meeting->id }})">--}}
-    {{--                                            {{ __('متوجه شدم') }}--}}
-    {{--                                        </x-primary-button>--}}
-    {{--                                    </div>--}}
-    {{--                                </div>--}}
-    {{--                            </div>--}}
-    {{--                        </div>--}}
-    {{--                    </td>--}}
-    {{--                </tr>--}}
-    {{--            @endforeach--}}
-    {{--            </tbody>--}}
-    {{--        </table>--}}
-
-    {{--        <span class="p-2 mx-2">--}}
-    {{--        {{ $this->meetingUsers->withQueryString()->links(data: ['scrollTo' => false]) }}--}}
-    {{--    </span>--}}
-    {{--    </div>--}}
-
-
-
-    <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white p-4">
-        <table class="w-full text-sm text-gray-700 text-right rtl:text-right">
-            <thead class="bg-gray-50 text-gray-600 border-b text-sm font-semibold">
-            <tr>
-                <th class="px-4 py-3">نوع پیام</th>
-                <th class="px-4 py-3">فرستنده</th>
-                <th class="px-4 py-3">متن</th>
-                <th class="px-4 py-3">اقدام شما</th>
-                <th class="px-4 py-3">{{__('وضعیت جلسه')}}</th>
-                <th class="px-4 py-3">عملیات</th>
-
-            </tr>
-            </thead>
-            @foreach($this->meetingUsers as $meetingUser)
-                <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3">{{__('دعوت به جلسه')}}</td>
-                    <td class="px-4 py-3">{{ $meetingUser->meeting->scriptorium }}</td>
-                    <td class="px-4 py-3">
-                        <p class="text-sm text-gray-600">
-                            <span>{{ $meetingUser->meeting->title }}</span>
-                            {{ __('شما در تاریخ') }} <span class="underline">{{ $meetingUser->meeting->date }}</span>
-                            {{ __('و در ساعت') }} <span class="underline">{{ $meetingUser->meeting->time }}</span>
-                            {{ __('توسط آقا/خانم') }} <span
-                                class="font-bold">{{ $meetingUser->meeting->scriptorium }}</span>
-                            {{ __('دعوت شده‌اید') }}
-                        </p>
-                    </td>
-                    <td class="px-4 py-3">
-                        @if(! $meetingUser->is_present() && ! $meetingUser->is_absent())
-                            <div class="flex gap-2 mt-4 md:mt-0">
-                                <button wire:click="accept({{$meetingUser->meeting_id}})"
-                                        class="px-3 py-1.5 mb-2 bg-gray-800 border border-transparent rounded-md text-sm text-white">
-                                    {{('قبول')}}
-                                </button>
-                                <button wire:click="openModalDeny({{$meetingUser->meeting_id}})"
-                                        class="px-3 py-1.5 mb-2 bg-red-600 border border-transparent rounded-md text-sm text-white">
-                                    {{('رد')}}
-                                </button>
-                            </div>
-                        @endif
-                        @if($meetingUser->is_present())
-                            {{ __('شما دعوت به این جلسه را') }} <span class="text-green-700">{{ __('پذیرفتید') }}</span>
-                        @elseif($meetingUser->is_absent())
-                            {{ __('شما دعوت به این جلسه را') }} <span class="text-red-600 font-bold">{{ __('نپذیرفتید') }}</span>
-                            @if($meetingUser->replacement)
-                                {{ __('و آقا/خانم') }} <span
-                                    class="text-green-700">{{ $meetingUser?->replacementName() }}</span>
-                                {{ __('به عنوان جانشین خود انتخاب کردید') }}
+    <div class="w-full overflow-x-auto overflow-y-hidden mb-4 pb-12" wire:poll.visible.60s>
+        <x-table.table>
+            <x-slot name="head">
+                <x-table.row>
+                    <x-table.heading>{{__('نوع پیام')}}</x-table.heading>
+                    <x-table.heading>{{__('فرستنده')}}</x-table.heading>
+                    <x-table.heading>{{__('متن/بند مذاکره')}}</x-table.heading>
+                    <x-table.heading>{{__('اقدام شما / درخواست ها')}}</x-table.heading>
+                    <x-table.heading>{{__('وضعیت جلسه')}}</x-table.heading>
+                    <x-table.heading>{{__('عملیات')}}</x-table.heading>
+                </x-table.row>
+            </x-slot>
+            <x-slot name="body">
+                @foreach($this->meetingUsers as $meetingUser)
+                    <x-table.row class="hover:bg-gray-50">
+                        <x-table.cell>
+                             <span
+                                 class="block w-full bg-yellow-100 text-xs text-gray-800 font-medium px-3 py-1 rounded-lg">
+                            {{__('دعوت به جلسه')}}</span>
+                        </x-table.cell>
+                        <x-table.cell>{{ $meetingUser->meeting->scriptorium }}</x-table.cell>
+                        <x-table.cell>
+                            <p class="text-sm text-gray-600">
+                                {{ __('شما در تاریخ ') }}<span
+                                    class="underline">{{ $meetingUser->meeting->date }}</span>
+                                {{ __('و در ساعت ') }}<span class="underline">{{ $meetingUser->meeting->time }}</span>
+                                {{ __('در جلسه ') }}<span class="underline">{{ $meetingUser->meeting->title }}</span>
+                                {{ __(' دعوت شده‌اید') }}
+                            </p>
+                        </x-table.cell>
+                        <x-table.cell>
+                            @if(! $meetingUser->is_present() && ! $meetingUser->is_absent())
+                                <div class="flex gap-2 mt-4 md:mt-0">
+                                    <x-accept-button wire:click="openModalAccept({{$meetingUser->meeting_id}})">
+                                        {{('تایید')}}
+                                    </x-accept-button>
+                                    <x-cancel-button wire:click="openModalDeny({{$meetingUser->meeting_id}})">
+                                        {{('رد')}}
+                                    </x-cancel-button>
+                                </div>
                             @endif
-                        @endif
-                    </td>
-                    <td class="px-4 py-3">
-                        @switch($meetingUser->meeting->status)
+                            @if($meetingUser->is_present())
+                                {{ __('شما دعوت به این جلسه را') }} <span
+                                    class="text-green-700">{{ __('پذیرفتید') }}</span>
+                                @if($meetingUser->replacement)
+                                    {{ __('و آقا/خانم') }} <span
+                                        class="text-green-700">{{ $meetingUser?->replacementName() }}</span>
+                                    {{ __('به عنوان جانشین خود انتخاب کردید') }}
+                                @endif
+                            @elseif($meetingUser->is_absent())
+                                {{ __('شما دعوت به این جلسه را') }} <span
+                                    class="text-red-600 font-bold">{{ __('نپذیرفتید') }}</span>
+                            @endif
+                        </x-table.cell>
+                        <x-table.cell>
+                            @switch($meetingUser->meeting->status)
 
-                            @case(MeetingStatus::IS_CANCELLED)
-                                <span
-                                    class="block w-full bg-red-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                @case(MeetingStatus::IS_CANCELLED)
+                                    <span
+                                        class="block w-full bg-red-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
                                             {{ __('جلسه لغو شد') }}
                                         </span>
-                                @break
+                                    @break
 
-                            @case(MeetingStatus::IS_NOT_CANCELLED)
-                                <span
-                                    class="block w-full bg-green-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                @case(MeetingStatus::IS_NOT_CANCELLED)
+                                    <span
+                                        class="block w-full bg-green-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
                                             {{ __('جلسه برگزار میشود') }}
                                         </span>
-                                @break
+                                    @break
 
-
-                            @case(MeetingStatus::IS_IN_PROGRESS)
-                                <span
-                                    class="block w-full bg-blue-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                @case(MeetingStatus::IS_IN_PROGRESS)
+                                    <span
+                                        class="block w-full bg-blue-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
                                                     {{ __('جلسه درحال برگزاری است') }}
                                                 </span>
-                                @break
+                                    @break
 
-                            @case(MeetingStatus::IS_FINISHED)
-                                <span
-                                    class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg shadow-sm m-1">
+                                @case(MeetingStatus::IS_FINISHED)
+                                    <span
+                                        class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg m-1">
                                             {{ __('جلسه خاتمه یافت') }}
                                         </span>
-                                @break
-                            @default
-                                <span
-                                    class="block w-full bg-yellow-400 text-xs text-gray-800 font-medium px-3 py-1 rounded-lg m-1">
+                                    @break
+                                @default
+                                    <span
+                                        class="block w-full bg-yellow-400 text-xs text-gray-800 font-medium px-3 py-1 rounded-lg m-1">
                                                 {{ __('درحال بررسی دعوتنامه') }}
                                             </span>
 
-                        @endswitch
-                    </td>
-                    <td class="px-4 py-3">
-                        <button>X</button>
-                    </td>
-                </tr>
-                {{--                <tr>--}}
-                {{--                    <td class="px-4 py-3">ارسال خلاصه مذاکره</td>--}}
-                {{--                    <td class="px-4 py-3">scriptorium</td>--}}
-                {{--                    <td class="px-4 py-3">آپدیت پرگار و مهلت انجام آن</td>--}}
-                {{--                    <td class="px-4 py-3">user 5</td>--}}
-                {{--                    <td class="px-4 py-3">--}}
-                {{--                        <button>Accept</button>/--}}
-                {{--                        <button>Deny</button>--}}
-                {{--                    </td>--}}
-                {{--                    <td class="px-4 py-3">در حال بررسی درخواست شما / خلاسه مذاگره برای شما ویرایش شد</td>--}}
-                {{--                    <td class="px-4 py-3">--}}
-                {{--                        <button>X</button>--}}
-                {{--                    </td>--}}
-                {{--                </tr>--}}
-                </tbody>
-            @endforeach
-        </table>
-
+                            @endswitch
+                        </x-table.cell>
+                        <x-table.cell>
+                            <div class="relative group">
+                                <button class="text-red-600 hover:text-red-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                </button>
+                                <div class="absolute left-1/2 -translate-x-1/2 mt-2 w-max p-2 text-white text-sm bg-gray-900 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-95 group-hover:scale-100">
+                                    {{ __('حذف پیام') }}
+                                </div>
+                            </div>
+                        </x-table.cell>
+                    </x-table.row>
+                @endforeach
+                @foreach($this->taskUsers as $taskUser)
+                    <x-table.row class="hover:bg-gray-50">
+                        <x-table.cell>
+                            <a href="{{route('tasks.create',$taskUser->task->meeting_id)}}" class="inline-block text-center w-full bg-pink-500 hover:bg-pink-600 text-white text-xs font-medium px-4 py-2 rounded-lg shadow transition duration-300 transform hover:scale-105 hover:shadow-lg cursor-pointer">
+                                {{ __('صورتجلسه') }}
+                            </a>
+                        </x-table.cell>
+                        <x-table.cell>{{ $taskUser->user->user_info->full_name ?? 'N/A' }}</x-table.cell>
+                        <x-table.cell class="break-words max-w-xs">{{ $taskUser->task->body }}</x-table.cell>
+                        <x-table.cell>{{ $taskUser->request_task ?? '---' }}</x-table.cell>
+                        <x-table.cell>---</x-table.cell>
+                    </x-table.row>
+                @endforeach
+            </x-slot>
+        </x-table.table>
     </div>
 
 
-    <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 bg-white p-4">
-        <table class="w-full text-sm text-gray-700 text-right rtl:text-right">
-            <thead class="bg-gray-50 text-gray-600 border-b text-sm font-semibold">
-            <tr>
-                <th class="px-4 py-3">نوع پیام</th>
-                <th class="px-4 py-3">فرستنده</th>
-                <th class="px-4 py-3">متن</th>
-                <th class="px-4 py-3">اقدام شما</th>
-                <th class="px-4 py-3">{{__('وضعیت جلسه')}}</th>
-                <th class="px-4 py-3">عملیات</th>
-
-            </tr>
-            </thead>
-            @foreach($this->taskUsers as $taskUser)
-                <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3">{{__('صورتجلسه')}}</td>
-                    <td class="px-4 py-3">{{ $taskUser->task->meeting->scriptorium ?? 'N/A' }}</td>
-                    <td class="px-4 py-3">
-                        <p class="text-sm text-gray-600">
-                            {{ $taskUser->task->body }}
-                        </p>
-                    </td>
-
-                    <td class="px-4 py-3">
-                        <button>X</button>
-                    </td>
-                </tr>
-                </tbody>
-            @endforeach
-        </table>
-
-    </div>
-
-    <x-modal name="deny">
+    <x-modal name="deny-invitation">
         @if($meetingId)
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
-{{--                 Header--}}
+                {{--                 Header--}}
                 <div class="sm:flex sm:items-center mb-4 border-b pb-3">
                     <div
                         class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
@@ -524,7 +171,7 @@
                     </div>
                 </div>
 
-{{--                 Denial Reason--}}
+                {{--                 Denial Reason--}}
                 <div>
                     <x-input-label for="body" :value="__('دلیل رد درخواست')" class="mb-2"/>
                     <textarea wire:model="body"
@@ -534,8 +181,45 @@
                 </div>
             </div>
 
-{{--             Replacement Section--}}
-            <div class="border-t p-4 space-y-3">
+            {{--             Footer Buttons--}}
+            <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
+                <x-accept-button wire:click="deny({{ $meetingId }})">
+                    {{ __('تایید') }}
+                </x-accept-button>
+                <x-cancel-button wire:click="close">
+                    {{ __('لغو') }}
+                </x-cancel-button>
+            </div>
+
+        @endif
+    </x-modal>
+
+    <x-modal name="accept-invitation">
+        @if($meetingId)
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
+                {{--                 Header--}}
+                <div class="sm:flex sm:items-center mb-4 border-b pb-3">
+                    <div
+                        class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                        <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
+                        <h3 class="text-sm text-gray-900 dark:text-gray-100">
+                            {{ __('آیا مطمئن هستید که می‌خواهید در جلسه') }}
+                            <span class="font-medium">{{ $meeting }}</span>
+                            {{ __('شرکت کنید؟') }}
+                        </h3>
+                    </div>
+                </div>
+
+            </div>
+
+            {{--             Replacement Section--}}
+            <div class="p-4 space-y-3">
                 <input type="checkbox" wire:model="checkBox" class="mr-2">
                 <span>در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:</span>
 
@@ -546,7 +230,7 @@
                         </label>
                         <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"
                                class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                     </div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>
                         <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"
@@ -557,67 +241,25 @@
                     <x-input-error :messages="$errors->get('p_code')" class="mt-2"/>
                 </div>
 
-{{--                 Error List--}}
-{{--                @if ($errors->any())--}}
-{{--                    <ul class="text-sm text-red-600 dark:text-red-400 space-y-1">--}}
-{{--                        @foreach ($errors->all() as $error)--}}
-{{--                            <li>{{ $error }}</li>--}}
-{{--                        @endforeach--}}
-{{--                    </ul>--}}
-{{--                @endif--}}
+                {{--                 Error List--}}
+                {{--                @if ($errors->any())--}}
+                {{--                    <ul class="text-sm text-red-600 dark:text-red-400 space-y-1">--}}
+                {{--                        @foreach ($errors->all() as $error)--}}
+                {{--                            <li>{{ $error }}</li>--}}
+                {{--                        @endforeach--}}
+                {{--                    </ul>--}}
+                {{--                @endif--}}
             </div>
 
-{{--             Footer Buttons--}}
+            {{--             Footer Buttons--}}
             <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
-                <x-primary-button wire:click="deny({{ $meetingId }})">
+                <x-accept-button wire:click="accept({{ $meetingId }})">
                     {{ __('تایید') }}
-                </x-primary-button>
-                <x-secondary-button wire:click="close">
+                </x-accept-button>
+                <x-cancel-button wire:click="close">
                     {{ __('لغو') }}
-                </x-secondary-button>
+                </x-cancel-button>
             </div>
-{{--            <div class="space-y-4">--}}
-{{--                <!-- Reason for Absence (Always Required) -->--}}
-{{--                <div>--}}
-{{--                    <label for="body" class="block text-sm font-medium text-gray-700">دلیل رد درخواست</label>--}}
-{{--                    <textarea wire:model.defer="body" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>--}}
-{{--                    @error('body')--}}
-{{--                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>--}}
-{{--                    @enderror--}}
-{{--                </div>--}}
-
-{{--                <!-- Replacement Section (Visible Only If Checkbox is Checked) -->--}}
-{{--                <div>--}}
-{{--                    <label class="flex items-center">--}}
-{{--                    --}}
-{{--                    </label>--}}
-{{--                </div>--}}
-
-{{--               --}}
-{{--                    <div>--}}
-{{--                        <label for="full_name" class="block text-sm font-medium text-gray-700">نام و نام خانوادگی</label>--}}
-{{--                        <input type="text" wire:model.defer="full_name" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">--}}
-{{--                        @error('full_name')--}}
-{{--                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>--}}
-{{--                        @enderror--}}
-{{--                    </div>--}}
-
-{{--                    <div>--}}
-{{--                        <label for="p_code" class="block text-sm font-medium text-gray-700">کد پرسنلی</label>--}}
-{{--                        <input type="text" wire:model.defer="p_code" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">--}}
-{{--                        @error('p_code')--}}
-{{--                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>--}}
-{{--                        @enderror--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-
-{{--            <!-- Submit Button -->--}}
-{{--            <div class="mt-4">--}}
-{{--                <button wire:click="deny({{ $meetingId }})" class="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700">--}}
-{{--                    تایید--}}
-{{--                </button>--}}
-{{--            </div>--}}
 
         @endif
     </x-modal>

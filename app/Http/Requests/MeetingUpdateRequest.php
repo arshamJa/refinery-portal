@@ -27,7 +27,7 @@ class MeetingUpdateRequest extends FormRequest
             'title' => ['required','string'],
             'unit_organization' => ['required','string','min:5','max:30', new farsi_chs()],
             'scriptorium' => ['required','string', new farsi_chs()],
-            'boss' => ['required','string', new farsi_chs()],
+            'boss' => ['required'],
             'location' => ['required','string','min:5','max:30'],
             'year' => ['required'],
             'month' => ['required'],
@@ -38,9 +38,7 @@ class MeetingUpdateRequest extends FormRequest
             'guest' => ['nullable'],
             'holders' => ['nullable'] ,
             'applicant' => ['required','string','min:5','max:20', new farsi_chs()],
-            'position_organization' => ['required','string','min:5','max:20', new farsi_chs()],
-            'signature' => ['required','file','mimes:jpg,png,jpeg,webp,pdf'],
-            'reminder' => ['required','numeric'],
+            'position_organization' => ['required','string','min:5','max:20', new farsi_chs()]
         ];
     }
 }

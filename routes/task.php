@@ -21,16 +21,11 @@ Route::middleware(['auth'])->group(function () {
 
     // this is the route for each user to sent their task
 //    Route::post('/tasks/{taskUser}/submit', [TaskController::class, 'submitTaskForm'])->name('tasks.submit');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+//    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/delete-file/{fileId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
 
 
     Route::post('/tasks/deny/{taskUserId}', [TaskController::class, 'denyTask'])->name('deny.task');
-
-
-
-
-
 
 
     // this is my task table
@@ -114,7 +109,7 @@ Route::middleware(['auth'])->group(function () {
 
 //    Route::get('/tasks/{task}/edit', [TaskManagementController::class, 'edit'])->name('tasks.edit');
 
-//    Route::patch('/tasks/{task}', [TaskManagementController::class, 'update'])->name('tasks.update');
+    Route::patch('/tasks/{task}', [TaskManagementController::class, 'update'])->name('tasks.update');
 
 //    Route::delete('/tasks/{task}', [TaskManagementController::class, 'destroy'])->name('tasks.destroy');
 

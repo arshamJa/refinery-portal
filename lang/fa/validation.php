@@ -249,7 +249,8 @@ return [
         'day' => 'روز',
         'permissions' => 'سطح دسترسی',
         'taskBody' => 'شرح اقدام',
-        'request_task' => 'متن'
+        'request_task' => 'متن',
+        'boss' => 'رییس جلسه'
     ],
 
 ];

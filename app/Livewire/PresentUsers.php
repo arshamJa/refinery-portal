@@ -53,6 +53,7 @@ class PresentUsers extends Component
         return MeetingUser::where('meeting_id',$this->meetingId)->where('is_present',0)->where('is_guest',0)->count();
     }
 
+
     public function acceptMeeting($meetingId)
     {
         $meeting = Meeting::find($meetingId);

@@ -17,24 +17,9 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
         </svg>
         <li>
-            <a href="{{route('meeting.create')}}"
-               class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                <span>{{__('ایجاد جلسه جدید')}}</span>
-            </a>
-        </li>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-             stroke="currentColor" class="w-3 h-3 text-gray-400">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
-        </svg>
-        <li>
-            <a href="{{route('meeting.table')}}"
+            <a href="{{route('dashboard.meeting')}}"
                class="inline-flex items-center px-2 gap-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>
-                </svg>
-                <span>{{__('جدول جلسات')}}</span>
+                <span>{{__('جلسات')}}</span>
             </a>
         </li>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -42,57 +27,64 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
         </svg>
         <li>
-                    <span
-                        class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                       {{__('ویرایش جلسه : ')}}{{$meeting->title}}
-                    </span>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+               {{__('ویرایش جلسه : ')}}{{$meeting->title}}
+            </span>
         </li>
     </x-breadcrumb>
 
+    <form action="{{route('meeting.update',$meeting->id)}}" method="post" enctype="multipart/form-data">
+        @csrf
+        @method('patch')
+        <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
 
-    <div dir="rtl" class="p-6 bg-white rounded-xl shadow-md space-y-6">
-        <form action="{{route('meeting.update',$meeting->id)}}" method="post" enctype="multipart/form-data">
-            @csrf
-            @method('patch')
-            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
+                {{ __('ویرایش بخش اطلاعات جلسه') }}
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
+                {{-- Meeting Title--}}
                 <div>
                     <x-input-label for="title" :value="__('موضوع جلسه')"/>
-                    <x-text-input name="title" id="title" value="{{$meeting->title}}" type="text" autofocus/>
+                    <x-text-input name="title" id="title" value="{{$meeting->title}}" class="block " type="text"
+                                  autofocus/>
                     <x-input-error :messages="$errors->get('title')"/>
                 </div>
-                <div>
-                    <x-input-label for="unit_organization" :value="__('انتخاب واحد سازمانی')"/>
-                    <x-text-input name="unit_organization" id="unit_organization"
-                                  value="{{$meeting->unit_organization}}" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('unit_organization')"/>
-                </div>
-                <div>
-                    <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
-                    <x-text-input name="scriptorium" id="scriptorium"
-                                  value="{{$meeting->scriptorium}}" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('scriptorium')"/>
-                </div>
+                {{-- Meeting Location--}}
                 <div>
                     <x-input-label for="location" :value="__('محل برگزاری جلسه')"/>
-                    <x-text-input name="location" id="location"
-                                  value="{{$meeting->location}}" type="text" autofocus/>
-
+                    <x-text-input name="location" id="location" value="{{$meeting->location}}" class="block "
+                                  type="text" autofocus/>
                     <x-input-error :messages="$errors->get('location')"/>
+                </div>
+                {{-- Treating--}}
+                <div>
+                    <x-input-label for="treat" :value="__('پذیرایی')"/>
+                    <label for="yes">{{__('بلی')}}
+                        <input type="radio" name="treat"
+                               value="true" {{ old('treat', $meeting->treat) == 'true' ? 'checked' : '' }}>
+                    </label>
+                    <label for="no" class="mr-3">{{__('خیر')}}
+                        <input type="radio" name="treat"
+                               value="false" {{ old('treat', $meeting->treat) == 'false' ? 'checked' : '' }}>
+                    </label>
+                    <x-input-error :messages="$errors->get('treat')"/>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
+
+            {{-- Time & Date--}}
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 ">
                 <div>
                     <x-input-label for="year" :value="__('سال')"/>
-                    <select name="year" id="year" dir="ltr"
-                            class="w-full my-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                        <option value="">...</option>
-                        @for($i = 1404; $i <= 1440; $i++)
+                    <x-select-input name="year" id="year" dir="ltr">
+                        <option value="">...سال</option>
+                        @for($i = 1404; $i <= 1430; $i++)
                             <option value="{{$i}}" @if(old('year', $year ?? '') == $i) selected @endif>
                                 {{$i}}
                             </option>
                         @endfor
-                    </select>
+                    </x-select-input>
                     <x-input-error :messages="$errors->get('year')"/>
                 </div>
                 <div>
@@ -100,37 +92,137 @@
                         $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
                     @endphp
                     <x-input-label for="month" :value="__('ماه')"/>
-                    <select name="month" id="month" dir="ltr"
-                            class="w-full my-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                        <option value="">...</option>
+                    <x-select-input name="month" id="month" dir="ltr">
+                        <option value="">...ماه</option>
                         @for ($i = 1; $i <= 12; $i++)
                             <option value="{{ $i }}" @if(old('month', $month ?? '') == $i) selected @endif>
                                 {{ $persian_months[$i - 1] }}
                             </option>
                         @endfor
-                    </select>
+                    </x-select-input>
                     <x-input-error :messages="$errors->get('month')"/>
                 </div>
                 <div>
                     <x-input-label for="day" :value="__('روز')"/>
-                    <select name="day" id="day" dir="ltr"
-                            class="w-full my-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                        <option value="">...</option>
+                    <x-select-input name="day" id="day" dir="ltr">
+                        <option value="">...روز</option>
                         @for($i = 1; $i <= 31; $i++)
                             <option value="{{$i}}" @if(old('day', $day ?? '') == $i) selected @endif>
                                 {{$i}}
                             </option>
                         @endfor
-                    </select>
+                    </x-select-input>
                     <x-input-error :messages="$errors->get('day')"/>
                 </div>
-
                 <div>
                     <x-input-label for="time" :value="__('ساعت جلسه')"/>
-                    <x-text-input name="time" id="time" value="{{$meeting->time}}" type="text" autofocus/>
+                    <x-text-input name="time" id="time"
+                                  value="{{$meeting->time}}"
+                                  class="block" type="text" placeholder="{{__('00:00')}}"
+                                  autofocus/>
                     <x-input-error :messages="$errors->get('time')"/>
                 </div>
             </div>
+
+
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 border-b pb-2">
+                {{ __('ویرایش بخش دبیرجلسه') }}
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
+                <div x-data="dropdown()" class="relative w-full col-span-2"
+                     x-init="initOptions({{ $users }}, {{ json_encode($bossInfo) }})">
+                    <x-input-label for="boss" class="mb-2" :value="__('رییس جلسه')"/>
+                    <!-- Dropdown Button (Displays Selected Boss Info) -->
+                    <button type="button" @click="open = !open"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-left text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+                    <span class="text-right w-full"
+                          x-text="selected ? selected.full_name + ' - ' + (selected.department ? selected.department.department_name : 'No department') + ' - ' + (selected.position ?? 'No Position') : '...'"></span>
+                        <!-- Down Arrow Icon -->
+                        <svg x-show="!open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                        <svg x-show="open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M5 15l7-7 7 7"></path>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div x-show="open" @click.away="open = false"
+                         class="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
+                        <!-- Search Input -->
+                        <div class="px-4 py-2">
+                            <input type="text" x-model="search" placeholder="جست و جو"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <!-- Dropdown Options -->
+                        <ul class="space-y-1">
+                            <!-- Null Option -->
+                            <li @click="select(null)"
+                                class="px-4 py-2 text-gray-600 hover:bg-blue-50 cursor-pointer rounded-lg">
+                                <span>...</span>
+                            </li>
+
+                            <!-- User List -->
+                            <template x-for="user in filteredOptions" :key="user.id">
+                                <li @click="select(user)"
+                                    class="px-4 py-2 text-gray-700 hover:bg-blue-50 cursor-pointer rounded-lg">
+                                    <span
+                                        x-text="user.full_name + ' - ' + (user.department ? user.department.department_name : 'No department') + ' - ' + (user.position ?? 'No Position')"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                    <!-- Hidden input to store the selected user's ID -->
+                    <input type="hidden" name="boss" x-bind:value="selected ? selected.id : ''">
+                    <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
+                    <script src="{{ asset('js/dropdown.js') }}" defer></script>
+                </div>
+
+                <div>
+                    <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
+                    <x-text-input name="scriptorium" id="scriptorium"
+                                  value="{{ $meeting->scriptorium }}"
+                                  class="block " type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('scriptorium')"/>
+                </div>
+                <div>
+                    <x-input-label for="unit_organization" :value="__('واحد سازمانی')"/>
+                    <x-text-input name="unit_organization" id="unit_organization"
+                                  value="{{ $meeting->unit_organization }}"
+                                  class="block " type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('unit_organization')"/>
+                </div>
+                <div>
+                    <x-input-label for="position_organization" :value="__('سمت دبیر جلسه')"/>
+                    <x-text-input name="position_organization" id="position_organization"
+                                  value="{{ $meeting->position_organization }}"
+                                  class="block " type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('position_organization')"/>
+                </div>
+                <div>
+                    <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
+                    <x-text-input name="unit_held" id="unit_held"
+                                  value="{{ $meeting->unit_held }}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('unit_held')"/>
+                </div>
+                <div>
+                    <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
+                    <x-text-input name="applicant" id="applicant"
+                                  value="{{ $meeting->applicant }}"
+                                  class="block" type="text" autofocus/>
+                    <x-input-error :messages="$errors->get('applicant')"/>
+                </div>
+            </div>
+
+
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 border-b pb-2">
+                {{ __('ویرایش بخش اعضا و مهمان') }}
+            </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
                 <div class="col-span-4">
@@ -139,12 +231,10 @@
                         @foreach($userIds as $meetingUser)
                             <div id="user-{{ $meetingUser->user_id }}"
                                  class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
-                                        <span>
-                                            {{ $meetingUser->user->user_info->full_name }}
-                                        </span>
+                                <span>{{ $meetingUser->user->user_info->full_name }}</span>
                                 <button
                                     class="delete-user bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full"
-                                    data-meeting-id="{{ $meeting->id }}" data-user-id="{{ $meetingUser->user_id }}">
+                                    onclick="deleteUser(event, {{ $meeting->id }}, {{ $meetingUser->user_id }})">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5" stroke="currentColor" class="size-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
@@ -152,6 +242,35 @@
                                 </button>
                             </div>
                         @endforeach
+
+                            <script>
+                                function deleteUser(event, meetingId, userId) {
+                                    event.preventDefault(); // Prevent any default behavior (like form submission)
+
+                                    if (!confirm("آیا مطمئن هستید که این کاربر را حذف می‌کنید؟")) {
+                                        return;
+                                    }
+
+                                    fetch(`/meetings/${meetingId}/users/${userId}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',  // This will add CSRF token
+                                            'Content-Type': 'application/json'
+                                        },
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.status) {
+                                                document.getElementById(`user-${userId}`).remove();
+                                                alert(data.status);
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            alert('مشکلی پیش آمده است.');
+                                        });
+                                }
+                            </script>
                     </div>
                 </div>
                 <div class="col-span-3 mb-4">
@@ -184,7 +303,7 @@
                             </div>
                             <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
                             @foreach($users->where('user_id', '!=', auth()->user()->id)
-                               ->whereNotIn('user_id', $meeting->meetingUsers->pluck('user_id')->toArray()) as $user)
+                              ->whereNotIn('user_id', $meeting->meetingUsers->pluck('user_id')->toArray()) as $user)
                                 <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}}</div>
                             @endforeach
                             <div class="no-result-message" style="display:none;">No result match</div>
@@ -195,194 +314,219 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
-                <div>
-                    <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
-                    <x-text-input name="unit_held" id="unit_held" value="{{$meeting->unit_held}}" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('unit_held')"/>
-                </div>
-                <div>
-                    <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
-                    <x-text-input name="applicant" value="{{$meeting->applicant}}" id="applicant" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('applicant')"/>
-                </div>
-                <div>
-                    <x-input-label for="position_organization" :value="__('سمت سازمانی')"/>
-                    <x-text-input name="position_organization" id="position_organization" value="{{$meeting->position_organization}}" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('position_organization')"/>
-                </div>
-                <div>
-                    <x-input-label for="reminder" :value="__('زمان جهت یادآوری')"/>
-                    <x-text-input name="reminder" value="{{$meeting->reminder}}" id="reminder" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('reminder')"/>
-                </div>
-            </div>
+                <div class="col-span-4 space-y-4">
+                    <div>
+                        <h2 class="text-lg font-semibold mb-2 text-gray-800">{{ __('لیست مهمان فعلی:') }}</h2>
+                    </div>
+                    <div>
+                        <div>
+                            <h3 class="text-md font-medium mb-2 text-gray-700">{{ __('لیست مهمان درون سازمانی:') }}</h3>
+                            <div class="flex flex-wrap gap-3">
+                                @foreach($innerGuests as $innerGuest)
+                                    <div id="guest-{{ $innerGuest->user_id }}" class="flex items-center gap-3 p-3 bg-red-100 rounded-md">
+                                        <span class="text-sm font-medium text-gray-700">
+                                            {{ $innerGuest->user->user_info->full_name }} -
+                                            {{ $innerGuest->department_name }}
+                                        </span>
+                                        <button
+                                            class="delete-guest bg-red-500 text-white p-1 rounded-full focus:outline-none"
+                                            onclick="deleteGuest(event, {{ $meeting->id }}, {{ $innerGuest->user_id }})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                                    <script>
+                                        function deleteGuest(event, meetingId, guestId) {
+                                            event.preventDefault(); // Prevent any default behavior (like form submission)
 
-            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 mt-2 gap-4">
-                <div class="col-span-1">
-                    <x-input-label for="treat" :value="__('پذیرایی')"/>
-                    <label for="yes">{{__('بلی')}}
-                        <input type="radio" name="treat" value="true" {{ old('treat', $meeting->treat) == 'true' ? 'checked' : '' }}>
-                    </label>
-                    <label for="no" class="mr-3">{{__('خیر')}}
-                        <input type="radio" name="treat" value="false"  {{ old('treat', $meeting->treat) == 'false' ? 'checked' : '' }}>
-                    </label>
-                    <x-input-error :messages="$errors->get('treat')"/>
-                </div>
-                <div class="col-span-1">
-                    <x-input-label for="signature" :value="__('امضا')"/>
-                    <x-text-input name="signature" id="signature" class="p-2" type="file" autofocus/>
-                    <x-input-error :messages="$errors->get('signature')"/>
-                </div>
-            </div>
+                                            // Confirmation message before deletion
+                                            if (!confirm("آیا مطمئن هستید که این مهمان را حذف می‌کنید؟")) {
+                                                return;
+                                            }
 
-            <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
-                <div class="col-span-4">
-                    <div class="mb-2">{{ __('لیست مهمان فعلی:') }}</div>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($meeting->guest ?? []  as $index => $nameGuest)
-                            <div id="guest-{{ $index }}"
-                                 class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
-                                <span>{{$nameGuest}}</span>
-                                <button
-                                    class="delete-guest bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-full"
-                                    data-meeting-id="{{ $meeting->id }}" data-guest-index="{{ $index }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
+                                            // Send a DELETE request to the backend
+                                            fetch(`/guests/${guestId}/delete`, {
+                                                method: 'DELETE',
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',  // CSRF token for security
+                                                    'Content-Type': 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    meeting_id: meetingId,  // Pass the meeting ID
+                                                    guest_id: guestId       // Pass the guest ID
+                                                })
+                                            })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data.status) {
+                                                        // If deletion is successful, remove the guest from the DOM
+                                                        document.getElementById(`guest-${guestId}`).remove();
+                                                        alert(data.status);
+                                                    } else {
+                                                        alert(data.status);
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                    alert('مشکلی پیش آمده است.');
+                                                });
+                                        }
+                                    </script>
+
                             </div>
-                        @endforeach
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-md font-medium mb-2 text-gray-700">{{ __('لیست مهمان برون سازمانی:') }}</h3>
+                        <div class="flex flex-wrap gap-3">
+                            @foreach($meeting->guest ?? [] as $index => $guest)
+                                <div id="guest-{{ $index }}" class="flex items-center gap-3 p-3 bg-red-100 rounded-md">
+                                    <span class="text-sm font-medium text-gray-700">
+                                        {{ $guest['name'] ?? 'Unknown Guest' }} - {{ $guest['companyName'] ?? 'Unknown Company' }}
+                                    </span>
+                                    <button class="delete-guest bg-red-500 text-white p-1 rounded-full focus:outline-none"
+                                            onclick="deleteOuterGuest(event, {{ $meeting->id }}, '{{ $index }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                                <script>
+                                    function deleteOuterGuest(event, meetingId, guestIndex) {
+                                        event.preventDefault(); // Prevent any default behavior (like form submission)
+
+                                        // Confirmation message before deletion
+                                        if (!confirm("آیا مطمئن هستید که این مهمان را حذف می‌کنید؟")) {
+                                            return;
+                                        }
+
+                                        // Send a DELETE request to the backend
+                                        fetch(`/meetings/${meetingId}/guests/${guestIndex}/delete`, {
+                                            method: 'DELETE',
+                                            headers: {
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',  // CSRF token for security
+                                            }
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Request failed');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                if (data.status) {
+                                                    // If deletion is successful, remove the guest from the DOM
+                                                    const guestElement = document.getElementById(`guest-${guestIndex}`);
+                                                    if (guestElement) {
+                                                        guestElement.remove();
+                                                    }
+                                                    alert(data.status);
+                                                } else {
+                                                    alert('حذف مهمان با مشکل مواجه شد.');
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                                alert('مشکلی پیش آمده است.');
+                                            });
+                                    }
+                                </script>
+
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <div class="row py-2 col-span-2" x-data="handler()">
-                        <div class="col">
-                            <table class="table table-bordered align-items-center table-sm">
-                                <thead class="thead-light">
+
+                <div class="col-span-2">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-700">{{__('لیست مهمانان جدید')}}</label>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <input type="checkbox" id="outer-organization-checkbox" class="h-4 w-4 text-blue-600"/>
+                            <label for="outer-organization-checkbox"
+                                   class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
+                        </div>
+                        <!-- Table for inner_organization (default table) -->
+                        <div id="inner-organization-table"
+                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
+                            <table id="guests-inner-table"
+                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                                <thead class="bg-gray-50">
                                 <tr>
-                                    <th>#</th>
-                                    <th>{{__('نام و نام خانوادگی')}}</th>
+                                    <th class="px-4 py-2 text-right">#</th>
+                                    <th class="px-4 py-2 text-right">نام و نام خانوادگی</th>
+                                    <th class="px-4 py-2 text-right">واحد سازمانی</th>
+                                    <th class="px-4 py-2 text-center">عملیات</th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                <template x-for="(field, index) in fields" :key="index">
-                                    <tr>
-                                        <td x-text="index + 1"></td>
-                                        <td>
-                                            <x-text-input x-model="field.guest" type="text"
-                                                          name="guest[]"
-                                                          class="block mr-1" autofocus/>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="mr-2"
-                                                    @click="removeField(index)">&times;
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </template>
+                                <tbody id="guests-inner-tbody" class="divide-y divide-gray-100">
+                                <!-- Dynamic rows for inner organization will be inserted here -->
                                 </tbody>
-                                <tfoot>
+                                <tfoot class="bg-gray-50">
                                 <tr>
-                                    <td colspan="4" class="text-right">
-                                        <button type="button" class="btn btn-info"
-                                                @click="addNewField()">{{__('افزودن مهمان')}}</button>
+                                    <td colspan="5" class="px-4 py-3 text-left">
+                                        <button type="button" id="add-inner-guest-btn"
+                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                                            افزودن مهمان
+                                        </button>
                                     </td>
                                 </tr>
                                 </tfoot>
                             </table>
                         </div>
+
+                        <!-- Table for outer_organization (will appear when checkbox is checked) -->
+                        <div id="outer-organization-table"
+                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
+                            <table id="guests-outer-table"
+                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-right">#</th>
+                                    <th class="px-4 py-2 text-right">نام و نام خانوادگی</th>
+                                    <th class="px-4 py-2 text-right">نام شرکت</th>
+                                    <th class="px-4 py-2 text-center">عملیات</th>
+                                </tr>
+                                </thead>
+                                <tbody id="guests-outer-tbody" class="divide-y divide-gray-100">
+                                <!-- Dynamic rows for outer organization will be inserted here -->
+                                </tbody>
+                                <tfoot class="bg-gray-50">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-3 text-left">
+                                        <button type="button" id="add-outer-guest-btn"
+                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                                            افزودن مهمان
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <x-input-error :messages="$errors->get('guest')" class="mt-2"/>
+                        <div id="guests-data"
+                             data-inner-guests="{{ json_encode(old('guests.inner', $item->guests['inner'] ?? [])) }}"
+                             data-outer-guests="{{ json_encode(old('guests.outer', $item->guests['outer'] ?? [])) }}">
+                        </div>
                     </div>
-                    <x-input-error :messages="$errors->get('guest')"/>
                 </div>
             </div>
 
             <!-- Buttons -->
             <div class="mt-4">
                 <x-primary-button type="submit">
-                    {{ __('ذخیره') }}
+                    {{ __('بروزرسانی') }}
                 </x-primary-button>
-                <a href="{{route('meeting.table')}}">
-                    <x-secondary-button>
+                <a href="{{route('dashboard.meeting')}}">
+                    <x-cancel-button>
                         {{__('لغو')}}
-                    </x-secondary-button>
+                    </x-cancel-button>
                 </a>
             </div>
-        </form>
-    </div>
-
-
-    <script>
-        // this is for deleting the current participants
-        $(document).ready(function () {
-            $('.delete-user').click(function (e) {
-                e.preventDefault();
-                const meetingId = $(this).data('meeting-id');
-                const userId = $(this).data('user-id');
-                const userDiv = $('#user-' + userId); // Select the parent div
-                if (confirm('آیا مطمئن هستید که این شحض حذف شود؟')) { //Optional confirmation
-                    $.ajax({
-                        url: '/meetings/' + meetingId + '/users/' + userId, // Construct the URL
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
-                        },
-                        success: function (response) {
-                            // Handle success (e.g., remove the user from the list)
-                            userDiv.fadeOut(300, function () { // Fade out and remove the div
-                                $(this).remove();
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle errors (e.g., display an error message)
-                            console.error(xhr.responseText);
-                            alert('An error occurred while deleting the user.');
-                        }
-                    });
-                }
-            });
-        });
-
-        $('.delete-guest').click(function (e) {
-            e.preventDefault();
-            const meetingId = $(this).data('meeting-id');
-            const guestIndex = $(this).data('guest-index');
-            const guestDiv = $('#guest-' + guestIndex);
-
-            if (confirm('آیا مطمئن هستید که این مهمان حذف شود؟')) {
-                $.ajax({
-                    url: '/meetings/' + meetingId + '/guests/' + guestIndex,
-                    type: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (response) {
-                        guestDiv.fadeOut(300, function () {
-                            $(this).remove();
-                        });
-                    },
-                    error: function (xhr) {
-                        console.error(xhr.responseText);
-                        alert('خطا در حذف مهمان!');
-                    }
-                });
-            }
-        });
-
-        // this is for adding new guest
-        function handler() {
-            return {
-                fields: [],
-                addNewField() {
-                    this.fields.push({
-                        guest: ''
-                    });
-                },
-                removeField(index) {
-                    this.fields.splice(index, 1);
-                }
-            }
-        }
-    </script>
+        </div>
+    </form>
+    <script src="{{ asset('js/createGuest.js') }}"></script>
 </x-app-layout>
 

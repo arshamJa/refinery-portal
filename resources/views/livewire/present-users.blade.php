@@ -60,7 +60,7 @@
             <li>
                     <span
                         class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                       {{__('وضعیت شرکت کنندگان در جلسه')}}
+                       {{__('تایید/رد جلسه')}}
                     </span>
             </li>
     </x-breadcrumb>
@@ -101,7 +101,16 @@
                 <p class="font-semibold text-base mb-2">{{ __('اسامی قبول کنندگان:') }}</p>
                 <div class="flex flex-wrap gap-2 text-green-700">
                     @foreach($this->meetingUsers->where('is_present', 1) as $user)
-                        <span class="bg-green-100 rounded-full px-3 py-1">{{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}</span>
+                        <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                            <p class="text-red-700 font-medium">
+                                {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
+                            </p>
+                            @if($user->replacement)
+                                <p class="text-sm text-indigo-600 mt-2">
+                                    {{ __('جانشین اینجانب = ') }}<strong>{{ $user->replacementName() }}</strong>
+                                </p>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
             </div>
@@ -116,11 +125,6 @@
                                 {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
                             </p>
                             <p class="text-sm text-gray-700 mt-1">{{ $user->reason_for_absent }}</p>
-                            @if($user->replacement)
-                                <p class="text-sm text-indigo-600 mt-2">
-                                    {{ __('جانشین اینجانب = ') }}<strong>{{ $user->replacementName() }}</strong>
-                                </p>
-                            @endif
                         </div>
                     @endforeach
                 </div>

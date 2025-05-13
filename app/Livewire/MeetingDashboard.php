@@ -36,6 +36,7 @@ class MeetingDashboard extends Component
     }
 
 
+
     #[Computed]
     public function meetings()
     {

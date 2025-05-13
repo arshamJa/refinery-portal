@@ -2,7 +2,9 @@
 
 namespace App\Exports;
 
+use App\Enums\TaskStatus;
 use App\Models\Task;
+use App\Models\TaskUser;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
@@ -23,8 +25,21 @@ class CompletedTasksExport implements FromCollection, WithHeadings, WithColumnFo
 
     public function collection()
     {
-        $query = Task::with('meeting', 'user')
-            ->where('is_completed', true)
+        $query = TaskUser::with([
+            'task' => function($query) {
+                $query->select('id', 'meeting_id'); // Select only the necessary columns for task
+            },
+            'task.meeting' => function($query) {
+                $query->select('id', 'title', 'scriptorium'); // Select necessary columns from meeting
+            },
+            'user' => function($query) {
+                $query->select('id'); // Only select the user id to avoid duplicates
+            },
+            'user.user_info' => function($query) {
+                $query->select('user_id', 'full_name'); // Select necessary columns from user_info
+            }
+        ])
+            ->where('task_status', TaskStatus::ACCEPTED->value)
             ->whereColumn('sent_date', '<=', 'time_out');
 
         // Apply date range filter (using the Jalali date as string)
@@ -37,29 +52,27 @@ class CompletedTasksExport implements FromCollection, WithHeadings, WithColumnFo
         // Apply search filter
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('time_out', 'like', '%'.$this->search.'%')
-                    ->orWhere('sent_date', 'like', '%'.$this->search.'%')
-                    ->orWhereHas('meeting', function ($meetingQuery) {
-                        $meetingQuery->where('title', 'like', '%'.$this->search.'%')
-                            ->orWhere('scriptorium', 'like', '%'.$this->search.'%');
+                $q->where('time_out', 'like', '%' . $this->search . '%')
+                    ->orWhere('sent_date', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('task.meeting', function ($meetingQuery) {
+                        $meetingQuery->where('title', 'like', '%' . $this->search . '%')
+                            ->orWhere('scriptorium', 'like', '%' . $this->search . '%');
                     })
-                    ->orWhereHas('user', function ($userQuery) {
-                        $userQuery->whereHas('user_info', function ($userInfoQuery) {
-                            $userInfoQuery->where('full_name', 'like', '%'.$this->search.'%');
-                        });
+                    ->orWhereHas('user.user_info', function ($userInfoQuery) {
+                        $userInfoQuery->where('full_name', 'like', '%' . $this->search . '%');
                     });
             });
         }
 
-        // Return the filtered data with Jalali date format as strings
-        return $query->get()->map(function ($task, $index) {
+        // Fetch the filtered data with necessary columns and map it
+        return $query->get()->map(function ($taskUser, $index) {
             return [
                 'Row' => $index + 1,  // Add the row number
-                'Meeting Title' => $task->meeting->title ?? 'N/A',
-                'Secretary' => $task->meeting->scriptorium ?? 'N/A',
-                'Task Performer' => $task->user->user_info->full_name ?? 'N/A',
-                'Sent Date' => $task->sent_date,
-                'Time Out' => $task->time_out,
+                'Meeting Title' => $taskUser->task->meeting->title ?? 'N/A',
+                'Secretary' => $taskUser->task->meeting->scriptorium ?? 'N/A',
+                'Task Performer' => $taskUser->user->user_info->full_name ?? 'N/A',
+                'Sent Date' => $taskUser->sent_date,
+                'Time Out' => $taskUser->time_out,
             ];
         });
     }
@@ -67,12 +80,12 @@ class CompletedTasksExport implements FromCollection, WithHeadings, WithColumnFo
     public function headings(): array
     {
         return [
-            'ردیف',
-            'موضوع جلسه',
-            'دبیر جلسه',
-            'اقدام کننده',
-            'تاریخ انجام اقدام',
-            'تاریخ مهلت اقدام',
+            'ردیف',  // Row number
+            'موضوع جلسه', // Meeting Title
+            'دبیر جلسه',  // Secretary
+            'اقدام کننده',  // Task Performer
+            'تاریخ انجام اقدام',  // Sent Date
+            'تاریخ مهلت اقدام',  // Time Out
         ];
     }
 

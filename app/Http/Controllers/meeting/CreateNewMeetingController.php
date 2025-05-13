@@ -9,17 +9,15 @@ use App\Http\Requests\MeetingUpdateRequest;
 use App\Models\Department;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
-use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use phpDocumentor\Reflection\Types\Null_;
 
 class CreateNewMeetingController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -53,6 +51,7 @@ class CreateNewMeetingController extends Controller
             'filteredMeetingsCount' => $filteredMeetingsCount
         ]);
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -106,23 +105,10 @@ class CreateNewMeetingController extends Controller
             })
             ->values();
 
-
         // Convert current Gregorian date to Jalali
-        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-
-        // Prevent selecting past dates
-        if ($request->year < $ja_year ||
-            ($request->year == $ja_year && $request->month < $ja_month) ||
-            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day)
-        ) {
-            throw ValidationException::withMessages(['year' => 'تاریخ گذشته نباید باشد']);
-        }
-
-        // Format date correctly
-        $newDate = sprintf('%04d/%02d/%02d', $request->year, $request->month, $request->day);
+        $newDate = $this->getCurrentDate($request->year,$request->month,$request->day);
 
         $bossName = UserInfo::where('user_id',$request->boss)->value('full_name');
-
 
         $request->merge([
             'time' => str_contains($request->time, ':') ? $request->time : sprintf('%02d:00', intval($request->time))
@@ -177,31 +163,8 @@ class CreateNewMeetingController extends Controller
             MeetingUser::insert($meetingUserRecords);
 
         }
-        return to_route('dashboard.meeting')->with('status','جلسه جدبد ساخته و دعوتنامه به اعضا جلسه ارسال شد');
-    }
+        return to_route('dashboard.meeting')->with('status', __('جلسه جدبد ساخته و دعوتنامه به اعضا جلسه ارسال شد'));
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        // Eager load relationships
-        $meeting = Meeting::with(['meetingUsers', 'tasks'])->findOrFail($id);
-
-        // Fetch all users related to the meeting
-        $userIds = $meeting->meetingUsers->pluck('user_id')->toArray();
-
-        // Fetch user info in one query
-        $userInfos = UserInfo::whereIn('user_id', $userIds)->pluck('full_name', 'user_id');
-
-        // Optimize task lookup
-        $tasks = $meeting->tasks->keyBy('user_id');
-
-        return view('meeting.crud.show', [
-            'meetings' => $meeting,
-            'userInfos' => $userInfos,
-            'tasks' => $tasks
-        ]);
     }
 
     /**
@@ -210,9 +173,15 @@ class CreateNewMeetingController extends Controller
     public function edit(string $id)
     {
         $meeting = Meeting::with([
-            'meetingUsers.user.user_info'
-        ])->findOrFail($id);
+            'meetingUsers.user.user_info.department',
+        ])
+            ->select('id','title',
+                'unit_organization', 'scriptorium', 'boss',
+                'location', 'date', 'time', 'unit_held', 'treat', 'guest',
+                'applicant', 'position_organization')
+            ->findOrFail($id);
 
+        // Date processing
         $date = $meeting->date;
         if ($date) {
             [$year, $month, $day] = explode('/', $date);
@@ -220,119 +189,116 @@ class CreateNewMeetingController extends Controller
             $year = $month = $day = null;
         }
 
-//        $users = User::with('user_info:id,full_name,user_id')->whereNull('deleted_at')->get();
-        $users = User::query()
-            ->whereDoesntHave('roles', function ($query) {
-                $query->whereIn('name', [UserRole::SUPER_ADMIN->value,UserRole::ADMIN->value]);
+        // Fetching the boss with department and position
+        $bossInfo = null;
+        if ($meeting->boss) {
+            $bossInfo = UserInfo::with(['department'])
+                ->where('full_name', $meeting->boss)
+                ->first();
+        }
+
+        // Map inner guests with department names
+        $innerGuests = $meeting->meetingUsers->filter(function ($meetingUser) {
+            return $meetingUser->is_guest;  // Only filter inner guests
+        })->map(function ($meetingUser) {
+            if ($meetingUser->user && $meetingUser->user->user_info) {
+                $meetingUser->department_name = $meetingUser->user->user_info->department->department_name ?? 'Unknown Department';
+            }
+            return $meetingUser;
+        });
+
+
+        // Get users (non-guests) excluding current user and super admins
+        $users = UserInfo::with('department:id,department_name')
+            ->whereHas('user', function ($query) {
+                $query->whereDoesntHave('roles', function ($roleQuery) {
+                    $roleQuery->where('name', UserRole::SUPER_ADMIN->value);
+                });
             })
-            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
-            ->select('users.id as user_id', 'user_infos.full_name')
-            ->whereNull('deleted_at')
+            ->where('user_id', '!=', auth()->id())
+            ->select('id', 'user_id', 'full_name', 'department_id', 'position')
             ->get();
+
         return view('meeting.crud.edit', [
             'meeting' => $meeting,
             'users' => $users,
-            'userIds' => $meeting->meetingUsers,
+            'userIds' => $meeting->meetingUsers->where('is_guest',false),
+            'innerGuests' => $innerGuests,
             'year' => $year,
             'month' => $month,
-            'day' => $day
+            'day' => $day,
+            'bossInfo' => $bossInfo,
         ]);
     }
+
     /**
-     * Update the specified resource in storage.
      * @throws ValidationException
      */
     public function update(MeetingUpdateRequest $request, string $id)
     {
+        // Validate request
         $request->validated();
 
         // Convert current Gregorian date to Jalali
-        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $newDate = $this->getCurrentDate($request->year, $request->month, $request->day);
 
-        // Prevent selecting past dates
-        if ($request->year < $ja_year ||
-            ($request->year == $ja_year && $request->month < $ja_month) ||
-            ($request->year == $ja_year && $request->month == $ja_month && $request->day < $ja_day)
-        ) {
-            throw ValidationException::withMessages(['year' => 'تاریخ گذشته نباید باشد']);
-        }
-
-        // Format date correctly
-        $newDate = sprintf('%04d/%02d/%02d', $request->year, $request->month, $request->day);
-
-        // Retrieve meeting and eager-load users
+        // Retrieve meeting
         $meeting = Meeting::with('meetingUsers')->findOrFail($id);
 
-        // Handle signature upload only if a new file is provided
-        if ($request->hasFile('signature')) {
-            if ($meeting->signature && file_exists(public_path('storage/' . $meeting->signature))) {
-                unlink(public_path('storage/' . $meeting->signature));
-            }
-            $newSignaturePath = $request->file('signature')->store('signatures', 'public');
-        } else {
-            $newSignaturePath = $meeting->signature; // Keep existing signature
-        }
+        // Get Boss Name from UserInfo
+        $bossName = UserInfo::where('user_id', $request->boss)->value('full_name');
 
-        // Update meeting details in a single query
+        // Merge Old and New Outer Guests
+        $existingOuterGuests = collect($meeting->guest ?? []);
+        $newOuterGuests = collect($request->input('guests.outer', []))
+            ->map(fn($g) => [
+                'name' => trim($g['name']),
+                'companyName' => trim($g['companyName'])
+            ])
+            ->filter(fn($g) => $g['name'] !== '' || $g['companyName'] !== '')->values();
+
+        $mergedOuterGuests = $existingOuterGuests->merge($newOuterGuests)->unique('name')->values()->toArray();
+
+        // Update meeting details
         $meeting->update([
             'title' => $request->title,
             'unit_organization' => $request->unit_organization,
             'scriptorium' => $request->scriptorium,
-            'boss' => $request->boss,
+            'boss' => $bossName,
             'location' => $request->location,
             'date' => $newDate,
             'time' => $request->time,
             'unit_held' => $request->unit_held,
             'treat' => $request->treat,
-            'guest' => $request->guest,
+            'guest' => $mergedOuterGuests,
             'applicant' => $request->applicant,
             'position_organization' => $request->position_organization,
-            'signature' => $newSignaturePath,
-            'reminder' => $request->reminder,
         ]);
 
-        // Process meeting holders
-        $holders = collect(explode(',', preg_replace('/\s+/', '', $request->holders)))
-            ->filter(function ($value) {
-                return is_numeric($value) && !empty($value);
-            })
-            ->map(fn($id) => (int)$id); // cast to int for safety
+        // Manage Inner Guests (Keep old, add new)
+        $innerGuests = collect($request->input('guests.inner', []))->pluck('name')->unique();
+        $guestUserIds = UserInfo::whereIn('full_name', $innerGuests)->pluck('user_id');
 
-        // Get current user IDs in the meeting
-        $existingUserIds = $meeting->meetingUsers->pluck('user_id')->toArray();
+        $existingGuests = $meeting->meetingUsers()->where('is_guest', true)->pluck('user_id');
+        $newGuests = $guestUserIds->diff($existingGuests);
 
-        // Determine which users need to be added and which need to be updated
-        $newUserIds = $holders->diff($existingUserIds);
-        $existingUserIdsToUpdate = $holders->intersect($existingUserIds);
+        $newGuests->each(fn($id) => $meeting->meetingUsers()->create(['user_id' => $id, 'is_guest' => true]));
 
-        // Bulk update existing users
-        MeetingUser::where('meeting_id', $meeting->id)
-            ->whereIn('user_id', $existingUserIdsToUpdate)
-            ->update([
-                'is_present' => false,
-                'reason_for_absent' => null,
-                'read_by_scriptorium' => false,
-                'read_by_user' => false,
-                'replacement' => null
-            ]);
+        // Manage Holders (Keep old, add new)
+        $holders = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
+            ->filter(fn($id) => is_numeric($id))->unique()->map(fn($id) => (int) $id);
 
-        // Bulk insert new users
-        $newMeetingUsers = $newUserIds->map(function ($userId) use ($meeting) {
-            return [
-                'meeting_id' => $meeting->id,
-                'user_id' => $userId,
-                'is_present' => false,
-                'reason_for_absent' => null,
-                'read_by_scriptorium' => false,
-                'read_by_user' => false,
-                'replacement' => null,
-            ];
-        })->toArray();
+        $existingHolders = $meeting->meetingUsers()->pluck('user_id');
+        $newHolders = $holders->diff($existingHolders);
 
-        if (!empty($newMeetingUsers)) {
-            MeetingUser::insert($newMeetingUsers);
-        }
-        return to_route('meeting.table')->with('status',' جلسه با موفقیت بروز شد');
+        $newHolders->each(fn($id) => $meeting->meetingUsers()->create([
+            'user_id' => $id,
+            'is_present' => false,
+            'read_by_user' => false,
+            'read_by_scriptorium' => false
+        ]));
+
+        return to_route('dashboard.meeting')->with('status', __('جلسه با موفقیت بروز شد'));
     }
 
     public function deleteUser(Request $request, $meetingId, $userId)
@@ -341,40 +307,87 @@ class CreateNewMeetingController extends Controller
         MeetingUser::where('user_id', $userId)->where('meeting_id',$meetingId)->delete();
         return response()->json(['status' => 'این شخص از جلسه حذف شد']);
     }
-    public function deleteGuest($meetingId, $index)
+    public function deleteGuest(Request $request, $guestId)
+    {
+        // Get meeting_id and guest_id from the request
+        $meetingId = $request->meeting_id;
+        $guestId = $request->guest_id;
+
+        // Check if the guest is part of the meeting and is marked as a guest
+        $meetingUser = MeetingUser::where('meeting_id', $meetingId)
+            ->where('user_id', $guestId)
+            ->where('is_guest', true)
+            ->first();
+
+        // If the guest is found, delete
+        if ($meetingUser) {
+            $meetingUser->delete();  // Delete the guest from the meeting_user table
+
+            // Respond with a success message
+            return response()->json(['status' => 'مهمان از جلسه حذف شد.']);
+        }
+
+        // If the guest is not found or not part of the meeting as a guest
+        return response()->json(['status' => 'مهمان پیدا نشد یا عضویت او به عنوان مهمان تایید نشده است.'], 404);
+    }
+    public function deleteOuterGuest($meetingId, $guestIndex)
     {
         $meeting = Meeting::findOrFail($meetingId);
-        $guests = $meeting->guest ?? [];
 
-        if (!isset($guests[$index])) {
-            return response()->json(['status' => 'مهمان یافت نشد'], 404);
+        if (is_array($meeting->guest) && isset($meeting->guest[$guestIndex])) {
+            // Remove the guest at the given index
+            $guests = $meeting->guest;
+            unset($guests[$guestIndex]);
+            $meeting->guest = array_values($guests); // Re-index the array
+            $meeting->save();
+            return response()->json(['status' => 'مهمان با موفقیت حذف شد.']);
         }
 
-        unset($guests[$index]);
-        $guests = array_values($guests); // Reindex
-
-        $meeting->guest = $guests;
-        $meeting->save();
-
-        return response()->json(['status' => 'مهمان با موفقیت پاک شد']);
+        return response()->json(['status' => 'مهمان یافت نشد.'], 404);
     }
+    //    /**
+//     * Remove the specified resource from storage.
+//     */
+//    public function destroy(string $id)
+//    {
+//        $meeting = Meeting::with('meetingUsers')->findOrFail($id);
+//        try {
+//            DB::transaction(function () use ($meeting) {
+//                // Soft delete related meeting users
+//                $meeting->meetingUsers()->delete();
+//                // Soft delete the meeting itself
+//                $meeting->delete();
+//            });
+//            return to_route('dashboard.meeting')->with('status',' جلسه با موفقیت حذف شد');
+//        } catch (\Exception $e) {
+//            return to_route('dashboard.meeting')->with('error', 'خطا در حذف جلسه: ' . $e->getMessage());
+//        }
+//    }
+
     /**
-     * Remove the specified resource from storage.
+     * Validate and format a Jalali date.
+     *
+     * @param int $year
+     * @param int $month
+     * @param int $day
+     * @return string
+     * @throws ValidationException
      */
-    public function destroy(string $id)
+    public function getCurrentDate(int $year, int $month, int $day): string
     {
-        $meeting = Meeting::with('meetingUsers')->findOrFail($id);
-        try {
-            DB::transaction(function () use ($meeting) {
-                // Soft delete related meeting users
-                $meeting->meetingUsers()->delete();
-                // Soft delete the meeting itself
-                $meeting->delete();
-            });
-            return to_route('dashboard.meeting')->with('status',' جلسه با موفقیت حذف شد');
-        } catch (\Exception $e) {
-            return to_route('dashboard.meeting')->with('error', 'خطا در حذف جلسه: ' . $e->getMessage());
-        }
-    }
+        // Convert current Gregorian date to Jalali
+        list($ja_year, $ja_month, $ja_day) = explode('/',
+            gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
+        // Prevent selecting past dates
+        if ($year < $ja_year ||
+            ($year == $ja_year && $month < $ja_month) ||
+            ($year == $ja_year && $month == $ja_month && $day < $ja_day)
+        ) {
+            throw ValidationException::withMessages(['year' => 'The selected date cannot be in the past.']);
+        }
+
+        // Return the formatted date
+        return sprintf('%04d/%02d/%02d', $year, $month, $day);
+    }
 }

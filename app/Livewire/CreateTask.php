@@ -146,7 +146,7 @@ class CreateTask extends Component
 
         $taskUser->update([
             'sent_date' => $newTime,
-            'is_completed' => true,
+            'is_completed' => TaskStatus::IS_COMPLETED,
             'body_task' => $taskBody,
         ]);
 
@@ -255,32 +255,35 @@ class CreateTask extends Component
 
         $validated = Validator::make(
             ['year' => $this->year, 'month' => $this->month, 'day' => $this->day, 'body' => $this->body],
-            ['year' => 'required', 'month' => 'required', 'day' => 'required', 'body' => 'required|min:3'],
+            ['year' => 'nullable', 'month' => 'nullable', 'day' => 'nullable', 'body' => 'nullable|min:3'],
             [
-                'year.required' => 'فیلد سال اجباری است.',
-                'month.required' => 'فیلد ماه اجباری است.',
-                'day.required' => 'فیلد روز اجباری است.',
-                'body.required' => 'فیلد خلاصه مذاکرات اجباری است.',
-                'body.min' => 'خلاصه مذاکرات باید حداقل ۳ کاراکتر باشد.'
+                'year.nullable' => 'فیلد سال می‌تواند خالی باشد.',
+                'month.nullable' => 'فیلد ماه می‌تواند خالی باشد.',
+                'day.nullable' => 'فیلد روز می‌تواند خالی باشد.',
+                'body.nullable' => 'فیلد خلاصه مذاکرات می‌تواند خالی باشد.',
+                'body.min' => 'خلاصه مذاکرات باید حداقل ۳ کاراکتر باشد.',
             ]
         )->validate();
 
-        // Sanitize the inputs before validation
-        $year = trim($this->year);
-        $month = trim($this->month);
-        $day = trim($this->day);
-        $body  = Str::of(strip_tags($this->body))->squish();
-
-
-
+        // Fetching the existing task and task user
         $taskUser = TaskUser::with('task')->findOrFail($this->taskUserId);
-        $oldTask  = Task::findOrFail($taskUser->task_id);
+        $oldTask = Task::findOrFail($taskUser->task_id);
 
+        // Sanitize the inputs before validation
+        // Using old values if any of the fields are null
+        $year = $this->year ?? (int)substr($taskUser->time_out, 0, 4);
+        $month = $this->month ?? (int)substr($taskUser->time_out, 5, 2);
+        $day = $this->day ?? (int)substr($taskUser->time_out, 8, 2);
+        $body = $this->body !== null ? Str::of(strip_tags($this->body))->squish() : $oldTask->body;
+
+        // Normalize text for comparison
         $normalizedOldBody = $this->normalizeText($oldTask->body);
         $normalizedNewBody = $this->normalizeText($body);
 
+        // Format the new date
         $newTimeOut = sprintf("%04d/%02d/%02d", $year, $month, $day);
 
+        // Checking if there are changes
         $bodyChanged = $normalizedOldBody !== $normalizedNewBody;
         $timeOutChanged = $taskUser->time_out !== $newTimeOut;
 
@@ -289,7 +292,7 @@ class CreateTask extends Component
             $this->dispatch('close-modal', name: 'edit-by-scriptorium');
             return;
         }
-
+        // Updating the task and taskUser only if there are changes
         if ($bodyChanged) {
             $newTask = Task::create([
                 'meeting_id' => $oldTask->meeting_id,
@@ -297,7 +300,6 @@ class CreateTask extends Component
             ]);
             $taskUser->task_id = $newTask->id;
         }
-
         if ($timeOutChanged || $bodyChanged) {
             $taskUser->update([
                 'time_out' => $newTimeOut,
@@ -305,7 +307,6 @@ class CreateTask extends Component
                 'request_task' => null
             ]);
         }
-
         session()->flash('status', 'ویرایش انجام شد');
         $this->dispatch('close-modal', name: 'edit-by-scriptorium');
     }

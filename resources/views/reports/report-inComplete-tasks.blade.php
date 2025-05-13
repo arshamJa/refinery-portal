@@ -87,70 +87,50 @@
         </form>
 
 
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead
-                class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                @foreach (['ردیف', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
-                               'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان گذشته'] as $th)
-                    <th class="px-4 py-3">{{ __($th) }}</th>
-                @endforeach
-            </tr>
-            </thead>
-            <tbody>
-            @forelse($tasks as $task)
-                <tr class="px-4 py-3 border-b text-center" wire:key="{{$task->id}}">
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->full_name()}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                        @if(!$task->sent_date)
-                            <span class="text-red-500">{{__('اقدامی انجام نشده')}}</span>
-                        @else
-                            {{$task->sent_date}}
-                        @endif
-                    </td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                        @php
+        <div class="w-full overflow-x-auto overflow-y-hidden mb-4 pb-12">
+            <x-table.table>
+                <x-slot name="head">
+                    <x-table.row>
+                        @foreach (['#', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
+                              'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان'] as $th)
+                            <x-table.heading>{{ __($th) }}</x-table.heading>
+                        @endforeach
+                    </x-table.row>
+                </x-slot>
+                <x-slot name="body">
+                    @forelse($taskUsers as $taskUser)
+                        <x-table.row wire:key="taskUser-{{ $taskUser->id }}">
+                            <x-table.cell>{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->task->meeting->title }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->task->meeting->scriptorium }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->full_name() }}</x-table.cell>
+                            <x-table.cell>
+                                @if(!$taskUser->sent_date)
+                                    <span class="text-red-500">{{__('اقدامی انجام نشده')}}</span>
+                                @else
+                                    {{$taskUsersk->sent_date}}
+                                @endif
+                            </x-table.cell>
+                            <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
+                            <x-table.cell>
+                                {{ $taskUser->formatted_diff ?? 'N/A' }}
+                            </x-table.cell>
 
-                            $gr_day = now()->day;
-                            $gr_month = now()->month;
-                            $gr_year = now()->year;
-                            $time = gregorian_to_jalali($gr_year,$gr_month,$gr_day,'/');
 
-                            $date1 = Carbon::parse($task->time_out);
-                            $date2 = Carbon::parse($time);
-                            $diff = $date1->diff($date2);
-                            $formattedDiff = '';
-
-                            if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
-                            if ($diff->m > 0) {$formattedDiff .= $diff->m . ' ماه';}
-                            if ($diff->d > 0) {$formattedDiff .= $diff->d . ' روز';}
-                            if ($diff->h > 0) {$formattedDiff .= $diff->h . ' ساعت';}
-                            if ($diff->i > 0) {$formattedDiff .= $diff->i . ' دقیقه';}
-                            if ($diff->s > 0) {$formattedDiff .= $diff->s . ' ثانیه';}
-
-                            // Remove the trailing comma and space if there's any output.
-                            $formattedDiff = rtrim($formattedDiff, ', ');
-                        @endphp
-                        {{ $formattedDiff }}
-                    </td>
-                </tr>
-            @empty
-                <tr class="border-b dark:border-gray-700">
-                    <th colspan="8"
-                        class="text-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                        {{__('رکوردی یافت نشد ...')}}
-                    </th>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-        <span class="p-2 mx-2">
-            {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
+                        </x-table.row>
+                    @empty
+                        <x-table.row>
+                            <x-table.cell colspan="6" class="py-6 text-center">
+                                {{ __('رکوردی یافت نشد ...') }}
+                            </x-table.cell>
+                        </x-table.row>
+                    @endforelse
+                </x-slot>
+            </x-table.table>
+            <span class="p-2 mx-2">
+            {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
         </span>
+        </div>
     </div>
 
 </x-app-layout>

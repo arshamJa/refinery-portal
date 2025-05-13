@@ -29,7 +29,7 @@ class MeetingStoreRequest extends FormRequest
             'title' => ['required','string','max:255'],
             'unit_organization' => ['required','string','min:5','max:255', new farsi_chs()],
             'scriptorium' => ['required','string','max:255', new farsi_chs()],
-            'boss' => ['required','max:255'],
+            'boss' => ['required'],
             'location' => ['required','string','max:255'],
             'year' => ['required'],
             'month' => ['required'],

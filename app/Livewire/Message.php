@@ -12,6 +12,7 @@ use App\Rules\farsi_chs;
 use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
@@ -27,7 +28,7 @@ class Message extends Component
     public $meeting;
     public $meetingId;
     public $body;
-    public $checkBox = false;
+    public bool $checkBox = false;
     public $full_name;
     public $p_code;
 
@@ -102,69 +103,59 @@ class Message extends Component
             ->select('id', 'meeting_id', 'user_id', 'is_present', 'reason_for_absent', 'read_by_user','replacement')
             ->paginate(5);
     }
-
     #[Computed]
     public function taskUsers()
     {
-        return TaskUser::with(['task.meeting'])
-            ->where('user_id',auth()->user()->id)
+        return TaskUser::with([
+            'task' => function ($query) {
+                $query->select('id', 'meeting_id', 'body');
+            },
+            'task.meeting' => function ($query) {
+                $query->select('id', 'title', 'date', 'time', 'scriptorium');
+            },
+            'user.user_info' => function ($query) {
+                $query->select('user_id', 'full_name');
+            }
+        ])
+            ->where('request_task','!=',null)
+            ->whereHas('task.meeting', function ($query) {
+                $query->where('scriptorium', auth()->user()->user_info->full_name);
+            })
+            ->select('id', 'task_id', 'user_id', 'request_task', 'created_at')
+            ->latest('created_at')
             ->get();
     }
 
-
-
-    public function accept($meetingId)
+    public function openModalAccept($meetingId)
     {
-        MeetingUser::where('meeting_id', $meetingId)
-            ->where('user_id', auth()->id())
-            ->update(['is_present' => '1']);
+        $this->meeting = Meeting::find($meetingId)?->title;
+        $this->meetingId = $meetingId;
+        $this->dispatch('crud-modal', name: 'accept-invitation');
     }
+
     public function openModalDeny($meetingId)
     {
         $this->meeting = Meeting::find($meetingId)?->title;
         $this->meetingId = $meetingId;
-        $this->dispatch('crud-modal', name: 'deny');
-    }
-    protected function normalizeText($text)
-    {
-        $text = preg_replace('/\s+/', ' ', trim($text));
-        $words = explode(' ', $text);
-        $uniqueWords = array_unique($words);
-        return implode(' ', $uniqueWords);
+        $this->dispatch('crud-modal', name: 'deny-invitation');
     }
 
 
-
-    protected function rules()
+    /**
+     * @throws ValidationException
+     */
+    public function accept($meetingId)
     {
-        return [
-            // Always validate body
-            'body' => 'required|string|max:255',
-
-            // Conditional validation for full_name and p_code when checkbox is checked
-            'full_name' => 'required_if:checkBox,true|string',
-            'p_code' => 'required_if:checkBox,true|numeric|digits:6',
-        ];
-    }
-
-    protected function messages()
-    {
-        return [
-            'body.required' => 'دلیل رد درخواست الزامی است و باید حداکثر 255 کاراکتر باشد',
-            'body.string' => 'دلیل رد درخواست باید یک رشته باشد',
-            'body.max' => 'دلیل رد درخواست نباید بیشتر از 255 کاراکتر باشد',
-            'full_name.required_if' => 'نام و نام خانوادگی الزامی است',
-            'p_code.required_if' => 'کد پرسنلی الزامی است',
-            'p_code.numeric' => 'کد پرسنلی باید عددی باشد',
-            'p_code.digits' => 'کد پرسنلی باید شامل 6 رقم باشد',
-        ];
-    }
-    public function deny($meetingId)
-    {
-        $this->validate();
-
-        // If checkbox is checked, validate full_name and p_code
         if ($this->checkBox) {
+            $validated = Validator::make(
+                ['full_name' => $this->full_name, 'p_code' => $this->p_code, 'checkBox' => $this->checkBox],
+                ['full_name' => 'required|string', 'p_code' => 'required|numeric|digits:6'],
+                [
+                    'full_name.required_if' => 'فیلد نام کامل اجباری است.',
+                    'p_code.required_if' => 'فیلد کد پرسنلی اجباری است.',
+                ]
+            )->validate();
+
             // Sanitize full_name
             $full_name = Str::deduplicate(trim($this->full_name));
 
@@ -194,14 +185,8 @@ class Message extends Component
                 return;
             }
 
-            // Update the current user's meeting record with the replacement
-            MeetingUser::where('meeting_id', $meetingId)
-                ->where('user_id', auth()->user()->id)
-                ->update([
-                    'replacement' => $userInfo->user_id,
-                    'reason_for_absent' => $this->body,
-                    'is_present' => '-1',
-                ]);
+            MeetingUser::where('meeting_id', $meetingId)->where('user_id', auth()->user()->id)
+                ->update(['is_present' => '1','replacement'=>$userInfo->user_id]);
 
             // Create the replacement user meeting record
             MeetingUser::create([
@@ -209,16 +194,42 @@ class Message extends Component
                 'user_id' => $userInfo->user_id,
                 'is_present' => '0',
             ]);
-        } else {
-            // If checkbox is not checked, just update the user's absence without replacement
-            MeetingUser::where('meeting_id', $meetingId)
-                ->where('user_id', auth()->user()->id)
-                ->update([
-                    'reason_for_absent' => $this->body,
-                    'is_present' => '-1',
-                    'replacement' => null,
-                ]);
         }
+        else {
+            // If checkbox is not checked, just update the user's presence without replacement
+            MeetingUser::where('meeting_id', $meetingId)
+                ->where('user_id', auth()->id())
+                ->update(['is_present' => '1']);
+        }
+        $this->close();
+    }
+
+    protected function normalizeText($text)
+    {
+        $text = preg_replace('/\s+/', ' ', trim($text));
+        $words = explode(' ', $text);
+        $uniqueWords = array_unique($words);
+        return implode(' ', $uniqueWords);
+    }
+
+
+    /**
+     * @throws ValidationException
+     */
+    public function deny($meetingId)
+    {
+        $validated = Validator::make(
+            ['body' => $this->body,],
+            ['body' => 'required|string|max:255',],
+            ['body.required' => 'فیلد دلیل رد درخواست اجباری است.',]
+        )->validate();
+
+        MeetingUser::where('meeting_id', $meetingId)
+            ->where('user_id', auth()->user()->id)
+            ->update([
+                'reason_for_absent' => $this->body,
+                'is_present' => '-1',
+            ]);
         $this->close();
     }
     public function close()
