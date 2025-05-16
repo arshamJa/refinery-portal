@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -90,5 +91,10 @@ class MeetingUser extends Model
     public function sentDate()
     {
         return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
+    }
+
+
+    public function notifications():MorphMany {
+        return $this->morphMany(Notification::class, 'notifiable');
     }
 }

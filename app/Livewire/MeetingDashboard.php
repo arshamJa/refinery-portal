@@ -68,7 +68,7 @@ class MeetingDashboard extends Component
         ])
             ->select([
                 'id', 'title', 'unit_organization', 'scriptorium', 'boss', 'location',
-                'date', 'time', 'status', 'position_organization', 'unit_held', 'applicant'
+                'date', 'time','end_time','status', 'position_organization', 'unit_held', 'applicant'
             ])
             ->when(!empty($search), function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {

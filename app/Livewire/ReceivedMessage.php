@@ -4,11 +4,11 @@ namespace App\Livewire;
 
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\User;
 use App\Models\UserInfo;
-use App\Rules\farsi_chs;
 use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
@@ -20,7 +20,7 @@ use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
-class Message extends Component
+class ReceivedMessage extends Component
 {
     use MessageReceived,WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks;
 
@@ -32,49 +32,17 @@ class Message extends Component
     public $full_name;
     public $p_code;
 
+    public $activeTab = 'sent';  // 'sent' or 'received'
+    public $unreadOnly = true;   // toggled by your button
+
     public function render()
     {
-        return view('livewire.message');
+        return view('livewire.received-message');
     }
-    #[Computed]
-    public function invitation()
-    {
-        return MeetingUser::where('user_id', auth()->id())
-            ->where('is_present', '0')
-            ->count();
-    }
-    #[Computed]
-    public function read_by_user()
-    {
-        return MeetingUser::where('user_id', auth()->id())
-            ->where('read_by_user', false)
-            ->count();
-    }
-    #[Computed]
-    public function sentTaskCount()
-    {
-        $fullName = auth()->user()->user_info->full_name;
 
-        return Task::whereHas('meeting', function ($query) use ($fullName) {
-            $query->where('scriptorium', $fullName);
-        })
-            ->where('status', true)
-            ->count();
-    }
-    #[Computed]
-    public function unreadMeetingUsersCount()
+    public function mount()
     {
-        return MeetingUser::where('is_present', '!=', '0')
-            ->where('read_by_scriptorium', false)
-            ->whereHas('meeting', function ($query) {
-                $query->where('scriptorium', auth()->user()->user_info->full_name);
-            })
-            ->count();
-    }
-    #[Computed]
-    public function meetingCount()
-    {
-        return Meeting::where('scriptorium', auth()->user()->user_info->full_name)->count();
+        $this->activeTab = request()->routeIs('received.message') ? 'received' : 'sent';
     }
 
 
@@ -88,6 +56,55 @@ class Message extends Component
             ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','status'])
             ->paginate(3);
     }
+
+
+
+    /**
+     * Show invitation to the participants
+     */
+    #[Computed]
+    public function participantNotifications()
+    {
+        return Notification::where('recipient_id', auth()->id())
+            ->whereHas('notifiable.meetingUsers', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
+            ->with([
+                'senderInfo.user_info',
+                'notifiable.meetingUsers',
+            ])
+            ->when($this->unreadOnly, fn($query) => $query->whereNull('read_at'))
+            ->latest()
+            ->paginate(5);
+    }
+
+
+    #[Computed]
+    public function scriptoriumNotifications()
+    {
+        return Notification::where('recipient_id', auth()->id())
+            ->where('type', 'DeniedTaskNotification')
+            ->with([
+                'senderInfo.user_info',
+                'notifiable.meetingUsers',
+            ])
+            ->when($this->unreadOnly, fn($query) => $query->whereNull('read_at'))
+            ->latest()
+            ->paginate(5);
+    }
+
+
+
+    /**
+     * Mark a notification as read.
+     */
+    public function markAsRead($notificationId)
+    {
+        auth()->user()->notifications()->where('id', $notificationId)->update(['read_at' => now()]);
+        return to_route('received.message');
+    }
+
+
 
     #[Computed]
     public function meetingUsers()
@@ -235,7 +252,6 @@ class Message extends Component
     public function close()
     {
         $this->dispatch('close-modal');
-        return to_route('message');
+        return to_route('received.message');
     }
-
 }

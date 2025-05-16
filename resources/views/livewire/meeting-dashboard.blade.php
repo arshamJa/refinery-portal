@@ -27,24 +27,22 @@
     <div class="mb-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             @can('create-meeting')
-                <a href="{{route('meeting.create')}}"
-                   class="inline-flex items-center  gap-2 px-5 py-4 rounded-xl text-white bg-gradient-to-r from-[#4332BD] to-[#6B5CFF] hover:from-[#3624A7] hover:to-[#5949F6] transition-all duration-300 ease-in-out shadow-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 4.5v15m7.5-7.5h-15"/>
+                <a href="{{ route('meeting.create') }}"
+                   class="inline-flex items-center gap-3 px-6 py-4 rounded-lg text-white bg-gradient-to-r from-[#0A74DA] to-[#34B3F1] transition-all duration-300 ease-in-out shadow-lg hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#0A74DA] disabled:opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                     </svg>
                     <span class="text-sm font-medium">
-                        {{__('ایجاد جلسه جدید')}}
-                    </span>
+                         {{ __('ایجاد جلسه جدید') }}
+                         </span>
                 </a>
             @endcan
-            <a href="{{route('my.task.table')}}"
-               class="inline-flex items-center gap-2 px-5 py-4 rounded-xl text-white bg-gradient-to-r from-[#FF6F61] to-[#4C6EF5] transition-all duration-300 ease-in-out shadow-md hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
-                    <span class="text-sm font-medium">
-                      {{__('اقدامات من')}}
-                    </span>
-            </a>
+                <a href="{{ route('my.task.table') }}"
+                   class="inline-flex items-center gap-3 px-6 py-4 rounded-lg text-white bg-gradient-to-r from-[#FF6F61] to-[#F2A900] transition-all duration-300 ease-in-out shadow-lg hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
+            <span class="text-sm font-medium">
+                {{ __('اقدامات من') }}
+            </span>
+                </a>
 
             {{--                <a href="{{route('meetingsList')}}"--}}
             {{--                   class="bg-[#FCF7F8]  hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow  flex gap-2 items-start transition duration-300 ease-in-out p-4 rounded-lg">--}}
@@ -193,7 +191,7 @@
                             <x-table.cell>{{$meeting->scriptorium}}</x-table.cell>
                             <x-table.cell>{{$meeting->unit_organization}}</x-table.cell>
                             <x-table.cell>{{$meeting->date}}</x-table.cell>
-                            <x-table.cell>{{$meeting->time}}</x-table.cell>
+                            <x-table.cell>{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
                             <x-table.cell>{{$meeting->location}}</x-table.cell>
                             @if(auth()->user()->user_info->full_name === $meeting->scriptorium)
                                 <x-table.cell>
@@ -208,43 +206,33 @@
                                     {{__('---')}}
                                 </x-table.cell>
                             @endif
-
                             <x-table.cell>
                                 @switch($meeting->status)
-
-                                    @case(MeetingStatus::IS_CANCELLED)
-                                        <span
-                                            class="block w-full bg-red-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                    @case(App\Enums\MeetingStatus::PENDING)
+                                        <span class="bg-yellow-100 text-yellow-600 text-sm font-medium px-3 py-1 rounded-lg">
+                                            {{ __('درحال بررسی دعوتنامه') }}
+                                        </span>
+                                        @break
+                                    @case(App\Enums\MeetingStatus::IS_CANCELLED)
+                                        <span class="bg-red-100 text-red-600 text-sm font-medium px-3 py-1 rounded-lg">
                                             {{ __('جلسه لغو شد') }}
                                         </span>
                                         @break
-
-                                    @case(MeetingStatus::IS_NOT_CANCELLED)
-                                        <span
-                                            class="block w-full bg-green-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
+                                    @case(App\Enums\MeetingStatus::IS_NOT_CANCELLED)
+                                        <span class="bg-green-100 text-green-600 text-sm font-medium px-3 py-1 rounded-lg">
                                             {{ __('جلسه برگزار میشود') }}
                                         </span>
                                         @break
-
-                                    @case(MeetingStatus::IS_IN_PROGRESS)
-                                        <span
-                                            class="block w-full bg-blue-500 text-xs text-white font-medium px-3 py-1 rounded-lg m-1">
-                                                    {{ __('جلسه درحال برگزاری است') }}
-                                                </span>
+                                    @case(App\Enums\MeetingStatus::IS_IN_PROGRESS)
+                                        <span class="bg-blue-100 text-blue-600 text-sm font-medium px-3 py-1 rounded-lg">
+                                            {{ __('جلسه درحال برگزاری است') }}
+                                        </span>
                                         @break
-
-                                    @case(MeetingStatus::IS_FINISHED)
-                                        <span
-                                            class="block w-full bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-lg m-1">
+                                    @case(App\Enums\MeetingStatus::IS_FINISHED)
+                                        <span class="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-lg">
                                             {{ __('جلسه خاتمه یافت') }}
                                         </span>
                                         @break
-                                    @default
-                                        <span
-                                            class="block w-full bg-yellow-400 text-xs text-gray-800 font-medium px-3 py-1 rounded-lg m-1">
-                                                {{ __('درحال بررسی دعوتنامه') }}
-                                            </span>
-
                                 @endswitch
                             </x-table.cell>
                             <!-- Start Meeting Button (New Column) -->

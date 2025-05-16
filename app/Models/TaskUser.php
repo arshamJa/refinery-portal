@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class TaskUser extends Model
 {
@@ -41,5 +42,8 @@ class TaskUser extends Model
     public function full_name()
     {
         return UserInfo::where('user_id',$this->user_id)->value('full_name');
+    }
+    public function notifications():MorphMany {
+        return $this->morphMany(Notification::class, 'notifiable');
     }
 }

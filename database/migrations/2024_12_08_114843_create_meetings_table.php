@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('location');
             $table->string('date');
             $table->string('time');
+            $table->string('end_time')->nullable();   // ساعت خاتمه جلسه
             $table->string('unit_held'); // واحد برگزار کننده
             $table->string('treat'); // پذیرایی
             $table->json('guest')->nullable(); // this could be multiple

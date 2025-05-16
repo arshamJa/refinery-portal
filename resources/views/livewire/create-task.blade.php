@@ -1,7 +1,5 @@
 @php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use Illuminate\Support\Str; @endphp
 <div>
-
-
     @if (session('status'))
         <div
             x-data="{ showMessage: true }" x-show="showMessage" x-transition x-cloak
@@ -88,7 +86,7 @@
                 <strong>{{ __('پیوست: ') }}</strong><span>{{ $this->meetings->tasks->flatMap->taskUsers->flatMap->taskUserFiles->count() === 1 ? 'دارد' : 'ندارد' }}</span>
             </div>
             <div><strong>{{ __('تاریخ جلسه: ') }}</strong><span>{{ $this->meetings->date }}</span></div>
-            <div><strong>{{ __('زمان جلسه: ') }}</strong><span>{{ $this->meetings->time }}</span></div>
+            <div><strong>{{ __('زمان جلسه: ') }}</strong><span>{{ $this->meetings->time }}@if($this->meetings->end_time)- {{ $this->meetings->end_time }}@endif</span></div>
             <div><strong>{{ __('مکان جلسه: ') }}</strong><span>{{ $this->meetings->location }}</span></div>
             <div><strong>{{ __('موضوع جلسه: ') }}</strong><span>{{ $this->meetings->title }}</span></div>
             <div class="col-span-2 print:col-span-2"><strong>{{ __('حاضرین: ') }}</strong>
@@ -359,9 +357,14 @@
                                     </x-primary-button>
                                 @endcan
                                 @can('updateTask', $taskUser)
-                                    <x-secondary-button wire:click="openUpdateModal({{$taskUser->id}})">
-                                        {{ __('ویرایش اقدام') }}
-                                    </x-secondary-button>
+                                    <div class="flex gap-2">
+                                        <x-secondary-button wire:click="openUpdateModal({{$taskUser->id}})">
+                                            {{ __('ویرایش') }}
+                                        </x-secondary-button>
+                                        <x-secondary-button wire:click="sendToScriptorium({{$taskUser->id}})">
+                                            {{ __('ارسال') }}
+                                        </x-secondary-button>
+                                    </div>
                                 @endcan
                             </td>
                         </tr>
@@ -455,17 +458,15 @@
                                           wire:loading.attr="disabled"
                                           wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="submitTaskForm">
-                            {{ __('ثبت') }}
+                            {{ __('ذخیره') }}
                         </span>
                         <span wire:loading wire:target="submitTaskForm" class="ml-2">
                             {{ __('در حال ثبت...') }}
                         </span>
                         </x-primary-button>
-
-                        <button type="button" x-on:click="$dispatch('close')"
-                                class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+                        <x-cancel-button x-on:click="$dispatch('close')">
                             {{ __('لغو') }}
-                        </button>
+                        </x-cancel-button>
                     </div>
                 </div>
             </form>
@@ -649,8 +650,11 @@
 
     <x-modal name="deny-task" :closable="false">
         @if ($selectedTask)
-            <form wire:submit="denyTask">
+            <form wire:submit="denyTask({{$selectedTask->id}})">
                 <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
+                    <div class="grid grid-cols-1 gap-4">
+                        <x-meeting-info label="{{ __('مهلت انجام') }}" :value="$selectedTask->time_out"/>
+                    </div>
                     <div class="grid grid-cols-1 gap-4">
                         <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
                     </div>

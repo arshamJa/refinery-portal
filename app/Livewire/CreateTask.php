@@ -5,9 +5,11 @@ namespace App\Livewire;
 use App\Enums\MeetingStatus;
 use App\Enums\TaskStatus;
 use App\Models\Meeting;
+use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\TaskUserFile;
+use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -161,7 +163,7 @@ class CreateTask extends Component
             }
         }
 
-        session()->flash('message', 'اقدام با موفقیت ثبت شد.');
+        session()->flash('status', 'اقدام با موفقیت ثبت شد.');
         $this->dispatch('close-modal');
     }
     public function openUpdateModal($taskUserId)
@@ -182,9 +184,12 @@ class CreateTask extends Component
 
     public function finishMeeting($meeting_id)
     {
-        Meeting::where('id', $meeting_id)->update(['status' => MeetingStatus::IS_FINISHED->value]);
+        Meeting::where('id', $meeting_id)->update([
+            'status' => MeetingStatus::IS_FINISHED->value,
+            'end_time' => now()->format('H:i')
+        ]);
         $this->dispatch('close-modal');
-        session()->flash('status', 'اقدام با موفقیت ثبت شد');
+        session()->flash('status', 'جلسه خاتمه یافت');
     }
 
 
@@ -215,9 +220,8 @@ class CreateTask extends Component
     /**
      * @throws ValidationException
      */
-    public function denyTask()
+    public function denyTask($selectedTaskId)
     {
-
         $validated = Validator::make(
             ['request_task' => $this->request_task],
             ['request_task' => 'required|min:3'],
@@ -227,13 +231,36 @@ class CreateTask extends Component
         $request_task = Str::of(strip_tags($this->request_task))->squish();
 
         // Find the TaskUser model
-        $taskUser = TaskUser::findOrFail($this->taskUserId);
+        $taskUser = TaskUser::findOrFail($selectedTaskId);
 
         // Update the task's status and reason
         $taskUser->task_status = TaskStatus::DENIED;
         $taskUser->request_task = $validated['request_task'];  // Save the reason
         $taskUser->save();
-        session()->flash('message', 'وظیفه با موفقیت رد شد.');
+
+        // Get the related meeting
+        $meeting = $taskUser->task->meeting;
+
+        // Prepare the notification message
+        $notificationMessage = "درخواست خلاصه مذاکره با دلیل رد: " . $request_task;
+        // Get the scriptorium user id (recipient)
+        $recipientId = User::whereHas('user_info', function($q) use ($meeting) {
+            $q->where('full_name', $meeting->scriptorium);
+        })->value('id');
+
+        if ($recipientId) {
+            // Create the notification to the scriptorium
+            Notification::create([
+                'type' => 'DeniedTaskNotification',
+                'data' => json_encode(['message' => $notificationMessage]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meeting->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $recipientId,
+            ]);
+        }
+
+        session()->flash('status', 'درخواست شما به دبیرجلسه ارسال شد');
         $this->dispatch('close-modal');
     }
 
@@ -288,7 +315,7 @@ class CreateTask extends Component
         $timeOutChanged = $taskUser->time_out !== $newTimeOut;
 
         if (!$bodyChanged && !$timeOutChanged) {
-            session()->flash('message', 'هیچ تغییری اعمال نشد.');
+            session()->flash('status', 'هیچ تغییری اعمال نشد.');
             $this->dispatch('close-modal', name: 'edit-by-scriptorium');
             return;
         }
@@ -309,6 +336,15 @@ class CreateTask extends Component
         }
         session()->flash('status', 'ویرایش انجام شد');
         $this->dispatch('close-modal', name: 'edit-by-scriptorium');
+    }
+
+
+    public function sendToScriptorium($taskUserId)
+    {
+        $taskUser = TaskUser::findOrFail($taskUserId);
+        $taskUser->task_status = TaskStatus::SENT_TO_SCRIPTORIUM;
+        $taskUser->save();
+        session()->flash('status', 'شرح اقدام به دبیرجلسه ارسال شد');
     }
 
     protected function normalizeText($text)

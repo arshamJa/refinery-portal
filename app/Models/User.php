@@ -50,8 +50,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-
     public function taskUsers():HasMany
     {
         return $this->hasMany(TaskUser::class)->chaperone();
@@ -204,5 +202,10 @@ class User extends Authenticatable
     public function profilePhoto()
     {
         return url('storage/'.$this->profile_photo_path);
+    }
+
+    public function notifications():HasMany
+    {
+        return $this->hasMany(Notification::class, 'recipient_id');
     }
 }

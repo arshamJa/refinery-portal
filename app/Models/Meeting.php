@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
@@ -24,6 +25,7 @@ class Meeting extends Model
         'location',
         'date',
         'time',
+        'end_time',
         'unit_held',
         'treat',
         'guest',
@@ -79,5 +81,7 @@ class Meeting extends Model
     }
     // End of  Scope for Scriptorium Report
 
-
+    public function notifications():MorphMany {
+        return $this->morphMany(Notification::class, 'notifiable');
+    }
 }

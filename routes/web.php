@@ -40,30 +40,8 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard');
 
 
-//    Route::middleware(['auth', 'role:ادمین,super_admin'])->group(function () {
-//        Route::get('/admin/dashboard', AdminDashboard::class)->name('dashboard');
-//    });
-//
-//    Route::middleware(['auth', 'role:اپراتور'])->group(function () {
-//        Route::get('/operator/dashboard', OperatorDashboard::class)->name('operator.dashboard');
-//    });
-//
-//    Route::middleware(['auth', 'role:کاربر'])->group(function () {
-//        Route::get('/employee/dashboard', EmployeeDashboard::class)->name('dashboard');
-//    });
-
-
-
-
-
-
-    // Employee-Access-Table Route
-//    Route::get('employee/access', EmployeeAccess::class)
-//        ->name('employeeAccess');
-
-
-    Route::get('message', Message::class)->name('message');
-
+    Route::get('received/message',\App\Livewire\ReceivedMessage::class)->name('received.message');
+    Route::get('sent/message',\App\Livewire\SentMessage::class)->name('sent.message');
 
     Route::get('employee/organization', EmployeesOrganization::class)
         ->name('employee.organization');

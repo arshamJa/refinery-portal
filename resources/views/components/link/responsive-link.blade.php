@@ -2,8 +2,8 @@
 
 @php
     $classes = ($active ?? false)
-                ? 'block text-right text-black rounded-md bg-gray-200 px-3 py-2 text-base font-medium'
-                : 'block text-right rounded-md px-3 py-2 text-base font-medium transition ease-in-out duration-200 text-gray-600 hover:text-black hover:bg-gray-200';
+                ? 'block text-sm text-right text-black rounded-md bg-blue-500 text-white px-3 py-2 text-base font-medium'
+                : 'block text-sm text-right rounded-md px-3 py-2 text-base font-medium transition ease-in-out duration-300 text-gray-700 hover:bg-blue-500 hover:text-white';
 @endphp
 
 <a wire:navigate wire:cloak {{ $attributes->merge(['class' => $classes]) }}>

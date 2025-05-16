@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('replacement')->nullable();
             $table->softDeletes();
             $table->timestamps();
+            $table->index(['meeting_id', 'user_id']);
         });
     }
 

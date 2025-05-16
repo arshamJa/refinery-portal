@@ -6,11 +6,14 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\meeting\MeetingStoreRequest;
 use App\Http\Requests\MeetingUpdateRequest;
+use App\Jobs\SendNotificationJob;
 use App\Models\Department;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Models\Notification;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -57,15 +60,30 @@ class CreateNewMeetingController extends Controller
      */
     public function create()
     {
-        $users = UserInfo::with('department:id,department_name')
-            ->whereHas('user', function ($query) {
-            $query->whereDoesntHave('roles', function ($roleQuery) {
-                $roleQuery->where('name', UserRole::SUPER_ADMIN->value);
-            });
-        })->select('id', 'user_id', 'full_name', 'department_id', 'position')
-            ->get();
+//        $users = UserInfo::with('department:id,department_name')
+//            ->whereHas('user', function ($query) {
+//            $query->whereDoesntHave('roles', function ($roleQuery) {
+//                $roleQuery->where('name', UserRole::SUPER_ADMIN->value);
+//            });
+//        })->select('id', 'user_id', 'full_name', 'department_id', 'position')
+//            ->get();
+//
+//        $departments = Department::select('id','department_name')->get();
 
-        $departments = Department::select('id','department_name')->get();
+        $users = Cache::remember('users_without_super_admin', 3600, function () {
+            return UserInfo::with('department:id,department_name')
+                ->whereHas('user', function ($query) {
+                    $query->whereDoesntHave('roles', function ($roleQuery) {
+                        $roleQuery->where('name', UserRole::SUPER_ADMIN->value);
+                    });
+                })
+                ->select('id', 'user_id', 'full_name', 'department_id', 'position')
+                ->get();
+        });
+        $departments = Cache::remember('departments_list', 3600, function () {
+            return Department::select('id', 'department_name')->get();
+        });
+
         return view('meeting.crud.create' , ['users' => $users,'departments'=>$departments]);
     }
 
@@ -108,7 +126,8 @@ class CreateNewMeetingController extends Controller
         // Convert current Gregorian date to Jalali
         $newDate = $this->getCurrentDate($request->year,$request->month,$request->day);
 
-        $bossName = UserInfo::where('user_id',$request->boss)->value('full_name');
+        $boss = UserInfo::where('user_id', $request->boss)->first();
+        $bossName = $boss ? $boss->full_name : 'Unknown';
 
         $request->merge([
             'time' => str_contains($request->time, ':') ? $request->time : sprintf('%02d:00', intval($request->time))
@@ -136,6 +155,9 @@ class CreateNewMeetingController extends Controller
 
             $meetingUserRecords = [];
 
+            // Collect recipients (holders + inner guests)
+            $recipients = collect();
+
             // 1. Holders
             $holders = Str::of($request->holders)->explode(',');
             foreach ($holders as $holder) {
@@ -146,11 +168,15 @@ class CreateNewMeetingController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
+                $recipients->push(trim($holder));
             }
 
             // 2. Inner Guests
             foreach ($innerGuests as $guest) {
                 $userInfo = UserInfo::where('full_name', $guest['name'])->first();
+                if ($userInfo) {
+                    $recipients->push((string) $userInfo->user_id);
+                }
                 $meetingUserRecords[] = [
                     'user_id' => $userInfo?->user_id,
                     'meeting_id' => $meeting->id,
@@ -161,6 +187,36 @@ class CreateNewMeetingController extends Controller
             }
             // 3. Insert everything at once
             MeetingUser::insert($meetingUserRecords);
+
+            if ($boss) {
+                $recipients->push((string) $boss->user_id);
+            }
+
+            // Create Notifications
+            foreach ($recipients as $recipientId) {
+                $notificationMessage = 'شما در جلسه: ' . $meeting->title .
+                    ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . 'دعوت شده اید';
+
+                Notification::create([
+                    'type' => 'Meeting Invitation',
+                    'data' => json_encode(['message' => $notificationMessage]),
+                    'notifiable_type' => Meeting::class,
+                    'notifiable_id' => $meeting->id,
+                    'sender_id' => auth()->id(),
+                    'recipient_id' => $recipientId,
+                ]);
+
+                // use this for jobs: php artisan queue:work --queue=notifications and below
+//                dispatch(new SendNotificationJob([
+//                    'type' => 'Meeting Invitation',
+//                    'data' => json_encode(['message' => $notificationMessage]),
+//                    'notifiable_type' => \App\Models\Meeting::class,
+//                    'notifiable_id' => $meeting->id,
+//                    'sender_id' => auth()->id(),
+//                    'recipient_id' => $recipientId,
+//                ]))->onQueue('notifications');
+            }
+
 
         }
         return to_route('dashboard.meeting')->with('status', __('جلسه جدبد ساخته و دعوتنامه به اعضا جلسه ارسال شد'));
@@ -297,16 +353,81 @@ class CreateNewMeetingController extends Controller
             'read_by_user' => false,
             'read_by_scriptorium' => false
         ]));
+        // List of fields to watch for changes
+        $watchedFields = [
+            'title', 'unit_organization', 'scriptorium', 'boss',
+            'location', 'date', 'time', 'unit_held',
+            'treat', 'guest', 'applicant', 'position_organization'
+        ];
 
+        // Check if any of these fields have changed
+        $originalMeeting = $meeting->getOriginal();
+        $hasChanged = collect($watchedFields)->contains(function ($field) use ($originalMeeting, $request) {
+            return $originalMeeting[$field] != $request->$field;
+        });
+
+        // Manage Inner Guests (Keep old, add new)
+        $innerGuests = collect($request->input('guests.inner', []))->pluck('name')->unique();
+        $guestUserIds = UserInfo::whereIn('full_name', $innerGuests)->pluck('user_id');
+
+        $existingGuests = $meeting->meetingUsers()->where('is_guest', true)->pluck('user_id');
+        $newGuests = $guestUserIds->diff($existingGuests);
+
+        // Manage Participants (Keep old, add new)
+        $participants = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
+            ->filter(fn($id) => is_numeric($id))->unique()->map(fn($id) => (int) $id);
+
+        $existingParticipants = $meeting->meetingUsers()->where('is_guest', false)->pluck('user_id');
+        $newParticipants = $participants->diff($existingParticipants);
+
+        // Define the notification message
+        $notificationMessage = 'شما در جلسه: ' . $meeting->title .
+            ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . ' دعوت شده اید';
+
+        // Collect all current participants and guests
+        $allUserIds = $guestUserIds->merge($participants)->unique();
+        $notificationsData = [];
+
+        // Prepare data for upsert
+        foreach ($allUserIds as $userId) {
+            $notificationsData[] = [
+                'type' => 'Meeting Invitation',
+                'data' => json_encode(['message' => $notificationMessage]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meeting->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $userId,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        // Upsert (Insert or Update) notifications in a single query
+        Notification::upsert(
+            $notificationsData,
+            ['notifiable_type', 'notifiable_id', 'recipient_id'], // Unique constraints to match
+            ['data', 'sender_id', 'updated_at'] // Fields to update if existing
+        );
         return to_route('dashboard.meeting')->with('status', __('جلسه با موفقیت بروز شد'));
     }
 
     public function deleteUser(Request $request, $meetingId, $userId)
     {
-        // Assuming $meetingId and $userId are passed as route parameters or request input
-        MeetingUser::where('user_id', $userId)->where('meeting_id',$meetingId)->delete();
+
+        // Delete the meeting user record
+        MeetingUser::where('user_id', $userId)
+            ->where('meeting_id', $meetingId)
+            ->delete();
+
+        // Delete the notification(s) related to this user and meeting
+        Notification::where('notifiable_type', Meeting::class)
+            ->where('notifiable_id', $meetingId)
+            ->where('recipient_id', $userId)
+            ->delete();
+
         return response()->json(['status' => 'این شخص از جلسه حذف شد']);
     }
+
     public function deleteGuest(Request $request, $guestId)
     {
         // Get meeting_id and guest_id from the request
@@ -322,6 +443,14 @@ class CreateNewMeetingController extends Controller
         // If the guest is found, delete
         if ($meetingUser) {
             $meetingUser->delete();  // Delete the guest from the meeting_user table
+
+
+            // Delete related notifications for this guest and meeting
+            Notification::where('notifiable_type', Meeting::class)
+                ->where('notifiable_id', $meetingId)
+                ->where('recipient_id', $guestId)
+                ->delete();
+
 
             // Respond with a success message
             return response()->json(['status' => 'مهمان از جلسه حذف شد.']);
@@ -345,24 +474,24 @@ class CreateNewMeetingController extends Controller
 
         return response()->json(['status' => 'مهمان یافت نشد.'], 404);
     }
-    //    /**
-//     * Remove the specified resource from storage.
-//     */
-//    public function destroy(string $id)
-//    {
-//        $meeting = Meeting::with('meetingUsers')->findOrFail($id);
-//        try {
-//            DB::transaction(function () use ($meeting) {
-//                // Soft delete related meeting users
-//                $meeting->meetingUsers()->delete();
-//                // Soft delete the meeting itself
-//                $meeting->delete();
-//            });
-//            return to_route('dashboard.meeting')->with('status',' جلسه با موفقیت حذف شد');
-//        } catch (\Exception $e) {
-//            return to_route('dashboard.meeting')->with('error', 'خطا در حذف جلسه: ' . $e->getMessage());
-//        }
-//    }
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $meeting = Meeting::with('meetingUsers')->findOrFail($id);
+        try {
+            DB::transaction(function () use ($meeting) {
+                // Soft delete related meeting users
+                $meeting->meetingUsers()->delete();
+                // Soft delete the meeting itself
+                $meeting->delete();
+            });
+            return to_route('dashboard.meeting')->with('status',' جلسه با موفقیت حذف شد');
+        } catch (\Exception $e) {
+            return to_route('dashboard.meeting')->with('error', 'خطا در حذف جلسه: ' . $e->getMessage());
+        }
+    }
 
     /**
      * Validate and format a Jalali date.
