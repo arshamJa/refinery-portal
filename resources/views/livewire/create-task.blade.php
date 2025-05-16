@@ -204,14 +204,17 @@
                         <x-input-error :messages="$errors->get('body')" class="mt-2"/>
                     </div>
 
+
+
+
                     <div class="flex space-x-2 rtl:space-x-reverse">
                         <x-primary-button type="submit">
                             {{ __('ارسال') }}
                         </x-primary-button>
                         <a href="{{route('dashboard.meeting')}}">
-                            <x-secondary-button>
+                            <x-cancel-button>
                                 {{__('لغو')}}
-                            </x-secondary-button>
+                            </x-cancel-button>
                         </a>
                     </div>
                 </div>

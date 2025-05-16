@@ -242,7 +242,7 @@ class CreateTask extends Component
         $meeting = $taskUser->task->meeting;
 
         // Prepare the notification message
-        $notificationMessage = "درخواست خلاصه مذاکره با دلیل رد: " . $request_task;
+        $notificationMessage = $request_task;
         // Get the scriptorium user id (recipient)
         $recipientId = User::whereHas('user_info', function($q) use ($meeting) {
             $q->where('full_name', $meeting->scriptorium);

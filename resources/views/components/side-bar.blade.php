@@ -1,20 +1,23 @@
 @php use App\Enums\UserRole; @endphp
-
-
 <div class="h-full flex flex-col">
         <!-- Profile Image and Name -->
-        <div class="flex flex-col justify-center items-center px-3 pb-4 font-bold border-b border-gray-700">
+        <div class="flex flex-col justify-center items-center text-gray-100 px-3 pb-4 font-bold border-b border-gray-500">
             <div>
                 @if(auth()->user()->profile_photo_path)
                     <img class="rounded-full m-2 w-14 h-14 object-cover" src="{{ auth()->user()->profilePhoto() }}" alt="">
                 @else
-                    <svg
-                        class="shrink-0 rounded-full m-2 w-14 h-14 bg-gray-100 text-gray-700"
-                        fill="currentColor"
-                        viewBox="0 0 24 24">
-                        <path
-                            d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"/>
+{{--                    <svg--}}
+{{--                        class="shrink-0 rounded-full m-2 w-14 h-14 bg-gray-100 text-gray-700"--}}
+{{--                        fill="currentColor"--}}
+{{--                        viewBox="0 0 24 24">--}}
+{{--                        <path--}}
+{{--                            d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"/>--}}
+{{--                    </svg>--}}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                         class="shrink-0 rounded-full m-2 w-14 h-14 ">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
+
                 @endif
             </div>
             <div class="text-center">
@@ -30,7 +33,7 @@
             <li class="mb-2">
                 <div x-data="{ openMeeting: false }" class="w-full">
                     <button @click="openMeeting = !openMeeting"
-                            class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-700 bg-gray-100 hover:bg-blue-500 hover:text-white transition ease-in-out duration-300 rounded-md">
+                            class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md">
                         <div class="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                  viewBox="0 0 24 24"
@@ -48,7 +51,7 @@
                                   clip-rule="evenodd"/>
                         </svg>
                     </button>
-                    <div x-show="openMeeting" x-transition class="mt-1 space-y-1 pl-4">
+                    <div x-show="openMeeting" x-transition class="mt-1 space-y-1 pr-3">
                         <x-link.responsive-link href="{{route('dashboard.meeting')}}"
                                                 :active="request()->is('dashboard/meeting')" class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -71,15 +74,17 @@
             <li class="mb-2">
                 <div x-data="{ openMessage: false }" class="w-full">
                     <button @click="openMessage = !openMessage"
-                            class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-700 bg-gray-100 hover:bg-blue-500 hover:text-white transition ease-in-out duration-300 rounded-md">
+                            class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
                         <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M4.5 8.25h15m-15 4.5h15m-15 4.5h15"/>
-                            </svg>
-                            <span> {{__('پیام ها')}}</span>
+                            @if(\App\Models\Notification::where('recipient_id',auth()->user()->id)->where('read_at',null))
+                                <div class="relative flex items-center">
+                                <span class="relative flex h-3 w-3">
+                                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-100 opacity-75"></span>
+                                    <span class="relative inline-flex h-3 w-3 rounded-full bg-sky-50"></span>
+                                </span>
+                                </div>
+                            @endif
+                            <span>پیام ها</span>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': openMessage}"
                              class="h-4 w-4 transition-transform"
@@ -89,7 +94,7 @@
                                   clip-rule="evenodd"/>
                         </svg>
                     </button>
-                    <div x-show="openMessage" x-transition class="mt-1 space-y-1 pl-4">
+                    <div x-show="openMessage" x-transition class="mt-1 space-y-1 pr-3">
                         <x-link.responsive-link href="{{route('received.message')}}"
                                                 :active="request()->is('received/message')" class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -159,9 +164,9 @@
                 @can('side-bar-notifications')
                     <div x-data="{ openSetting: false }" class="w-full mb-4">
                         <button @click="openSetting = !openSetting"
-                                class="w-full flex items-center justify-between px-4 py-2  font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition">
+                                class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition">
                             <div class="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                      viewBox="0 0 24 24"
                                      stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -177,7 +182,7 @@
                                       clip-rule="evenodd"/>
                             </svg>
                         </button>
-                        <div x-show="openSetting" x-transition class="mt-1 space-y-1 pl-4">
+                        <div x-show="openSetting" x-transition class="mt-1 space-y-1 pr-3">
                             <x-link.responsive-link href="{{route('users.create')}}" :active="request()->is('users/create')"
                                                     class="flex items-center text-sm gap-x-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -225,18 +230,19 @@
         </ul>
     </nav>
 
-    <div class="py-4 px-2 border-t border-gray-700">
+    <div class="py-4 px-2 border-t border-gray-500">
         <form action="{{route('logout')}}" method="post">
             @csrf
-            <button type="submit"
-                    class="hover:text-white bg-transparent border border-gray-700 hover:border-transparent hover:bg-[#E96742] transition ease-in-out duration-200 inline-flex justify-center items-center gap-1 w-full text-base font-medium rounded-md px-4 py-2 text-right">
+            <x-cancel-button type="submit" class="inline-flex justify-center items-center gap-1 w-full">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="size-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
                 </svg>
-                <span>{{__('خروج')}}</span>
-            </button>
+                <span class="text-sm">{{__('خروج')}}</span>
+            </x-cancel-button>
         </form>
     </div>
 </div>
+
+

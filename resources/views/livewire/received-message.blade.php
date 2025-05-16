@@ -153,7 +153,7 @@
             <x-table.table>
                 <x-slot name="head">
                     <x-table.row>
-                        @foreach (['#', 'فرستنده (کاربر)', 'متن دلیل رد', 'وضعیت جلسه', 'وضعیت خواندن'] as $th)
+                        @foreach (['#', 'فرستنده (کاربر)', 'متن دلیل رد', 'وضعیت جلسه', 'قابلیت','وضعیت خواندن'] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
                     </x-table.row>
@@ -179,7 +179,6 @@
                                 @php
                                     $meeting = $notification->notifiable;
                                 @endphp
-
                                 @switch($meeting->status ?? null)
                                     @case(App\Enums\MeetingStatus::PENDING)
                                         <span class="bg-yellow-100 text-yellow-600 text-sm font-medium px-3 py-1 rounded-lg">
@@ -213,8 +212,13 @@
 
                             {{-- Read Status --}}
                             <x-table.cell>
-                                <div id="read-status-{{ $notification->id }}">
-                                    @if (!$notification->read_at)
+                                <a href="{{route('tasks.create',$meeting->id)}}" wire:navigate>
+                                    <x-secondary-button>{{__('نمایش صورتجلسه')}}</x-secondary-button>
+                                </a>
+                            </x-table.cell>
+                            <x-table.cell>
+                                <div id="notification-{{ $notification->id }}">
+                                    @if (! $notification->read_at)
                                         <button wire:click="markAsRead('{{ $notification->id }}')" class="text-blue-500 underline">
                                             {{ __('متوجه شدم') }}
                                         </button>
