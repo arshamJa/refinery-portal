@@ -158,6 +158,8 @@ class CreateNewMeetingController extends Controller
             // Collect recipients (holders + inner guests)
             $recipients = collect();
 
+            $guestIds = collect();
+
             // 1. Holders
             $holders = Str::of($request->holders)->explode(',');
             foreach ($holders as $holder) {
@@ -194,11 +196,21 @@ class CreateNewMeetingController extends Controller
 
             // Create Notifications
             foreach ($recipients as $recipientId) {
-                $notificationMessage = 'شما در جلسه: ' . $meeting->title .
-                    ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . 'دعوت شده اید';
+                // Check if the recipient is an inner guest
+                $isGuest = $guestIds->contains($recipientId);
+
+                if ($isGuest) {
+                    $notificationType = 'MeetingGuestInvitation';
+                    $notificationMessage = 'شما به عنوان مهمان در جلسه: ' . $meeting->title .
+                        ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . ' دعوت شده اید';
+                } else {
+                    $notificationType = 'MeetingInvitation';
+                    $notificationMessage = 'شما در جلسه: ' . $meeting->title .
+                        ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . ' دعوت شده اید';
+                }
 
                 Notification::create([
-                    'type' => 'Meeting Invitation',
+                    'type' => $notificationType,
                     'data' => json_encode(['message' => $notificationMessage]),
                     'notifiable_type' => Meeting::class,
                     'notifiable_id' => $meeting->id,
@@ -337,7 +349,6 @@ class CreateNewMeetingController extends Controller
 
         $existingGuests = $meeting->meetingUsers()->where('is_guest', true)->pluck('user_id');
         $newGuests = $guestUserIds->diff($existingGuests);
-
         $newGuests->each(fn($id) => $meeting->meetingUsers()->create(['user_id' => $id, 'is_guest' => true]));
 
         // Manage Holders (Keep old, add new)
@@ -346,67 +357,61 @@ class CreateNewMeetingController extends Controller
 
         $existingHolders = $meeting->meetingUsers()->pluck('user_id');
         $newHolders = $holders->diff($existingHolders);
-
         $newHolders->each(fn($id) => $meeting->meetingUsers()->create([
             'user_id' => $id,
             'is_present' => false,
             'read_by_user' => false,
             'read_by_scriptorium' => false
         ]));
-        // List of fields to watch for changes
+
+        // List of fields to watch for changes (optional if needed)
         $watchedFields = [
             'title', 'unit_organization', 'scriptorium', 'boss',
             'location', 'date', 'time', 'unit_held',
             'treat', 'guest', 'applicant', 'position_organization'
         ];
 
-        // Check if any of these fields have changed
         $originalMeeting = $meeting->getOriginal();
         $hasChanged = collect($watchedFields)->contains(function ($field) use ($originalMeeting, $request) {
             return $originalMeeting[$field] != $request->$field;
         });
 
-        // Manage Inner Guests (Keep old, add new)
-        $innerGuests = collect($request->input('guests.inner', []))->pluck('name')->unique();
-        $guestUserIds = UserInfo::whereIn('full_name', $innerGuests)->pluck('user_id');
-
-        $existingGuests = $meeting->meetingUsers()->where('is_guest', true)->pluck('user_id');
-        $newGuests = $guestUserIds->diff($existingGuests);
-
-        // Manage Participants (Keep old, add new)
+        // Manage Inner Guests & Participants for notifications
         $participants = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
             ->filter(fn($id) => is_numeric($id))->unique()->map(fn($id) => (int) $id);
 
-        $existingParticipants = $meeting->meetingUsers()->where('is_guest', false)->pluck('user_id');
-        $newParticipants = $participants->diff($existingParticipants);
-
-        // Define the notification message
-        $notificationMessage = 'شما در جلسه: ' . $meeting->title .
-            ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . ' دعوت شده اید';
-
-        // Collect all current participants and guests
         $allUserIds = $guestUserIds->merge($participants)->unique();
+
         $notificationsData = [];
 
-        // Prepare data for upsert
         foreach ($allUserIds as $userId) {
+            $isGuest = $guestUserIds->contains($userId);
+            if ($isGuest) {
+                $notificationType = 'MeetingGuestInvitation';
+                $notificationMessage = 'شما به عنوان مهمان در جلسه: ' . $meeting->title .
+                    ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . ' دعوت شده اید';
+            } else {
+                $notificationType = 'MeetingInvitation';
+                $notificationMessage = 'شما در جلسه: ' . $meeting->title .
+                    ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . ' دعوت شده اید';
+            }
+
             $notificationsData[] = [
-                'type' => 'Meeting Invitation',
+                'type' => $notificationType,
                 'data' => json_encode(['message' => $notificationMessage]),
                 'notifiable_type' => Meeting::class,
                 'notifiable_id' => $meeting->id,
                 'sender_id' => auth()->id(),
                 'recipient_id' => $userId,
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
         }
 
-        // Upsert (Insert or Update) notifications in a single query
         Notification::upsert(
             $notificationsData,
-            ['notifiable_type', 'notifiable_id', 'recipient_id'], // Unique constraints to match
-            ['data', 'sender_id', 'updated_at'] // Fields to update if existing
+            ['notifiable_type', 'notifiable_id', 'recipient_id'], // unique keys
+            ['data', 'sender_id', 'updated_at'] // fields to update if exists
         );
         return to_route('dashboard.meeting')->with('status', __('جلسه با موفقیت بروز شد'));
     }

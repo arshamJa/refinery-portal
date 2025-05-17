@@ -347,9 +347,9 @@
                         {{ __('ارسال') }}
                     </x-primary-button>
                     <a href="{{route('dashboard.meeting')}}">
-                        <x-secondary-button>
+                        <x-cancel-button>
                             {{__('لغو')}}
-                        </x-secondary-button>
+                        </x-cancel-button>
                     </a>
                 </div>
             </div>

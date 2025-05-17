@@ -4,6 +4,7 @@ namespace App\Livewire\admin;
 use App\Enums\MeetingStatus;
 use App\Models\Department;
 use App\Models\Meeting;
+use App\Models\Notification;
 use App\Models\Task;
 use App\Models\User;
 use App\Traits\MeetingsTasks;
@@ -32,6 +33,12 @@ class AdminDashboard extends Component
             ->select('id','title','date','time','location')
             ->orderBy('time', 'asc')
             ->get();
+    }
+
+    #[Computed]
+    public function messagesNotification()
+    {
+        return Notification::where('recipient_id',auth()->user()->id)->where('read_at',null)->count();
     }
 
 

@@ -81,7 +81,8 @@ class Meeting extends Model
     }
     // End of  Scope for Scriptorium Report
 
-    public function notifications():MorphMany {
+    public function notifications(): MorphMany
+    {
         return $this->morphMany(Notification::class, 'notifiable');
     }
 }

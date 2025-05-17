@@ -9,38 +9,38 @@ use Livewire\Attributes\Computed;
 
 trait MessageReceived
 {
-    #[Computed]
-    public function messagesNotification()
-    {
-        $user = auth()->user();
-        $userId = $user->id;
-        $fullName = $user->user_info->full_name;
-
-        $invitationCount = MeetingUser::where('user_id', $userId)
-            ->where('is_present', '0')
-            ->count();
-
-        $readByUserCount = MeetingUser::where('user_id', $userId)
-            ->where('read_by_user', false)
-            ->count();
-
-//        $sentTaskCount = Task::whereHas('meeting', function ($query) use ($fullName) {
-//            $query->where('scriptorium', $fullName);
-//        })
-//            ->where('is_completed', true)
+//    #[Computed]
+//    public function messagesNotification()
+//    {
+//        $user = auth()->user();
+//        $userId = $user->id;
+//        $fullName = $user->user_info->full_name;
+//
+//        $invitationCount = MeetingUser::where('user_id', $userId)
+//            ->where('is_present', '0')
 //            ->count();
-
-        $unreadMeetingUsersCount = MeetingUser::where('is_present', '!=', '0')
-            ->where('read_by_scriptorium', false)
-            ->whereHas('meeting', function ($query) use ($fullName) {
-                $query->where('scriptorium', $fullName);
-            })
-            ->count();
-
-        return $invitationCount + $readByUserCount +
-//            $sentTaskCount +
-            $unreadMeetingUsersCount;
-    }
+//
+//        $readByUserCount = MeetingUser::where('user_id', $userId)
+//            ->where('read_by_user', false)
+//            ->count();
+//
+////        $sentTaskCount = Task::whereHas('meeting', function ($query) use ($fullName) {
+////            $query->where('scriptorium', $fullName);
+////        })
+////            ->where('is_completed', true)
+////            ->count();
+//
+//        $unreadMeetingUsersCount = MeetingUser::where('is_present', '!=', '0')
+//            ->where('read_by_scriptorium', false)
+//            ->whereHas('meeting', function ($query) use ($fullName) {
+//                $query->where('scriptorium', $fullName);
+//            })
+//            ->count();
+//
+//        return $invitationCount + $readByUserCount +
+////            $sentTaskCount +
+//            $unreadMeetingUsersCount;
+//    }
 
 
 

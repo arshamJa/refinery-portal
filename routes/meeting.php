@@ -38,8 +38,8 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
         ->name('meeting.edit');
     Route::patch('/meetings/{meeting}', [CreateNewMeetingController::class, 'update'])
         ->name('meeting.update');
-//    Route::delete('/meetings/{meeting}', [CreateNewMeetingController::class, 'destroy'])
-//        ->name('meeting.destroy');
+    Route::delete('/meetings/{meeting}', [CreateNewMeetingController::class, 'destroy'])
+        ->name('meeting.destroy');
 
 
     Route::delete('/meetings/{meetingId}/users/{userId}', [CreateNewMeetingController::class, 'deleteUser']);

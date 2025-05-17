@@ -38,30 +38,6 @@ class MeetingUser extends Model
         return $this->belongsTo(Meeting::class);
     }
 
-    public function invitation()
-    {
-        return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
-    }
-
-//    public function holders()
-//    {
-//        return UserInfo::where('user_id',$this->user_id)->value('full_name');
-//    }
-
-
-//    public function is_present()
-//    {
-//        return MeetingUser::where('meeting_id',$this->meeting_id)
-//                ->where('user_id',$this->user_id)
-//                ->value('is_present') == '1';
-//    }
-//
-//    public function is_absent()
-//    {
-//        return MeetingUser::where('meeting_id',$this->meeting_id)
-//                ->where('user_id',$this->user_id)
-//                ->value('is_present') == '-1';
-//    }
     public function getIsPresentStatusAttribute(): ?int
     {
         return (int) $this->attributes['is_present'];
@@ -76,13 +52,17 @@ class MeetingUser extends Model
     {
         return $this->attributes['is_present'] == -1;
     }
-    public function replacementName(): ?string
+//    public function replacementName(): ?string
+//    {
+//        if (! $this->replacement) return null;
+//
+//        return UserInfo::with('user')
+//            ->whereRelation('user', 'id', $this->replacement)
+//            ->value('full_name');
+//    }
+    public function replacementUser(): BelongsTo
     {
-        if (! $this->replacement) return null;
-
-        return UserInfo::with('user')
-            ->whereRelation('user', 'id', $this->replacement)
-            ->value('full_name');
+        return $this->belongsTo(User::class, 'replacement');
     }
     public function deadLineTask()
     {
@@ -91,10 +71,5 @@ class MeetingUser extends Model
     public function sentDate()
     {
         return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('sent_date');
-    }
-
-
-    public function notifications():MorphMany {
-        return $this->morphMany(Notification::class, 'notifiable');
     }
 }

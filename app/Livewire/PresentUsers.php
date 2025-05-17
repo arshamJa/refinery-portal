@@ -23,7 +23,7 @@ class PresentUsers extends Component
     #[Computed]
     public function meetingUsers()
     {
-        return MeetingUser::with('user','meeting')
+        return MeetingUser::with(['user', 'meeting', 'replacementUser.user_info'])
             ->where('meeting_id',$this->meetingId)
             ->where('is_guest',0)
             ->get(['meeting_id','user_id','is_present','reason_for_absent','replacement']);

@@ -12,26 +12,28 @@ class Notification extends Model
         'type', 'data', 'notifiable_type', 'notifiable_id', 'sender_id', 'recipient_id', 'status'
     ];
 
-    public function sender():BelongsTo
+
+    /**
+     * Polymorphic relationship to related models (Meeting, Task, etc.)
+     */
+    public function notifiable(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Relationship to the user who sent the notification.
+     */
+    public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
-    public function recipient():BelongsTo
+    /**
+     * Relationship to the user who received the notification.
+     */
+    public function recipient(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recipient_id');
-    }
-
-    public function notifiable():MorphTo
-    {
-        return $this->morphTo();
-    }
-    public function user():BelongsTo
-    {
-        return $this->belongsTo(User::class, 'recipient_id');
-    }
-    public function senderInfo():BelongsTo
-    {
-        return $this->belongsTo(User::class, 'sender_id')->withDefault()->with('user_info');
     }
 }

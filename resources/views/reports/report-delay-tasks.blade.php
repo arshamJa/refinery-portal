@@ -21,7 +21,7 @@
             <li class="flex items-center h-full">
                 <a href="{{route('meeting.report')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>  {{__('داشبورد جلسات')}}</span>
+                    <span>  {{__('گزارش اقدامات')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"

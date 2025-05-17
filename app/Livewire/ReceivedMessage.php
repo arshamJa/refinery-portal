@@ -12,6 +12,7 @@ use App\Models\UserInfo;
 use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -35,6 +36,15 @@ class ReceivedMessage extends Component
     public $activeTab = 'sent';  // 'sent' or 'received'
     public $unreadOnly = true;   // toggled by your button
 
+    public $filter = '';
+
+
+    public function filterMessage()
+    {
+        $this->resetPage();
+    }
+
+
     public function render()
     {
         return view('livewire.received-message');
@@ -44,6 +54,40 @@ class ReceivedMessage extends Component
     {
         $this->activeTab = request()->routeIs('received.message') ? 'received' : 'sent';
     }
+    #[Computed]
+    public function userNotifications(string $type = null, bool $unreadOnly = false)
+    {
+        $query = Notification::where('recipient_id', auth()->id())
+            ->with([
+                'sender.user_info',
+                'notifiable.meetingUsers' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                },
+            ]);
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if ($unreadOnly) {
+            $query->whereNull('read_at');
+        }
+        return $query->latest()->paginate(5);
+    }
+
+    public function updatedUnreadOnly()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Mark a notification as read.
+     */
+    public function markAsRead($notificationId)
+    {
+        auth()->user()->notifications()->where('id', $notificationId)->update(['read_at' => now()]);
+        return to_route('received.message');
+    }
+
 
 
     #[Computed]
@@ -56,55 +100,6 @@ class ReceivedMessage extends Component
             ->select(['id','title','unit_organization','scriptorium','location','date','time','reminder','status'])
             ->paginate(3);
     }
-
-
-
-    /**
-     * Show invitation to the participants
-     */
-    #[Computed]
-    public function participantNotifications()
-    {
-        return Notification::where('recipient_id', auth()->id())
-            ->whereHas('notifiable.meetingUsers', function ($query) {
-                $query->where('user_id', auth()->id());
-            })
-            ->with([
-                'senderInfo.user_info',
-                'notifiable.meetingUsers',
-            ])
-            ->when($this->unreadOnly, fn($query) => $query->whereNull('read_at'))
-            ->latest()
-            ->paginate(5);
-    }
-
-
-    #[Computed]
-    public function scriptoriumNotifications()
-    {
-        return Notification::where('recipient_id', auth()->id())
-            ->where('type', 'DeniedTaskNotification')
-            ->with([
-                'senderInfo.user_info',
-                'notifiable.meetingUsers',
-            ])
-            ->when($this->unreadOnly, fn($query) => $query->whereNull('read_at'))
-            ->latest()
-            ->paginate(5);
-    }
-
-
-
-    /**
-     * Mark a notification as read.
-     */
-    public function markAsRead($notificationId)
-    {
-        auth()->user()->notifications()->where('id', $notificationId)->update(['read_at' => now()]);
-        return to_route('received.message');
-    }
-
-
 
     #[Computed]
     public function meetingUsers()

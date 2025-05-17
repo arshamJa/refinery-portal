@@ -19,7 +19,7 @@
             <li>
              <span
                  class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                 {{__('داشبورد جلسات')}}
+                 {{__('گزارش اقدامات')}}
              </span>
             </li>
         </ol>

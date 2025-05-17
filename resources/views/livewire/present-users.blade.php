@@ -107,8 +107,13 @@
                             </p>
                             @if($user->replacement)
                                 <p class="text-sm text-indigo-600 mt-2">
-                                    {{ __('جانشین اینجانب = ') }}<strong>{{ $user->replacementName() }}</strong>
+                                    {{ __('جانشین اینجانب = ') }}
+                                    <strong>{{ $meetingUser->replacementUser->user_info->full_name ?? 'N/A' }}</strong>>
                                 </p>
+                            @endif
+                            @if ($meetingUser->replacementUser)
+                                {{ __('و آقا/خانم') }}
+                                {{ __('به عنوان جانشین خود انتخاب کردید') }}
                             @endif
                         </div>
                     @endforeach

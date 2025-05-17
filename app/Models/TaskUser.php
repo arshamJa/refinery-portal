@@ -43,7 +43,4 @@ class TaskUser extends Model
     {
         return UserInfo::where('user_id',$this->user_id)->value('full_name');
     }
-    public function notifications():MorphMany {
-        return $this->morphMany(Notification::class, 'notifiable');
-    }
 }

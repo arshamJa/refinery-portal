@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -204,8 +205,12 @@ class User extends Authenticatable
         return url('storage/'.$this->profile_photo_path);
     }
 
-    public function notifications():HasMany
+//    public function notifications():HasMany
+//    {
+//        return $this->hasMany(Notification::class, 'recipient_id');
+//    }
+    public function notifications():MorphMany
     {
-        return $this->hasMany(Notification::class, 'recipient_id');
+        return $this->morphMany(Notification::class, 'notifiable');
     }
 }

@@ -59,6 +59,8 @@ class MeetingDashboard extends Component
         $endDate = trim($filters['end_date'] ?? '');  // Get the end date value
         $statusFilter = $filters['statusFilter'] ?? '';  // Get the status filter value
         $scriptoriumFilter = $filters['scriptoriumFilter'] ?? 'all';
+        $userId = auth()->id();
+        $userFullName = auth()->user()->user_info->full_name;
 
         return Meeting::with([
             'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,read_by_scriptorium,read_by_user,replacement',
@@ -70,6 +72,13 @@ class MeetingDashboard extends Component
                 'id', 'title', 'unit_organization', 'scriptorium', 'boss', 'location',
                 'date', 'time','end_time','status', 'position_organization', 'unit_held', 'applicant'
             ])
+            ->where(function ($query) use ($userId, $userFullName) {
+                $query->where('scriptorium', $userFullName)
+                    ->orWhereHas('meetingUsers', function ($q) use ($userId) {
+                        $q->where('user_id', $userId)
+                            ->where('is_guest', 0);
+                    });
+            })
             ->when(!empty($search), function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")

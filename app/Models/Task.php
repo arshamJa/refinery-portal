@@ -29,7 +29,8 @@ class Task extends Model
     {
         return $this->hasMany(TaskUser::class)->chaperone();
     }
-    public function notifications():MorphMany {
+    public function notifications(): MorphMany
+    {
         return $this->morphMany(Notification::class, 'notifiable');
     }
 }
