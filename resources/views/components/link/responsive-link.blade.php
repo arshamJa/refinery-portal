@@ -6,6 +6,6 @@
                 : 'block text-sm text-right rounded-md px-3 py-2 text-base font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white';
 @endphp
 
-<a {{ $attributes->merge(['class' => $classes]) }}>
+<a wire:navigate {{ $attributes->merge(['class' => $classes]) }}>
     {{ $slot }}
 </a>

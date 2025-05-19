@@ -13,6 +13,7 @@ use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -34,8 +35,7 @@ class ReceivedMessage extends Component
     public $p_code;
 
     public $activeTab = 'sent';  // 'sent' or 'received'
-    public $unreadOnly = true;   // toggled by your button
-
+    public bool $unreadOnly = true;
     public $filter = '';
 
 
@@ -43,7 +43,6 @@ class ReceivedMessage extends Component
     {
         $this->resetPage();
     }
-
 
     public function render()
     {
@@ -54,8 +53,13 @@ class ReceivedMessage extends Component
     {
         $this->activeTab = request()->routeIs('received.message') ? 'received' : 'sent';
     }
+    public function toggleUnreadOnly()
+    {
+        $this->unreadOnly = !$this->unreadOnly;
+        $this->resetPage();
+    }
     #[Computed]
-    public function userNotifications(string $type = null, bool $unreadOnly = false)
+    public function userNotifications(string $type = null)
     {
         $query = Notification::where('recipient_id', auth()->id())
             ->with([
@@ -64,30 +68,50 @@ class ReceivedMessage extends Component
                     $query->where('user_id', auth()->id());
                 },
             ]);
+
         if ($type) {
             $query->where('type', $type);
         }
 
-        if ($unreadOnly) {
-            $query->whereNull('read_at');
+        if ($this->unreadOnly) {
+            $query->whereNull('recipient_read_at');
         }
+
         return $query->latest()->paginate(5);
     }
-
-    public function updatedUnreadOnly()
-    {
-        $this->resetPage();
-    }
-
     /**
      * Mark a notification as read.
      */
     public function markAsRead($notificationId)
     {
-        auth()->user()->notifications()->where('id', $notificationId)->update(['read_at' => now()]);
-        return to_route('received.message');
+        $notification = Notification::where('recipient_id',auth()->id())->findOrFail($notificationId);
+        $notification->recipient_read_at = now();
+        $notification->save();
+        // Clear cached counts for this user
+        $userId = auth()->id();
+        Cache::forget("unread_received_count_user_{$userId}");
+        Cache::forget("unread_sent_count_user_{$userId}");
+        $this->resetPage();
     }
 
+
+    #[Computed]
+    public function getSentNotificationDateTime($notification)
+    {
+        // Extract the date and time from created_at
+        $datetime = $notification->created_at;
+        list($date, $time) = explode(' ', $datetime);
+        // Separate the date into year, month, and day
+        list($year, $month, $day) = explode('-', $date);
+        // Convert the Gregorian date to Jalali
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali($year, $month, $day, '/'));
+        // Format the Jalali date
+        $newDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
+        // Extract hour and minute from time
+        list($hour, $minute) = explode(':', $time);
+        // Combine Jalali date with hour and minute only
+        return $newDate . ' - ' . $hour . ':' . $minute;
+    }
 
 
     #[Computed]
@@ -197,6 +221,9 @@ class ReceivedMessage extends Component
                 return;
             }
 
+            $meeting = Meeting::select('id', 'title', 'date', 'time', 'scriptorium')->findOrFail($meetingId);
+            $scriptoriumUserId = UserInfo::where('full_name', $meeting->scriptorium)->value('user_id');
+
             MeetingUser::where('meeting_id', $meetingId)->where('user_id', auth()->user()->id)
                 ->update(['is_present' => '1','replacement'=>$userInfo->user_id]);
 
@@ -206,13 +233,36 @@ class ReceivedMessage extends Component
                 'user_id' => $userInfo->user_id,
                 'is_present' => '0',
             ]);
+            $notificationMessage = 'شما در این جلسه در تاریخ ' . $meeting->date . ' و ساعت ' . $meeting->time . ' به عنوان جانشین از طرف ' . auth()->user()->name . ' دعوت شده‌اید.';
+            Notification::create([
+                'type' => 'ReplacementForMeeting',
+                'data' => json_encode(['message' => $notificationMessage]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meetingId,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $userInfo->user_id,
+            ]);
         }
         else {
+            $meeting = Meeting::select('id', 'title', 'date', 'time', 'scriptorium')->findOrFail($meetingId);
+            $scriptoriumUserId = UserInfo::where('full_name', $meeting->scriptorium)->value('user_id');
+            $notificationMessage = 'شما دعوت به جلسه را قبول کردید.';
+            Notification::create([
+                'type' => 'AcceptInvitation',
+                'data' => json_encode(['message' => $notificationMessage]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meetingId,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $scriptoriumUserId,
+            ]);
             // If checkbox is not checked, just update the user's presence without replacement
             MeetingUser::where('meeting_id', $meetingId)
                 ->where('user_id', auth()->id())
                 ->update(['is_present' => '1']);
         }
+
+
+
         $this->close();
     }
 

@@ -105,8 +105,7 @@ class CreateNewMeetingController extends Controller
             ->filter(function ($guest) {
                 return $guest['name'] !== '' || $guest['department'] !== '';
             })
-            ->values()
-            ->all();
+            ->values();
 
         $outerGuests = collect($request->input('guests.outer', []))
             ->map(function ($guest) {
@@ -137,7 +136,8 @@ class CreateNewMeetingController extends Controller
             throw ValidationException::withMessages([
                 'time' => 'در این زمان جلسه ثبت شده است'
             ]);
-        }else{
+        }
+
             $meeting = Meeting::create([
                 'title' => $request->title,
                 'unit_organization' => $request->unit_organization,
@@ -158,7 +158,7 @@ class CreateNewMeetingController extends Controller
             // Collect recipients (holders + inner guests)
             $recipients = collect();
 
-            $guestIds = collect();
+//            $guestIds = collect();
 
             // 1. Holders
             $holders = Str::of($request->holders)->explode(',');
@@ -197,7 +197,7 @@ class CreateNewMeetingController extends Controller
             // Create Notifications
             foreach ($recipients as $recipientId) {
                 // Check if the recipient is an inner guest
-                $isGuest = $guestIds->contains($recipientId);
+                $isGuest = $innerGuests->pluck('name')->contains(UserInfo::find($recipientId)->full_name ?? '');
 
                 if ($isGuest) {
                     $notificationType = 'MeetingGuestInvitation';
@@ -230,7 +230,6 @@ class CreateNewMeetingController extends Controller
             }
 
 
-        }
         return to_route('dashboard.meeting')->with('status', __('جلسه جدبد ساخته و دعوتنامه به اعضا جلسه ارسال شد'));
 
     }
@@ -315,6 +314,7 @@ class CreateNewMeetingController extends Controller
 
         // Get Boss Name from UserInfo
         $bossName = UserInfo::where('user_id', $request->boss)->value('full_name');
+        $originalBoss = $meeting->boss;
 
         // Merge Old and New Outer Guests
         $existingOuterGuests = collect($meeting->guest ?? []);
@@ -380,9 +380,21 @@ class CreateNewMeetingController extends Controller
         $participants = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
             ->filter(fn($id) => is_numeric($id))->unique()->map(fn($id) => (int) $id);
 
-        $allUserIds = $guestUserIds->merge($participants)->unique();
+        $allUserIds = $guestUserIds->merge($participants)->push($request->boss)->unique();
 
         $notificationsData = [];
+
+
+        // If boss changed, delete old boss notification
+        if ($originalBoss !== $bossName) {
+            $originalBossUser = UserInfo::where('full_name', $originalBoss)->first();
+            if ($originalBossUser) {
+                Notification::where('notifiable_type', Meeting::class)
+                    ->where('notifiable_id', $meeting->id)
+                    ->where('recipient_id', $originalBossUser->user_id)
+                    ->delete();
+            }
+        }
 
         foreach ($allUserIds as $userId) {
             $isGuest = $guestUserIds->contains($userId);
@@ -492,6 +504,12 @@ class CreateNewMeetingController extends Controller
                 // Soft delete the meeting itself
                 $meeting->delete();
             });
+
+            // Delete related notifications
+            Notification::where('notifiable_type', Meeting::class)
+                ->where('notifiable_id', $meeting->id)
+                ->delete();
+
             return to_route('dashboard.meeting')->with('status',' جلسه با موفقیت حذف شد');
         } catch (\Exception $e) {
             return to_route('dashboard.meeting')->with('error', 'خطا در حذف جلسه: ' . $e->getMessage());

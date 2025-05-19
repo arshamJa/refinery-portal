@@ -43,7 +43,7 @@
     <div class="pt-4 px-6 sm:pt-6 border shadow-md rounded-md">
 
         <div class="flex justify-between mb-4">
-            <button wire:click="$toggle('unreadOnly')" class="px-4 py-2 bg-blue-500 text-white rounded-md">
+            <button wire:click="toggleUnreadOnly" class="px-4 py-2 bg-blue-500 text-white rounded-md">
                 {{ $unreadOnly ? 'نمایش تمامی پیام ها' : 'نمایش پیام های خوانده نشده' }}
             </button>
         </div>
@@ -78,33 +78,33 @@
             <x-table.table>
                 <x-slot name="head">
                     <x-table.row>
-                        @foreach (['نوع پیام', 'فرستنده(کاربر/دبیر)', 'متن', 'اقدام شما', 'وضعیت جلسه', 'وضعیت خواندن'] as $th)
+                        @foreach (['نوع پیام','تاریخ ارسال پیام', 'فرستنده(دبیر)', 'متن', 'اقدام شما', 'وضعیت جلسه', 'وضعیت خواندن'] as $th)
                             <x-table.heading>{{ __($th) }}</x-table.heading>
                         @endforeach
                     </x-table.row>
                 </x-slot>
                 <x-slot name="body">
-                    @forelse ($this->userNotifications(null, $unreadOnly) as $notification)
+                    @forelse ($this->userNotifications as $notification)
                         <x-table.row class="hover:bg-gray-50" wire:key="notification-{{ $notification->id }}">
                             <x-table.cell>
-{{--                                @if($notification->type === 'MeetingInvitation')--}}
-{{--                                    <span class="text-blue-600 font-bold">{{ __('دعوتنامه') }}</span>--}}
-{{--                                @else--}}
-{{--                                    <span class="text-green-600 font-bold">{{ __('صورتجلسه') }}</span>--}}
-{{--                                @endif--}}
                                 @if($notification->type === 'MeetingInvitation')
                                     <span class="text-blue-600 font-bold">{{ __('دعوتنامه') }}</span>
                                 @elseif($notification->type === 'MeetingGuestInvitation')
-                                    <span class="text-purple-600 font-bold">{{ __('دعوتنامه مهمان') }}</span>
+                                    <span class="text-pink-600 font-bold">{{ __('دعوتنامه مهمان') }}</span>
                                 @else
                                     <span class="text-green-600 font-bold">{{ __('صورتجلسه') }}</span>
                                 @endif
                             </x-table.cell>
+                            <x-table.cell>{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
                             <x-table.cell>{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>
                             <x-table.cell>{{ json_decode($notification->data)->message ?? 'N/A' }}</x-table.cell>
                             <x-table.cell>
                                 @if ($notification->type === 'MeetingInvitation' && $notification->notifiable)
-                                    @php $meetingUser = $notification->notifiable->meetingUsers->where('user_id', auth()->id())->first(); @endphp
+                                    @php $meetingUser = $notification->notifiable->meetingUsers
+                                        ->where('user_id', auth()->id())
+                                        ->where('meeting_id', $notification->notifiable->id) // Explicitly match the meeting ID
+                                        ->first();
+                                     @endphp
                                     @if ($meetingUser)
                                         @if (! $meetingUser->is_present() && ! $meetingUser->is_absent())
                                             <div class="flex gap-2 items-center justify-center mt-4 md:mt-0">
@@ -167,7 +167,7 @@
                             <x-table.cell>
                                 <div id="read-status-{{ $notification->id }}">
                                     @if (! $notification->read_at)
-                                        <button wire:click="markAsRead('{{ $notification->id }}')" class="text-blue-500 underline">{{ __('متوجه شدم') }}</button>
+                                        <button wire:click="markAsRead({{ $notification->id }})" class="text-blue-500 underline">{{ __('متوجه شدم') }}</button>
                                     @else
                                         <span class="text-gray-500">{{ __('خوانده شده') }}</span>
                                     @endif
@@ -176,15 +176,19 @@
                         </x-table.row>
                     @empty
                         <x-table.row>
-                            <x-table.cell colspan="6" class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
+                            <x-table.cell colspan="7" class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
                         </x-table.row>
                     @endforelse
                 </x-slot>
+                <div class="mt-2">
+                    {{ $this->userNotifications->links() }}
+                </div>
             </x-table.table>
         </div>
 
 
-</div>
+
+    </div>
 
 
     <x-modal name="deny-invitation">

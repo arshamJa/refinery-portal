@@ -14,20 +14,20 @@ return new class extends Migration
         Schema::create('meetings', function (Blueprint $table) {
             $table->id();
             $table->string('title'); // موضوع جلسه
-            $table->string('unit_organization'); // واحد سازمانی
-            $table->string('scriptorium'); // نام دبیر جلسه
+            $table->string('unit_organization')->index(); // واحد سازمانی
+            $table->string('scriptorium')->index(); // نام دبیر جلسه
             $table->string('boss');
             $table->string('location');
-            $table->string('date');
-            $table->string('time');
-            $table->string('end_time')->nullable();   // ساعت خاتمه جلسه
+            $table->string('date')->index();
+            $table->string('time')->index();
+            $table->string('end_time')->nullable()->index();   // ساعت خاتمه جلسه
             $table->string('unit_held'); // واحد برگزار کننده
             $table->string('treat'); // پذیرایی
             $table->json('guest')->nullable(); // this could be multiple
             $table->string('applicant'); // نام درخواست دهنده جلسه
             $table->string('position_organization');
-            $table->integer('status')->default(\App\Enums\MeetingStatus::PENDING->value);
-            $table->softDeletes();
+            $table->smallInteger('status')->default(\App\Enums\MeetingStatus::PENDING->value)->index();
+            $table->softDeletes()->index();
             $table->timestamps();
         });
     }

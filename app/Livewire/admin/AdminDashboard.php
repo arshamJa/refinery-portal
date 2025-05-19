@@ -7,6 +7,7 @@ use App\Models\Meeting;
 use App\Models\Notification;
 use App\Models\Task;
 use App\Models\User;
+use App\Traits\HasNotificationCount;
 use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
@@ -17,7 +18,7 @@ use Livewire\Component;
 class AdminDashboard extends Component
 {
 
-    use Organizations,MessageReceived;
+    use Organizations,HasNotificationCount;
 
     #[Computed]
     public function getTodaysMeeting()
@@ -34,13 +35,6 @@ class AdminDashboard extends Component
             ->orderBy('time', 'asc')
             ->get();
     }
-
-    #[Computed]
-    public function messagesNotification()
-    {
-        return Notification::where('recipient_id',auth()->user()->id)->where('read_at',null)->count();
-    }
-
 
 
 //    #[Computed]

@@ -8,6 +8,7 @@ use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Notification;
 use App\Models\User;
+use App\Traits\HasNotificationCount;
 use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
@@ -22,7 +23,7 @@ use Nette\Schema\ValidationException;
 class EmployeeDashboard extends Component
 {
 
-    use MeetingsTasks;
+    use MeetingsTasks,HasNotificationCount;
 
 
     #[Computed]
@@ -40,13 +41,7 @@ class EmployeeDashboard extends Component
             ->orderBy('time', 'asc')
             ->get();
     }
-
-    #[Computed]
-    public function messagesNotification()
-    {
-        return Notification::where('recipient_id',auth()->user()->id)->where('read_at',null)->count();
-    }
-
+    
 
     public function render()
     {

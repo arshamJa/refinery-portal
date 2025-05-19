@@ -299,6 +299,67 @@
         </div>
     </div>
 
+
+{{--    <div class="w-full max-w-2xl mx-auto bg-white shadow-md rounded-lg">--}}
+{{--        <table class="min-w-full bg-white border-collapse table-fixed rounded-lg">--}}
+{{--            <thead class="bg-gray-50">--}}
+{{--            <tr>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Song</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Artist</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Artist</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Artist</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Artist</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Artist</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Artist</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Artist</th>--}}
+{{--                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Year</th>--}}
+{{--            </tr>--}}
+{{--            </thead>--}}
+{{--            <tbody class="divide-y divide-gray-200">--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">The Sliding Mr. Bones (Next Stop, Pottersville)</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Malcolm Lockyer</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1961</td>--}}
+{{--            </tr>--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">The Sliding Mr. Bones (Next Stop, Pottersville)</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Malcolm Lockyer</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1961</td>--}}
+{{--            </tr>--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">The Sliding Mr. Bones (Next Stop, Pottersville)</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Malcolm Lockyer</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1961</td>--}}
+{{--            </tr>--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">The Sliding Mr. Bones (Next Stop, Pottersville)</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Malcolm Lockyer</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1961</td>--}}
+{{--            </tr>--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">The Sliding Mr. Bones (Next Stop, Pottersville)</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Malcolm Lockyer</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1961</td>--}}
+{{--            </tr>--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)The Sliding Mr. Bones (Next Stop, Pottersville)</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Malcolm Lockyer</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1961</td>--}}
+{{--            </tr>--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Witchy Woman</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">The Eagles</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1972</td>--}}
+{{--            </tr>--}}
+{{--            <tr>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Shining Star</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">Earth, Wind, and Fire</td>--}}
+{{--                <td class="px-6 py-4 text-sm text-gray-700">1975</td>--}}
+{{--            </tr>--}}
+{{--            </tbody>--}}
+{{--        </table>--}}
+{{--    </div>--}}
+
     <x-modal name="view-meeting-modal" maxWidth="4xl">
         @if ($selectedMeeting)
             @php

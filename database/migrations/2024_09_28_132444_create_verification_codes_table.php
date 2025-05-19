@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('verification_codes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('two_factor_code')->nullable();
+            $table->string('two_factor_code')->nullable()->index();
             $table->timestamps();
         });
     }

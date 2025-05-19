@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('read_by_scriptorium')->default(false);
             $table->boolean('read_by_user')->default(false);
             $table->string('replacement')->nullable();
-            $table->softDeletes();
+            $table->softDeletes()->index();
             $table->timestamps();
             $table->index(['meeting_id', 'user_id']);
         });

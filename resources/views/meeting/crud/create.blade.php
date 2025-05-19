@@ -137,7 +137,6 @@
                 <div x-data="dropdown()" class="relative w-full col-span-2"
                      x-init="initOptions({{ $users }}, '{{ old('boss') }}')">
                     <x-input-label for="boss" class="mb-2" :value="__('رئیس جلسه')"/>
-
                     <!-- Dropdown Button -->
                     <button type="button" @click="open = !open"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 text-left text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">

@@ -25,7 +25,6 @@
     <script src="{{asset('flowBiteChart.js')}}"></script>
 </head>
 <body>
-{{--<livewire:layout.navigation/>--}}
 <div dir="rtl" x-data="{ open: true }" x-cloak>
     <!-- Top Navigation Bar -->
     <x-navigation/>
@@ -35,7 +34,7 @@
         <aside
             :class="{'translate-x-full': open, 'translate-x-0': !open}"
             class="fixed bg-gray-800 md:pt-2 px-2 inset-y-0 right-0 top-0 bottom-0 z-20 w-64 transform transition-transform duration-300 md:translate-x-0">
-            <x-side-bar/>
+            <livewire:side-bar/>
         </aside>
 
         <!-- Main content -->

@@ -103,10 +103,11 @@
                 <x-primary-button type="submit">
                     {{ __('ذخیره') }}
                 </x-primary-button>
-                <x-cancel-link href="{{route('users.index')}}">
-                    {{__('لغو')}}
-                </x-cancel-link>
-
+                <a href="{{route('users.index')}}">
+                    <x-cancel-button >
+                        {{__('لغو')}}
+                    </x-cancel-button>
+                </a>
             </div>
         </div>
     </form>
