@@ -74,7 +74,6 @@ class TaskManagementController extends Controller
     {
         $request->validate([
            'holders' => ['required'],
-//            'time_out' => ['required','date_format:Y/m/d' , new DateRule()],
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],
@@ -109,20 +108,15 @@ class TaskManagementController extends Controller
         $initiators = Str::of($request->holders)->split('/[\s,]+/');
 
 
+        foreach ($initiators as $initiator) {
         $task = Task::create([
             'meeting_id' => $meeting,
-            'body' => $body
+            'user_id' => $initiator,
+            'body' => $body,
+            'time_out' => $newTime,
+            'is_completed' => false,
+            'request_task' => null,
         ]);
-
-
-        foreach ($initiators as $initiator) {
-            TaskUser::create([
-                'task_id' => $task->id,
-                'user_id' => $initiator,
-                'time_out' => $newTime,
-                'is_completed' => false,
-                'request_task' => null,
-            ]);
         }
 
         return to_route('tasks.create',$meeting)->with('status','درج اقدام انجام شد');

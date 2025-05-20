@@ -87,12 +87,61 @@ class ReceivedMessage extends Component
         $notification = Notification::where('recipient_id',auth()->id())->findOrFail($notificationId);
         $notification->recipient_read_at = now();
         $notification->save();
-        // Clear cached counts for this user
-        $userId = auth()->id();
-        Cache::forget("unread_received_count_user_{$userId}");
-        Cache::forget("unread_sent_count_user_{$userId}");
+        $this->dispatch('notificationRead');
         $this->resetPage();
     }
+
+
+    #[Computed]
+    public function getNotificationMessage($notification)
+    {
+        $message = json_decode($notification->data)->message ?? 'N/A';
+        // Directly check the notification type for 'AcceptInvitation'
+        if ($notification->type === 'AcceptInvitation') {
+            return 'شما دعوت به جلسه را قبول کردید.';
+        }
+        if ($notification->type === 'DenyInvitation') {
+            return 'شما دعوت به جلسه را رد کردید.';
+        }
+        if ($notification->type === 'ReplacementForMeeting') {
+            $meeting = $notification->notifiable;
+            if ($meeting) {
+                $recipient = User::find($notification->recipient_id);
+                $fullName = $recipient?->user_info?->full_name ?? 'نامشخص';
+
+                return 'شما این جلسه را پذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
+            }
+        }
+        if (auth()->id() === $notification->sender_id) {
+            $meeting = $notification->notifiable; // Assuming this is your meeting model
+            if ($meeting) {
+                // Format date/time (assuming $meeting->date is a Carbon instance or date string)
+                $dateMeeting = $meeting->date;
+                $timeMeeting = $meeting->time;
+
+                return "شما آقای/خانم " . ($notification->recipient->user_info->full_name ?? 'N/A')
+                    . " را به جلسه \"{$meeting->title}\" در تاریخ {$dateMeeting} و ساعت {$timeMeeting} دعوت کرده‌اید.";
+            }
+            // Fallback message if meeting is not found
+            return "شما آقای/خانم " . ($notification->recipient->user_info->full_name ?? 'N/A') . " را به یک جلسه دعوت کرده‌اید.";
+        }
+
+        return $message;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     #[Computed]
@@ -233,7 +282,7 @@ class ReceivedMessage extends Component
                 'user_id' => $userInfo->user_id,
                 'is_present' => '0',
             ]);
-            $notificationMessage = 'شما در این جلسه در تاریخ ' . $meeting->date . ' و ساعت ' . $meeting->time . ' به عنوان جانشین از طرف ' . auth()->user()->name . ' دعوت شده‌اید.';
+            $notificationMessage = 'شما در این جلسه در تاریخ ' . $meeting->date . ' و ساعت ' . $meeting->time . ' به عنوان جانشین از طرف ' . auth()->user()->user_info->full_name . ' دعوت شده‌اید.';
             Notification::create([
                 'type' => 'ReplacementForMeeting',
                 'data' => json_encode(['message' => $notificationMessage]),
@@ -260,9 +309,6 @@ class ReceivedMessage extends Component
                 ->where('user_id', auth()->id())
                 ->update(['is_present' => '1']);
         }
-
-
-
         $this->close();
     }
 
@@ -292,6 +338,19 @@ class ReceivedMessage extends Component
                 'reason_for_absent' => $this->body,
                 'is_present' => '-1',
             ]);
+
+        $meeting = Meeting::select('id', 'title', 'date', 'time', 'scriptorium')->findOrFail($meetingId);
+        $scriptoriumUserId = UserInfo::where('full_name', $meeting->scriptorium)->value('user_id');
+
+        $notificationMessage = 'شما دعوت به جلسه را رد کردید.';
+        Notification::create([
+            'type' => 'DenyInvitation',
+            'data' => json_encode(['message' => $notificationMessage]),
+            'notifiable_type' => Meeting::class,
+            'notifiable_id' => $meetingId,
+            'sender_id' => auth()->id(),
+            'recipient_id' => $scriptoriumUserId,
+        ]);
         $this->close();
     }
     public function close()

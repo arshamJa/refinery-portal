@@ -58,14 +58,6 @@
                 </button>
             </div>
 
-            <!-- Sign Up Link -->
-            <div class="text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('حساب کاربری ندارید؟') }}
-                    <a href="{{ route('register') }}" class="text-red-500 hover:underline">{{ __('ثبت نام') }}</a>
-                </p>
-            </div>
-
         </form>
 
 </x-guest-layout>

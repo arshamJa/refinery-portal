@@ -37,6 +37,21 @@ class AdminDashboard extends Component
     }
 
 
+    #[Computed]
+    public function unreadReceivedCount()
+    {
+        return Notification::where('recipient_id', auth()->id())
+            ->whereNull('recipient_read_at')
+            ->count();
+    }
+    #[Computed]
+    public function unreadSentCount()
+    {
+        return Notification::where('sender_id', auth()->id())
+            ->whereNull('sender_read_at')
+            ->count();
+    }
+
 //    #[Computed]
 //    public function tasksOnTime()
 //    {

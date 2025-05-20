@@ -20,18 +20,6 @@ class MeetingNotification extends Component
     {
         return view('livewire.meeting-notification');
     }
-//    #[Computed]
-//    public function meetingUsers()
-//    {
-//        return MeetingUser::with([
-//            'meeting:id,title,unit_organization,location,scriptorium,date,time,status',
-//            'user:id',
-//            'user.user_info:user_id,full_name'
-//        ])
-//            ->where('user_id',auth()->user()->id)
-////            ->where('is_present','!=','0')
-//            ->get(['id','meeting_id','user_id','is_present','reason_for_absent']);
-//    }
 
     #[Computed]
     public function meetingUsers()

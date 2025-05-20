@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('meeting_id');
+            $table->foreignId('meeting_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->longText('body');
+            $table->string('time_out')->nullable()->index();
+            $table->string('sent_date')->nullable()->index();
+            $table->smallInteger('task_status')->default(\App\Enums\TaskStatus::PENDING->value)->index();
+            $table->text('body_task')->nullable();
+            $table->text('request_task')->nullable();
             $table->timestamps();
         });
     }

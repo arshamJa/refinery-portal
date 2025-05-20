@@ -40,6 +40,54 @@ class CreateTask extends Component
     public $day,$month,$year,$body;
     public $request_task;
 
+
+
+
+
+
+    public $editingTaskId;
+    public $editingBodyTask;
+    public $editingTimeOut;
+    public function edit($taskId): void
+    {
+        $task = Task::find($taskId);
+        $this->editingTaskId = $taskId;
+        $this->editingBodyTask = $task->body;
+        $this->editingTimeOut = $task->time_out;
+    }
+    public function delete($taskId)
+    {
+        Task::findOrFail($taskId)->delete();
+        session()->flash('delete', 'Todo were deleted successfully.');
+    }
+    public function cancel(): void
+    {
+        $this->reset('editingTaskId', 'editingBodyTask');
+    }
+    public function update(): void
+    {
+        $this->validate([
+            'editingBodyTask' => 'required|string|max:1000',
+            'editingTimeOut' => 'required',
+        ]);
+
+        Task::findOrFail($this->editingTaskId)->update([
+            'body' => $this->editingBodyTask,
+            'time_out' => $this->editingTimeOut,
+        ]);
+
+        $this->cancel();
+    }
+
+
+
+
+
+    public function render()
+    {
+        return view('livewire.create-task');
+    }
+
     #[Computed]
     public function meetings()
     {
@@ -47,13 +95,12 @@ class CreateTask extends Component
         if (!$this->loadedMeeting) {
             $this->loadedMeeting = Meeting::with([
                 'meetingUsers.user.user_info:id,user_id,full_name',
-                'tasks.taskUsers.user.user_info:id,user_id,full_name',
+                'tasks.user.user_info:id,user_id,full_name',
             ])
                 ->findOrFail($this->meeting);
         }
         return $this->loadedMeeting;
     }
-
     #[Computed]
     public function employees()
     {
@@ -62,40 +109,14 @@ class CreateTask extends Component
         }
         return $this->loadedEmployees;
     }
-
     #[Computed]
     public function tasks()
     {
         if (!$this->loadedTasks) {
-            $this->loadedTasks = $this->meetings()->tasks()->with([
-                'taskUsers.user.user_info',
-                'taskUsers.taskUserFiles',
-            ])->get();
+            $this->loadedTasks = $this->meetings()->tasks()->get();
         }
         return $this->loadedTasks;
     }
-
-    #[Computed]
-    public function allUsersHaveTasks()
-    {
-        $userIdsCount = $this->employees()->count();
-
-        if ($userIdsCount === 0) {
-            return false;
-        }
-
-        $usersWithTasksCount = TaskUser::whereHas('task', function ($query) {
-            $query->where('meeting_id', $this->meeting);
-        })->distinct()->count('user_id');
-
-        return $usersWithTasksCount === $userIdsCount;
-    }
-
-    public function render()
-    {
-        return view('livewire.create-task');
-    }
-
     #[Computed]
     public function presentUsers()
     {
@@ -105,6 +126,7 @@ class CreateTask extends Component
             return $employee->user;
         });
     }
+
 
 
     public function showTaskDetails($taskUserId)
@@ -263,81 +285,6 @@ class CreateTask extends Component
         session()->flash('status', 'درخواست شما به دبیرجلسه ارسال شد');
         $this->dispatch('close-modal');
     }
-
-
-    public function openModalScriptorium($taskUserId)
-    {
-        $taskUser = TaskUser::findOrFail($taskUserId);
-        $this->taskUserId = $taskUser->id;
-        $this->userName = $taskUser->user->user_info->full_name;
-        $this->dispatch('crud-modal', name: 'edit-by-scriptorium');
-    }
-
-
-    /**
-     * @throws ValidationException
-     */
-    public function updateTask()
-    {
-
-        $validated = Validator::make(
-            ['year' => $this->year, 'month' => $this->month, 'day' => $this->day, 'body' => $this->body],
-            ['year' => 'nullable', 'month' => 'nullable', 'day' => 'nullable', 'body' => 'nullable|min:3'],
-            [
-                'year.nullable' => 'فیلد سال می‌تواند خالی باشد.',
-                'month.nullable' => 'فیلد ماه می‌تواند خالی باشد.',
-                'day.nullable' => 'فیلد روز می‌تواند خالی باشد.',
-                'body.nullable' => 'فیلد خلاصه مذاکرات می‌تواند خالی باشد.',
-                'body.min' => 'خلاصه مذاکرات باید حداقل ۳ کاراکتر باشد.',
-            ]
-        )->validate();
-
-        // Fetching the existing task and task user
-        $taskUser = TaskUser::with('task')->findOrFail($this->taskUserId);
-        $oldTask = Task::findOrFail($taskUser->task_id);
-
-        // Sanitize the inputs before validation
-        // Using old values if any of the fields are null
-        $year = $this->year ?? (int)substr($taskUser->time_out, 0, 4);
-        $month = $this->month ?? (int)substr($taskUser->time_out, 5, 2);
-        $day = $this->day ?? (int)substr($taskUser->time_out, 8, 2);
-        $body = $this->body !== null ? Str::of(strip_tags($this->body))->squish() : $oldTask->body;
-
-        // Normalize text for comparison
-        $normalizedOldBody = $this->normalizeText($oldTask->body);
-        $normalizedNewBody = $this->normalizeText($body);
-
-        // Format the new date
-        $newTimeOut = sprintf("%04d/%02d/%02d", $year, $month, $day);
-
-        // Checking if there are changes
-        $bodyChanged = $normalizedOldBody !== $normalizedNewBody;
-        $timeOutChanged = $taskUser->time_out !== $newTimeOut;
-
-        if (!$bodyChanged && !$timeOutChanged) {
-            session()->flash('status', 'هیچ تغییری اعمال نشد.');
-            $this->dispatch('close-modal', name: 'edit-by-scriptorium');
-            return;
-        }
-        // Updating the task and taskUser only if there are changes
-        if ($bodyChanged) {
-            $newTask = Task::create([
-                'meeting_id' => $oldTask->meeting_id,
-                'body' => $body,
-            ]);
-            $taskUser->task_id = $newTask->id;
-        }
-        if ($timeOutChanged || $bodyChanged) {
-            $taskUser->update([
-                'time_out' => $newTimeOut,
-                'task_status' => TaskStatus::PENDING,
-                'request_task' => null
-            ]);
-        }
-        session()->flash('status', 'ویرایش انجام شد');
-        $this->dispatch('close-modal', name: 'edit-by-scriptorium');
-    }
-
 
     public function sendToScriptorium($taskUserId)
     {

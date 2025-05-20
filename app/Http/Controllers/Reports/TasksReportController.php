@@ -119,12 +119,6 @@ class TasksReportController extends Controller
         return Excel::download(new CompletedTasksWithDelayExport($startDate, $endDate, $search), 'completed_tasks_with_delay.xlsx');
     }
 
-
-
-
-
-
-
     public function incompleteTasks(Request $request)
     {
         $query = TaskUser::with([

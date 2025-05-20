@@ -44,8 +44,8 @@ class PermissionSeeder extends Seeder
         $superAdminRole->assignPermission($rolePermissionTable);
 
 
-        $users = DB::table('users')->whereNotIn('id', [1, 2, 3,4])->get();
-        foreach ($users as $user){
+        $users = User::whereNotIn('id', [1, 2, 3, 4])->get();
+        foreach ($users as $user) {
             $user->assignRole($userRole);
         }
 

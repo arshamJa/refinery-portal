@@ -1,8 +1,8 @@
-<table class="text-center min-w-full text-sm bg-white mb-6 text-gray-700">
-    <thead class="text-gray-800 bg-gray-100">
+<table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+    <thead class="text-gray-100 bg-gray-800 dark:bg-gray-700 dark:text-gray-400">
         {{$head}}
     </thead>
-    <tbody>
+    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
         {{$body}}
     </tbody>
 </table>

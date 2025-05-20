@@ -27,10 +27,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li>
-                        <span
-                            class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                           {{__('ایجاد جلسه جدید')}}
-                        </span>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+               {{__('ایجاد جلسه جدید')}}
+            </span>
             </li>
         </ol>
         {{--        <a href="{{route('meeting.table')}}">--}}

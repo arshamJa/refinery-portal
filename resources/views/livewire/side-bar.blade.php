@@ -26,7 +26,7 @@
     <nav class="flex-1 overflow-y-auto p-2">
         <ul class="w-full mt-2">
             <li class="mb-2">
-                <x-link.responsive-link href="{{route('dashboard')}}"
+                <x-link.responsive-link wire:navigate href="{{route('dashboard')}}"
                                         :active="request()->is('dashboard')" class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5 ">
@@ -67,7 +67,7 @@
                             </svg>
                             {{__('ایجاد جلسه جدید')}}
                         </x-link.responsive-link>
-                        <x-link.responsive-link href="{{route('my.task.table')}}"
+                        <x-link.responsive-link wire:navigate href="{{route('my.task.table')}}"
                                                 :active="request()->is('my/task/table')"
                                                 class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -77,7 +77,7 @@
                             </svg>
                             {{__('اقدامات من')}}
                         </x-link.responsive-link>
-                        <x-link.responsive-link href="{{route('dashboard.meeting')}}"
+                        <x-link.responsive-link wire:navigate href="{{route('dashboard.meeting')}}"
                                                 :active="request()->is('dashboard/meeting')"
                                                 class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -125,7 +125,7 @@
                         </svg>
                     </button>
                     <div x-show="openMessage" x-transition class="mt-1 space-y-1 pr-3">
-                        <x-link.responsive-link href="{{route('received.message')}}"
+                        <x-link.responsive-link wire:navigate href="{{route('received.message')}}"
                                                 :active="request()->is('received/message')"
                                                 class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -139,13 +139,13 @@
                                     {{__('پیام های دریافتی')}}
                                 </span>
                                 @if($this->unreadReceivedCount() > 0)
-                                    <span class="text-red-500 font-bold">
-                                    {{ $this->unreadReceivedCount() > 10 ? '10+' : $this->unreadReceivedCount() }}
+                                    <span class="text-gray-100 font-bold">
+                                    {{ $this->unreadReceivedCount() > 10 ? '+10' : $this->unreadReceivedCount() }}
                                     </span>
                                 @endif
                             </span>
                         </x-link.responsive-link>
-                        <x-link.responsive-link href="{{route('sent.message')}}"
+                        <x-link.responsive-link wire:navigate href="{{route('sent.message')}}"
                                                 :active="request()->is('sent/message')"
                                                 class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -157,8 +157,8 @@
                             <span class="flex justify-between w-full">
                             <span>{{__('پیام های ارسالی')}}</span>
                                 @if($this->unreadSentCount() > 0)
-                                    <span class="text-red-500 font-bold">
-                                        {{ $this->unreadSentCount() > 10 ? '10+' : $this->unreadSentCount() }}
+                                    <span class="text-gray-100 font-bold">
+                                        {{ $this->unreadSentCount() > 10 ? '+10' : $this->unreadSentCount() }}
                                     </span>
                                 @endif
                             </span>
@@ -167,7 +167,7 @@
                 </div>
             </li>
             <li class="mb-2">
-                <x-link.responsive-link href="{{route('employee.organization')}}"
+                <x-link.responsive-link wire:navigate href="{{route('employee.organization')}}"
                                         :active="request()->is('employee/organization')"
                                         class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -179,7 +179,7 @@
                 </x-link.responsive-link>
             </li>
             <li class="mb-2">
-                <x-link.responsive-link href="{{route('blogs.index')}}"
+                <x-link.responsive-link wire:navigate href="{{route('blogs.index')}}"
                                         :active="request()->is('blogs')" class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">
@@ -190,7 +190,7 @@
                 </x-link.responsive-link>
             </li>
             <li class="mb-2">
-                <x-link.responsive-link href="{{route('phone-list.index')}}"
+                <x-link.responsive-link wire:navigate href="{{route('phone-list.index')}}"
                                         :active="request()->is('phone-list')" class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">

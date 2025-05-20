@@ -25,77 +25,85 @@
 
 
     <div class="flex justify-center items-center mb-8 gap-4">
-        <a href="{{ route('sent.message') }}" wire:navigate
+        <a href="{{ route('sent.message') }}" wire:navigate wire:click="$set('activeTab', 'sent')"
            class="px-6 py-4 rounded-lg transition-all duration-300 ease-in-out shadow-lg outline-none focus:outline-none focus:ring-2 focus:ring-offset-2 hover:ring-2 hover:ring-offset-2 hover:ring-blue-400
-{{--       {{ request()->routeIs('sent.message') ? 'bg-[#FF6F61] text-white' : 'bg-white text-gray-700' }}"--}}
-           {{ $activeTab === 'sent' ? 'bg-[#FF6F61] text-white' : 'bg-white text-gray-700' }}"
-        >
+       {{ $activeTab === 'sent' ? 'bg-[#FF6F61] text-white' : 'bg-white text-gray-700' }}">
         <span class="text-sm font-medium">
             {{ __('پیام های ارسالی') }}
         </span>
         </a>
-
-        <a href="{{ route('received.message') }}" wire:navigate
+        <a href="{{ route('received.message') }}" wire:navigate wire:click="$set('activeTab', 'received')"
            class="px-6 py-4 rounded-lg transition-all duration-300 ease-in-out shadow-lg outline-none focus:outline-none focus:ring-2 focus:ring-offset-2 hover:ring-2 hover:ring-offset-2 hover:ring-blue-400
-{{--       {{ request()->routeIs('received.message') ? 'bg-[#FF6F61] text-white' : 'bg-white text-gray-700' }}--}}
-       {{ $activeTab === 'received' ? 'bg-[#FF6F61] text-white' : 'bg-white text-gray-700' }}"
-        >
+       {{ $activeTab === 'received' ? 'bg-[#FF6F61] text-white' : 'bg-white text-gray-700' }}">
         <span class="text-sm font-medium">
             {{ __('پیام های دریافتی') }}
         </span>
         </a>
     </div>
 
-
     <div class="flex justify-between mb-4">
-        <button wire:click="toggleUnreadOnly" class="px-4 py-2 bg-blue-500 text-white rounded-md">
-            {{ $unreadOnly ? 'نمایش تمامی پیام ها' : 'نمایش پیام های خوانده نشده' }}
-        </button>
+        <x-secondary-button wire:click="toggleUnreadOnly">
+            {{ $unreadOnly ? 'نمایش تمامی پیام های ارسالی' : 'نمایش پیام های خوانده نشده ارسالی' }}
+        </x-secondary-button>
     </div>
 
-    <x-table.table>
-        <x-slot name="head">
-            <x-table.row>
-                @foreach (['نوع پیام','تاریخ ارسال پیام', 'گیرنده', 'متن', 'وضعیت خواندن'] as $th)
-                    <x-table.heading>{{ __($th) }}</x-table.heading>
-                @endforeach
-            </x-table.row>
-        </x-slot>
 
-        <x-slot name="body">
-            @forelse ($this->userNotifications as $notification)
-                <x-table.row class="hover:bg-gray-50" wire:key="notification-{{ $notification->id }}">
-                    <x-table.cell>
-                        @if($notification->type === 'MeetingInvitation')
-                            <span class="text-blue-600 font-bold">{{ __('ارسال دعوتنامه') }}</span>
-                        @elseif($notification->type === 'MeetingGuestInvitation')
-                            <span class="text-pink-600 font-bold">{{ __('ارسال دعوتنامه به مهمان') }}</span>
-                        @elseif($notification->type === 'AcceptInvitation')
-                            <span class="text-green-600 font-bold">{{ __('تایید دعوتنامه') }}</span>
-                        @endif
-                    </x-table.cell>
-                    <x-table.cell>{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
-                    <x-table.cell>{{ $notification->recipient->user_info->full_name ?? 'N/A' }}</x-table.cell>
-                    <x-table.cell>{{ $this->getNotificationMessage($notification) }}</x-table.cell>
-                    <x-table.cell>
-                        @if (!$notification->isReadBySender())
-                            <button wire:click="markAsRead({{ $notification->id }})"
-                                    class="text-blue-500 underline">{{ __('متوجه شدم') }}</button>
-                        @else
-                            <span class="text-gray-500">{{ __('خوانده شده') }}</span>
-                        @endif
-                    </x-table.cell>
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
+        <x-table.table>
+            <x-slot name="head">
+                <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                    @foreach (['نوع پیام','تاریخ ارسال پیام', 'گیرنده(دبیر/کاربر)', 'متن', 'وضعیت خواندن'] as $th)
+                        <x-table.heading
+                            class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                            {{ __($th) }}
+                        </x-table.heading>
+                    @endforeach
                 </x-table.row>
-            @empty
-                <x-table.row>
-                    <x-table.cell colspan="7"
-                                  class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
-                </x-table.row>
-            @endforelse
-        </x-slot>
+            </x-slot>
+            <x-slot name="body">
+                @forelse ($this->userNotifications as $notification)
+                    <x-table.row wire:key="notification-{{ $notification->id }}"
+                                 class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                        <x-table.cell class="border-none">
+                            @if($notification->type === 'MeetingInvitation')
+                                <span class="text-blue-600 font-bold">{{ __('ارسال دعوتنامه') }}</span>
+                            @elseif($notification->type === 'MeetingGuestInvitation')
+                                <span class="text-pink-600 font-bold">{{ __('ارسال دعوتنامه به مهمان') }}</span>
+                            @elseif($notification->type === 'AcceptInvitation')
+                                <span class="text-green-600 font-bold">{{ __('تایید دعوتنامه') }}</span>
+                            @elseif($notification->type === 'ReplacementForMeeting')
+                                <span class="text-green-600 font-bold">{{ __('انتخاب جانشین') }}</span>
+                            @elseif($notification->type === 'DenyInvitation')
+                                <span class="text-green-600 font-bold">{{ __('رد دعوتنامه') }}</span>
+                            @endif
+                        </x-table.cell>
+                        <x-table.cell
+                            class="whitespace-nowrap">{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
+                        <x-table.cell>{{ $notification->recipient->user_info->full_name ?? 'N/A' }}</x-table.cell>
 
-    </x-table.table>
-    <span class="p-2 mx-2">
-                    {{ $this->userNotifications->withQueryString()->links(data: ['scrollTo' => false]) }}
-            </span>
+                        <x-table.cell
+                            class="whitespace-pre-wrap">{{ $this->getNotificationMessage($notification) }}</x-table.cell>
+                        <x-table.cell>
+                            @if (!$notification->isReadBySender())
+                                <x-secondary-button wire:click="markAsRead({{ $notification->id }})">
+                                    {{ __('متوجه شدم') }}
+                                </x-secondary-button>
+                            @else
+                                <span class="text-gray-500">{{ __('خوانده شده') }}</span>
+                            @endif
+                        </x-table.cell>
+                    </x-table.row>
+                @empty
+                    <x-table.row>
+                        <x-table.cell colspan="5"
+                                      class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
+                    </x-table.row>
+                @endforelse
+            </x-slot>
+        </x-table.table>
+    </div>
+    <div class="mt-2">
+        {{ $this->userNotifications->withQueryString()->links(data: ['scrollTo' => false]) }}
+    </div>
+
 </div>

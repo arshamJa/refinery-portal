@@ -28,9 +28,9 @@
             </li>
         </ol>
     </nav>
-    <div class="bg-white px-3 relative shadow-md sm:rounded-lg overflow-hidden">
+
         <form method="GET" action="{{ route('phone-list.index') }}" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 px-3 pt-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4  pt-3">
                 <div>
                     <x-input-label for="department">{{ __('دپارتمان') }}</x-input-label>
                     <x-text-input type="text" name="department" id="department" value="{{ request('department') }}"/>
@@ -73,21 +73,28 @@
                 @endif
             </div>
         </form>
-        <div class="pt-4 overflow-x-auto overflow-y-hidden sm:pt-6 bg-white pb-10">
-            <x-table.table>
-                <x-slot name="head">
-                    @foreach (['ردیف', 'دپارتمان', 'نام و نام خانوادگی','تلفن محل کار'] as $th)
-                        <x-table.heading>{{ __($th) }}</x-table.heading>
-                    @endforeach
-                    @can('viewAny',User::class)
-                        <x-table.heading>{{ __('تلفن همراه') }}</x-table.heading>
-                        <x-table.heading>{{ __('تلفن منزل') }}</x-table.heading>
-                        <x-table.heading>{{ __('قابلیت') }}</x-table.heading>
-                    @endcan
-                </x-slot>
-                <x-slot name="body">
+
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
+        <x-table.table>
+            <x-slot name="head">
+                <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                        @foreach (['ردیف', 'دپارتمان', 'نام و نام خانوادگی','تلفن محل کار'] as $th)
+                            <x-table.heading
+                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                                {{ __($th) }}
+                            </x-table.heading>
+                        @endforeach
+                        @can('viewAny',User::class)
+                            <x-table.heading class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('تلفن همراه') }}</x-table.heading>
+                            <x-table.heading class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('تلفن منزل') }}</x-table.heading>
+                            <x-table.heading class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('قابلیت') }}</x-table.heading>
+                        @endcan
+                </x-table.row>
+            </x-slot>
+            <x-slot name="body">
+{{--                <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">--}}
                     @forelse($userInfos as $userInfo)
-                        <x-table.row>
+                        <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                             <x-table.cell>{{ ($userInfos->currentPage() - 1) * $userInfos->perPage() + $loop->iteration }}</x-table.cell>
                             <x-table.cell>{{ $userInfo->department->department_name ?? 'بدون واحد'}}</x-table.cell>
                             <x-table.cell> {{ $userInfo->full_name }}</x-table.cell>
@@ -97,9 +104,9 @@
                                 <x-table.cell>{{ $userInfo->house_phone }}</x-table.cell>
                                 <x-table.cell>
                                     <a href="{{route('phone-list.edit',$userInfo->id)}}">
-                                        <x-primary-button>
+                                        <x-secondary-button>
                                             {{__('ویرایش')}}
-                                        </x-primary-button>
+                                        </x-secondary-button>
                                     </a>
                                 </x-table.cell>
                                 {{--                                @endcan--}}
@@ -125,7 +132,6 @@
                                 {{--                                </x-dropdown>--}}
                             @endcan
                         </x-table.row>
-
                     @empty
                         <x-table.row>
                             <x-table.cell colspan="7" class="py-6">
@@ -133,13 +139,14 @@
                             </x-table.cell>
                         </x-table.row>
                     @endforelse
-                </x-slot>
-            </x-table.table>
-            <span class="p-2 mx-2">
-                {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
-            </span>
-        </div>
+{{--                </x-table.row>--}}
+            </x-slot>
+        </x-table.table>
     </div>
+    <div class="mt-2 mb-12">
+        {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
+    </div>
+
 
 
 </x-app-layout>

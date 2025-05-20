@@ -42,9 +42,9 @@
                         {{ __('ذخیره') }}
                     </x-primary-button>
                     <a href="{{route('phone-list.index')}}">
-                        <x-secondary-button>
+                        <x-cancel-button>
                             {{__('لغو')}}
-                        </x-secondary-button>
+                        </x-cancel-button>
                     </a>
                 </div>
             </div>

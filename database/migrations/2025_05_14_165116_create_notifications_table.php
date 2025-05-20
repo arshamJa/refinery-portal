@@ -26,7 +26,6 @@ return new class extends Migration
             $table->index('notifiable_type');
             $table->index('notifiable_id');
 
-
             // Composite indexes for optimal performance
             $table->index(['recipient_id', 'recipient_read_at'], 'notifications_recipient_read_idx');
             $table->index(['sender_id', 'sender_read_at'], 'notifications_sender_read_idx');

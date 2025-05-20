@@ -1,7 +1,11 @@
 <x-app-layout>
     <form action="{{route('users.store')}}" method="post" enctype="multipart/form-data">
         @csrf
+
         <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
+                {{ __('ساخت کاربر جدید') }}
+            </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
                 <div>
                     <x-input-label for="role" :value="__('نقش')"/>

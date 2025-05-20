@@ -152,7 +152,6 @@
                                             href="{{Illuminate\Support\Facades\URL::signedRoute('newUser.show',$userInfo->id)}}">
                                             {{__('نمایش')}}
                                         </x-dropdown-link>
-
 {{--                                    @endcan--}}
 {{--                                    @can('update-user')--}}
                                         <x-dropdown-link

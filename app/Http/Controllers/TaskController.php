@@ -100,18 +100,4 @@ class TaskController extends Controller
         // Return a success message
         return response()->json(['success' => true, 'message' => 'فایل با موفقیت حذف شد']);
     }
-
-
-//    public function denyTask(Request $request, $taskUserId)
-//    {
-//        $request->validate([
-//            'request_task' => 'required|string|max:1000',
-//        ]);
-//
-//        $taskUser = TaskUser::findOrFail($taskUserId);
-//        $taskUser->status = TaskStatus::DENIED->value;
-//        $taskUser->request_task = $request->input('request_task'); // Save the reason
-//        $taskUser->save();
-//        return redirect()->back()->with('status', 'Task was denied and reason recorded.');
-//    }
 }

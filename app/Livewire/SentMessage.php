@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Notification;
+use App\Models\User;
 use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
@@ -75,10 +76,7 @@ class SentMessage extends Component
         $notification = Notification::where('sender_id',auth()->id())->findOrFail($notificationId);
         $notification->sender_read_at = now();
         $notification->save();
-        // Clear cached counts for this user
-        $userId = auth()->id();
-        Cache::forget("unread_received_count_user_{$userId}");
-        Cache::forget("unread_sent_count_user_{$userId}");
+        $this->dispatch('notificationRead');
         $this->resetPage();
     }
 
@@ -90,6 +88,18 @@ class SentMessage extends Component
         // Directly check the notification type for 'AcceptInvitation'
         if ($notification->type === 'AcceptInvitation') {
             return 'شما دعوت به جلسه را قبول کردید.';
+        }
+        if ($notification->type === 'DenyInvitation') {
+            return 'شما دعوت به جلسه را رد کردید.';
+        }
+        if ($notification->type === 'ReplacementForMeeting') {
+            $meeting = $notification->notifiable;
+            if ($meeting) {
+                $recipient = User::find($notification->recipient_id);
+                $fullName = $recipient?->user_info?->full_name ?? 'نامشخص';
+
+                return 'شما این جلسه را پذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
+            }
         }
         if (auth()->id() === $notification->sender_id) {
             $meeting = $notification->notifiable; // Assuming this is your meeting model

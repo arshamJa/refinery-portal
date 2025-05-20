@@ -2,7 +2,12 @@
 
 namespace App\Traits;
 
+use App\Models\Meeting;
+use App\Models\MeetingUser;
 use App\Models\Notification;
+use App\Models\Task;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 
 trait HasNotificationCount
@@ -31,4 +36,5 @@ trait HasNotificationCount
             })
             ->count();
     }
+
 }
