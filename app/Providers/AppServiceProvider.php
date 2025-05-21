@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Policies\BlogPolicy;
 use App\Policies\PhoneListPolicy;
 use App\Policies\ProfilePolicy;
-use App\Policies\TaskUserPolicy;
+use App\Policies\TaskPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -48,6 +48,10 @@ class AppServiceProvider extends ServiceProvider
         // Gate for SuperAdmin
         Gate::before(function (User $user, $ability) {
             return $user->hasRole('super-admin') ? true : null;
+        });
+
+        Gate::define('access-meeting', function ($user, $meetingId) {
+            return $user->hasRole(UserRole::SUPER_ADMIN->value);
         });
 
         // Gate For Side Bar

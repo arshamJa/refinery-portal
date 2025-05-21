@@ -35,7 +35,7 @@ class Task extends Model
 
     public function taskUserFiles(): HasMany
     {
-        return $this->hasMany(TaskUserFile::class);
+        return $this->hasMany(TaskUserFile::class, 'task_id');
     }
 
     public function full_name()

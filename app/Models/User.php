@@ -51,10 +51,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function taskUsers():HasMany
-    {
-        return $this->hasMany(TaskUser::class)->chaperone();
-    }
 
 
 //    public function tasks():HasMany

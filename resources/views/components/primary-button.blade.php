@@ -1,4 +1,4 @@
-<button {{ $attributes->merge(['type' => 'submit', 'class' => 'inline-flex items-center hover:ring-2
+<button {{ $attributes->merge(['type' => 'submit', 'class' => ' hover:ring-2
  hover:ring-gray-800 hover:ring-offset-2
  border border-transparent rounded-md text-xs uppercase transition ease-in-out duration-300
  border-[#990302] hover:border-transparent

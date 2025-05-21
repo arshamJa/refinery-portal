@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/tasks/create/{meeting}', \App\Livewire\CreateTask::class)
-        ->name('tasks.create');
+        ->name('tasks.create')->middleware('signed');
 
     Route::get('/task/list/{meeting}', TaskList::class)->name('task.list');
 
@@ -91,15 +91,15 @@ Route::middleware(['auth'])->group(function () {
 //    Route::post('/tasks/{meetingId}', [TaskManagementController::class, 'store'])->name('tasks.store');
 
     Route::post('tasks/{meeting}', [TaskManagementController::class, 'store'])->name('tasks.store');
-
-    Route::post('/editTask/{task}', [TaskManagementController::class, 'edit'])
-        ->name('editTask');
-
-    Route::get('/editUserTask/{task}', [TaskManagementController::class, 'editUserTask'])
-        ->name('editUserTask');
-
-    Route::put('/editUserTask/{task}', [TaskManagementController::class, 'updateUserTask'])
-        ->name('updateUserTask');
+//
+//    Route::post('/editTask/{task}', [TaskManagementController::class, 'edit'])
+//        ->name('editTask');
+//
+//    Route::get('/editUserTask/{task}', [TaskManagementController::class, 'editUserTask'])
+//        ->name('editUserTask');
+//
+//    Route::put('/editUserTask/{task}', [TaskManagementController::class, 'updateUserTask'])
+//        ->name('updateUserTask');
 
 //    Route::get('/tasks/create',[TaskManagementController::class,'create'])->name('tasks.create');
 
@@ -109,7 +109,7 @@ Route::middleware(['auth'])->group(function () {
 
 //    Route::get('/tasks/{task}/edit', [TaskManagementController::class, 'edit'])->name('tasks.edit');
 
-    Route::patch('/tasks/{task}', [TaskManagementController::class, 'update'])->name('tasks.update');
+//    Route::patch('/tasks/{task}', [TaskManagementController::class, 'update'])->name('tasks.update');
 
 //    Route::delete('/tasks/{task}', [TaskManagementController::class, 'destroy'])->name('tasks.destroy');
 

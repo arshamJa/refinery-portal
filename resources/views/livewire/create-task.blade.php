@@ -1,28 +1,5 @@
 @php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use Illuminate\Support\Str; @endphp
 <div>
-    @if (session('status'))
-        <div
-            x-data="{ showMessage: true }" x-show="showMessage" x-transition x-cloak
-            x-init="setTimeout(() => showMessage = false, 4000)"
-            dir="rtl"
-            class="fixed top-5 right-5 z-[99] max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
-            <div class="flex p-4">
-                <div class="shrink-0">
-                    <svg class="shrink-0 size-4 text-teal-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16"
-                         height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path
-                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"></path>
-                    </svg>
-                </div>
-                <div class="ms-3">
-                    <p class="text-sm text-gray-700 dark:text-neutral-400">
-                        {{ session('status') }}
-                    </p>
-                </div>
-            </div>
-        </div>
-    @endif
-
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -232,35 +209,27 @@
                     </x-table.row>
                 </x-slot>
                 <x-slot name="body">
-                    @foreach ($this->tasks() as $task)
+                    @foreach ($this->tasks as $task)
                         <tr class="bg-white hover:bg-gray-50 transition" wire:key="task-{{ $task->id }}">
-                            <td class="px-4 py-4">{{ $task->id }}</td>
+                            <td class="px-4 py-4">{{ $loop->iteration }}</td>
                             <td class="px-6 py-2 border-r border-gray-300 whitespace-pre-wrap ">
                                 @if($editingTaskId === $task->id)
-                                    <div>
-                                            <textarea wire:model.defer="editingBodyTask"
-                                                      class="mt-1 bg-gray-200 text-gray-900 text-sm border-none outline-none rounded block w-full p-2.5 resize-y"
-                                                      rows="3"
-                                                      placeholder="شرح اقدام را وارد کنید..."></textarea>
-                                        @error('editingBodyTask')
-                                        <span class="text-red-500 text-xs block">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                                    <textarea wire:model.defer="editingBodyTask"
+                                              class="mt-1 bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50 block w-full p-2.5 resize-y"
+                                              rows="3"
+                                    ></textarea>
+                                    <x-input-error :messages="$errors->get('editingBodyTask')"/>
                                 @else
-                                   <span>{{$task->body}}</span>
+                                    <span>{{$task->body}}</span>
                                 @endif
                             </td>
                             {{-- time_out is specific per user, so render without rowspan --}}
-                            <td class="px-4 py-4 border-r border-gray-300">
+                            <td class="px-2 py-4 border-r border-gray-300">
                                 @if($editingTaskId === $task->id)
-                                    <div>
-                                        <input id="timeout"
-                                               wire:model.defer="editingTimeOut"
-                                               class="mt-1 bg-gray-200 text-gray-900 text-sm border-none outline-none rounded block w-full p-2.5">
-                                        @error('editingTimeOut')
-                                        <span class="text-red-500 text-xs block">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                                    <input id="timeout"
+                                           wire:model.defer="editingTimeOut"
+                                           class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                    <x-input-error :messages="$errors->get('editingTimeOut')"/>
                                 @else
                                     <span>{{ $task->time_out }}</span>
                                 @endif
@@ -291,9 +260,11 @@
                                                     class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">
                                                 <template x-if="!expanded">
                                                                 <span class="no-print flex items-center">
-                                                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                                                    <svg class="w-4 h-4 ml-1" fill="none"
+                                                                         stroke="currentColor"
                                                                          stroke-width="2" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        <path stroke-linecap="round"
+                                                                              stroke-linejoin="round"
                                                                               d="M19 9l-7 7-7-7"></path>
                                                                     </svg>
                                                                     {{__('نمایش بیشتر')}}
@@ -301,9 +272,11 @@
                                                 </template>
                                                 <template x-if="expanded">
                                                                 <span class="no-print flex items-center">
-                                                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                                                    <svg class="w-4 h-4 ml-1" fill="none"
+                                                                         stroke="currentColor"
                                                                          stroke-width="2" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        <path stroke-linecap="round"
+                                                                              stroke-linejoin="round"
                                                                               d="M5 15l7-7 7 7"></path>
                                                                     </svg>
                                                                     {{__('نمایش کمتر')}}
@@ -348,14 +321,9 @@
                             </td>
 
 
-
-
-
-
                             <td class="px-4 py-4 border-r border-gray-300 text-center screen-only no-print">
-                                {{--  @can('acceptOrDeny',$taskUser)--}}
-                                @if (auth()->id() === $task->user_id && $task->task_status === TaskStatus::PENDING)
-                                    <div class="flex gap-2 justify-center">
+                                @can('acceptOrDenyByParticipant',$task)
+                                    <div class="flex gap-2 flex-col">
                                         <x-primary-button wire:click="acceptTask({{ $task->id }})">
                                             {{ __('تایید') }}
                                         </x-primary-button>
@@ -363,48 +331,46 @@
                                             {{ __('رد') }}
                                         </x-danger-button>
                                     </div>
-                                @endif
-                                {{--  @endcan--}}
-                                {{--                                    @can('scriptoriumCanEdit', $task)--}}
-                                @if($editingTaskId !== $task->id)
-                                    <div class="flex gap-2 flex-col">
-                                        <x-edit-button wire:click="edit({{ $task->id }})">
-                                            {{ __('ویرایش') }}
-                                        </x-edit-button>
-                                        <x-danger-button wire:click="delete({{$task->id}})"
-                                                         wire:confirm="Are you sure you want to delete this todo?">
-                                            {{ __('حذف') }}
-                                        </x-danger-button>
-                                    </div>
-                                @endif
-                                @if($editingTaskId === $task->id)
-                                    <div class="flex gap-2 flex-col">
-                                        <x-accept-button wire:click="update">
-                                            {{ __('بروزرسانی') }}
-                                        </x-accept-button>
-                                        <x-danger-button wire:click="cancel">
-                                            {{ __('لغو') }}
-                                        </x-danger-button>
-                                    </div>
-                                @endif
-                                {{--                                    @endcan--}}
-                                @can('writeTask', $task)
-                                    <x-primary-button class="px-3 py-2"
-                                                      wire:click="showTaskDetails({{ $task->id }})">
+                                @endcan
+                                @can('scriptoriumCanEdit', $task)
+                                    @if($editingTaskId !== $task->id)
+                                        <div class="flex gap-2 flex-col">
+                                            <x-edit-button wire:click="edit({{ $task->id }})">
+                                                {{ __('ویرایش') }}
+                                            </x-edit-button>
+                                            <x-danger-button wire:click="delete({{$task->id}})"
+                                                             wire:confirm="Are you sure you want to delete this todo?">
+                                                {{ __('حذف') }}
+                                            </x-danger-button>
+                                        </div>
+                                    @endif
+                                    @if($editingTaskId === $task->id)
+                                        <div class="flex gap-2 flex-col">
+                                            <x-accept-button wire:click="update">
+                                                {{ __('بروزرسانی') }}
+                                            </x-accept-button>
+                                            <x-danger-button wire:click="cancel">
+                                                {{ __('لغو') }}
+                                            </x-danger-button>
+                                        </div>
+                                    @endif
+                                @endcan
+                                @can('participantCanWriteTask', $task)
+                                    <x-primary-button class="px-3 py-2 whitespace-nowrap"
+                                                      wire:click="showTaskForm({{ $task->id }})">
                                         {{ __('انجام اقدام') }}
                                     </x-primary-button>
                                 @endcan
-                                @can('updateTask', $task)
-                                    <div class="flex gap-2">
-                                        <x-secondary-button wire:click="openUpdateModal({{$task->id}})">
+                                @can('participantCanUpdateTask', $task)
+                                    <div class="flex flex-col gap-2">
+                                        <x-edit-button wire:click="openUpdateModal({{$task->id}})">
                                             {{ __('ویرایش') }}
-                                        </x-secondary-button>
+                                        </x-edit-button>
                                         <x-secondary-button wire:click="sendToScriptorium({{$task->id}})">
                                             {{ __('ارسال') }}
                                         </x-secondary-button>
                                     </div>
                                 @endcan
-
                             </td>
                         </tr>
                     @endforeach
@@ -413,224 +379,94 @@
             <script src="{{ asset('js/printTable.js') }}"></script>
         </div>
 
+        {{-- شرح اقدام Cards below the table --}}
+        <h2 class="text-lg font-semibold mb-4">{{ __('شرح اقدامات:') }}</h2>
+        <div class="mt-8 grid grid-cols-1 gap-6">
+            @foreach ($this->tasks as $task)
+                <div wire:key="task-{{$task->id}}">
+                    @if($task->body_task && $task->body_task !== '---')
+                        <div class="p-4 bg-white rounded-lg shadow-md border border-gray-200">
+                            <h3 class="text-md font-semibold mb-2">
+                                {{ $task->user->user_info->full_name ?? 'ناشناس' }}
+                            </h3>
+                            <p class="text-gray-700 text-sm whitespace-pre-line">
+                                {{ $task->body_task }}
+                            </p>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+
+
+        {{--        <div class="relative mb-12" id="task-table">--}}
+        {{--            --}}{{-- Search/filter bar --}}
+        {{--            <div class="mb-4 flex justify-between items-center">--}}
+        {{--                <input type="search" placeholder="جستجو..." wire:model.debounce.300ms="search"--}}
+        {{--                       class="px-4 py-2 border rounded-md w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-400" />--}}
+        {{--                --}}{{-- You can add sorting dropdown here --}}
+        {{--            </div>--}}
+
+
+        {{--            --}}{{-- Mobile Cards --}}
+        {{--            <div class="space-y-4">--}}
+        {{--                @foreach ($this->tasks as $task)--}}
+        {{--                    <div class="bg-white p-4 rounded-lg shadow border border-gray-200">--}}
+        {{--                        <div class="flex justify-between items-center mb-2">--}}
+        {{--                            <div class="font-semibold text-gray-800">--}}
+        {{--                                {{ $task->user->user_info->full_name ?? 'ناشناس' }}--}}
+        {{--                            </div>--}}
+        {{--                            <div class="text-xs text-gray-500">{{ $task->time_out }}</div>--}}
+        {{--                        </div>--}}
+        {{--                        <div class="mb-2 whitespace-pre-wrap text-gray-700">{{ $task->body }}</div>--}}
+        {{--                        <div class="mb-2 text-sm text-gray-600 truncate" title="{{ $task->body_task }}">--}}
+        {{--                            <strong>شرح اقدام:</strong> {{ $task->body_task }}--}}
+        {{--                        </div>--}}
+        {{--                        <div class="flex space-x-2">--}}
+        {{--                            <button wire:click="edit({{ $task->id }})" class="text-blue-600 hover:text-blue-800" aria-label="ویرایش">--}}
+        {{--                                ✏️--}}
+        {{--                            </button>--}}
+        {{--                            <button wire:click="delete({{ $task->id }})" class="text-red-600 hover:text-red-800" aria-label="حذف">--}}
+        {{--                                🗑️--}}
+        {{--                            </button>--}}
+        {{--                        </div>--}}
+        {{--                    </div>--}}
+        {{--                @endforeach--}}
+        {{--            </div>--}}
+        {{--        </div>--}}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{{--        <div class="overflow-x-auto rounded-xl border border-gray-300 shadow-sm">--}}
-{{--                        <table id="task-table" class="w-full text-right text-sm border-collapse">--}}
-{{--                            <thead class="bg-gray-100 text-gray-700">--}}
-{{--                            @foreach (['#', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده','عملیات'] as $th)--}}
-{{--                                <th class="px-4 py-3 border-b border-gray-400 @if ($loop->last) screen-only @endif @if ($loop->index === 4) no-print @endif">--}}
-{{--                                    {{ __($th) }}--}}
-{{--                                </th>--}}
-{{--                            @endforeach--}}
-{{--                            </thead>--}}
-{{--                            <tbody class="divide-y divide-gray-300">--}}
-{{--                            @foreach ($this->tasks as $index => $task)--}}
-{{--                                @foreach ($task->taskUsers as $userIndex => $taskUser)--}}
-{{--                                    <tr class="bg-white hover:bg-gray-50 transition">--}}
-{{--                                        @if ($userIndex === 0)--}}
-{{--                                             Render only once for the first user of this task--}}
-{{--                                            <td class="px-4 py-4 align-top"--}}
-{{--                                                rowspan="{{ $task->taskUsers->count() }}">{{ $index + 1 }}</td>--}}
-{{--                                            <td class="px-4 py-4 border-r border-gray-300 align-top"--}}
-{{--                                                rowspan="{{ $task->taskUsers->count() }}">{{ $task->body }}</td>--}}
-{{--                                        @endif--}}
-
-{{--                                         time_out is specific per user, so render without rowspan --}}
-{{--                                        <td class="px-4 py-4 border-r border-gray-300 align-top">--}}
-{{--                                            {{ $taskUser->time_out }}--}}
-{{--                                        </td>--}}
-
-{{--                                        <td class="px-4 py-4 border-r border-gray-300" data-username="true">--}}
-{{--                                            {{ $taskUser->user->user_info->full_name ?? '---' }}--}}
-{{--                                        </td>--}}
-
-{{--                                         Action description--}}
-{{--                                        @php--}}
-{{--                                            list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));--}}
-{{--                                            $todayDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);--}}
-{{--                                            $isAfterTimeOut = $todayDate >= $taskUser->time_out;--}}
-{{--                                        @endphp--}}
-
-{{--                                         Removed the column for شرح اقدام in print version --}}
-{{--                                        <td class="px-4 py-4 border-r border-gray-300 no-print">--}}
-{{--                                            @if(!$isAfterTimeOut)--}}
-{{--                                                @if($taskUser->body_task && $taskUser->body_task !== '---')--}}
-{{--                                                    <!-- Content visible only on the page (screen-only) -->--}}
-{{--                                                    <div x-data="{ expanded: false }" class="screen-only">--}}
-{{--                                                        <div x-show="!expanded" class="truncate">--}}
-{{--                                                            {{ Str::words($taskUser->body_task, 5, '...') }}--}}
-{{--                                                        </div>--}}
-{{--                                                        <div x-show="expanded"--}}
-{{--                                                             class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">--}}
-{{--                                                            {{ $taskUser->body_task }}--}}
-{{--                                                        </div>--}}
-{{--                                                        <button @click="expanded = !expanded"--}}
-{{--                                                                class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">--}}
-{{--                                                            <template x-if="!expanded">--}}
-{{--                                                                <span class="no-print flex items-center">--}}
-{{--                                                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"--}}
-{{--                                                                         stroke-width="2" viewBox="0 0 24 24">--}}
-{{--                                                                        <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                                                              d="M19 9l-7 7-7-7"></path>--}}
-{{--                                                                    </svg>--}}
-{{--                                                                    {{__('نمایش بیشتر')}}--}}
-{{--                                                                </span>--}}
-{{--                                                            </template>--}}
-{{--                                                            <template x-if="expanded">--}}
-{{--                                                                <span class="no-print flex items-center">--}}
-{{--                                                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"--}}
-{{--                                                                         stroke-width="2" viewBox="0 0 24 24">--}}
-{{--                                                                        <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                                                              d="M5 15l7-7 7 7"></path>--}}
-{{--                                                                    </svg>--}}
-{{--                                                                    {{__('نمایش کمتر')}}--}}
-{{--                                                                </span>--}}
-{{--                                                            </template>--}}
-{{--                                                        </button>--}}
-{{--                                                    </div>--}}
-{{--                                                    <!-- Content only for printing (always visible in print) -->--}}
-{{--                                                    <div class="task-card print-only" style="display: none;">--}}
-{{--                                                        {{ $taskUser->body_task }}--}}
-{{--                                                    </div>--}}
-{{--                                                @else--}}
-{{--                                                    <span>---</span>--}}
-{{--                                                @endif--}}
-{{--                                            @else--}}
-{{--                                                <div class="mt-2 text-sm text-gray-400">--}}
-{{--                                                    {{ __('مهلت اقدام به پایان رسیده است') }}--}}
-{{--                                                </div>--}}
-{{--                                                <div class="task-card print-only" style="display: none;">--}}
-{{--                                                    {{ __('پاسخی از سمت اقدام کننده در مهلت مقرر صورت نگرفت') }}--}}
-{{--                                                </div>--}}
-{{--                                            @endif--}}
-{{--                                        </td>--}}
-
-
-{{--                                        <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                                            {{ $taskUser->sent_date ?? '---' }}--}}
-{{--                                        </td>--}}
-
-{{--                                        <td class="px-4 py-4 border-r border-gray-300">--}}
-{{--                                            @if ($taskUser->taskUserFiles->isNotEmpty())--}}
-{{--                                                <div class="flex flex-col gap-2 screen-only">--}}
-{{--                                                    @foreach ($taskUser->taskUserFiles as $file)--}}
-{{--                                                        <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"--}}
-{{--                                                           class="text-blue-600 hover:underline text-xs truncate">--}}
-{{--                                                            📄 {{ $file->original_name }}--}}
-{{--                                                        </a>--}}
-{{--                                                    @endforeach--}}
-{{--                                                </div>--}}
-{{--                                                <div class="print-only hidden">{{ __('دارای فایل') }}</div>--}}
-{{--                                            @else--}}
-{{--                                                <span class="text-gray-400 print-only text-xs">{{__('بدون فایل')}}</span>--}}
-{{--                                            @endif--}}
-{{--                                        </td>--}}
-
-{{--                                        <td class="px-4 py-4 border-r border-gray-300 text-center screen-only">--}}
-{{--                                              @can('acceptOrDeny',$taskUser)--}}
-{{--                                            @if (auth()->id() === $taskUser->user_id && $taskUser->task_status === TaskStatus::PENDING)--}}
-{{--                                                <div class="flex gap-2 justify-center">--}}
-{{--                                                    <x-primary-button wire:click="acceptTask({{ $task->id }})">--}}
-{{--                                                        {{ __('تایید') }}--}}
-{{--                                                    </x-primary-button>--}}
-{{--                                                    <x-danger-button wire:click="openDenyModal({{ $taskUser->id }})">--}}
-{{--                                                        {{ __('رد') }}--}}
-{{--                                                    </x-danger-button>--}}
-{{--                                                </div>--}}
-{{--                                            @endif--}}
-{{--                                              @endcan--}}
-{{--                                            @can('scriptoriumCanEdit', $taskUser)--}}
-{{--                                                <x-secondary-button wire:click="openModalScriptorium({{$taskUser->id}})">--}}
-{{--                                                    {{ __('ویرایش') }}--}}
-{{--                                                </x-secondary-button>--}}
-{{--                                            @endcan--}}
-{{--                                            @can('writeTask', $taskUser)--}}
-{{--                                                <x-primary-button class="px-3 py-2"--}}
-{{--                                                                  wire:click="showTaskDetails({{ $taskUser->id }})">--}}
-{{--                                                    {{ __('انجام اقدام') }}--}}
-{{--                                                </x-primary-button>--}}
-{{--                                            @endcan--}}
-{{--                                            @can('updateTask', $taskUser)--}}
-{{--                                                <div class="flex gap-2">--}}
-{{--                                                    <x-secondary-button wire:click="openUpdateModal({{$taskUser->id}})">--}}
-{{--                                                        {{ __('ویرایش') }}--}}
-{{--                                                    </x-secondary-button>--}}
-{{--                                                    <x-secondary-button wire:click="sendToScriptorium({{$taskUser->id}})">--}}
-{{--                                                        {{ __('ارسال') }}--}}
-{{--                                                    </x-secondary-button>--}}
-{{--                                                </div>--}}
-{{--                                            @endcan--}}
-
-{{--                                        </td>--}}
-{{--                                    </tr>--}}
-{{--                                @endforeach--}}
-{{--                            @endforeach--}}
-{{--                            </tbody>--}}
-{{--                        </table>--}}
-{{--        </div>--}}
 
 
 
 
         @if($this->tasks()->where('task_status',TaskStatus::DENIED)->isNotEmpty())
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
-            <x-table.table>
-                <x-slot name="head">
-                    <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
+                <x-table.table>
+                    <x-slot name="head">
+                        <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
                             @foreach (['#', 'نام', 'دلیل رد', ] as $th)
                                 <x-table.heading
                                     class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                                     {{ __($th) }}
                                 </x-table.heading>
                             @endforeach
-                    </x-table.row>
-                </x-slot>
-                <x-slot name="body">
-                    @foreach($this->tasks()->where('task_status',TaskStatus::DENIED) as $taskRequest)
-                        <x-table.row wire:key="taskRequest-{{ $taskRequest->id }}"
-                                     class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                            <x-table.cell>{{ $loop->iteration }}</x-table.cell>
-                            <x-table.cell>{{ $taskRequest->user->user_info->full_name }}</x-table.cell>
-                            <x-table.cell class="whitespace-pre-wrap wrap-anywhere">{{ $taskRequest->request_task }}</x-table.cell>
                         </x-table.row>
-                    @endforeach
-                </x-slot>
-            </x-table.table>
-        </div>
+                    </x-slot>
+                    <x-slot name="body">
+                        @foreach($this->tasks()->where('task_status',TaskStatus::DENIED) as $taskRequest)
+                            <x-table.row wire:key="taskRequest-{{ $taskRequest->id }}"
+                                         class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                                <x-table.cell>{{ $loop->iteration }}</x-table.cell>
+                                <x-table.cell>{{ $taskRequest->user->user_info->full_name }}</x-table.cell>
+                                <x-table.cell
+                                    class="whitespace-pre-wrap wrap-anywhere">{{ $taskRequest->request_task }}</x-table.cell>
+                            </x-table.row>
+                        @endforeach
+                    </x-slot>
+                </x-table.table>
+            </div>
         @endif
 
 
@@ -683,33 +519,55 @@
 
     </div>
 
-
-    {{--        --}}{{--    this one has wire:target--}}
-        <x-modal name="view-task-details-modal" maxWidth="4xl" :closable="false">
-            @if ($selectedTask)
-                <form wire:submit.prevent="submitTaskForm({{ $selectedTask->id}})" enctype="multipart/form-data">
+    <x-modal name="view-task-details-modal" maxWidth="4xl" :closable="false">
+        @if ($selectedTask)
+            @can('participantCanWriteTask',$selectedTask)
+                <form wire:submit="submitTaskForm" enctype="multipart/form-data">
                     <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
                         <div class="border-b pb-4">
                             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('جزئیات') }}</h2>
                         </div>
 
                         <div class="grid grid-cols-1 gap-4">
-                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
+                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->body"/>
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="taskBody" :value="__('شرح اقدام شما')" class="mb-2"/>
-                            <textarea wire:model.defer="taskBody" id="taskBody" rows="4"
+                            <x-input-label for="participantTaskBody" :value="__('شرح اقدام شما')" class="mb-2"/>
+                            <textarea wire:model.defer="participantTaskBody" id="participantTaskBody" rows="4"
                                       class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300"></textarea>
-                            <x-input-error :messages="$errors->get('taskBody')"/>
+                            <x-input-error :messages="$errors->get('participantTaskBody')"/>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="mt-4" x-data="{ progress: 0 }"
+                             x-on:livewire-upload-start="progress = 0"
+                             x-on:livewire-upload-progress="progress = $event.detail.progress"
+                             x-on:livewire-upload-finish="progress = 100"
+                             x-on:livewire-upload-error="progress = 0">
+
                             <x-input-label for="files" :value="__('آپلود فایل مرتبط')" class="mb-2"/>
                             <input type="file" wire:model="files" multiple class="w-full text-sm text-gray-500"/>
-                            <div wire:loading wire:target="files" class="text-blue-500 text-sm mt-2">{{ __('در حال آپلود فایل...') }}</div>
-                            <x-input-error :messages="$errors->get('files')"/>
+
+                            <div class="w-full bg-gray-200 rounded h-2 mt-2 overflow-hidden">
+                                <div class="bg-green-500 h-2 transition-all duration-300"
+                                     :style="`width: ${progress}%`"></div>
+                            </div>
+
+                            <div x-text="progress + '%'" class="text-xs text-right text-gray-700 mt-1"></div>
+
+                            <div wire:loading wire:target="files" class="text-blue-500 text-sm mt-2">
+                                {{ __('در حال آپلود فایل...') }}
+                            </div>
+
+                            {{-- Upload complete message --}}
+                            <div wire:loading.remove wire:target="files" class="text-green-600 text-sm mt-2" x-cloak>
+                                @if (!empty($files))
+                                    {{ __('فایل‌(ها) با موفقیت آپلود شدند.') }}
+                                @endif
+                            </div>
                         </div>
+                        <x-input-error :messages="$errors->get('files')"/>
+
 
                         <div class="pt-4 flex justify-between gap-2">
                             <x-primary-button type="submit"
@@ -719,36 +577,33 @@
                             <span wire:loading.remove wire:target="submitTaskForm">
                                 {{ __('ذخیره') }}
                             </span>
-                            <span wire:loading wire:target="submitTaskForm" class="ml-2">
+                                <span wire:loading wire:target="submitTaskForm" class="ml-2">
                                 {{ __('در حال ثبت...') }}
                             </span>
                             </x-primary-button>
                             <x-cancel-button x-on:click="$dispatch('close')">
-                                {{ __('لغو') }}
+                                {{ __('انصراف') }}
                             </x-cancel-button>
                         </div>
                     </div>
                 </form>
-            @endif
-        </x-modal>
+            @endcan
+        @endif
+    </x-modal>
 
-        <x-modal name="edit-task-details-modal" maxWidth="4xl" :closable="false">
-            @if ($selectedTask)
-                <form method="POST" action="{{ route('tasks.update', $selectedTask->id) }}" enctype="multipart/form-data"
-                      class="text-sm text-gray-800">
-                    @csrf
-                    @method('PUT')
 
+    <x-modal name="edit-task-details-modal" maxWidth="4xl" :closable="false">
+        @if ($selectedTask)
+            @can('participantCanUpdateTask', $selectedTask)
+                <form wire:submit="updateTaskForm" class="text-sm text-gray-800">
                     <!-- Header -->
                     <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                         <h2 class="text-lg font-semibold text-gray-800">{{ __('ویرایش اقدام') }}</h2>
-                        <button type="button"
-                                x-on:click="show = false"
+                        <button type="button" x-on:click="$dispatch('close')"
                                 class="text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
                             X
                         </button>
                     </div>
-
                     <!-- Body -->
                     <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
 
@@ -756,7 +611,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                                 <p class="text-xs text-gray-500 mb-1">{{ __('خلاصه مذاکره') }}</p>
-                                <p class="font-medium">{{ $selectedTask->task->body }}</p>
+                                <p class="font-medium">{{ $selectedTask->body }}</p>
                             </div>
                             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                                 <p class="text-xs text-gray-500 mb-1">{{ __('اقدام کننده') }}</p>
@@ -766,24 +621,46 @@
 
                         <!-- Task Body -->
                         <div>
-                            <x-input-label for="taskBody" :value="__('شرح اقدام شما')" class="mb-1"/>
-                            <textarea name="taskBody" id="taskBody" rows="6"
-                                      class="w-full p-4 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm resize-none"
-                                      placeholder="شرح اقدام خود را وارد کنید...">{{ old('taskBody', $selectedTask->body_task) }}</textarea>
-                            @error('taskBody')
-                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                            @enderror
+                            <x-input-label for="updateTaskBody" :value="__('شرح اقدام شما')" class="mb-1"/>
+                            <textarea id="updateTaskBody" rows="6" wire:model.defer="updateTaskBody"
+                                      class="w-full p-4 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm resize-none"></textarea>
+                            <x-input-error :messages="$errors->get('participantTaskBody')"/>
                         </div>
 
-                        <!-- File Upload -->
-                        <div>
-                            <x-input-label for="fileUpload" :value="__('آپلود فایل جدید (در صورت نیاز)')" class="mb-1"/>
-                            <input type="file" name="fileUpload[]" id="fileUpload" multiple
-                                   class="block w-full text-sm file:px-4 file:py-2 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 file:font-semibold hover:file:bg-blue-100"/>
-                            @error('fileUpload.*')
-                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                            @enderror
+                        <!-- File Upload with Progress Bar -->
+                        <div class="mt-4" x-data="{ progress: 0 }"
+                             x-on:livewire-upload-start="progress = 0"
+                             x-on:livewire-upload-progress="progress = $event.detail.progress"
+                             x-on:livewire-upload-finish="progress = 100";
+                             x-on:livewire-upload-error="progress = 0">
+
+                            <x-input-label for="newFiles" :value="__('آپلود فایل جدید (در صورت نیاز)')" class="mb-2"/>
+                            <input type="file" id="newFiles" wire:model="newFiles" multiple class="w-full text-sm text-gray-500"/>
+
+                            <!-- Progress Bar -->
+                            <div class="w-full bg-gray-200 rounded h-2 mt-2 overflow-hidden">
+                                <div class="bg-green-500 h-2 transition-all duration-300"
+                                     :style="`width: ${progress}%`"></div>
+                            </div>
+
+                            <!-- Percentage Text -->
+                            <div x-text="progress + '%'" class="text-xs text-right text-gray-700 mt-1"></div>
+
+                            <!-- Uploading Text -->
+                            <div wire:loading wire:target="newFiles" class="text-blue-500 text-sm mt-2">
+                                {{ __('در حال آپلود فایل...') }}
+                            </div>
+
+                            <!-- Upload Done Text -->
+                            <div wire:loading.remove wire:target="newFiles" class="text-green-600 text-sm mt-2" x-cloak>
+                                @if (!empty($newFiles))
+                                    {{ __('فایل‌(ها) با موفقیت آپلود شدند.') }}
+                                @endif
+                            </div>
+
+                            <x-input-error :messages="$errors->get('newFiles')"/>
                         </div>
+
 
                         <!-- Existing Files -->
                         @if (!empty($selectedTaskFiles))
@@ -797,9 +674,9 @@
                                                class="text-blue-600 text-xs hover:underline truncate w-4/5">
                                                 📄 {{ $file->original_name }}
                                             </a>
-                                            <button type="button"
-                                                    class="text-red-500 text-xs hover:underline delete-file"
-                                                    data-file-id="{{ $file->id }}">
+                                            <button type="button" wire:click="deleteUploadedFile({{$file->id}})"
+                                                    wire:confirm="{{__('آیا مطمئن هستید این فایل پاک شود؟')}}"
+                                                    class="text-red-500 text-xs hover:underline">
                                                 {{ __('حذف') }}
                                             </button>
                                         </div>
@@ -808,138 +685,143 @@
                             </div>
                         @endif
                     </div>
-
                     <!-- Footer -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-50 border-t border-gray-200">
-                        <x-primary-button type="submit" class="px-5 py-2 text-sm">
-                            {{ __('به‌روزرسانی') }}
+                        <x-primary-button type="submit"
+                                          wire:loading.attr="disabled"
+                                          wire:target="updateTaskForm"
+                                          wire:loading.class="opacity-50">
+                    <span wire:loading.remove wire:target="updateTaskForm">
+                        {{ __('به‌روزرسانی') }}
+                    </span>
+                            <span wire:loading wire:target="updateTaskForm" class="ml-2">
+                        {{ __('در حال ثبت...') }}
+                    </span>
                         </x-primary-button>
-                        <a href="{{route('tasks.create',$selectedTask->task->meeting_id)}}">
-                            <x-cancel-button>
-                                {{ __('انصراف') }}
-                            </x-cancel-button>
-                        </a>
-                    </div>
-                </form>
-            @endif
-        </x-modal>
-
-
-        <script>
-            $(document).ready(function () {
-                // Function to load the files dynamically
-                function loadTaskFiles(taskUserId) {
-                    $.ajax({
-                        url: '/tasks/files/' + taskUserId, // URL to fetch files
-                        method: 'GET',
-                        success: function (response) {
-                            if (response.files.length > 0) {
-                                let filesHtml = '';
-                                response.files.forEach(function (file) {
-                                    filesHtml += `
-                                    <li id="file-${file.id}" class="flex items-center justify-between bg-gray-100 p-2 rounded">
-                                        <a href="{{ asset('storage/') }}/${file.file_path}" target="_blank" class="text-blue-600 hover:underline truncate">
-                                            📄 ${file.original_name}
-                                        </a>
-                                        <button class="text-red-500 text-xs hover:underline delete-file" data-file-id="${file.id}">
-                                            حذف
-                                        </button>
-                                    </li>
-                                `;
-                                });
-                                $('#task-files-list').html(filesHtml);
-                            } else {
-                                $('#task-files-list').html('<p>هیچ فایلی آپلود نشده است.</p>');
-                            }
-                        }
-                    });
-                }
-
-                // Handle file deletion
-                $('body').on('click', '.delete-file', function (e) {
-                    e.preventDefault();
-                    var fileId = $(this).data('file-id');
-                    var fileRow = $('#file-' + fileId);  // The row to remove
-
-                    if (confirm('آیا مطمئن هستید که می‌خواهید این فایل را حذف کنید؟')) {
-                        $.ajax({
-                            url: '/tasks/delete-file/' + fileId, // URL to delete file
-                            method: 'DELETE',
-                            data: {
-                                _token: '{{ csrf_token() }}', // CSRF token
-                            },
-                            success: function (response) {
-                                if (response.success) {
-                                    fileRow.fadeOut();  // Remove the file row
-                                    alert(response.message);  // Show success message
-                                } else {
-                                    alert('عملیات حذف ناموفق بود.');
-                                }
-                            },
-                            error: function (xhr, status, error) {
-                                alert('خطا در حذف فایل');
-                            }
-                        });
-                    }
-                });
-            });
-        </script>
-
-
-        @if($this->meetings->status === MeetingStatus::IS_IN_PROGRESS)
-            <x-modal name="final-check" :closable="false">
-                <form wire:submit="finishMeeting({{$this->meetings->id}})">
-                    <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                        <h2 class="text-2xl font-bold text-gray-800">{{ __('آیا تایید نهایی این جلسه مطمئن هستید؟') }}</h2>
-                    </div>
-                    <div class="px-6 py-4">
-                        <p class="text-md text-red-500">{{ __('این اقدام قابل بازگشت نیست!') }}</p>
-                    </div>
-                    <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                        <x-primary-button type="submit">
-                            {{ __('تایید') }}
-                        </x-primary-button>
-                        <x-cancel-button x-on:click="$dispatch('close')">
+                        <x-cancel-button wire:click="close({{$selectedTask->meeting_id}})">
                             {{ __('انصراف') }}
                         </x-cancel-button>
                     </div>
                 </form>
-            </x-modal>
+            @endcan
         @endif
+    </x-modal>
 
-        <x-modal name="deny-task" :closable="false">
-            @if ($selectedTask)
-                <form wire:submit="denyTask({{$selectedTask->id}})">
-                    <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
-                        <div class="grid grid-cols-1 gap-4">
-                            <x-meeting-info label="{{ __('مهلت انجام') }}" :value="$selectedTask->time_out"/>
-                        </div>
-                        <div class="grid grid-cols-1 gap-4">
-                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->task->body"/>
-                        </div>
-                        <div>
-                            <label for="request_task" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('دلیل رد خلاصه مذاکره') }}
-                            </label>
-                            <textarea wire:model.defer="request_task" id="request_task" rows="4"
-                                      class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
-                </textarea>
-                            <x-input-error :messages="$errors->get('request_task')"/>
-                        </div>
 
-                    </div>
-                    <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                        <x-primary-button type="submit">
-                            {{ __('ثبت') }}
-                        </x-primary-button>
-                        <x-cancel-button x-on:click="$dispatch('close')">
-                            {{ __('انصراف') }}
-                        </x-cancel-button>
-                    </div>
-                </form>
-            @endif
-        </x-modal>
+    {{--    <script>--}}
+    {{--        $(document).ready(function () {--}}
+    {{--            // Function to load the files dynamically--}}
+    {{--            function loadTaskFiles(taskUserId) {--}}
+    {{--                $.ajax({--}}
+    {{--                    url: '/tasks/files/' + taskUserId, // URL to fetch files--}}
+    {{--                    method: 'GET',--}}
+    {{--                    success: function (response) {--}}
+    {{--                        if (response.files.length > 0) {--}}
+    {{--                            let filesHtml = '';--}}
+    {{--                            response.files.forEach(function (file) {--}}
+    {{--                                filesHtml += `--}}
+    {{--                                        <li id="file-${file.id}" class="flex items-center justify-between bg-gray-100 p-2 rounded">--}}
+    {{--                                            <a href="{{ asset('storage/') }}/${file.file_path}" target="_blank" class="text-blue-600 hover:underline truncate">--}}
+    {{--                                                📄 ${file.original_name}--}}
+    {{--                                            </a>--}}
+    {{--                                            <button class="text-red-500 text-xs hover:underline delete-file" data-file-id="${file.id}">--}}
+    {{--                                                حذف--}}
+    {{--                                            </button>--}}
+    {{--                                        </li>--}}
+    {{--                                    `;--}}
+    {{--                            });--}}
+    {{--                            $('#task-files-list').html(filesHtml);--}}
+    {{--                        } else {--}}
+    {{--                            $('#task-files-list').html('<p>هیچ فایلی آپلود نشده است.</p>');--}}
+    {{--                        }--}}
+    {{--                    }--}}
+    {{--                });--}}
+    {{--            }--}}
 
+    {{--            // Handle file deletion--}}
+    {{--            $('body').on('click', '.delete-file', function (e) {--}}
+    {{--                e.preventDefault();--}}
+    {{--                var fileId = $(this).data('file-id');--}}
+    {{--                var fileRow = $('#file-' + fileId);  // The row to remove--}}
+
+    {{--                if (confirm('آیا مطمئن هستید که می‌خواهید این فایل را حذف کنید؟')) {--}}
+    {{--                    $.ajax({--}}
+    {{--                        url: '/tasks/delete-file/' + fileId, // URL to delete file--}}
+    {{--                        method: 'DELETE',--}}
+    {{--                        data: {--}}
+    {{--                            _token: '{{ csrf_token() }}', // CSRF token--}}
+    {{--                        },--}}
+    {{--                        success: function (response) {--}}
+    {{--                            if (response.success) {--}}
+    {{--                                fileRow.fadeOut();  // Remove the file row--}}
+    {{--                                alert(response.message);  // Show success message--}}
+    {{--                            } else {--}}
+    {{--                                alert('عملیات حذف ناموفق بود.');--}}
+    {{--                            }--}}
+    {{--                        },--}}
+    {{--                        error: function (xhr, status, error) {--}}
+    {{--                            alert('خطا در حذف فایل');--}}
+    {{--                        }--}}
+    {{--                    });--}}
+    {{--                }--}}
+    {{--            });--}}
+    {{--        });--}}
+    {{--    </script>--}}
+
+
+    {{--        @if($this->meetings->status === MeetingStatus::IS_IN_PROGRESS)--}}
+    {{--            <x-modal name="final-check" :closable="false">--}}
+    {{--                <form wire:submit="finishMeeting({{$this->meetings->id}})">--}}
+    {{--                    <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">--}}
+    {{--                        <h2 class="text-2xl font-bold text-gray-800">{{ __('آیا تایید نهایی این جلسه مطمئن هستید؟') }}</h2>--}}
+    {{--                    </div>--}}
+    {{--                    <div class="px-6 py-4">--}}
+    {{--                        <p class="text-md text-red-500">{{ __('این اقدام قابل بازگشت نیست!') }}</p>--}}
+    {{--                    </div>--}}
+    {{--                    <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">--}}
+    {{--                        <x-primary-button type="submit">--}}
+    {{--                            {{ __('تایید') }}--}}
+    {{--                        </x-primary-button>--}}
+    {{--                        <x-cancel-button x-on:click="$dispatch('close')">--}}
+    {{--                            {{ __('انصراف') }}--}}
+    {{--                        </x-cancel-button>--}}
+    {{--                    </div>--}}
+    {{--                </form>--}}
+    {{--            </x-modal>--}}
+    {{--        @endif--}}
+
+    {{--        <x-modal name="deny-task" :closable="false">--}}
+    {{--            @if ($selectedTask)--}}
+    {{--                <form wire:submit="denyTask({{$selectedTask->id}})">--}}
+    {{--                    <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">--}}
+    {{--                        <div class="grid grid-cols-1 gap-4">--}}
+    {{--                            <x-meeting-info label="{{ __('مهلت انجام') }}" :value="$selectedTask->time_out"/>--}}
+    {{--                        </div>--}}
+    {{--                        <div class="grid grid-cols-1 gap-4">--}}
+    {{--                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTask->body"/>--}}
+    {{--                        </div>--}}
+    {{--                        <div>--}}
+    {{--                            <label for="request_task" class="block text-sm font-medium text-gray-700 mb-2">--}}
+    {{--                                {{ __('دلیل رد خلاصه مذاکره') }}--}}
+    {{--                            </label>--}}
+    {{--                            <textarea wire:model.defer="request_task" id="request_task" rows="4"--}}
+    {{--                                      class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">--}}
+    {{--                </textarea>--}}
+    {{--                            <x-input-error :messages="$errors->get('request_task')"/>--}}
+    {{--                        </div>--}}
+
+    {{--                    </div>--}}
+    {{--                    <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">--}}
+    {{--                        <x-primary-button type="submit">--}}
+    {{--                            {{ __('ثبت') }}--}}
+    {{--                        </x-primary-button>--}}
+    {{--                        <x-cancel-button x-on:click="$dispatch('close')">--}}
+    {{--                            {{ __('انصراف') }}--}}
+    {{--                        </x-cancel-button>--}}
+    {{--                    </div>--}}
+    {{--                </form>--}}
+    {{--            @endif--}}
+    {{--        </x-modal>--}}
 
 
 </div>

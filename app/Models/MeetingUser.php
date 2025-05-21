@@ -52,18 +52,15 @@ class MeetingUser extends Model
     {
         return $this->attributes['is_present'] == -1;
     }
-//    public function replacementName(): ?string
-//    {
-//        if (! $this->replacement) return null;
-//
-//        return UserInfo::with('user')
-//            ->whereRelation('user', 'id', $this->replacement)
-//            ->value('full_name');
-//    }
-    public function replacementUser(): BelongsTo
+    public function replacementName(): ?string
     {
-        return $this->belongsTo(User::class, 'replacement');
+
+        if (! $this->replacement) {
+            return null;
+        }
+        return UserInfo::where('user_id', $this->replacement)->value('full_name');
     }
+
     public function deadLineTask()
     {
         return Task::where('user_id',$this->user_id)->where('meeting_id',$this->meeting_id)->value('time_out');

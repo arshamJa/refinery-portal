@@ -149,8 +149,6 @@
                 </x-table.row>
             </x-slot>
             <x-slot name="body">
-                <x-table.row
-                    class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                     @forelse($this->meetings as $meeting)
                         <x-table.row wire:key="meeting-{{ $meeting->id }}" class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                             <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
@@ -209,7 +207,11 @@
                                         {{ __('شروع جلسه') }}
                                     </button>
                                 @elseif($meeting->status == MeetingStatus::IS_IN_PROGRESS || $meeting->status == MeetingStatus::IS_FINISHED)
-                                    <a href="{{route('tasks.create',$meeting->id)}}"
+{{--                                    <a href="{{route('tasks.create',$meeting->id)}}"--}}
+{{--                                       class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-neutral-600 text-white hover:bg-neutral-700 hover:outline-none hover:ring-2 hover:ring-neutral-500 hover:ring-offset-2">--}}
+{{--                                        {{ __('نمایش صورتجلسه') }}--}}
+{{--                                    </a>--}}
+                                    <a href="{{ URL::signedRoute('tasks.create', ['meeting' => $meeting->id]) }}"
                                        class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-neutral-600 text-white hover:bg-neutral-700 hover:outline-none hover:ring-2 hover:ring-neutral-500 hover:ring-offset-2">
                                         {{ __('نمایش صورتجلسه') }}
                                     </a>
@@ -256,7 +258,6 @@
                             </x-table.cell>
                         </x-table.row>
                     @endforelse
-                </x-table.row>
             </x-slot>
         </x-table.table>
     </div>

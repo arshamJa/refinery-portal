@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Department;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use Livewire\Attributes\Computed;
@@ -10,22 +9,21 @@ use Livewire\Component;
 
 class PresentUsers extends Component
 {
-
     public $meetingTitle;
+    public $meetingId;
 
     public function render()
     {
         return view('livewire.present-users');
     }
 
-    public $meetingId;
 
     #[Computed]
     public function meetingUsers()
     {
-        return MeetingUser::with(['user', 'meeting', 'replacementUser.user_info'])
+        return MeetingUser::with(['user', 'meeting', 'user.user_info'])
             ->where('meeting_id',$this->meetingId)
-            ->where('is_guest',0)
+            ->where('is_guest',false)
             ->get(['meeting_id','user_id','is_present','reason_for_absent','replacement']);
     }
 

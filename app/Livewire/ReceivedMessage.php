@@ -131,19 +131,6 @@ class ReceivedMessage extends Component
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     #[Computed]
     public function getSentNotificationDateTime($notification)
     {
@@ -161,7 +148,6 @@ class ReceivedMessage extends Component
         // Combine Jalali date with hour and minute only
         return $newDate . ' - ' . $hour . ':' . $minute;
     }
-
 
     #[Computed]
     public function meetings()
@@ -188,28 +174,29 @@ class ReceivedMessage extends Component
             ->select('id', 'meeting_id', 'user_id', 'is_present', 'reason_for_absent', 'read_by_user','replacement')
             ->paginate(5);
     }
-    #[Computed]
-    public function taskUsers()
-    {
-        return TaskUser::with([
-            'task' => function ($query) {
-                $query->select('id', 'meeting_id', 'body');
-            },
-            'task.meeting' => function ($query) {
-                $query->select('id', 'title', 'date', 'time', 'scriptorium');
-            },
-            'user.user_info' => function ($query) {
-                $query->select('user_id', 'full_name');
-            }
-        ])
-            ->where('request_task','!=',null)
-            ->whereHas('task.meeting', function ($query) {
-                $query->where('scriptorium', auth()->user()->user_info->full_name);
-            })
-            ->select('id', 'task_id', 'user_id', 'request_task', 'created_at')
-            ->latest('created_at')
-            ->get();
-    }
+
+//    #[Computed]
+//    public function taskUsers()
+//    {
+//        return TaskUser::with([
+//            'task' => function ($query) {
+//                $query->select('id', 'meeting_id', 'body');
+//            },
+//            'task.meeting' => function ($query) {
+//                $query->select('id', 'title', 'date', 'time', 'scriptorium');
+//            },
+//            'user.user_info' => function ($query) {
+//                $query->select('user_id', 'full_name');
+//            }
+//        ])
+//            ->where('request_task','!=',null)
+//            ->whereHas('task.meeting', function ($query) {
+//                $query->where('scriptorium', auth()->user()->user_info->full_name);
+//            })
+//            ->select('id', 'task_id', 'user_id', 'request_task', 'created_at')
+//            ->latest('created_at')
+//            ->get();
+//    }
 
     public function openModalAccept($meetingId)
     {
