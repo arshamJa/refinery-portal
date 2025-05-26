@@ -3,36 +3,7 @@
 <div>
 
     <x-sessionMessage name="status"/>
-    <x-modal name="delete">
-        @if($meetingId)
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
-                <div class="sm:flex sm:items-center">
-                    <div
-                        class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                        <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                        </svg>
-                    </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
-                        <h3 class="text-sm text-gray-900 dark:text-gray-100">
-                            {{ __('آیا مطمئن هستید که جلسه ') }} <span
-                                class="font-medium">{{$meetingTitle}}</span> {{__('لغو شود ؟')}}
-                        </h3>
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-row justify-between px-6 gap-x-3 py-4 bg-gray-100">
-                <x-secondary-button wire:click="close">
-                    {{ __('لغو') }}
-                </x-secondary-button>
-                <x-primary-button wire:click="denyMeeting({{$meetingId}})">
-                    {{ __('تایید') }}
-                </x-primary-button>
-            </div>
-        @endif
-    </x-modal>
+
     <x-breadcrumb>
         <li class="flex items-center h-full">
             <a href="{{route('dashboard')}}"
@@ -66,6 +37,7 @@
                     </span>
         </li>
     </x-breadcrumb>
+
     <div wire:poll.visible.60s class="bg-white p-8 rounded-2xl shadow-lg space-y-8 max-w-4xl">
         <!-- Stats -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
@@ -89,7 +61,7 @@
             <div>
                 <p class="font-semibold text-base mb-2">{{ __('اسامی ثبت نشده:') }}</p>
                 <div class="flex flex-wrap gap-2 text-gray-600">
-                    @foreach($this->meetingUsers->where('is_present',0) as $user)
+                    @foreach($this->meetingUsers->where('is_present',0)->where('is_guest',false) as $user)
                         <span class="bg-gray-100 rounded-full px-3 py-1">
                             {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
                         </span>
@@ -131,6 +103,22 @@
                     @endforeach
                 </div>
             </div>
+
+
+            <!-- Guests -->
+            <div>
+                <p class="font-semibold text-base mb-2">{{ __('اسامی مهمان :') }}</p>
+                <div class="space-y-4">
+                    @foreach($this->meetingUsers->where('is_guest',true) as $user)
+                        <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                            <p class="text-red-700 font-medium">
+                                {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
+                            </p>
+                            <p class="text-sm text-gray-700 mt-1">{{ $user->reason_for_absent }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
         </div>
 
         <!-- Buttons -->
@@ -145,8 +133,59 @@
                 </x-danger-button>
             </div>
         @endif
-
     </div>
+
+    <x-modal name="delete" maxWidth="4xl" :closable="false">
+        @if($meetingId)
+            <!-- Header -->
+            <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                <div class="sm:flex sm:items-center">
+                    <div
+                        class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                        <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
+                        <h3 class="text-sm text-gray-900 dark:text-gray-100">
+                            {{ __('آیا مطمئن هستید که جلسه ') }} <span
+                                class="font-medium">{{$meetingTitle}}</span> {{__('لغو شود ؟')}}
+                        </h3>
+                    </div>
+                </div>
+                <button type="button" x-on:click="$dispatch('close')"
+                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Body -->
+            <div
+                class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Warning Message -->
+                    <div class="md:col-span-2">
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded">
+                            <p class="font-semibold">{{ __('هشدار:') }}</p>
+                            <p>{{ __('این اقدام قابل بازگشت نیست و با لغو این جلسه تمامی اعضای این جلسه و مهمان حذف می شوند') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-row justify-between px-6 gap-x-3 py-4 bg-gray-100">
+                <x-primary-button wire:click="denyMeeting({{$meetingId}})">
+                    {{ __('تایید') }}
+                </x-primary-button>
+                <x-cancel-button wire:click="close">
+                    {{ __('لغو') }}
+                </x-cancel-button>
+            </div>
+        @endif
+    </x-modal>
 
 
 </div>

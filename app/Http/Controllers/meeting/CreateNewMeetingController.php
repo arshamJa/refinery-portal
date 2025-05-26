@@ -60,16 +60,6 @@ class CreateNewMeetingController extends Controller
      */
     public function create()
     {
-//        $users = UserInfo::with('department:id,department_name')
-//            ->whereHas('user', function ($query) {
-//            $query->whereDoesntHave('roles', function ($roleQuery) {
-//                $roleQuery->where('name', UserRole::SUPER_ADMIN->value);
-//            });
-//        })->select('id', 'user_id', 'full_name', 'department_id', 'position')
-//            ->get();
-//
-//        $departments = Department::select('id','department_name')->get();
-
         $users = Cache::remember('users_without_super_admin', 3600, function () {
             return UserInfo::with('department:id,department_name')
                 ->whereHas('user', function ($query) {
@@ -228,8 +218,6 @@ class CreateNewMeetingController extends Controller
 //                    'recipient_id' => $recipientId,
 //                ]))->onQueue('notifications');
             }
-
-
         return to_route('dashboard.meeting')->with('status', __('جلسه جدبد ساخته و دعوتنامه به اعضا جلسه ارسال شد'));
 
     }
@@ -536,7 +524,7 @@ class CreateNewMeetingController extends Controller
             ($year == $ja_year && $month < $ja_month) ||
             ($year == $ja_year && $month == $ja_month && $day < $ja_day)
         ) {
-            throw ValidationException::withMessages(['year' => 'The selected date cannot be in the past.']);
+            throw ValidationException::withMessages(['year' => 'تاریخ نباید گذشته باشد']);
         }
 
         // Return the formatted date

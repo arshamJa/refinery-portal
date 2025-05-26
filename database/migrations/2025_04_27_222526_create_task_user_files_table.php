@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('task_user_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Task::class)->constrained()->cascadeOnDelete();
+            $table->foreignId('task_user_id')->constrained()->cascadeOnDelete();
             $table->string('original_name');
             $table->string('file_path');
             $table->timestamps();

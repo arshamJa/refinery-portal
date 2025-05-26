@@ -250,7 +250,9 @@ return [
         'permissions' => 'سطح دسترسی',
         'taskBody' => 'شرح اقدام',
         'request_task' => 'متن',
-        'boss' => 'رییس جلسه'
+        'boss' => 'رییس جلسه',
+        'newFiles' => 'فایل(ها)',
+        'files' => 'فایل(ها)'
     ],
 
 ];

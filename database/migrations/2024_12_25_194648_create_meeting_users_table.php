@@ -18,8 +18,6 @@ return new class extends Migration
             $table->boolean('is_guest')->default(false);
             $table->string('is_present')->default('0');
             $table->text('reason_for_absent')->nullable();
-            $table->boolean('read_by_scriptorium')->default(false);
-            $table->boolean('read_by_user')->default(false);
             $table->string('replacement')->nullable();
             $table->softDeletes()->index();
             $table->timestamps();

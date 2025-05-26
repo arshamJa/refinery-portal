@@ -75,6 +75,12 @@
                                 <span class="text-green-600 font-bold">{{ __('انتخاب جانشین') }}</span>
                             @elseif($notification->type === 'DenyInvitation')
                                 <span class="text-green-600 font-bold">{{ __('رد دعوتنامه') }}</span>
+                            @elseif($notification->type === 'AssignedNewTask')
+                                <span class="text-green-600 font-bold">{{ __('ارسال اقدام') }}</span>
+                            @elseif($notification->type === 'UpdatedTaskTimeOut')
+                                <span class="text-green-600 font-bold">{{ __('ویرایش مهلت اقدام') }}</span>
+                            @elseif($notification->type === 'UpdatedTaskBody')
+                                <span class="text-green-600 font-bold">{{ __('ویرایش بند مذاکره') }}</span>
                             @endif
                         </x-table.cell>
                         <x-table.cell
@@ -102,7 +108,7 @@
             </x-slot>
         </x-table.table>
     </div>
-    <div class="mt-2">
+    <div class="mt-2 mb-10">
         {{ $this->userNotifications->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
 

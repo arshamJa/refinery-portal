@@ -11,13 +11,13 @@ class TaskUserFile extends Model
     use HasFactory;
 
     protected $fillable = [
-        'task_id',
+        'task_user_id',
         'original_name',
         'file_path',
     ];
 
-    public function task():BelongsTo
+    public function taskUser():BelongsTo
     {
-        return $this->belongsTo(Task::class);
+        return $this->belongsTo(TaskUser::class);
     }
 }

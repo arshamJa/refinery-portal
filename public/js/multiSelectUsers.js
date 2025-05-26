@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (selectedOptions.length === 0) {
             tagsHTML = '<span class="placeholder">...</span>';
         } else {
-            const maxTagsToShow = 3;
+            const maxTagsToShow = 2;
             let additionalTagsCount = 0;
 
             selectedOptions.forEach(function (option, index) {

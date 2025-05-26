@@ -13,25 +13,26 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/tasks/create/{meeting}', \App\Livewire\CreateTask::class)
-        ->name('tasks.create')->middleware('signed');
+    Route::get('/view/tasks/{meeting}', \App\Livewire\ViewTaskPage::class)
+        ->name('view.task.page')->middleware('signed');
 
     Route::get('/task/list/{meeting}', TaskList::class)->name('task.list');
+
+
+    Route::post('tasks/{meeting}', [TaskManagementController::class, 'store'])->name('tasks.store');
 
 
     // this is the route for each user to sent their task
 //    Route::post('/tasks/{taskUser}/submit', [TaskController::class, 'submitTaskForm'])->name('tasks.submit');
 //    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/tasks/delete-file/{fileId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
+//    Route::delete('/tasks/delete-file/{fileId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
 
 
-    Route::post('/tasks/deny/{taskUserId}', [TaskController::class, 'denyTask'])->name('deny.task');
+//    Route::post('/tasks/deny/{taskUserId}', [TaskController::class, 'denyTask'])->name('deny.task');
 
 
     // this is my task table
-    Route::get('my/task/table',\App\Livewire\MyTasks::class)
-        ->name('my.task.table');
-
+    Route::get('my/task/table',\App\Livewire\MyTasks::class)->name('my.task.table');
 
     // Route to Export for all 3 Tasks
     Route::get('tasks/report/completed/download', [TasksReportController::class, 'downloadCompletedTasksExcel'])
@@ -49,8 +50,6 @@ Route::middleware(['auth'])->group(function () {
 //    Route::get('participants/task', [ParticipantsTaskController::class, 'index'])
 //        ->name('participants.task');
 
-    // sent tasks by participants to their scriptorium
-    Route::get('/tasks/sent', TaskSent::class)->name('task.sent');
 
 
     // tasks report on time
@@ -77,20 +76,10 @@ Route::middleware(['auth'])->group(function () {
 //        ->name('tasksDoneWithDelay');
 
 
-    Route::get('/dashboard/tasks', TaskManagementTable::class)
-        ->name('tasks.index');
-
-//    Route::get('/tasks/create/{meeting}', [TaskManagementController::class, 'create'])
-//        ->name('tasks.create');
-
-
-
-
 
 
 //    Route::post('/tasks/{meetingId}', [TaskManagementController::class, 'store'])->name('tasks.store');
 
-    Route::post('tasks/{meeting}', [TaskManagementController::class, 'store'])->name('tasks.store');
 //
 //    Route::post('/editTask/{task}', [TaskManagementController::class, 'edit'])
 //        ->name('editTask');

@@ -53,11 +53,10 @@ class User extends Authenticatable
     }
 
 
-//    public function tasks():HasMany
-//    {
-//        return $this->hasMany(Task::class)->chaperone();
-//    }
-
+    public function taskUsers(): HasMany
+    {
+        return $this->hasMany(TaskUser::class);
+    }
 
 
     public function getTranslatedRole(): string

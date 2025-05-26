@@ -16,16 +16,6 @@ class Task extends Model
     protected $fillable = [
         'meeting_id',
         'body',
-        'user_id',
-        'sent_date',
-        'time_out',
-        'task_status',
-        'body_task',
-        'request_task',
-    ];
-
-    protected $casts = [
-        'task_status' => TaskStatus::class,
     ];
 
     public function user(): BelongsTo
@@ -33,10 +23,7 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function taskUserFiles(): HasMany
-    {
-        return $this->hasMany(TaskUserFile::class, 'task_id');
-    }
+
 
     public function full_name()
     {
@@ -46,6 +33,10 @@ class Task extends Model
     public function meeting(): BelongsTo
     {
         return $this->belongsTo(Meeting::class);
+    }
+    public function taskUsers(): HasMany
+    {
+        return $this->hasMany(TaskUser::class);
     }
 
     public function notifications(): MorphMany

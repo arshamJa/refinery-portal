@@ -58,7 +58,6 @@ class Meeting extends Model
         return $this->hasMany(Task::class)->chaperone();
     }
 
-
     // Scope for Scriptorium Report
     public function scopeDateRange($query, $start, $end)
     {

@@ -264,8 +264,8 @@
                                 </button>
                             </div>
                             <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                            @foreach($users->where('user_id','!=',auth()->user()->id) as $user)
-                                <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}}</div>
+                            @foreach($users->where('user_id','!=',auth()->id()) as $user)
+                                <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}} - {{$user->position}}</div>
                             @endforeach
                             <div class="no-result-message" style="display:none;">No result match</div>
                         </div>
@@ -342,12 +342,12 @@
                     </div>
                 </div>
                 <div class="col-span-1 mt-12">
-                    <x-primary-button type="submit">
+                    <x-primary-button type="submit" class="ml-2">
                         {{ __('ارسال') }}
                     </x-primary-button>
                     <a href="{{route('dashboard.meeting')}}">
                         <x-cancel-button>
-                            {{__('لغو')}}
+                            {{__('انصراف')}}
                         </x-cancel-button>
                     </a>
                 </div>

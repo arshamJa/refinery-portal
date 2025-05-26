@@ -9,5 +9,6 @@ enum UserRole: string
     case OPERATOR = 'اپراتور';
     case USER = 'کاربر';
     case SCRIPTORIUM = 'دبیرجلسه';
+    case BOSS = 'رئیس';
 
 }

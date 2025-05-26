@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Policies\BlogPolicy;
 use App\Policies\PhoneListPolicy;
 use App\Policies\ProfilePolicy;
-use App\Policies\TaskPolicy;
+use App\Policies\TaskUserPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -50,9 +50,21 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super-admin') ? true : null;
         });
 
-        Gate::define('access-meeting', function ($user, $meetingId) {
-            return $user->hasRole(UserRole::SUPER_ADMIN->value);
+
+
+        Gate::define('scriptorium-role', function ($user) {
+            return $user->hasRole(UserRole::SCRIPTORIUM->value);
         });
+
+
+
+
+        //  for Boss & Scriptorium
+        Gate::define('view-denied-tasks', function (User $user) {
+            return $user->hasAnyRoles([UserRole::SCRIPTORIUM->value, UserRole::BOSS->value]);
+        });
+
+
 
         // Gate For Side Bar
         Gate::define('side-bar-notifications',function (User $user){

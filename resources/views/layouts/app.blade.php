@@ -39,7 +39,7 @@
 
         <!-- Main content -->
         <main class="flex-1 px-4 md:mr-72  mt-20">
-            @if (session('status'))
+            @if (session()->has('status'))
                 <div
                     x-data="{ showMessage: true }" x-show="showMessage" x-transition x-cloak
                     x-init="setTimeout(() => showMessage = false, 4000)"

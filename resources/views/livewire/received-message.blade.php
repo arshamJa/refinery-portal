@@ -53,7 +53,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['نوع پیام','تاریخ ارسال پیام', 'فرستنده(دبیر/کاربر)', 'متن', 'اقدام شما', 'وضعیت جلسه', 'وضعیت خواندن'] as $th)
+                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده(دبیر/کاربر)', 'متن', 'اقدام شما', 'وضعیت جلسه', 'وضعیت خواندن'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}

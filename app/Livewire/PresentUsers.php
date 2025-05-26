@@ -2,8 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Enums\MeetingStatus;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Models\Notification;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -23,8 +26,7 @@ class PresentUsers extends Component
     {
         return MeetingUser::with(['user', 'meeting', 'user.user_info'])
             ->where('meeting_id',$this->meetingId)
-            ->where('is_guest',false)
-            ->get(['meeting_id','user_id','is_present','reason_for_absent','replacement']);
+            ->get(['meeting_id','user_id','is_guest','is_present','reason_for_absent','replacement']);
     }
 
     #[Computed]
@@ -54,10 +56,36 @@ class PresentUsers extends Component
 
     public function acceptMeeting($meetingId)
     {
-        $meeting = Meeting::find($meetingId);
-        $meeting->status = '-1';
+        $meeting = Meeting::findOrFail($meetingId);
+        $meeting->status = MeetingStatus::IS_NOT_CANCELLED->value;
         $meeting->save();
-        return redirect()->back()->with('status','جلسه با موفقیت تایید نهایی شد');
+
+        // ✅ Fetch all users (participants + inner guests), regardless of attendance
+        $participantUserIds = DB::table('meeting_users')
+            ->where('meeting_id', $meeting->id)
+            ->pluck('user_id');
+
+        $meetingDate = $meeting->date ?? 'تاریخ مشخص نشده';
+        $meetingTime = $meeting->time ?? 'ساعت مشخص نشده';
+
+        $notificationsData = [];
+        foreach ($participantUserIds as $userId) {
+            $notificationsData[] = [
+                'type' => 'MeetingConfirmed',
+                'data' => json_encode([
+                    'message' => "این جلسه در تاریخ {$meetingDate} و ساعت {$meetingTime} برگزار خواهد شد."
+                ]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meeting->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $userId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        Notification::insert($notificationsData);
+
+        return redirect()->back()->with('status', 'جلسه با موفقیت تایید نهایی شد و شرکت‌کنندگان مطلع شدند.');
     }
 
     public function openModalDeny($department_id)
@@ -68,11 +96,37 @@ class PresentUsers extends Component
     }
     public function denyMeeting($meetingId)
     {
-        $meeting = Meeting::find($meetingId);
-        $meeting->status = '1';
+        $meeting = Meeting::findOrFail($meetingId);
+        $meeting->status = MeetingStatus::IS_CANCELLED->value;
         $meeting->save();
+
+        // ✅ Fetch all users (participants + inner guests), regardless of attendance
+        $participantUserIds = DB::table('meeting_users')
+            ->where('meeting_id', $meeting->id)
+            ->pluck('user_id');
+
+        $meetingDate = $meeting->date ?? 'تاریخ مشخص نشده';
+        $meetingTime = $meeting->time ?? 'ساعت مشخص نشده';
+
+        $notificationsData = [];
+        foreach ($participantUserIds as $userId) {
+            $notificationsData[] = [
+                'type' => 'MeetingCancelled',
+                'data' => json_encode([
+                    'message' => "این جلسه در تاریخ {$meetingDate} و ساعت {$meetingTime} لغو شد."
+                ]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meeting->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $userId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        Notification::insert($notificationsData);
         $this->dispatch('close-modal');
-        return redirect()->back()->with('status','جلسه با موفقیت لفو نهایی شد');
+        return redirect()->back()->with('status', 'جلسه با موفقیت لغو نهایی شد و شرکت‌کنندگان مطلع شدند');
 
     }
     public function accept($meetingId)

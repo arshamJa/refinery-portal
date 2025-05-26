@@ -14,6 +14,7 @@ use App\Traits\MessageReceived;
 use App\Traits\Organizations;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -112,6 +113,26 @@ class ReceivedMessage extends Component
                 return 'شما این جلسه را پذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
             }
         }
+        if ($notification->type === 'MeetingInvitation') {
+            $meeting = $notification->notifiable;
+            if ($meeting) {
+                $isGuest = DB::table('meeting_users')
+                    ->where('meeting_id', $meeting->id)
+                    ->where('user_id', $notification->recipient_id)
+                    ->where('is_guest', true)
+                    ->exists();
+
+                $date = $meeting->date;
+                $time = $meeting->time;
+
+                if ($isGuest) {
+                    return "شما به عنوان مهمان به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$date} و ساعت {$time} دعوت شده‌اید.";
+                } else {
+                    return "شما به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$date} و ساعت {$time} دعوت شده‌اید.";
+                }
+            }
+        }
+
         if (auth()->id() === $notification->sender_id) {
             $meeting = $notification->notifiable; // Assuming this is your meeting model
             if ($meeting) {

@@ -92,6 +92,7 @@ function printTable() {
                 }
                 .task-details {
                     margin-top: 20px;
+                      break-inside: avoid;
                 }
                 .task-card {
                     border: 1px solid #ddd;
@@ -99,6 +100,8 @@ function printTable() {
                     padding: 8px;
                     margin-bottom: 8px;
                     border-radius: 5px;
+                    page-break-inside: avoid;
+                    break-inside: avoid;
                 }
                 .task-card strong {
                     display: block;

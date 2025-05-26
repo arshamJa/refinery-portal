@@ -21,8 +21,6 @@ class MeetingUser extends Model
         'meeting_id',
         'is_present',
         'reason_for_absent',
-        'read_by_scriptorium',
-        'read_by_user',
         'replacement',
         'is_guest'
     ];

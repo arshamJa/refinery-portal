@@ -12,7 +12,7 @@
                 @elseif (auth()->user()->hasRole(\App\Enums\UserRole::OPERATOR->value))
                     {{__('اپراتور')}}
                 @elseif (auth()->user()->hasRole(\App\Enums\UserRole::USER->value))
-                    {{__('کارمند')}}
+                    {{__('کاربر')}}
                 @endif
             @endif
         </span>

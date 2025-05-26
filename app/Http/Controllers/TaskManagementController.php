@@ -3,69 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meeting;
-use App\Models\MeetingUser;
+use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskUser;
-use App\Models\UserInfo;
-use App\Rules\DateRule;
-use App\Rules\farsi_chs;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class TaskManagementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return view('task.index');
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(string $meeting)
-    {
-
-        $meetings = Meeting::select('id', 'title','unit_organization','scriptorium','boss',
-            'date', 'time','location','unit_held','applicant','position_organization')
-            ->findOrFail($meeting);
-
-
-        // Select specific columns from MeetingUser and related user.user_info
-        $employees = MeetingUser::select('id', 'user_id', 'meeting_id','is_present')
-            ->with([
-                'user:id', // assuming 'user_id' is in MeetingUser
-                'user.user_info:id,user_id,full_name' // only needed fields from user_info
-            ])
-            ->where('meeting_id', $meeting)
-            ->get();
-
-
-        // Select specific columns from Task and eager load specific columns from TaskUser
-        $tasks = Task::select('id', 'meeting_id', 'body')
-            ->with([
-                'taskUsers' => function ($query) {
-                    $query->select('id', 'task_id', 'user_id','time_out','sent_date', 'is_completed', 'request_task', 'body_task');
-                }
-            ])
-            ->where('meeting_id', $meeting)
-            ->get();
-
-        $taskUsers = TaskUser::all();
-
-        return view('task.create' , [
-            'meetings' => $meetings,
-            'employees' => $employees,
-            'tasks' => $tasks,
-            'taskUsers' => $taskUsers
-        ]);
-    }
-
-
     /**
      * Store a newly created resource in storage.
      * @throws ValidationException
@@ -79,14 +26,12 @@ class TaskManagementController extends Controller
             'day' => ['required'],
             'body' => ['required', 'string', 'min:5']
         ]);
+        // Convert current Gregorian date to Jalali
         $gr_day = now()->day;
         $gr_month = now()->month;
         $gr_year = now()->year;
-        $time = gregorian_to_jalali($gr_year,$gr_month,$gr_day,'/');
-        $parts = explode("/", $time);
-        $ja_year = $parts[0];
-        $ja_month = $parts[1];
-        $ja_day = $parts[2];
+        $jalaliDate = gregorian_to_jalali($gr_year, $gr_month, $gr_day, '/');
+        [$ja_year, $ja_month, $ja_day] = explode('/', $jalaliDate);
 
         if (
             ($request->year < $ja_year) ||
@@ -102,95 +47,43 @@ class TaskManagementController extends Controller
         $new_day = sprintf("%02d", $request->day);
         $newTime = $request->year . '/' . $new_month . '/' . $new_day;
 
-        $body = Str::of($request->body)
-            ->squish()           // Squish to remove unnecessary spaces
-            ->deduplicate();     // Remove duplicate words
+        $body = $this->normalizeText($request->body);
         $initiators = Str::of($request->holders)->split('/[\s,]+/');
 
+        $task = Task::create([
+            'meeting_id' => $request->meeting,
+            'body'   => $body
+        ]);
 
         foreach ($initiators as $initiator) {
-        $task = Task::create([
-            'meeting_id' => $meeting,
-            'user_id' => $initiator,
-            'body' => $body,
-            'time_out' => $newTime,
-            'is_completed' => false,
-            'request_task' => null,
-        ]);
+            $taskUser = TaskUser::create([
+                'task_id' => $task->id,
+                'user_id' => $initiator,
+                'time_out' => $newTime,
+            ]);
+
+            $notificationMessage = 'یک بند جدید به شما اختصاص داده شده است و مهلت انجام آن: ' . $taskUser->time_out;
+            $notificationsData[] = [
+                'type' => 'AssignedNewTask',
+                'data' => json_encode(['message' => $notificationMessage]),
+                'notifiable_type' => Task::class,
+                'notifiable_id' => $task->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $initiator,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
-
-        return to_route('tasks.create',$meeting)->with('status','درج اقدام انجام شد');
+        Notification::insert($notificationsData);
+        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $meeting]);
+        return redirect()->to($signedUrl)->with('status','درج اقدام انجام شد');
     }
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    protected function normalizeText($text)
     {
-        $task = Task::find($id);
-        $taskUsers = DB::table('task_user')->get(['id','task_id','file']);
-        return view('task.show',['task'=>$task , 'taskUsers' => $taskUsers]);
-    }
-
-    public function complete(string $id)
-    {
-        $task = Task::find($id);
-        $task->is_completed = true;
-        $task->save();
-        return to_route('tasks.index')->with('status','وظیفه انجام شد');
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Request $request , string $id)
-    {
-        $request->validate([
-            'body' => 'required'
-        ]);
-        $task = Task::find($id);
-        $task->request_task = $request->body;
-        $task->save();
-        return to_route('tasks.show',$id)->with('status','درخواست شما ارسال شد');
-    }
-
-    public function editUserTask(string $taskId)
-    {
-        $task = Task::with('meeting')->find($taskId);
-        return view('task.editUserTask',['task' => $task]);
-    }
-
-    public function updateUserTask(Request $request , string $taskId)
-    {
-        $validated = $request->validate([
-            'title' => 'required',
-            'body' => 'required',
-            'sent_date' => 'required',
-            'time_out' => 'required',
-            'files' => 'nullable',
-        ]);
-        $task = Task::find($taskId);
-        $task->title = $request->title;
-        $task->body = $request->body;
-        $task->sent_date = $request->sent_date;
-        $task->time_out = $request->time_out;
-        $task->request_task = null;
-        $task->save();
-        return redirect()->signedRoute('meetings.show',$task->meeting_id)->with('status','درخواست کارمند انجام شد');
-    }
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $text = strip_tags($text);                         // Remove HTML tags
+        $text = preg_replace('/\s+/', ' ', trim($text));   // Normalize whitespace
+        $words = explode(' ', $text);                      // Split into words
+        $uniqueWords = array_unique($words);               // Remove duplicate words
+        return implode(' ', $uniqueWords);                 // Join back to string
     }
 }

@@ -63,7 +63,7 @@ class MeetingDashboard extends Component
         $userFullName = auth()->user()->user_info->full_name;
 
         return Meeting::with([
-            'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,read_by_scriptorium,read_by_user,replacement',
+            'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,replacement',
             'meetingUsers.user:id',
             'meetingUsers.user.user_info:id,user_id,full_name',
             'meetingUsers.user.user_info.department:id,department_name',
@@ -112,7 +112,7 @@ class MeetingDashboard extends Component
         // Get the filtered meetings based on the provided filters
         $meetings = $this->baseFilteredMeetingQuery($filters)
             ->with([
-                'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,read_by_scriptorium,read_by_user,replacement',
+                'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,replacement',
                 'meetingUsers.user:id',
                 'meetingUsers.user.user_info:id,user_id,full_name,department_id',
                 'meetingUsers.user.user_info.department:id,department_name',
@@ -129,8 +129,7 @@ class MeetingDashboard extends Component
         $this->selectedMeeting = Meeting::with([
             'meetingUsers' => function ($query) {
                 $query->select(
-                    'id', 'meeting_id', 'user_id', 'is_guest', 'is_present', 'reason_for_absent',
-                    'read_by_scriptorium', 'read_by_user', 'replacement'
+                    'id', 'meeting_id', 'user_id', 'is_guest', 'is_present', 'reason_for_absent', 'replacement'
                 )
                     ->with([
                         'user.user_info.department'
