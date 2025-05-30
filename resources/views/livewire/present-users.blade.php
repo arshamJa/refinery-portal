@@ -73,7 +73,7 @@
             <div>
                 <p class="font-semibold text-base mb-2">{{ __('اسامی قبول کنندگان:') }}</p>
                 <div class="flex flex-wrap gap-2 text-green-700">
-                    @foreach($this->meetingUsers->where('is_present', 1) as $user)
+                    @foreach($this->meetingUsers->where('is_guest','==',false)->where('is_present', 1) as $user)
                         <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
                             <p class="text-red-700 font-medium">
                                 {{ $user->user->user_info->full_name ?? '---' }}
@@ -93,7 +93,7 @@
             <div>
                 <p class="font-semibold text-base mb-2">{{ __('اسامی رد کنندگان به همراه دلیل:') }}</p>
                 <div class="space-y-4">
-                    @foreach($this->meetingUsers->where('is_present', -1) as $user)
+                    @foreach($this->meetingUsers->where('is_guest','==',false)->where('is_present', -1) as $user)
                         <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
                             <p class="text-red-700 font-medium">
                                 {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
@@ -114,7 +114,18 @@
                             <p class="text-red-700 font-medium">
                                 {{ UserInfo::where('user_id', $user->user_id)->value('full_name') }}
                             </p>
-                            <p class="text-sm text-gray-700 mt-1">{{ $user->reason_for_absent }}</p>
+                            @if($user->reason_for_absent != null)
+                                <p class="text-sm text-gray-700 mt-1">
+                                    {{ __('علت رد = ') }}
+                                    {{ $user->reason_for_absent }}
+                                </p>
+                            @endif
+                            @if ($user->replacementName())
+                                <p class="text-sm text-indigo-600 mt-2">
+                                    {{ __('جانشین اینجانب = ') }}
+                                    <strong>{{ $user->replacementName() }}</strong>
+                                </p>
+                            @endif
                         </div>
                     @endforeach
                 </div>

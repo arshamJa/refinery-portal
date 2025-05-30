@@ -1,14 +1,14 @@
-const container = document.getElementById('boss_dropdown');
-const users = JSON.parse(container.getAttribute('data-users'));
-
 document.addEventListener("DOMContentLoaded", () => {
-    const dropdownBtn = document.getElementById("dropdown-btn");
-    const dropdownMenu = document.getElementById("dropdown-menu");
-    const dropdownSearch = document.getElementById("dropdown-search");
-    const dropdownList = document.getElementById("dropdown-list");
-    const selectedText = document.getElementById("selected-text");
-    const hiddenInput = document.getElementById("hidden-input");
-    const noResult = document.getElementById("no-result");
+    const container = document.getElementById('scriptorium_dropdown');
+    const users = JSON.parse(container.getAttribute('data-users'));
+
+    const dropdownBtn = document.getElementById("scriptorium-dropdown-btn");
+    const dropdownMenu = document.getElementById("scriptorium-dropdown-menu");
+    const dropdownSearch = document.getElementById("scriptorium-dropdown-search");
+    const dropdownList = document.getElementById("scriptorium-dropdown-list");
+    const selectedText = document.getElementById("scriptorium-selected-text");
+    const hiddenInput = document.getElementById("scriptorium-hidden-id");
+    const noResult = document.getElementById("scriptorium-no-result");
 
     let selected = null;
 
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dropdownList.innerHTML = "";
 
         const filteredUsers = users.filter(user => {
-            const text = `${user.full_name} - ${user.department?.department_name ?? "بدون بخش"} - ${user.position}`;
+            const text = `${user.full_name} - ${user.department?.department_name ?? "بدون بخش"} - ${user.position ?? ""}`;
             return text.toLowerCase().includes(filter.toLowerCase());
         });
 
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             li.className = "px-4 py-2 text-gray-700 hover:bg-blue-50 cursor-pointer rounded-lg truncate";
             li.setAttribute("role", "option");
             li.setAttribute("tabindex", "0");
-            li.textContent = `${user.full_name} - ${user.department?.department_name ?? "بدون بخش"} - ${user.position}`;
+            li.textContent = `${user.full_name} - ${user.department?.department_name ?? "بدون بخش"} - ${user.position ?? ""}`;
             li.dataset.id = user.id;
 
             if (selected && selected.id === user.id) {
@@ -56,8 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function selectUser(user) {
         selected = user;
-        selectedText.textContent = `${user.full_name} - ${user.department?.department_name ?? "بدون بخش"} - ${user.position}`;
+        selectedText.textContent = `${user.full_name} - ${user.department?.department_name ?? "بدون بخش"} - ${user.position ?? ""}`;
         hiddenInput.value = user.id;
+        document.getElementById('scriptorium-hidden-department').value = user.department?.department_name || '';
+        document.getElementById('scriptorium-hidden-position').value = user.position || '';
     }
 
     function clearSelection() {
@@ -102,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     dropdownBtn.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+        if (["ArrowDown", "Enter", " "].includes(e.key)) {
             e.preventDefault();
             openDropdown();
         }

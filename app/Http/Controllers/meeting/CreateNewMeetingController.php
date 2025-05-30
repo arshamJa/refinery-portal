@@ -28,7 +28,7 @@ class CreateNewMeetingController extends Controller
     {
         $query = Meeting::with('meetingUsers:id,meeting_id,user_id')
             ->where('scriptorium', auth()->user()->user_info->full_name)
-            ->select(['id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time']);
+            ->select(['id', 'title', 'scriptorium_department', 'scriptorium', 'location', 'date', 'time']);
 
         // Get total count before filtering
         $originalMeetingsCount = (clone $query)->count();
@@ -37,7 +37,7 @@ class CreateNewMeetingController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('unit_organization', 'like', '%' . $search . '%')
+                    ->orWhere('scriptorium_department', 'like', '%' . $search . '%')
                     ->orWhere('scriptorium', 'like', '%' . $search . '%')
                     ->orWhere('location', 'like', '%' . $search . '%')
                     ->orWhere('date', 'like', '%' . $search . '%')
@@ -70,11 +70,7 @@ class CreateNewMeetingController extends Controller
                 ->select('id', 'user_id', 'full_name', 'department_id', 'position')
                 ->get();
         });
-        $departments = Cache::remember('departments_list', 3600, function () {
-            return Department::select('id', 'department_name')->get();
-        });
-
-        return view('meeting.crud.create' , ['users' => $users,'departments'=>$departments]);
+        return view('meeting.crud.create' , ['users' => $users]);
     }
 
     /**
@@ -83,7 +79,7 @@ class CreateNewMeetingController extends Controller
      */
     public function store(MeetingStoreRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         $innerGuests = collect($request->input('guests.inner', []))
             ->map(function ($guest) {
@@ -113,34 +109,36 @@ class CreateNewMeetingController extends Controller
             ->values();
 
         // Convert current Gregorian date to Jalali
-        $newDate = $this->getCurrentDate($request->year,$request->month,$request->day);
+        $newDate = $this->getCurrentDate($validated['year'],$validated['month'],$validated['day']);
 
-        $boss = UserInfo::where('user_id', $request->boss)->first();
+        $boss = UserInfo::where('user_id', $validated['boss'])->first();
         $bossName = $boss ? $boss->full_name : 'Unknown';
+        $scriptorium = UserInfo::where('user_id',$validated['scriptorium'])->where('position',$validated['scriptorium_position'])->first();
+        $scriptoriumName = $scriptorium ? $scriptorium->full_name : 'Unknown';
 
         $request->merge([
-            'time' => str_contains($request->time, ':') ? $request->time : sprintf('%02d:00', intval($request->time))
+            'time' => str_contains($validated['time'], ':') ? $validated['time'] : sprintf('%02d:00', intval($validated['time']))
         ]);
 
-        if (Meeting::where('date', $newDate)->where('time', $request->time)->exists()) {
+        if (Meeting::where('date', $newDate)->where('time', $validated['time'])->exists()) {
             throw ValidationException::withMessages([
                 'time' => 'در این زمان جلسه ثبت شده است'
             ]);
         }
 
             $meeting = Meeting::create([
-                'title' => $request->title,
-                'unit_organization' => $request->unit_organization,
-                'scriptorium' => $request->scriptorium,
+                'title' => $validated['title'],
+                'scriptorium' => $scriptoriumName,
+                'scriptorium_department' => $validated['scriptorium_department'],
+                'scriptorium_position' => $validated['scriptorium_position'],
                 'boss' => $bossName,
-                'location' => $request->location,
+                'location' => $validated['location'],
                 'date' => $newDate,
-                'time' => $request->time,
-                'unit_held' => $request->unit_held,
-                'treat' => $request->treat,
+                'time' => $validated['time'],
+                'unit_held' => $validated['unit_held'],
+                'treat' => $validated['treat'],
                 'guest' => $outerGuests ?? null,
-                'applicant' => $request->applicant,
-                'position_organization' => $request->position_organization,
+
             ]);
 
             $meetingUserRecords = [];
@@ -151,7 +149,7 @@ class CreateNewMeetingController extends Controller
 //            $guestIds = collect();
 
             // 1. Holders
-            $holders = Str::of($request->holders)->explode(',');
+            $holders = Str::of($validated['holders'])->explode(',');
             foreach ($holders as $holder) {
                 $meetingUserRecords[] = [
                     'user_id' => trim($holder),
@@ -198,7 +196,6 @@ class CreateNewMeetingController extends Controller
                     $notificationMessage = 'شما در جلسه: ' . $meeting->title .
                         ' در تاریخ ' . $newDate . ' و در ساعت ' . $request->time . ' دعوت شده اید';
                 }
-
                 Notification::create([
                     'type' => $notificationType,
                     'data' => json_encode(['message' => $notificationMessage]),
@@ -207,7 +204,6 @@ class CreateNewMeetingController extends Controller
                     'sender_id' => auth()->id(),
                     'recipient_id' => $recipientId,
                 ]);
-
                 // use this for jobs: php artisan queue:work --queue=notifications and below
 //                dispatch(new SendNotificationJob([
 //                    'type' => 'Meeting Invitation',
@@ -230,10 +226,9 @@ class CreateNewMeetingController extends Controller
         $meeting = Meeting::with([
             'meetingUsers.user.user_info.department',
         ])
-            ->select('id','title',
-                'unit_organization', 'scriptorium', 'boss',
-                'location', 'date', 'time', 'unit_held', 'treat', 'guest',
-                'applicant', 'position_organization')
+            ->select('id','title', 'scriptorium_department',
+                'scriptorium', 'boss', 'location', 'date', 'time',
+                'unit_held', 'treat', 'guest', 'scriptorium_position')
             ->findOrFail($id);
 
         // Date processing
@@ -247,7 +242,7 @@ class CreateNewMeetingController extends Controller
         // Fetching the boss with department and position
         $bossInfo = null;
         if ($meeting->boss) {
-            $bossInfo = UserInfo::with(['department'])
+            $bossInfo = UserInfo::with(['department:id,department_name'])
                 ->where('full_name', $meeting->boss)
                 ->first();
         }
@@ -291,18 +286,19 @@ class CreateNewMeetingController extends Controller
      */
     public function update(MeetingUpdateRequest $request, string $id)
     {
-        // Validate request
-        $request->validated();
 
-        // Convert current Gregorian date to Jalali
-        $newDate = $this->getCurrentDate($request->year, $request->month, $request->day);
+        $validated = $request->validated();
+
+        $newDate = $this->getCurrentDate($validated['year'],$validated['month'],$validated['day']);
 
         // Retrieve meeting
         $meeting = Meeting::with('meetingUsers')->findOrFail($id);
 
         // Get Boss Name from UserInfo
-        $bossName = UserInfo::where('user_id', $request->boss)->value('full_name');
+        $bossName = UserInfo::where('user_id', $validated['boss'])->value('full_name');
         $originalBoss = $meeting->boss;
+        $scriptorium = UserInfo::where('user_id',$validated['scriptorium'])->where('position',$validated['scriptorium_position'])->first();
+        $scriptoriumName = $scriptorium ? $scriptorium->full_name : 'Unknown';
 
         // Merge Old and New Outer Guests
         $existingOuterGuests = collect($meeting->guest ?? []);
@@ -318,17 +314,16 @@ class CreateNewMeetingController extends Controller
         // Update meeting details
         $meeting->update([
             'title' => $request->title,
-            'unit_organization' => $request->unit_organization,
-            'scriptorium' => $request->scriptorium,
+            'scriptorium' => $scriptoriumName,
+            'scriptorium_department' => $validated['scriptorium_department'],
+            'scriptorium_position' => $validated['scriptorium_position'],
             'boss' => $bossName,
-            'location' => $request->location,
+            'location' => $validated['location'],
             'date' => $newDate,
-            'time' => $request->time,
-            'unit_held' => $request->unit_held,
-            'treat' => $request->treat,
+            'time' => $validated['time'],
+            'unit_held' => $validated['unit_held'],
+            'treat' => $validated['treat'],
             'guest' => $mergedOuterGuests,
-            'applicant' => $request->applicant,
-            'position_organization' => $request->position_organization,
         ]);
 
         // Manage Inner Guests (Keep old, add new)
@@ -354,9 +349,9 @@ class CreateNewMeetingController extends Controller
 
         // List of fields to watch for changes (optional if needed)
         $watchedFields = [
-            'title', 'unit_organization', 'scriptorium', 'boss',
+            'title', 'scriptorium_department', 'scriptorium', 'boss',
             'location', 'date', 'time', 'unit_held',
-            'treat', 'guest', 'applicant', 'position_organization'
+            'treat', 'guest', 'scriptorium_position'
         ];
 
         $originalMeeting = $meeting->getOriginal();
@@ -368,7 +363,7 @@ class CreateNewMeetingController extends Controller
         $participants = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
             ->filter(fn($id) => is_numeric($id))->unique()->map(fn($id) => (int) $id);
 
-        $allUserIds = $guestUserIds->merge($participants)->push($request->boss)->unique();
+        $allUserIds = $guestUserIds->merge($participants)->push($validated['boss'])->unique();
 
         $notificationsData = [];
 

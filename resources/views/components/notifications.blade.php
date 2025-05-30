@@ -9,47 +9,8 @@
         </svg>
         <h3 class="text-sm font-semibold"> {{__('جلسات')}}</h3>
     </x-notification-link>
-    <x-notification-link href="{{route('my.task.table')}}">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-             class="size-5">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122"/>
-        </svg>
-        <h3 class="text-sm font-semibold"> {{__('اقدامات من')}}</h3>
-    </x-notification-link>
 
 
-    <x-notification-link href="{{route('received.message')}}">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-             stroke="currentColor" class="size-5">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-        </svg>
-        <h3 class="text-sm font-semibold">  {{__('پیام های دریافتی')}}</h3>
-
-        @if($this->unreadReceivedCount() > 0)
-            <span wire:poll.visible.60s
-                  class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                {{ $this->unreadReceivedCount() > 10 ? '+10' : $this->unreadReceivedCount() }}
-            </span>
-        @endif
-    </x-notification-link>
-    <x-notification-link href="{{route('sent.message')}}">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-             stroke="currentColor" class="size-5">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-        </svg>
-        <h3 class="text-sm font-semibold">  {{__('پیام های ارسالی')}}</h3>
-        @if($this->unreadSentCount() > 0)
-            <span wire:poll.visible.60s
-                  class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                {{ $this->unreadSentCount() > 10 ? '+10' : $this->unreadSentCount() }}
-        </span>
-        @endif
-    </x-notification-link>
 
 
 </div>
@@ -62,9 +23,9 @@
                       d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z"/>
             </svg>
             <h3 class="text-sm font-semibold">{{ __('سامانه ها') }}</h3>
-            <span class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-            {{Organization::all()->count()}}
-        </span>
+{{--            <span class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">--}}
+{{--            {{Organization::all()->count()}}--}}
+{{--        </span>--}}
         </x-notification-link>
 
         <x-notification-link href="{{route('phone-list.index')}}">
@@ -88,6 +49,7 @@
         </x-notification-link>
     </div>
 </div>
+@can('has-permission', \App\Enums\UserPermission::TASK_REPORT_TABLE)
 <div class="mb-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <x-notification-link href="{{route('meeting.report')}}">
@@ -96,7 +58,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
             </svg>
-            <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات')}}</h3>
+            <h3 class="text-sm font-semibold"> {{__('گزارش جلسات شرکت')}}</h3>
         </x-notification-link>
     </div>
 </div>
+@endcan

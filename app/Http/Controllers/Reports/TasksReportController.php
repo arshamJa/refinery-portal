@@ -77,8 +77,22 @@ class TasksReportController extends Controller
 
     public function completedTasksWithDelay(Request $request)
     {
-        $query = Task::with('meeting')
-            ->where('is_completed', true)
+        $query = TaskUser::with([
+            'task' => function($query) {
+                $query->select('id', 'meeting_id'); // Select specific columns from the task table
+            },
+            'task.meeting' => function($query) {
+                $query->select('id', 'title', 'scriptorium'); // Select specific columns from the meeting table
+            },
+            'user' => function($query) {
+                // Only select the user id to avoid duplicate queries for user_info
+                $query->select('id');
+            },
+            'user.user_info' => function($query) {
+                $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
+            }
+        ])
+            ->where('task_status', TaskStatus::IS_COMPLETED->value)
             ->whereColumn('sent_date', '>', 'time_out');
 
         $startDate = trim($request->input('start_date'));

@@ -24,12 +24,6 @@ class Task extends Model
     }
 
 
-
-    public function full_name()
-    {
-        return UserInfo::where('user_id', $this->user_id)->value('full_name');
-    }
-
     public function meeting(): BelongsTo
     {
         return $this->belongsTo(Meeting::class);

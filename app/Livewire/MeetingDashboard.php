@@ -6,6 +6,7 @@ use App\Enums\MeetingStatus;
 use App\Exports\MeetingsExport;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
+use App\Models\Notification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,22 @@ class MeetingDashboard extends Component
     }
 
 
+
+
+    #[Computed]
+    public function unreadReceivedCount()
+    {
+        return Notification::where('recipient_id', auth()->id())
+            ->whereNull('recipient_read_at')
+            ->count();
+    }
+    #[Computed]
+    public function unreadSentCount()
+    {
+        return Notification::where('sender_id', auth()->id())
+            ->whereNull('sender_read_at')
+            ->count();
+    }
 
     #[Computed]
     public function meetings()
@@ -69,20 +86,19 @@ class MeetingDashboard extends Component
             'meetingUsers.user.user_info.department:id,department_name',
         ])
             ->select([
-                'id', 'title', 'unit_organization', 'scriptorium', 'boss', 'location',
-                'date', 'time','end_time','status', 'position_organization', 'unit_held', 'applicant'
+                'id', 'title', 'scriptorium_department', 'scriptorium', 'boss', 'location',
+                'date', 'time','end_time','status', 'scriptorium_position', 'unit_held'
             ])
             ->where(function ($query) use ($userId, $userFullName) {
                 $query->where('scriptorium', $userFullName)
                     ->orWhereHas('meetingUsers', function ($q) use ($userId) {
-                        $q->where('user_id', $userId)
-                            ->where('is_guest', 0);
+                        $q->where('user_id', $userId);
                     });
             })
             ->when(!empty($search), function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('unit_organization', 'like', "%{$search}%")
+                        ->orWhere('scriptorium_department', 'like', "%{$search}%")
                         ->orWhere('scriptorium', 'like', "%{$search}%")
                         ->orWhere('location', 'like', "%{$search}%")
                         ->orWhere('date', 'like', "%{$search}%")
@@ -137,8 +153,8 @@ class MeetingDashboard extends Component
             }
         ])
             ->select(
-                'id', 'title', 'unit_organization', 'scriptorium', 'location', 'date', 'time',
-                'unit_held', 'treat', 'applicant', 'position_organization', 'guest', 'boss'
+                'id', 'title', 'scriptorium_department', 'scriptorium', 'location', 'date', 'time',
+                'unit_held', 'treat', 'scriptorium_position', 'guest', 'boss'
             )
             ->findOrFail($id);
 
@@ -148,7 +164,7 @@ class MeetingDashboard extends Component
 
     public function deleteMeeting($id)
     {
-        $this->selectedMeeting = Meeting::select('id', 'title', 'date', 'time')
+        $this->selectedMeeting = Meeting::select('id', 'title', 'date', 'time','scriptorium','scriptorium_position')
             ->findOrFail($id);
         $this->dispatch('crud-modal', name: 'delete-meeting-modal');
     }

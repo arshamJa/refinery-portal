@@ -1,4 +1,4 @@
-@php use App\Enums\MeetingStatus; @endphp
+@php use App\Enums\MeetingStatus;use App\Enums\UserPermission;use App\Enums\UserRole; @endphp
 <div>
     <x-breadcrumb>
         <li class="flex items-center h-full">
@@ -24,28 +24,64 @@
         </li>
     </x-breadcrumb>
 
-    <div class="mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            @can('create-meeting')
-                <a href="{{ route('meeting.create') }}"
-                   class="inline-flex items-center gap-3 px-6 py-4 rounded-lg text-white bg-gradient-to-r from-[#0A74DA] to-[#34B3F1] transition-all duration-300 ease-in-out shadow-lg hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#0A74DA] disabled:opacity-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                    </svg>
-                    <span class="text-sm font-medium">
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
+            <a href="{{ route('meeting.create') }}"
+               class="inline-flex items-center gap-3 px-6 py-4 rounded-lg text-white bg-gradient-to-r from-[#0A74DA] to-[#34B3F1] transition-all duration-300 ease-in-out shadow-lg hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#0A74DA] disabled:opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                <span class="text-sm font-medium">
                          {{ __('ایجاد جلسه جدید') }}
                          </span>
-                </a>
-            @endcan
-            <a href="{{ route('my.task.table') }}"
-               class="inline-flex items-center gap-3 px-6 py-4 rounded-lg text-white bg-gradient-to-r from-[#FF6F61] to-[#F2A900] transition-all duration-300 ease-in-out shadow-lg hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#FF6F61] disabled:opacity-50">
+            </a>
+        @endcan
+        <a href="{{ route('my.task.table') }}"
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
             <span class="text-sm font-medium">
                 {{ __('اقدامات من') }}
             </span>
-            </a>
-        </div>
+        </a>
+
+        <a href="{{route('received.message')}}"
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="size-5">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+            </svg>
+            <h3 class="text-sm font-semibold">  {{__('پیام های دریافتی')}}</h3>
+            @if($this->unreadReceivedCount() > 0)
+                <span wire:poll.visible.60s
+                      class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                {{ $this->unreadReceivedCount() > 10 ? '+10' : $this->unreadReceivedCount() }}
+            </span>
+            @endif
+        </a>
+
+
+        <a href="{{route('sent.message')}}"
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="size-5">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+            </svg>
+            <h3 class="text-sm font-semibold">  {{__('پیام های ارسالی')}}</h3>
+            @if($this->unreadSentCount() > 0)
+                <span wire:poll.visible.60s
+                      class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                {{ $this->unreadSentCount() > 10 ? '+10' : $this->unreadSentCount() }}
+        </span>
+            @endif
+        </a>
+
     </div>
+
 
     <form wire:submit="filterMeetings"
           class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
@@ -80,24 +116,25 @@
                 </x-select-input>
             </div>
 
-            <!-- Date Inputs (side-by-side) -->
-            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <div class="flex-1">
-                        <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
-                        <x-date-input>
-                            <x-text-input id="start_date" wire:model="start_date" class="block ps-10"/>
-                        </x-date-input>
-                    </div>
-                    <div class="flex-1">
-                        <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
-                        <x-date-input>
-                            <x-text-input id="end_date" wire:model="end_date" class="block ps-10"/>
-                        </x-date-input>
+            @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
+                <!-- Date Inputs (side-by-side) -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
+                            <x-date-input>
+                                <x-text-input id="start_date" wire:model="start_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
+                        <div class="flex-1">
+                            <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
+                            <x-date-input>
+                                <x-text-input id="end_date" wire:model="end_date" class="block ps-10"/>
+                            </x-date-input>
+                        </div>
                     </div>
                 </div>
-            </div>
-
+            @endcan
             <!-- Search + Show All Buttons -->
             <div class="col-span-6 lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
                 <x-search-button>{{ __('جست و جو') }}</x-search-button>
@@ -107,30 +144,30 @@
                     </x-view-all-link>
                 @endif
             </div>
-
-            <!-- Export Button under the right group -->
-            <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
-                <x-export-link wire:click.prevent="exportExcel" wire:loading.attr="disabled"
-                               class="relative">
-                    {{-- Spinner while loading --}}
-                    <svg wire:loading wire:target="exportExcel"
-                         class="animate-spin h-5 w-5 mr-2 text-white"
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10"
-                                stroke="currentColor" stroke-width="4"/>
-                        <path class="opacity-75" fill="currentColor"
-                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
-                    </svg>
-                    {{-- Button Text --}}
-                    <span wire:loading.remove wire:target="exportExcel">
+            @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
+                <!-- Export Button under the right group -->
+                <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
+                    <x-export-link wire:click.prevent="exportExcel" wire:loading.attr="disabled"
+                                   class="relative">
+                        {{-- Spinner while loading --}}
+                        <svg wire:loading wire:target="exportExcel"
+                             class="animate-spin h-5 w-5 mr-2 text-white"
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor"
+                                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+                        </svg>
+                        {{-- Button Text --}}
+                        <span wire:loading.remove wire:target="exportExcel">
                             {{ __('خروجی Excel') }}
                         </span>
-                    <span wire:loading wire:target="exportExcel">
+                        <span wire:loading wire:target="exportExcel">
                             {{ __('در حال دریافت...') }}
                         </span>
-                </x-export-link>
-            </div>
-
+                    </x-export-link>
+                </div>
+            @endcan
 
         </div>
     </form>
@@ -140,7 +177,9 @@
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
                     @foreach ([
-                              '#','موضوع جلسه','دبیر جلسه','واحد سازمانی','تاریخ','ساعت','رد/تایید(جلسه)','وضعیت جلسه','اتاق جلسه','جزئیات'
+                              '#','موضوع جلسه','دبیر جلسه','نقش شما','واحد متولی جلسه','تاریخ','ساعت',
+//                              'رد/تایید(جلسه)',
+                              'وضعیت جلسه','اتاق جلسه','جزئیات'
                           ] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
@@ -156,22 +195,25 @@
                         <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
                         <x-table.cell>{{$meeting->title}}</x-table.cell>
                         <x-table.cell>{{$meeting->scriptorium}}</x-table.cell>
-                        <x-table.cell>{{$meeting->unit_organization}}</x-table.cell>
+                        <x-table.cell>
+                            {{$meeting->getRoleForUser(auth()->user())}}
+                        </x-table.cell>
+                        <x-table.cell>{{$meeting->scriptorium_department}}</x-table.cell>
                         <x-table.cell>{{$meeting->date}}</x-table.cell>
-                        <x-table.cell>{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
-                        @if( auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->position_organization)
-                            <x-table.cell>
-                                <a href="{{route('presentUsers',$meeting->id)}}">
-                                    <x-secondary-button>
-                                        {{__('نمایش')}}
-                                    </x-secondary-button>
-                                </a>
-                            </x-table.cell>
-                        @else
-                            <x-table.cell>
-                                {{__('---')}}
-                            </x-table.cell>
-                        @endif
+                        <x-table.cell class="whitespace-nowrap">{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
+{{--                        @if( auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)--}}
+{{--                            <x-table.cell>--}}
+{{--                                <a href="{{route('presentUsers',$meeting->id)}}">--}}
+{{--                                    <x-secondary-button>--}}
+{{--                                        {{__('نمایش')}}--}}
+{{--                                    </x-secondary-button>--}}
+{{--                                </a>--}}
+{{--                            </x-table.cell>--}}
+{{--                        @else--}}
+{{--                            <x-table.cell>--}}
+{{--                                {{__('---')}}--}}
+{{--                            </x-table.cell>--}}
+{{--                        @endif--}}
                         <x-table.cell class="whitespace-nowrap">
                             @switch($meeting->status)
                                 @case(App\Enums\MeetingStatus::PENDING)
@@ -204,13 +246,13 @@
                         </x-table.cell>
                         <!-- Start Meeting Button (New Column) -->
                         <x-table.cell class="whitespace-nowrap">
-                            @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED &&auth()->user()->user_info->full_name === $meeting->scriptorium &&auth()->user()->user_info->position === $meeting->position_organization)
+                            @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED &&auth()->user()->user_info->full_name === $meeting->scriptorium &&auth()->user()->user_info->position === $meeting->scriptorium_position)
                                 <button wire:click="startMeeting({{ $meeting->id }})"
                                         class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-pink-500 text-white hover:bg-pink-600 hover:outline-none hover:ring-2 hover:ring-pink-500 hover:ring-offset-2">
                                     {{ __('شروع جلسه') }}
                                 </button>
                             @elseif($meeting->status == MeetingStatus::IS_IN_PROGRESS || $meeting->status == MeetingStatus::IS_FINISHED)
-                                <a href="{{ URL::signedRoute('view.task.page', ['meeting' => $meeting->id]) }}"
+                                <a href="{{ route('view.task.page',  $meeting->id) }}"
                                    class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-neutral-600 text-white hover:bg-neutral-700 hover:outline-none hover:ring-2 hover:ring-neutral-500 hover:ring-offset-2">
                                     {{ __('نمایش صورتجلسه') }}
                                 </a>
@@ -234,13 +276,13 @@
                                     <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                         {{ __('نمایش') }}
                                     </x-dropdown-link>
-                                    @if( $meeting->status === MeetingStatus::PENDING && auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->position_organization)
+                                    @if( $meeting->status === MeetingStatus::PENDING && auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)
                                         <x-dropdown-link href="{{route('meeting.edit',$meeting->id)}}">
                                             {{ __('ویرایش') }}
                                         </x-dropdown-link>
                                     @endif
                                     @if(( $meeting->status == MeetingStatus::PENDING || $meeting->status == MeetingStatus::IS_CANCELLED ) &&
-                                        auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->position_organization)
+                                        auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)
                                         <x-dropdown-link wire:click.prevent="deleteMeeting({{ $meeting->id }})"
                                                          class="text-red-600">
                                             {{ __('حذف') }}
@@ -299,15 +341,13 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[15px]">
                     <x-meeting-info label="{{ __('رئیس جلسه') }}" :value="$selectedMeeting->boss"/>
                     <x-meeting-info label="{{ __('دبیرجلسه') }}" :value="$selectedMeeting->scriptorium"/>
-                    <x-meeting-info label="{{ __('واحد سازمانی') }}" :value="$selectedMeeting->unit_organization"/>
-                    <x-meeting-info label="{{ __('سمت دبیرجلسه') }}" :value="$selectedMeeting->position_organization"/>
+                    <x-meeting-info label="{{ __('واحد سازمانی') }}" :value="$selectedMeeting->scriptorium_department"/>
+                    <x-meeting-info label="{{ __('سمت دبیرجلسه') }}" :value="$selectedMeeting->scriptorium_position"/>
                     <x-meeting-info label="{{ __('مکان') }}" :value="$selectedMeeting->location"/>
                     <x-meeting-info label="{{ __('تاریخ') }}" :value="$selectedMeeting->date"/>
                     <x-meeting-info label="{{ __('زمان') }}" :value="$selectedMeeting->time"/>
-                    <x-meeting-info label="{{ __('کمیته یا واحد برگزار کننده') }}"
-                                    :value="$selectedMeeting->unit_held"/>
+                    <x-meeting-info label="{{ __('کمیته یا واحد برگزار کننده') }}" :value="$selectedMeeting->unit_held"/>
                     <x-meeting-info label="{{ __('پذیرایی') }}" :value="$selectedMeeting->treat ? 'دارد' : 'ندارد'"/>
-                    <x-meeting-info label="{{ __('نام درخواست دهنده') }}" :value="$selectedMeeting->applicant"/>
                 </div>
 
                 {{-- Participants --}}
@@ -367,37 +407,39 @@
 
     <x-modal name="delete-meeting-modal">
         @if ($selectedMeeting)
-            <form method="POST" action="{{ route('meeting.destroy', $selectedMeeting->id) }}">
-                @csrf
-                @method('DELETE')
-                <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                    <p class="text-xl font-bold text-red-600 dark:text-red-400">
-                        {{ __('آیا از حذف جلسه زیر اطمینان دارید؟') }}
-                    </p>
-                </div>
-                <div class="px-6 py-4" dir="rtl">
-                    <div class="mt-4 text-sm text-gray-600">
-                        {{--                         Show a bit of meeting info for confirmation--}}
-                        <ul class="list-disc list-inside text-sm space-y-2">
-                            <li><strong>{{ __('عنوان جلسه:') }}</strong> {{ $selectedMeeting->title }}</li>
-                            <li><strong>{{ __('تاریخ:') }}</strong> {{ $selectedMeeting->date }}</li>
-                            <li><strong>{{ __('زمان:') }}</strong> {{ $selectedMeeting->time }}</li>
-                        </ul>
-
-                        <p class="text-xs text-red-500 dark:text-red-300 mt-2">
-                            {{ __('توجه: این عمل غیرقابل بازگشت است و تمام اطلاعات مرتبط با این جلسه (شامل اعضا و مهمانان) حذف خواهند شد.') }}
+            @if(auth()->user()->user_info->full_name === $selectedMeeting->scriptorium && auth()->user()->user_info->position === $selectedMeeting->scriptorium_position)
+                <form method="POST" action="{{ route('meeting.destroy', $selectedMeeting->id) }}">
+                    @csrf
+                    @method('DELETE')
+                    <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
+                        <p class="text-xl font-bold text-red-600 dark:text-red-400">
+                            {{ __('آیا از حذف جلسه زیر اطمینان دارید؟') }}
                         </p>
                     </div>
-                </div>
-                <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                    <x-danger-button type="submit">
-                        {{ __('حذف جلسه') }}
-                    </x-danger-button>
-                    <x-secondary-button x-on:click="$dispatch('close')" class="text-gray-700 dark:text-gray-300">
-                        {{ __('لغو') }}
-                    </x-secondary-button>
-                </div>
-            </form>
+                    <div class="px-6 py-4" dir="rtl">
+                        <div class="mt-4 text-sm text-gray-600">
+                            {{--                         Show a bit of meeting info for confirmation--}}
+                            <ul class="list-disc list-inside text-sm space-y-2">
+                                <li><strong>{{ __('عنوان جلسه:') }}</strong> {{ $selectedMeeting->title }}</li>
+                                <li><strong>{{ __('تاریخ:') }}</strong> {{ $selectedMeeting->date }}</li>
+                                <li><strong>{{ __('زمان:') }}</strong> {{ $selectedMeeting->time }}</li>
+                            </ul>
+
+                            <p class="text-xs text-red-500 dark:text-red-300 mt-2">
+                                {{ __('توجه: این عمل غیرقابل بازگشت است و تمام اطلاعات مرتبط با این جلسه (شامل اعضا و مهمانان) حذف خواهند شد.') }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
+                        <x-danger-button type="submit">
+                            {{ __('حذف جلسه') }}
+                        </x-danger-button>
+                        <x-secondary-button x-on:click="$dispatch('close')" class="text-gray-700 dark:text-gray-300">
+                            {{ __('لغو') }}
+                        </x-secondary-button>
+                    </div>
+                </form>
+            @endif
         @endif
     </x-modal>
 

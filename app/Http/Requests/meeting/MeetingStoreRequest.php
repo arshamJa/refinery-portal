@@ -27,20 +27,19 @@ class MeetingStoreRequest extends FormRequest
     {
         return [
             'title' => ['required','string','max:255'],
-            'unit_organization' => ['required','string','min:5','max:255', new farsi_chs()],
-            'scriptorium' => ['required','string','max:255', new farsi_chs()],
+            'scriptorium' => ['required','string','max:255'],
+            'scriptorium_department' => ['required','string','min:5','max:255'],
+            'scriptorium_position' => ['required','string','max:255'],
             'boss' => ['required'],
             'location' => ['required','string','max:255'],
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],
             'time' => ['required', new Time()],
-            'unit_held' => ['required','string','max:255', new farsi_chs()],
+            'unit_held' => ['required','string','max:255'],
             'treat' => ['required'],
             'guest' => ['nullable','string'],
-            'holders' => ['required'] ,
-            'applicant' => ['required','string','max:255', new farsi_chs()],
-            'position_organization' => ['required','string','max:255',new farsi_chs()],
+            'holders' => ['required']
         ];
     }
 }

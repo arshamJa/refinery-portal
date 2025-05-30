@@ -78,26 +78,26 @@ class TaskController extends Controller
 //        return redirect()->back()->with('status', 'اقدام با موفقیت ویرایش شد');
 //    }
 
-    public function deleteFile($fileId)
-    {
-        $file = TaskUserFile::findOrFail($fileId);
-
-        // Authorization check
-        abort_unless($file->taskUser->user_id === auth()->id(), 403);
-
-        // Delete the file from storage
-        Storage::disk('public')->delete($file->file_path);
-
-        // Check if the file exists in the public storage
-        if (Storage::disk('public')->exists($file->file_path)) {
-            // Delete the file from storage
-            Storage::disk('public')->delete($file->file_path);
-        }
-
-        // Delete the file from the database
-        $file->delete();
-
-        // Return a success message
-        return response()->json(['success' => true, 'message' => 'فایل با موفقیت حذف شد']);
-    }
+//    public function deleteFile($fileId)
+//    {
+//        $file = TaskUserFile::findOrFail($fileId);
+//
+//        // Authorization check
+//        abort_unless($file->taskUser->user_id === auth()->id(), 403);
+//
+//        // Delete the file from storage
+//        Storage::disk('public')->delete($file->file_path);
+//
+//        // Check if the file exists in the public storage
+//        if (Storage::disk('public')->exists($file->file_path)) {
+//            // Delete the file from storage
+//            Storage::disk('public')->delete($file->file_path);
+//        }
+//
+//        // Delete the file from the database
+//        $file->delete();
+//
+//        // Return a success message
+//        return response()->json(['success' => true, 'message' => 'فایل با موفقیت حذف شد']);
+//    }
 }

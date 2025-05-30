@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserPermission;
 use App\Models\Meeting;
 use App\Models\Notification;
+use App\Models\Permission;
 use App\Models\Task;
 use App\Models\TaskUser;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -13,6 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class TaskManagementController extends Controller
 {
+
     /**
      * Store a newly created resource in storage.
      * @throws ValidationException
@@ -66,8 +70,8 @@ class TaskManagementController extends Controller
             $notificationsData[] = [
                 'type' => 'AssignedNewTask',
                 'data' => json_encode(['message' => $notificationMessage]),
-                'notifiable_type' => Task::class,
-                'notifiable_id' => $task->id,
+                'notifiable_type' => \App\Models\Meeting::class,
+                'notifiable_id' => $task->meeting_id,
                 'sender_id' => auth()->id(),
                 'recipient_id' => $initiator,
                 'created_at' => now(),
@@ -75,8 +79,7 @@ class TaskManagementController extends Controller
             ];
         }
         Notification::insert($notificationsData);
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $meeting]);
-        return redirect()->to($signedUrl)->with('status','درج اقدام انجام شد');
+        return to_route('view.task.page',$meeting)->with('status','درج اقدام انجام شد');
     }
     protected function normalizeText($text)
     {

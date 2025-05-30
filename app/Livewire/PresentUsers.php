@@ -60,7 +60,7 @@ class PresentUsers extends Component
         $meeting->status = MeetingStatus::IS_NOT_CANCELLED->value;
         $meeting->save();
 
-        // ✅ Fetch all users (participants + inner guests), regardless of attendance
+        // Fetch all users (participants + inner guests), regardless of attendance
         $participantUserIds = DB::table('meeting_users')
             ->where('meeting_id', $meeting->id)
             ->pluck('user_id');
@@ -68,24 +68,20 @@ class PresentUsers extends Component
         $meetingDate = $meeting->date ?? 'تاریخ مشخص نشده';
         $meetingTime = $meeting->time ?? 'ساعت مشخص نشده';
 
-        $notificationsData = [];
         foreach ($participantUserIds as $userId) {
-            $notificationsData[] = [
-                'type' => 'MeetingConfirmed',
-                'data' => json_encode([
+            $notification = Notification::where('notifiable_type', Meeting::class)
+                ->where('notifiable_id', $meeting->id)->where('recipient_id', $userId)
+                ->first();
+                // Update existing notification
+                $notification->type = 'MeetingConfirmed';
+                $notification->data = json_encode([
                     'message' => "این جلسه در تاریخ {$meetingDate} و ساعت {$meetingTime} برگزار خواهد شد."
-                ]),
-                'notifiable_type' => Meeting::class,
-                'notifiable_id' => $meeting->id,
-                'sender_id' => auth()->id(),
-                'recipient_id' => $userId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+                ]);
+            $notification->recipient_read_at = null;
+            $notification->updated_at = now();
+                $notification->save();
         }
-        Notification::insert($notificationsData);
-
-        return redirect()->back()->with('status', 'جلسه با موفقیت تایید نهایی شد و شرکت‌کنندگان مطلع شدند.');
+        return to_route('dashboard.meeting')->with('status', 'جلسه با موفقیت تایید نهایی شد و شرکت‌کنندگان مطلع شدند.');
     }
 
     public function openModalDeny($department_id)
@@ -100,7 +96,7 @@ class PresentUsers extends Component
         $meeting->status = MeetingStatus::IS_CANCELLED->value;
         $meeting->save();
 
-        // ✅ Fetch all users (participants + inner guests), regardless of attendance
+        // Fetch all users (participants + inner guests), regardless of attendance
         $participantUserIds = DB::table('meeting_users')
             ->where('meeting_id', $meeting->id)
             ->pluck('user_id');
@@ -108,25 +104,23 @@ class PresentUsers extends Component
         $meetingDate = $meeting->date ?? 'تاریخ مشخص نشده';
         $meetingTime = $meeting->time ?? 'ساعت مشخص نشده';
 
-        $notificationsData = [];
         foreach ($participantUserIds as $userId) {
-            $notificationsData[] = [
-                'type' => 'MeetingCancelled',
-                'data' => json_encode([
+            $notification = Notification::where('notifiable_type', Meeting::class)
+                ->where('notifiable_id', $meeting->id)
+                ->where('recipient_id', $userId)
+                ->first();
+                // Update existing notification
+                $notification->type = 'MeetingCancelled';
+                $notification->data = json_encode([
                     'message' => "این جلسه در تاریخ {$meetingDate} و ساعت {$meetingTime} لغو شد."
-                ]),
-                'notifiable_type' => Meeting::class,
-                'notifiable_id' => $meeting->id,
-                'sender_id' => auth()->id(),
-                'recipient_id' => $userId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+                ]);
+                $notification->recipient_read_at = null;
+                $notification->updated_at = now();
+                $notification->save();
         }
 
-        Notification::insert($notificationsData);
         $this->dispatch('close-modal');
-        return redirect()->back()->with('status', 'جلسه با موفقیت لغو نهایی شد و شرکت‌کنندگان مطلع شدند');
+        return to_route('dashboard.meeting')->with('status', 'جلسه با موفقیت لغو نهایی شد و شرکت‌کنندگان مطلع شدند');
 
     }
     public function accept($meetingId)

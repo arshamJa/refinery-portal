@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Http\Requests\PermissionStoreRequest;
 use App\Http\Requests\RoleStoreRequest;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,20 @@ use Illuminate\Support\Facades\DB;
 
 class RolePermissionController extends Controller
 {
+    public function connect()
+    {
+        $users = User::whereNotIn('id', [1, 2])->get();
+        // Create the permission if it doesn't exist
+        $permissionName = UserPermission::SCRIPTORIUM_PERMISSIONS->value;
+        $permission = Permission::firstOrCreate(
+            ['name' => $permissionName]
+        );
+        // Assign the permission to each user
+        foreach ($users as $user) {
+            $user->assignPermission($permission);
+        }
+    }
+
     public function table(Request $request)
     {
         $user = Auth::user();

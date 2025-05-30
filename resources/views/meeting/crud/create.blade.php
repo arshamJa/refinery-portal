@@ -37,6 +37,7 @@
         {{--            <x-primary-button>{{__('جدول جلسات')}}</x-primary-button>--}}
         {{--        </a>--}}
     </nav>
+
     <form action="{{route('meeting.store')}}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
@@ -134,97 +135,72 @@
             </h2>
             {{--                        Scriptorium Information--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-                <div x-data="dropdown()" class="relative w-full col-span-2"
-                     x-init="initOptions({{ $users }}, '{{ old('boss') }}')">
-                    <x-input-label for="boss" class="mb-2" :value="__('رئیس جلسه')"/>
-                    <!-- Dropdown Button -->
-                    <button type="button" @click="open = !open"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-left text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
-                        <span class="text-right w-full"
-                              x-text="selected ? selected.full_name + ' - ' + (selected.department ? selected.department.department_name : 'No department') + ' - ' + selected.position : '...'"></span>
-                        <!-- Down Arrow Icon -->
-                        <svg x-show="!open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+
+                <div id="boss_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                    <x-input-label for="title" class="mb-1.5" :value="__('رئیس جلسه')"/>
+                    <!-- Select box -->
+                    <button id="dropdown-btn" type="button"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
+                            aria-haspopup="listbox" aria-expanded="false">
+                        <span id="selected-text" class="truncate">...</span>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
                              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                        <svg x-show="open" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
-                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M5 15l7-7 7 7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <!-- Dropdown Menu -->
-                    <div x-show="open" @click.away="open = false"
-                         class="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
-                        <!-- Search Input -->
+                    <!-- Dropdown menu -->
+                    <div id="dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
                         <div class="px-4 py-2">
-                            <input type="text" x-model="search" placeholder="جست و جو"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input id="dropdown-search" type="text" placeholder="جست و جو"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
-
-                        <!-- Dropdown Options -->
-                        <ul class="space-y-1">
-                            <!-- Null Option -->
-                            <li @click="select(null)"
-                                class="px-4 py-2 text-gray-600 hover:bg-blue-50 cursor-pointer rounded-lg">
-                                <span>...</span>
-                            </li>
-
-                            <!-- User List -->
-                            <template x-for="user in filteredOptions" :key="user.id">
-                                <li @click="select(user)"
-                                    class="px-4 py-2 text-gray-700 hover:bg-blue-50 cursor-pointer rounded-lg">
-                                    <span
-                                        x-text="user.full_name + ' - ' + (user.department ? user.department.department_name : 'No department') + ' - ' + user.position"></span>
-                                </li>
-                            </template>
+                        <ul id="dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
+                            <!-- Options will be populated here -->
                         </ul>
+                        <div id="no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
                     </div>
-                    <!-- Hidden input to store the selected user's ID -->
-                    <input type="hidden" name="boss" x-bind:value="selected ? selected.id : '{{ old('boss') }}'">
-                    <!-- Show Laravel validation error message if any -->
+                    <input type="hidden" name="boss" id="hidden-input" value="{{ old('boss') }}">
+                    <div id="error-msg" class="mt-2 text-red-600 text-sm"></div>
                     <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
-                    <script src="{{ asset('js/bossScriptorium-dropdown.js') }}" defer></script>
                 </div>
 
 
-                <div>
-                    <x-input-label for="scriptorium" :value="__('نام دبیر جلسه')"/>
-                    <x-text-input name="scriptorium" id="scriptorium"
-                                  value="{{ old('scriptorium', auth()->user()->full_name() ?? '') }}"
-                                  class="block " type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('scriptorium')"/>
-                </div>
-                <div>
-                    <x-input-label for="unit_organization" :value="__('واحد سازمانی')"/>
-                    <x-text-input name="unit_organization" id="unit_organization"
-                                  value="{{ old('unit_organization', auth()->user()->user_info->department->department_name ?? '') }}"
-                                  class="block " type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('unit_organization')"/>
+
+
+                <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                    <x-input-label for="title" class="mb-1.5" :value="__('دبیرجلسه')"/>
+                    <button id="scriptorium-dropdown-btn" type="button"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
+                            aria-haspopup="listbox" aria-expanded="false">
+                        <span id="scriptorium-selected-text" class="truncate">...</span>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="scriptorium-dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                        <div class="px-4 py-2">
+                            <input id="scriptorium-dropdown-search" type="text" placeholder="جست و جو"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <ul id="scriptorium-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
+                            <!-- Options populated by JS -->
+                        </ul>
+                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
+                    </div>
+                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-id" value="{{ old('scriptorium') }}">
+                    <input type="hidden" name="scriptorium_department" id="scriptorium-hidden-department" value="">
+                    <input type="hidden" name="scriptorium_position" id="scriptorium-hidden-position" value="">
+                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2" />
                 </div>
 
-                <div>
-                    <x-input-label for="position_organization" :value="__('سمت دبیر جلسه')"/>
-                    <x-text-input name="position_organization" id="position_organization"
-                                  value="{{ old('position_organization', auth()->user()->user_info->position ?? '') }}"
-                                  class="block " type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('position_organization')"/>
-                </div>
                 <div>
                     <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
-                    <x-text-input name="unit_held" id="unit_held"
-                                  value="{{old('applicant')}}"
+                    <x-text-input name="unit_held" id="unit_held" value="{{old('unit_held')}}"
                                   class="block" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('unit_held')"/>
                 </div>
-                <div>
-                    <x-input-label for="applicant" :value="__('نام درخواست دهنده جلسه')"/>
-                    <x-text-input name="applicant" id="applicant"
-                                  value="{{old('applicant')}}"
-                                  class="block" type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('applicant')"/>
-                </div>
+
 
             </div>
 
@@ -233,44 +209,33 @@
                 {{ __('بخش اعضا و مهمان') }}
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
-                {{--                            Participants Information--}}
-                <div class="col-span-2">
-                    <x-input-label for="holders" class="mb-2"
-                                   :value="__('انتخاب اعضای جلسه یا حاضرین در جلسه')"/>
-                    <div class="custom-select">
-                        <div class="select-box">
-                            <!-- The selected values will be stored in the "holders" input -->
-                            <input type="text" class="tags_input" multiple name="holders" hidden
-                                   value="{{ is_array(old('holders')) ? implode(',', old('holders')) : old('holders') }}">                            <div class="selected-options"></div>
-                            <div class="arrow">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5"
-                                     stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                                </svg>
-                            </div>
+
+                <div id="participants_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                    <x-input-label for="participants" class="mb-1.5" :value="__('شرکت‌کنندگان')" />
+                    <button id="participants-dropdown-btn" type="button"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
+                            aria-haspopup="listbox" aria-expanded="false">
+                        <span id="participants-selected-text" class="truncate">انتخاب شرکت‌کنندگان</span>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="participants-dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                        <div class="px-4 py-2">
+                            <input id="participants-dropdown-search" type="text" placeholder="جست و جو"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
-                        <div class="options">
-                            <div class="option-search-tags">
-                                <input type="text" class="search-tags" placeholder="جست و جو ...">
-                                <button type="button" class="clear">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5"
-                                         stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M6 18 18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                            @foreach($users->where('user_id','!=',auth()->id()) as $user)
-                                <div class="option" data-value="{{$user->user_id}}">{{$user->full_name}} - {{$user->position}}</div>
-                            @endforeach
-                            <div class="no-result-message" style="display:none;">No result match</div>
-                        </div>
+                        <ul id="participants-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
+                            <!-- Options populated by JS -->
+                        </ul>
+                        <div id="participants-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
                     </div>
-                    <x-input-error :messages="$errors->get('holders')" />
+                    <!-- Selected participants displayed here -->
+                    <div id="participants-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
+                    <!-- Hidden input to hold selected IDs (comma separated) -->
+                    <input type="hidden" name="holders" id="participants-hidden-input" value="{{ old('holders') ?? '' }}">
+                    <x-input-error :messages="$errors->get('holders')" class="mt-2" />
                 </div>
 
                 {{--                            Guests--}}

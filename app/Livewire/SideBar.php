@@ -18,8 +18,6 @@ class SideBar extends Component
         return view('livewire.side-bar');
     }
 
-
-
     #[Computed]
     public function unreadReceivedCount()
     {

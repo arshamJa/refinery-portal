@@ -19,19 +19,6 @@ class MeetingsExport implements FromCollection, WithHeadings
     public function collection()
     {
         return $this->meetings->values()->map(function ($meeting, $index) {
-            // Get full names of participants
-//            $participants = $meeting->meetingUsers
-//                ->map(fn($mu) => optional($mu->user->user_info)->full_name)
-//                ->filter()
-//                ->join(', ');
-
-//            $participants = $meeting->meetingUsers
-//                ->map(function ($mu) {
-//                    // Check if the user exists and if user_info is available
-//                    return optional($mu->user)->user_info ? optional($mu->user->user_info)->full_name : null;
-//                })
-//                ->filter()  // Filter out null values
-//                ->join(', ');
 
             // Get full names of participants (including all meeting user info)
             $participants = $meeting->meetingUsers
@@ -55,14 +42,13 @@ class MeetingsExport implements FromCollection, WithHeadings
                 'ردیف' => $index + 1,
                 'نام دبیر' => $meeting->scriptorium,
                 'نام رئیس جلسه' => $meeting->boss,
-                'واحد سازمانی' => $meeting->unit_organization,
+                'واحد سازمانی' => $meeting->scriptorium_department,
                 'موضوع جلسه' => $meeting->title,
                 'تاریخ برگزاری' => $meeting->date,
                 'مکان' => $meeting->location,
                 'زمان' => $meeting->time,
-                'سمت سازمانی' => $meeting->position_organization,
+                'سمت سازمانی' => $meeting->scriptorium_position,
                 'واحد برگزار کننده' => $meeting->unit_held,
-                'درخواست دهنده جلسه' => $meeting->applicant,
                 'اعضای جلسه' => $participants,
                 'مهمان' => $guests,
             ];
@@ -72,7 +58,7 @@ class MeetingsExport implements FromCollection, WithHeadings
     {
         return [
             'ردیف', 'نام دبیر','نام رئیس جلسه' , 'واحد سازمانی', 'موضوع جلسه', 'تاریخ برگزاری', 'مکان','زمان',
-            'سمت سازمانی', 'واحد برگزار کننده', 'درخواست دهنده جلسه', 'اعضای جلسه', 'مهمان',
+            'سمت سازمانی', 'واحد برگزار کننده', 'اعضای جلسه', 'مهمان',
         ];
     }
 }

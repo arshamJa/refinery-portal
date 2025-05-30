@@ -25,20 +25,19 @@ class MeetingUpdateRequest extends FormRequest
     {
         return [
             'title' => ['required','string'],
-            'unit_organization' => ['required','string','min:5','max:30', new farsi_chs()],
-            'scriptorium' => ['required','string', new farsi_chs()],
+            'scriptorium' => ['required','string','max:255'],
+            'scriptorium_department' => ['required','string','min:5','max:255'],
+            'scriptorium_position' => ['required','string','max:255'],
             'boss' => ['required'],
             'location' => ['required','string','min:5','max:30'],
             'year' => ['required'],
             'month' => ['required'],
             'day' => ['required'],
-            'time' => ['required' , 'date_format:H:i' , new Time()],
+            'time' => ['required' , new Time()],
             'unit_held' => ['required','string','min:5','max:30', new farsi_chs()],
             'treat' => ['required'],
             'guest' => ['nullable'],
-            'holders' => ['nullable'] ,
-            'applicant' => ['required','string','min:5','max:20', new farsi_chs()],
-            'position_organization' => ['required','string','min:5','max:20', new farsi_chs()]
+            'holders' => ['nullable']
         ];
     }
 }

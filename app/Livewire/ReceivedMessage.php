@@ -15,6 +15,7 @@ use App\Traits\Organizations;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -36,12 +37,17 @@ class ReceivedMessage extends Component
     public $p_code;
 
     public $activeTab = 'sent';  // 'sent' or 'received'
-    public bool $unreadOnly = true;
     public $filter = '';
-
+    public $message_status = '';
+    public $notificationType;
 
     public function filterMessage()
     {
+        $this->resetPage();
+    }
+    public function resetFilters()
+    {
+        $this->filter = '';
         $this->resetPage();
     }
 
@@ -54,30 +60,30 @@ class ReceivedMessage extends Component
     {
         $this->activeTab = request()->routeIs('received.message') ? 'received' : 'sent';
     }
-    public function toggleUnreadOnly()
-    {
-        $this->unreadOnly = !$this->unreadOnly;
-        $this->resetPage();
-    }
+
     #[Computed]
     public function userNotifications(string $type = null)
     {
         $query = Notification::where('recipient_id', auth()->id())
-            ->with([
-                'sender.user_info',
-                'notifiable.meetingUsers' => function ($query) {
-                    $query->where('user_id', auth()->id());
-                },
-            ]);
+            ->with(['sender.user_info', 'notifiable']);
 
         if ($type) {
             $query->where('type', $type);
         }
+        // Filter by message status
+        if ($this->message_status) {
+            switch ($this->message_status) {
+                case 'unread':
+                    // Assuming unread means sender_read_at IS NULL
+                    $query->whereNull('sender_read_at');
+                    break;
 
-        if ($this->unreadOnly) {
-            $query->whereNull('recipient_read_at');
+                case 'read':
+                    // Read means sender_read_at IS NOT NULL
+                    $query->whereNotNull('sender_read_at');
+                    break;
+            }
         }
-
         return $query->latest()->paginate(5);
     }
     /**
@@ -97,20 +103,66 @@ class ReceivedMessage extends Component
     public function getNotificationMessage($notification)
     {
         $message = json_decode($notification->data)->message ?? 'N/A';
-        // Directly check the notification type for 'AcceptInvitation'
         if ($notification->type === 'AcceptInvitation') {
-            return 'شما دعوت به جلسه را قبول کردید.';
-        }
-        if ($notification->type === 'DenyInvitation') {
-            return 'شما دعوت به جلسه را رد کردید.';
+            $meeting = $notification->notifiable;
+
+            if ($meeting) {
+                // Check replacement for the recipient in meeting_users
+                $replacementId = DB::table('meeting_users')
+                    ->where('meeting_id', $meeting->id)
+                    ->where('user_id', $notification->recipient_id)
+                    ->value('replacement');  // get replacement user id if any
+
+                // Format date and time — adjust formatting if needed
+                $date = $meeting->date; // assuming a string or Carbon instance
+                $time = $meeting->time;
+
+                $message = "این شخص دعوت به جلسه \"{$meeting->title}\" برای تاریخ {$date} و ساعت {$time} قبول کرده است";
+
+                if ($replacementId) {
+                    $replacementUser = User::find($replacementId);
+                    $replacementName = $replacementUser?->user_info?->full_name ?? 'نامشخص';
+
+                    $message .= " و این جانشین او است: {$replacementName}";
+                }
+                return $message;
+            }
+            // fallback message if no meeting found
+            return 'این شخص دعوت به جلسه را قبول کرده است';
+
+        } elseif ($notification->type === 'DenyInvitation') {
+            $meeting = $notification->notifiable;
+
+            if ($meeting) {
+                $date = $meeting->date;
+                $time = $meeting->time;
+
+                return "این شخص برای جلسه \"{$meeting->title}\" برای تاریخ {$date} و ساعت {$time} دعوت را رد کرده است.";
+            }
+            // fallback message if no meeting found
+            return 'این شخص دعوت به جلسه را رد کرده است.';
         }
         if ($notification->type === 'ReplacementForMeeting') {
             $meeting = $notification->notifiable;
-            if ($meeting) {
-                $recipient = User::find($notification->recipient_id);
-                $fullName = $recipient?->user_info?->full_name ?? 'نامشخص';
 
-                return 'شما این جلسه را پذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
+            if ($meeting) {
+                $replacementUserId = $notification->recipient_id; // The user who is the replacement (recipient of the notification)
+                $replacementUser = User::with('user_info')->find($replacementUserId);
+                $replacementName = $replacementUser?->user_info?->full_name ?? 'نامشخص';
+
+                // Find the meeting_user row where replacement = $replacementUserId
+                $meetingUser = $meeting->meetingUsers()->where('replacement', $replacementUserId)->with('user.user_info')
+                    ->first();
+
+                $assignerName = $meetingUser?->user?->user_info?->full_name ?? 'فرد ناشناس';
+
+                // Get date and time from meeting (adjust if you store these differently)
+                $date = $meeting->date;
+                $time = $meeting->time;
+
+                // Get meeting title
+                $title = $meeting->title ?? 'بدون عنوان جلسه';
+                return "{$assignerName} شما را به عنوان جانشین خود برای جلسه «{$title}» در تاریخ {$date} ساعت {$time} انتخاب کرده است.";
             }
         }
         if ($notification->type === 'MeetingInvitation') {
@@ -219,10 +271,12 @@ class ReceivedMessage extends Component
 //            ->get();
 //    }
 
-    public function openModalAccept($meetingId)
+    public function openModalAccept($meetingId, $notificationId)
     {
+
         $this->meeting = Meeting::find($meetingId)?->title;
         $this->meetingId = $meetingId;
+        $this->notificationType = Notification::findOrFail($notificationId);
         $this->dispatch('crud-modal', name: 'accept-invitation');
     }
 
@@ -233,6 +287,14 @@ class ReceivedMessage extends Component
         $this->dispatch('crud-modal', name: 'deny-invitation');
     }
 
+    #[Computed]
+    public function IsAlreadyRepresentative()
+    {
+        return DB::table('meeting_users')
+            ->where('meeting_id', $this->meetingId)
+            ->where('replacement', auth()->id())
+            ->exists();
+    }
 
     /**
      * @throws ValidationException
@@ -298,6 +360,16 @@ class ReceivedMessage extends Component
                 'notifiable_id' => $meetingId,
                 'sender_id' => auth()->id(),
                 'recipient_id' => $userInfo->user_id,
+            ]);
+            // ALSO send AcceptInvitation to scriptorium
+            $scriptoriumAcceptMessage = 'شما این دعوت را قبول کردید و آقای/خانم ' . $userInfo->full_name . ' به جای شما در جلسه شرکت خواهد کرد.';
+            Notification::create([
+                'type' => 'AcceptInvitation',
+                'data' => json_encode(['message' => $scriptoriumAcceptMessage]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meetingId,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $scriptoriumUserId,
             ]);
         }
         else {

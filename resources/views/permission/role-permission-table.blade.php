@@ -26,6 +26,8 @@
         </ol>
     </nav>
 
+    <a href="{{route('connect-permissions')}}">Create the Permissions</a>
+
 
     <div class="bg-white px-3 relative shadow-md sm:rounded-lg overflow-hidden mb-4">
         <h2 class="text-2xl font-semibold mb-4">{{__('مدیریت نقش')}}</h2>

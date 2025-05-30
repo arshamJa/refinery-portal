@@ -70,8 +70,11 @@
 
 
 @livewireScripts
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="{{ asset('js/bossScriptorium-dropdown.js') }}"></script>
+<script src="{{ asset('js/scriptorium-dropdown.js') }}"></script>
 <script src="{{asset('js/multiSelectUsers.js')}}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {{--<script src="{{asset('richText.js')}}"></script>--}}
 {{--<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"--}}
 {{--        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="--}}

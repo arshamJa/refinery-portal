@@ -35,102 +35,101 @@
             </li>
         </ol>
     </nav>
-    <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
-        <form method="GET" action="{{route('incompleteTasks')}}">
-            @csrf
-            <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
-                <!-- Search Input -->
-                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
-                    <x-search-input>
-                        <x-text-input type="text" id="search" name="search"
-                                      class="block ps-10"
-                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
-                    </x-search-input>
-                </div>
+    <form method="GET" action="{{route('incompleteTasks')}}">
+        @csrf
+        <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
+            <!-- Search Input -->
+            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                <x-search-input>
+                    <x-text-input type="text" id="search" name="search"
+                                  class="block ps-10"
+                                  placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                </x-search-input>
+            </div>
 
-                <!-- Date Inputs (side-by-side) -->
-                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <div class="flex-1">
-                            <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
-                            <x-date-input>
-                                <x-text-input id="start_date" name="start_date" class="block ps-10"/>
-                            </x-date-input>
-                        </div>
-                        <div class="flex-1">
-                            <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
-                            <x-date-input>
-                                <x-text-input id="end_date" name="end_date" class="block ps-10"/>
-                            </x-date-input>
-                        </div>
+            <!-- Date Inputs (side-by-side) -->
+            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-1">
+                        <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
+                        <x-date-input>
+                            <x-text-input id="start_date" name="start_date" class="block ps-10"/>
+                        </x-date-input>
+                    </div>
+                    <div class="flex-1">
+                        <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
+                        <x-date-input>
+                            <x-text-input id="end_date" name="end_date" class="block ps-10"/>
+                        </x-date-input>
                     </div>
                 </div>
-                <!-- Search + Show All Buttons -->
-                <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
-                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
-                    @if(request()->has('search') || request()->has('start_date'))
-                        <x-view-all-link href="{{route('incompleteTasks')}}">
-                            {{ __('نمایش همه') }}
-                        </x-view-all-link>
-                    @endif
-                </div>
-                <!-- Export Button under the right group -->
-                <!-- For Incomplete Tasks -->
-                <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
-                    <x-export-link href="{{ route('tasks.report.incomplete.download', request()->query()) }}">
-                        {{ __('خروجی Excel') }}
-                    </x-export-link>
-                </div>
-
             </div>
-        </form>
+            <!-- Search + Show All Buttons -->
+            <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
+                <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                @if(request()->has('search') || request()->has('start_date'))
+                    <x-view-all-link href="{{route('incompleteTasks')}}">
+                        {{ __('نمایش همه') }}
+                    </x-view-all-link>
+                @endif
+            </div>
+            <!-- Export Button under the right group -->
+            <!-- For Incomplete Tasks -->
+            <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
+                <x-export-link href="{{ route('tasks.report.incomplete.download', request()->query()) }}">
+                    {{ __('خروجی Excel') }}
+                </x-export-link>
+            </div>
 
-
-        <div class="w-full overflow-x-auto overflow-y-hidden mb-4 pb-12">
-            <x-table.table>
-                <x-slot name="head">
-                    <x-table.row>
-                        @foreach (['#', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
-                              'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان'] as $th)
-                            <x-table.heading>{{ __($th) }}</x-table.heading>
-                        @endforeach
-                    </x-table.row>
-                </x-slot>
-                <x-slot name="body">
-                    @forelse($taskUsers as $taskUser)
-                        <x-table.row wire:key="taskUser-{{ $taskUser->id }}">
-                            <x-table.cell>{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
-                            <x-table.cell>{{ $taskUser->task->meeting->title }}</x-table.cell>
-                            <x-table.cell>{{ $taskUser->task->meeting->scriptorium }}</x-table.cell>
-                            <x-table.cell>{{ $taskUser->full_name() }}</x-table.cell>
-                            <x-table.cell>
-                                @if(!$taskUser->sent_date)
-                                    <span class="text-red-500">{{__('اقدامی انجام نشده')}}</span>
-                                @else
-                                    {{$taskUsersk->sent_date}}
-                                @endif
-                            </x-table.cell>
-                            <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
-                            <x-table.cell>
-                                {{ $taskUser->formatted_diff ?? 'N/A' }}
-                            </x-table.cell>
-
-
-                        </x-table.row>
-                    @empty
-                        <x-table.row>
-                            <x-table.cell colspan="6" class="py-6 text-center">
-                                {{ __('رکوردی یافت نشد ...') }}
-                            </x-table.cell>
-                        </x-table.row>
-                    @endforelse
-                </x-slot>
-            </x-table.table>
-            <span class="p-2 mx-2">
-            {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
-        </span>
         </div>
+    </form>
+
+    <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
+        <x-table.table>
+            <x-slot name="head">
+                <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                    @foreach (['#', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
+                          'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان'] as $th)
+                        <x-table.heading
+                            class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                            {{ __($th) }}
+                        </x-table.heading>
+                    @endforeach
+                </x-table.row>
+            </x-slot>
+            <x-slot name="body">
+                @forelse($taskUsers as $taskUser)
+                    <x-table.row wire:key="taskUser-{{ $taskUser->id }}" class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                        <x-table.cell class="border-r-0">{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
+                        <x-table.cell>{{ $taskUser->task->meeting->title }}</x-table.cell>
+                        <x-table.cell>{{ $taskUser->task->meeting->scriptorium }}</x-table.cell>
+                        <x-table.cell>{{ $taskUser->full_name() }}</x-table.cell>
+                        <x-table.cell>
+                            @if(!$taskUser->sent_date)
+                                <span class="text-red-500">{{__('اقدامی انجام نشده')}}</span>
+                            @else
+                                {{$taskUsersk->sent_date}}
+                            @endif
+                        </x-table.cell>
+                        <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
+                        <x-table.cell>
+                            {{ $taskUser->formatted_diff ?? 'N/A' }}
+                        </x-table.cell>
+                    </x-table.row>
+                @empty
+                    <x-table.row>
+                        <x-table.cell colspan="6" class="py-6 text-center">
+                            {{ __('رکوردی یافت نشد ...') }}
+                        </x-table.cell>
+                    </x-table.row>
+                @endforelse
+            </x-slot>
+        </x-table.table>
+
+    </div>
+    <div class="mt-2">
+        {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
 
 </x-app-layout>

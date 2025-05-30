@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
+use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\User;
@@ -47,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Gate for SuperAdmin
         Gate::before(function (User $user, $ability) {
-            return $user->hasRole('super-admin') ? true : null;
+            return $user->hasRole('super_admin') ? true : null;
         });
 
 
@@ -56,15 +57,30 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole(UserRole::SCRIPTORIUM->value);
         });
 
-
-
-
         //  for Boss & Scriptorium
-        Gate::define('view-denied-tasks', function (User $user) {
-            return $user->hasAnyRoles([UserRole::SCRIPTORIUM->value, UserRole::BOSS->value]);
+//        Gate::define('view-denied-tasks', function (User $user) {
+//            return $user->hasAnyRoles([UserRole::SCRIPTORIUM->value, UserRole::BOSS->value]);
+//        });
+
+        Gate::define('has-permission', function ($user, UserPermission|string $permission) {
+            $permissionName = $permission instanceof UserPermission ? $permission->value : $permission;
+            return $user->permissions->contains('name', $permissionName);
         });
 
+        Gate::define('has-permission-and-role', function ($user, UserPermission|string $permission, UserRole|string $role = null) {
+            $permissionName = $permission instanceof UserPermission ? $permission->value : $permission;
+            $hasPermission = $user->permissions->contains('name', $permissionName);
 
+            if ($role === null) {
+                // Only permission check
+                return $hasPermission;
+            }
+            $roleName = $role instanceof UserRole ? $role->value : $role;
+            $hasRole = $user->roles->contains('name', $roleName);
+
+            // Return true if user has either the permission OR the role
+            return $hasPermission || $hasRole;
+        });
 
         // Gate For Side Bar
         Gate::define('side-bar-notifications',function (User $user){
@@ -75,11 +91,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('view-profile-page',[ProfilePolicy::class,'view']);
         Gate::define('update-profile-page',[ProfilePolicy::class,'update']);
 
-
-        // Gate for creating meeting
-        Gate::define('create-meeting',function (User $user){
-            return $user->userHasPermission(UserPermission::CREATE_MEETING->value);
-        });
 
 
         //gate definition for phone list via phoneListPolicy...

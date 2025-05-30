@@ -18,7 +18,6 @@ class SentMessage extends Component
 {
 
     use WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks;
-
     public ?string $search='';
     public $meeting;
     public $meetingId;
@@ -28,23 +27,23 @@ class SentMessage extends Component
     public $p_code;
 
     public $activeTab = 'sent';  // 'sent' or 'received'
-    public bool $unreadOnly = true;
     public $filter = '';
+
 
 
     public function filterMessage()
     {
         $this->resetPage();
     }
+    public function resetFilters()
+    {
+        $this->filter = '';
+        $this->resetPage();
+    }
 
     public function render()
     {
         return view('livewire.sent-message');
-    }
-    public function toggleUnreadOnly()
-    {
-        $this->unreadOnly = !$this->unreadOnly;
-        $this->resetPage();
     }
 
     #[Computed]
@@ -63,10 +62,9 @@ class SentMessage extends Component
             $query->where('type', $type);
         }
 
-        if ($this->unreadOnly) {
-            $query->whereNull('sender_read_at');
+        if ($this->filter) {
+            $query->where('type', $this->filter);
         }
-
         return $query->latest()->paginate(5);
     }
 
@@ -84,12 +82,33 @@ class SentMessage extends Component
     public function getNotificationMessage($notification)
     {
         $message = json_decode($notification->data)->message ?? 'N/A';
-        // Directly check the notification type for 'AcceptInvitation'
         if ($notification->type === 'AcceptInvitation') {
-            return 'شما دعوت به جلسه را قبول کردید.';
-        }
-        if ($notification->type === 'DenyInvitation') {
-            return 'شما دعوت به جلسه را رد کردید.';
+            $userId = $notification->recipient->id;
+            $meeting = $notification->notifiable;
+
+            $date = $meeting->date;
+            $time = $meeting->time;
+            $title = $meeting->title;
+
+            $meetingUser = \App\Models\MeetingUser::where('meeting_id', $meeting->id)
+                ->where('user_id', $userId)
+                ->first();
+
+            if ($meetingUser && $meetingUser->replacement) {
+                $replacementUserInfo = \App\Models\UserInfo::where('user_id', $meetingUser->replacement)->first();
+                $replacementName = $replacementUserInfo->full_name ?? 'نامشخص';
+                return "شما دعوت به جلسه «{$title}» در تاریخ {$date} و ساعت {$time} را قبول کردید و آقای/خانم {$replacementName} به جای شما در جلسه شرکت خواهد کرد.";
+            } else {
+                return "شما دعوت به جلسه «{$title}» در تاریخ {$date} و ساعت {$time} را قبول کردید.";
+            }
+        } elseif ($notification->type === 'DenyInvitation') {
+            $meeting = $notification->notifiable;
+
+            $date = $meeting->date;
+            $time = $meeting->time;
+            $title = $meeting->title;
+
+            return "شما دعوت به جلسه «{$title}» در تاریخ {$date} و ساعت {$time} را رد کردید.";
         }
         if ($notification->type === 'ReplacementForMeeting') {
             $meeting = $notification->notifiable;
@@ -100,22 +119,27 @@ class SentMessage extends Component
                 return 'شما این جلسه را پذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
             }
         }
-        if ($notification->type === 'MeetingGuestInvitation') {
+        if ($notification->type === 'MeetingGuestInvitation' || $notification->type === 'MeetingInvitation') {
             $meeting = $notification->notifiable;
             if ($meeting) {
                 $date = $meeting->date;
                 $time = $meeting->time;
+                $roleText = $notification->type === 'MeetingGuestInvitation' ? 'به عنوان مهمان ' : '';
 
-                return "این شخص به عنوان مهمان در جلسه \"{$meeting->title}\" و در تاریخ {$date} و ساعت {$time} دعوت شده‌است.";
+                return "این شخص {$roleText}در جلسه \"{$meeting->title}\" و در تاریخ {$date} و ساعت {$time} دعوت شده‌است.";
             }
         }
-        if ($notification->type === 'MeetingInvitation') {
+        if ($notification->type === 'MeetingConfirmed' || $notification->type === 'MeetingCancelled') {
             $meeting = $notification->notifiable;
             if ($meeting) {
                 $date = $meeting->date;
                 $time = $meeting->time;
 
-                return "این شخص در جلسه \"{$meeting->title}\" و در تاریخ {$date} و ساعت {$time} دعوت شده‌است.";
+                if ($notification->type === 'MeetingConfirmed') {
+                    return "جلسه \"{$meeting->title}\" در تاریخ {$date} و ساعت {$time} برگزار خواهد شد.";
+                } else {
+                    return "جلسه \"{$meeting->title}\" که قرار بود در تاریخ {$date} و ساعت {$time} برگزار شود، لغو شده‌است.";
+                }
             }
         }
         if ($notification->type === 'AssignedNewTask') {
@@ -131,21 +155,18 @@ class SentMessage extends Component
             return "شما وظیفه‌ای را به آقای/خانم {$recipientFullName} ارسال کرده‌اید برای جلسه «{$meetingTitle}». تاریخ مهلت اقدام: {$timeOut}.";
         }
 
-        if ($notification->type === 'UpdatedTaskTimeOut') {
+        if ($notification->type === 'UpdatedTaskTimeOut' || $notification->type === 'UpdatedTaskBody') {
             $taskUser = $notification->notifiable;
-            $timeOut = $taskUser?->time_out ?? 'زمان مشخص نشده';
-            $meetingTitle = $taskUser?->task?->meeting?->title ?? 'بدون عنوان جلسه';
-            $recipientFullName = $notification->recipient?->user_info?->full_name ?? 'نامشخص';
-            return "مهلت انجام اقدام آقای/خانم {$recipientFullName} برای جلسه «{$meetingTitle}» به تاریخ {$timeOut} به‌روزرسانی شد.";
-        }
-        if ($notification->type === 'UpdatedTaskBody') {
-            $taskUser = $notification->notifiable; // TaskUser model instance
             $meetingTitle = $taskUser?->task?->meeting?->title ?? 'بدون عنوان جلسه';
             $recipientFullName = $notification->recipient?->user_info?->full_name ?? 'نامشخص';
 
-            return "متن مذاکره آقای/خانم {$recipientFullName} برای جلسه «{$meetingTitle}» به‌روزرسانی شد.";
+            if ($notification->type === 'UpdatedTaskTimeOut') {
+                $timeOut = $taskUser?->time_out ?? 'زمان مشخص نشده';
+                return "مهلت انجام اقدام آقای/خانم {$recipientFullName} برای جلسه «{$meetingTitle}» به تاریخ {$timeOut} به‌روزرسانی شد.";
+            } else {
+                return "متن مذاکره آقای/خانم {$recipientFullName} برای جلسه «{$meetingTitle}» به‌روزرسانی شد.";
+            }
         }
-
 
         if (auth()->id() === $notification->sender_id) {
             $meeting = $notification->notifiable; // Assuming this is your meeting model

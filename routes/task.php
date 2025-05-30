@@ -14,13 +14,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/view/tasks/{meeting}', \App\Livewire\ViewTaskPage::class)
-        ->name('view.task.page')->middleware('signed');
+        ->name('view.task.page');
 
     Route::get('/task/list/{meeting}', TaskList::class)->name('task.list');
 
 
     Route::post('tasks/{meeting}', [TaskManagementController::class, 'store'])->name('tasks.store');
-
 
     // this is the route for each user to sent their task
 //    Route::post('/tasks/{taskUser}/submit', [TaskController::class, 'submitTaskForm'])->name('tasks.submit');

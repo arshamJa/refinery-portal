@@ -29,7 +29,6 @@ class PermissionSeeder extends Seeder
         $superAdminRole = Role::create(['name' => UserRole::SUPER_ADMIN->value]);
         $adminRole = Role::create(['name' => UserRole::ADMIN->value]);
         $operatorRole = Role::create(['name' => UserRole::OPERATOR->value]);
-        $scriptoriumRole = Role::create(['name' => UserRole::SCRIPTORIUM->value]);
         $userRole = Role::create(['name' => UserRole::USER->value]);
 
         // Assign Role to Super Admin User
@@ -37,11 +36,9 @@ class PermissionSeeder extends Seeder
 
         // Create Permissions
         $meetingCreate = Permission::create(['name' => 'ایجاد جلسه']);
-        $rolePermissionTable = Permission::create(['name' => 'مدیریت نقش-دسترسی']);
 
         // Assign Permissions to Roles
         $superAdminRole->assignPermission($meetingCreate);
-        $superAdminRole->assignPermission($rolePermissionTable);
 
 
         $users = User::whereNotIn('id', [1, 2, 3, 4])->get();

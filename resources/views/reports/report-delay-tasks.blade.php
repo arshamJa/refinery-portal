@@ -36,7 +36,6 @@
             </li>
         </ol>
     </nav>
-    <div class="pt-4 px-10 sm:pt-6 border shadow-md rounded-md">
         <form method="GET" action="{{route('tasksWithDelay')}}">
             @csrf
             <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
@@ -88,58 +87,61 @@
         </form>
 
 
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead
-                class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                @foreach (['ردیف', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
+
+    <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
+        <x-table.table>
+            <x-slot name="head">
+                <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                    @foreach (['ردیف', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
                                'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان تاخیر'] as $th)
-                    <th class="px-4 py-3">{{ __($th) }}</th>
-                @endforeach
-            </tr>
-            </thead>
-            <tbody>
-            @forelse($tasks as $task)
-                <tr class="px-4 py-3 border-b text-center" wire:key="{{$task->id}}">
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$loop->iteration}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->title}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->meeting->scriptorium}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->full_name()}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->sent_date}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">{{$task->time_out}}</td>
-                    <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                        @php
-                            $date1 = Carbon::parse($task->sent_date);
-                            $date2 = Carbon::parse($task->time_out);
-                            $diff = $date1->diff($date2);
-                            $formattedDiff = '';
+                        <x-table.heading
+                            class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                            {{ __($th) }}
+                        </x-table.heading>
+                    @endforeach
+                </x-table.row>
+            </x-slot>
+            <x-slot name="body">
+                @forelse($tasks as $task)
+                    <x-table.row wire:key="{{$task->id}}" class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                        <x-table.cell class="border-r-0">{{ ($tasks->currentPage() - 1) * $tasks->perPage() + $loop->iteration }}</x-table.cell>
+                        <x-table.cell>{{$task->meeting->title}}</x-table.cell>
+                        <x-table.cell>{{$task->meeting->scriptorium}}</x-table.cell>
+                        <x-table.cell>{{$task->full_name()}}</x-table.cell>
+                        <x-table.cell>{{$task->sent_date}}</x-table.cell>
+                        <x-table.cell>{{$task->time_out}}</x-table.cell>
+                        <x-table.cell>
+                            @php
+                                $date1 = Carbon::parse($task->sent_date);
+                                $date2 = Carbon::parse($task->time_out);
+                                $diff = $date1->diff($date2);
+                                $formattedDiff = '';
+                                if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
+                                if ($diff->m > 0) {$formattedDiff .= $diff->m . ' ماه';}
+                                if ($diff->d > 0) {$formattedDiff .= $diff->d . ' روز';}
+                                if ($diff->h > 0) {$formattedDiff .= $diff->h . ' ساعت';}
+                                if ($diff->i > 0) {$formattedDiff .= $diff->i . ' دقیقه';}
+                                if ($diff->s > 0) {$formattedDiff .= $diff->s . ' ثانیه';}
 
-                            if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
-                            if ($diff->m > 0) {$formattedDiff .= $diff->m . ' ماه';}
-                            if ($diff->d > 0) {$formattedDiff .= $diff->d . ' روز';}
-                            if ($diff->h > 0) {$formattedDiff .= $diff->h . ' ساعت';}
-                            if ($diff->i > 0) {$formattedDiff .= $diff->i . ' دقیقه';}
-                            if ($diff->s > 0) {$formattedDiff .= $diff->s . ' ثانیه';}
+                                // Remove the trailing comma and space if there's any output.
+                                $formattedDiff = rtrim($formattedDiff, ', ');
+                            @endphp
+                            {{ $formattedDiff }}
+                        </x-table.cell>
+                    </x-table.row>
+                @empty
+                    <x-table.row>
+                        <x-table.cell colspan="8" class="py-6 text-center">
+                            {{ __('رکوردی یافت نشد ...') }}
+                        </x-table.cell>
+                    </x-table.row>
+                @endforelse
+            </x-slot>
+        </x-table.table>
 
-                            // Remove the trailing comma and space if there's any output.
-                            $formattedDiff = rtrim($formattedDiff, ', ');
-                        @endphp
-                        {{ $formattedDiff }}
-                    </td>
-                </tr>
-            @empty
-                <tr class="border-b dark:border-gray-700">
-                    <th colspan="8"
-                        class="text-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                        {{__('رکوردی یافت نشد ...')}}
-                    </th>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-        <span class="p-2 mx-2">
-            {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
-        </span>
     </div>
+    <div class="mt-2">
+            {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
+        </div>
 
 </x-app-layout>

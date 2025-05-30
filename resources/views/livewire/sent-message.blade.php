@@ -41,18 +41,43 @@
         </a>
     </div>
 
-    <div class="flex justify-between mb-4">
-        <x-secondary-button wire:click="toggleUnreadOnly">
-            {{ $unreadOnly ? 'نمایش تمامی پیام های ارسالی' : 'نمایش پیام های خوانده نشده ارسالی' }}
-        </x-secondary-button>
-    </div>
+    <form wire:submit.prevent="filterMessage" class="flex flex-col sm:flex-row items-start sm:items-end gap-4 mb-6">
+        {{-- Message Type Dropdown --}}
+        <div class="w-full sm:w-64">
+            <x-input-label for="filter" value="{{ __('نوع پیام') }}"/>
+            <x-select-input id="filter" wire:model.defer="filter">
+                <option value="">{{ __('همه پیام‌ها') }}</option>
+                <option value="MeetingInvitation">{{ __('دعوتنامه') }}</option>
+                <option value="MeetingGuestInvitation">{{ __('دعوتنامه به مهمان') }}</option>
+                <option value="MeetingConfirmed">{{ __(' برگزاری جلسه') }}</option>
+                <option value="MeetingCancelled">{{ __(' لغو جلسه') }}</option>
+                <option value="AcceptInvitation">{{ __('تایید دعوتنامه') }}</option>
+                <option value="DenyInvitation">{{ __('رد دعوتنامه') }}</option>
+                <option value="ReplacementForMeeting">{{ __('انتخاب جانشین') }}</option>
+                <option value="AssignedNewTask">{{ __('ارسال اقدامات') }}</option>
+                <option value="UpdatedTaskTimeOut">{{ __('ویرایش مهلت اقدام') }}</option>
+                <option value="UpdatedTaskBody">{{ __('ویرایش بند مذاکره') }}</option>
+                <option value="DeniedTaskNotification">{{ __('رد اقدام') }}</option>
+            </x-select-input>
+        </div>
+
+
+        <div class="col-span-6 lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
+            <x-search-button>{{ __('جست و جو') }}</x-search-button>
+            @if($filter !== '')
+                <x-view-all-link href="{{ route('sent.message') }}">
+                    {{ __('نمایش همه') }}
+                </x-view-all-link>
+            @endif
+        </div>
+    </form>
 
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['نوع پیام','تاریخ ارسال پیام', 'گیرنده(دبیر/کاربر)', 'متن', 'وضعیت خواندن'] as $th)
+                    @foreach (['نوع پیام','تاریخ ارسال پیام', 'گیرنده(دبیر/کاربر)', 'متن'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -66,43 +91,36 @@
                                  class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                         <x-table.cell class="border-none">
                             @if($notification->type === 'MeetingInvitation')
-                                <span class="text-blue-600 font-bold">{{ __('ارسال دعوتنامه') }}</span>
+                                <span class="text-indigo-600 font-semibold">{{ __('دعوتنامه') }}</span>
                             @elseif($notification->type === 'MeetingGuestInvitation')
-                                <span class="text-pink-600 font-bold">{{ __('ارسال دعوتنامه به مهمان') }}</span>
+                                <span class="text-purple-600 font-semibold">{{ __('دعوتنامه به مهمان') }}</span>
+                            @elseif($notification->type === 'MeetingConfirmed')
+                                <span class="text-green-700 font-semibold">{{ __(' برگزاری جلسه') }}</span>
+                            @elseif($notification->type === 'MeetingCancelled')
+                                <span class="text-red-600 font-semibold">{{ __(' لغو جلسه') }}</span>
                             @elseif($notification->type === 'AcceptInvitation')
-                                <span class="text-green-600 font-bold">{{ __('تایید دعوتنامه') }}</span>
+                                <span class="text-emerald-600 font-semibold">{{ __('تایید دعوتنامه') }}</span>
                             @elseif($notification->type === 'ReplacementForMeeting')
-                                <span class="text-green-600 font-bold">{{ __('انتخاب جانشین') }}</span>
+                                <span class="text-yellow-600 font-semibold">{{ __('انتخاب جانشین') }}</span>
                             @elseif($notification->type === 'DenyInvitation')
-                                <span class="text-green-600 font-bold">{{ __('رد دعوتنامه') }}</span>
+                                <span class="text-orange-600 font-semibold">{{ __('رد دعوتنامه') }}</span>
                             @elseif($notification->type === 'AssignedNewTask')
-                                <span class="text-green-600 font-bold">{{ __('ارسال اقدام') }}</span>
+                                <span class="text-blue-700 font-semibold">{{ __('ارسال اقدام') }}</span>
                             @elseif($notification->type === 'UpdatedTaskTimeOut')
-                                <span class="text-green-600 font-bold">{{ __('ویرایش مهلت اقدام') }}</span>
+                                <span class="text-cyan-700 font-semibold">{{ __('ویرایش مهلت اقدام') }}</span>
                             @elseif($notification->type === 'UpdatedTaskBody')
-                                <span class="text-green-600 font-bold">{{ __('ویرایش بند مذاکره') }}</span>
+                                <span class="text-sky-700 font-semibold">{{ __('ویرایش بند مذاکره') }}</span>
+                                @elseif($notification->type === 'DeniedTaskNotification')
+                                    <span class="text-red-600 font-semibold">{{ __('رد اقدام') }}</span>
                             @endif
                         </x-table.cell>
-                        <x-table.cell
-                            class="whitespace-nowrap">{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
+                        <x-table.cell class="whitespace-nowrap">{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
                         <x-table.cell>{{ $notification->recipient->user_info->full_name ?? 'N/A' }}</x-table.cell>
-
-                        <x-table.cell
-                            class="whitespace-pre-wrap">{{ $this->getNotificationMessage($notification) }}</x-table.cell>
-                        <x-table.cell>
-                            @if (!$notification->isReadBySender())
-                                <x-secondary-button wire:click="markAsRead({{ $notification->id }})">
-                                    {{ __('متوجه شدم') }}
-                                </x-secondary-button>
-                            @else
-                                <span class="text-gray-500">{{ __('خوانده شده') }}</span>
-                            @endif
-                        </x-table.cell>
+                        <x-table.cell>{{ $this->getNotificationMessage($notification) }}</x-table.cell>
                     </x-table.row>
                 @empty
                     <x-table.row>
-                        <x-table.cell colspan="5"
-                                      class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
+                        <x-table.cell colspan="5" class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
                     </x-table.row>
                 @endforelse
             </x-slot>

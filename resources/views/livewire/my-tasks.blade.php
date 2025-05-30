@@ -56,8 +56,6 @@
                     <option value="0">{{__('انجام ندادم')}}</option>
                 </x-select-input>
             </div>
-
-
             <!-- Search + Show All Buttons -->
             <div class="col-span-6 lg:col-span-3 flex justify-start md:justify-end flex-row gap-4 mt-4 lg:mt-0">
                 <x-search-button>{{ __('جست و جو') }}</x-search-button>
@@ -75,7 +73,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['ردیف','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','شرح اقدام','تاریخ ارسال اقدام','',''] as $th)
+                    @foreach (['#','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','شرح اقدام','تاریخ ارسال اقدام'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -84,8 +82,6 @@
                 </x-table.row>
             </x-slot>
             <x-slot name="body">
-                <x-table.row
-                    class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                     @forelse($this->taskUsers as $taskUser)
                         <x-table.row wire:key="task-{{ $taskUser->id }}" class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                             <x-table.cell>{{ ($this->taskUsers->currentPage() - 1) * $this->taskUsers->perPage() + $loop->iteration }}</x-table.cell>
@@ -143,7 +139,6 @@
                                           class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
                         </x-table.row>
                     @endforelse
-                </x-table.row>
             </x-slot>
         </x-table.table>
     </div>

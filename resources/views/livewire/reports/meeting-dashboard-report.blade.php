@@ -25,6 +25,77 @@
         </ol>
     </nav>
 
+
+
+
+    <div class="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+        <!-- Line Chart -->
+        <div class="py-6" id="pie-chart"></div>
+    </div>
+    @script
+    <script>
+        const getChartOptions = () => {
+            const tasksOnTime = {{$this->tasksOnTime()}};
+            const tasksWithDelay = {{$this->tasksDoneWithDelay()}};
+            const tasksNotDone = {{$this->tasksNotDone()}};
+            return {
+                series: [tasksOnTime, tasksWithDelay, tasksNotDone],
+                colors: ["#605C3C", "#1f4037", "#2C5364"],
+                chart: {
+                    height: 420,
+                    width: "100%",
+                    type: "pie",
+                    events: {
+                        dataPointSelection: function(event, chartContext, config) {
+                            const routes = [
+                                "{{ route('completedTasks') }}",
+                                "{{ route('tasksWithDelay') }}",
+                                "{{ route('incompleteTasks') }}"
+                            ];
+                            window.location.href = routes[config.dataPointIndex];
+                        }
+                    }
+                },
+                stroke: {
+                    colors: ["white"],
+                },
+                plotOptions: {
+                    pie: {
+                        size: "100%",
+                        dataLabels: {
+                            offset: -25
+                        }
+                    },
+                },
+                labels: [
+                    "{{__('انجام شده در مهلت مقرر')}}",
+                    "{{__('انجام شده خارج از مهلت مقرر')}}",
+                    "{{__('انجام نشده در مهلت مقرر')}}"
+                ],
+                dataLabels: {
+                    enabled: true,
+                    style: {
+                        fontFamily: "Inter, sans-serif",
+                    },
+                    formatter: function (val, opts) {
+                        return opts.w.config.series[opts.seriesIndex];
+                    }
+                },
+                legend: {
+                    position: "bottom",
+                    fontFamily: "Inter, sans-serif",
+                }
+            };
+        }
+        if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
+            const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
+            chart.render();
+        }
+    </script>
+    @endscript
+
+
+
     <div class="grid grid-cols-2 gap-4 place-content-around">
         <div>
             <div class="grid grid-cols-1 mb-4 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
@@ -112,6 +183,7 @@
             <div class="w-full rounded-lg shadow-sm px-6 py-4" id="bar-chart"></div>
 
         </div>
+
         @script
         <script>
             const yearData = @json($yearData);

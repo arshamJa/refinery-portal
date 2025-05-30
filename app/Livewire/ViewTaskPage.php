@@ -60,7 +60,7 @@ class ViewTaskPage extends Component
     public $employee_id,$task_id,$year,$month,$day;
     public function submitParticipantForm()
     {
-        abort_if(!Gate::allows('scriptorium-role'), 403);
+//        abort_if(!Gate::allows('scriptorium-role'), 403);
         $validated = Validator::make(
             ['employee_id' => $this->employee_id, 'task_id' => $this->task_id,
                 'year' => $this->year, 'month' => $this->month, 'day' => $this->day,],
@@ -108,9 +108,9 @@ class ViewTaskPage extends Component
             'time_out' => $time_out,
         ]);
 
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'اقدام کننده جدید ثبت شد');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
 
     }
     public function opedEditModal($taskUserId)
@@ -150,11 +150,7 @@ class ViewTaskPage extends Component
 
         // Validate date is not in the past
         if ($validated['year'] && $validated['month'] && $validated['day']) {
-            // Convert current Gregorian date to Jalali
-            list($ja_year, $ja_month, $ja_day) = explode('/',
-                gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-
-            // Prevent selecting past dates
+            list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
             if (
                 $validated['year'] < $ja_year ||
                 ($validated['year'] == $ja_year && $validated['month'] < $ja_month) ||
@@ -164,7 +160,6 @@ class ViewTaskPage extends Component
                 return;
             }
         }
-
         $taskUser = $this->selectedTaskUser;
         $oldDate = $taskUser->time_out;
         $oldBody = $taskUser->task->body;
@@ -182,14 +177,19 @@ class ViewTaskPage extends Component
                 ->first();
             if ($targetTaskUser) {
                 $targetTaskUser->time_out = $newDate;
+                $targetTaskUser->task_status = TaskStatus::PENDING->value;
+                $targetTaskUser->request_task = null;
                 $targetTaskUser->save();
+
+                $meetingId = $taskUser->task->meeting_id;
+
                 // Prepare notification message for time_out update
                 $notificationMessage = "مهلت انجام اقدام شما به تاریخ {$newDate} تغییر کرد.";
                 $notificationsData[] = [
                     'type' => 'UpdatedTaskTimeOut',
                     'data' => json_encode(['message' => $notificationMessage]),
-                    'notifiable_type' => \App\Models\TaskUser::class,
-                    'notifiable_id' => $targetTaskUser->id,
+                    'notifiable_type' => \App\Models\Meeting::class,
+                    'notifiable_id' => $meetingId,
                     'sender_id' => auth()->id(),
                     'recipient_id' => $targetTaskUser->user_id,
                     'created_at' => now(),
@@ -210,6 +210,8 @@ class ViewTaskPage extends Component
             $newTaskUser = $taskUser->replicate();
             $newTaskUser->task_id = $newTask->id;
             $newTaskUser->time_out = $newDate ?: $taskUser->time_out;
+            $newTaskUser->task_status = TaskStatus::PENDING->value;
+            $newTaskUser->request_task = null;
             $newTaskUser->save();
 
             // Always delete old task_user for the same user
@@ -219,33 +221,42 @@ class ViewTaskPage extends Component
             if ($taskUsersCount === 1) {
                 $taskUser->task->delete();
             }
+            $meetingId = $newTask->meeting_id;
             // Prepare notification message for body update
             $notificationMessage = "متن وظیفه شما به روز رسانی شد.";
             $notificationsData[] = [
                 'type' => 'UpdatedTaskBody',
                 'data' => json_encode(['message' => $notificationMessage]),
-                'notifiable_type' => \App\Models\TaskUser::class,
-                'notifiable_id' => $newTaskUser->id,
+                'notifiable_type' => \App\Models\Meeting::class,
+                'notifiable_id' => $meetingId,
                 'sender_id' => auth()->id(),
                 'recipient_id' => $newTaskUser->user_id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
         }
+        \App\Models\Notification::where('recipient_id', $taskUser->user_id)
+            ->where(function ($query) use ($taskUser) {
+                $query->where('type', 'UpdatedTaskTimeOut')
+                    ->orWhere('type', 'UpdatedTaskBody');
+            })
+            ->where('notifiable_type', \App\Models\Meeting::class)
+            ->where('notifiable_id', $taskUser->task->meeting_id)
+            ->delete();
+
         // Insert notifications if any
         if (!empty($notificationsData)) {
             \App\Models\Notification::insert($notificationsData);
         }
         session()->flash('status', 'اطلاعات با موفقیت ویرایش شد');
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
     public function delete($taskUserId)
     {
         TaskUser::findOrFail($taskUserId)->delete();
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'اقدام کننده با موفقیت حذف شد');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
 
     public function openDeleteTaskModal()
@@ -273,10 +284,44 @@ class ViewTaskPage extends Component
             DB::table('task_users')->where('task_id', $this->task_id)->delete();
             DB::table('tasks')->where('id', $this->task_id)->delete();
         });
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'بند مذاکره با موفقیت حذف شد.');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
+
+
+    public $task_body;
+    public function openEditTaskModal($taskId)
+    {
+
+        $task = Task::findOrFail($taskId);
+        $this->task_body = $task->body;
+        $this->task_id = $task->id;
+        $this->dispatch('crud-modal', name: 'edit-task-body');
+    }
+    public function editTaskBody()
+    {
+        $validated = Validator::make(
+            ['task_body' => $this->task_body],
+            ['task_body' => 'required|string|min:5'],
+            ['task_body.required' => 'متن بند مذاکره اجباری است.',
+                'task_body.min' => 'متن بند مذاکره باید حداقل ۵ کاراکتر باشد.',]
+        )->validate();
+        $body = $this->normalizeText($validated['task_body']);
+
+        DB::table('tasks')->where('id',$this->task_id)->update([
+            'body' => $body,
+        ]);
+
+        session()->flash('status', 'بند مذاکره با موفقیت ویرایش شد.');
+        return to_route('view.task.page',$this->meeting);
+
+    }
+
+
+
+
+
 
 
     public function openParticipantTaskBodyModal($taskUserId)
@@ -359,9 +404,9 @@ class ViewTaskPage extends Component
             ->where('user_id', auth()->id())
             ->update(['task_status' => TaskStatus::ACCEPTED->value]);
 
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'خلاصه مذاکره تایید شد');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
     /**
      * To show Task form model to the participant
@@ -447,9 +492,9 @@ class ViewTaskPage extends Component
             }
         }
         $this->dispatch('close-modal');
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'اقدام با موفقیت ذخیره شد.');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
     /**
      * To Show update Task form to the participant
@@ -540,9 +585,9 @@ class ViewTaskPage extends Component
         }
 
         $this->dispatch('close-modal');
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'اقدام با موفقیت ویرایش شد.');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
 
 
@@ -566,9 +611,9 @@ class ViewTaskPage extends Component
             'end_time' => now()->format('H:i'),
         ]);
         $this->dispatch('close-modal');
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'جلسه خاتمه یافت');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
 
 
@@ -636,9 +681,9 @@ class ViewTaskPage extends Component
             ]);
         }
         $this->dispatch('close-modal');
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'درخواست رد شما به دبیر جلسه ارسال شد.');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
 
     public function sendToScriptorium($taskId)
@@ -663,9 +708,9 @@ class ViewTaskPage extends Component
                 'task_status' => TaskStatus::SENT_TO_SCRIPTORIUM->value,
             ]);
 
-        $signedUrl = URL::signedRoute('view.task.page', ['meeting' => $this->meeting]);
+
         session()->flash('status', 'شرح اقدام به دبیر جلسه ارسال شد.');
-        return redirect()->to($signedUrl);
+        return to_route('view.task.page',$this->meeting);
     }
 
     protected function normalizeText($text)

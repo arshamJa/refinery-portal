@@ -13,7 +13,6 @@ use App\Livewire\operator\OperatorDashboard;
 use App\Livewire\TranslatePage;
 use Illuminate\Support\Facades\Route;
 
-
 Route::middleware('guest')->group(function () {
 
     Route::get('/', [AuthController::class, 'create'])->name('login');
@@ -49,7 +48,6 @@ Route::get('/reset/password/{id}', [ResetPasswordController::class, 'index'])
     ->middleware('guest');
 Route::post('/resetPassword/{id}', [ResetPasswordController::class, 'reset'])
     ->name('resetPassword');
-
 
 require __DIR__.'/department_organization.php';
 require __DIR__.'/otp.php';

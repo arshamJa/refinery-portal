@@ -37,7 +37,7 @@
         </ol>
     </nav>
 
-    <div class="p-6 max-w-6xl bg-white rounded-2xl shadow-md space-y-6">
+    <div class="p-6 max-w-6xl bg-white rounded-2xl shadow-md space-y-6 mb-6">
         <div class="w-full text-center">
             @switch($this->meetings->status)
                 @case(MeetingStatus::IS_IN_PROGRESS)
@@ -77,11 +77,16 @@
                 </span>
             </div>
         </div>
-        <div class="flex justify-end items-center gap-4">
-            @if (auth()->user()->user_info->full_name === $this->meetings->scriptorium)
+        @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium && auth()->user()->user_info->position === $this->meetings->position_organization)
+            <div class="flex justify-end items-center gap-4">
                 @if( $this->meetings->status == MeetingStatus::IS_IN_PROGRESS)
-                    <x-accept-button wire:click="showFinalCheck({{ $this->meetings->id}})" class="flex gap-2 items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
+                    <x-accept-button wire:click="showFinalCheck({{ $this->meetings->id}})"
+                                     class="flex gap-2 items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/>
+                        </svg>
                         {{ __('خاتمه جلسه') }}
                     </x-accept-button>
                 @endif
@@ -90,11 +95,7 @@
                         class=" px-4 py-2 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-xs uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
                     {{__('چاپ صوتجلسه')}}
                 </button>
-            @endif
-        </div>
-
-
-        @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium )
+            </div>
             <form action="{{route('tasks.store', $this->meetings->id)}}" method="post" class="border-t border-b py-3"
                   enctype="multipart/form-data">
                 @csrf
@@ -220,7 +221,7 @@
                     {{ __('افزودن اقدام کننده') }}
                 </x-secondary-button>
                 <x-danger-button wire:click="openDeleteTaskModal">
-                    {{ __('حذف بند خلاصه مذاکره') }}
+                    {{ __('حذف بند مذاکره') }}
                 </x-danger-button>
             </div>
             <x-modal name="add-participant" maxWidth="4xl" :closable="false">
@@ -247,7 +248,7 @@
                                     <option value="">{{ __('انتخاب کنید') }}</option>
                                     @foreach($this->tasks as $task)
                                         <option value="{{ $task->id }}">
-                                           {{$loop->index+1}} - {{ Str::words($task->body,10, '...') }}
+                                            {{$loop->index+1}} - {{ Str::words($task->body,10, '...') }}
                                         </option>
                                     @endforeach
                                 </x-select-input>
@@ -349,7 +350,7 @@
                                     <option value="">{{ __('انتخاب کنید') }}</option>
                                     @foreach($this->tasks as $task)
                                         <option value="{{ $task->id }}">
-                                           {{$loop->index+1}} -{{ Str::words($task->body,10, '...') }}
+                                            {{$loop->index+1}} -{{ Str::words($task->body,10, '...') }}
                                         </option>
                                     @endforeach
                                 </x-select-input>
@@ -374,16 +375,27 @@
             </x-modal>
         @endif
 
-
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" id="task-table">
             <x-table.table wire:poll.visible.60s>
                 <x-slot name="head">
                     <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                        @foreach (['#', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده','عملیات'] as $th)
-                            <x-table.heading
-                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}  {{ in_array($loop->index, [4, 7]) ? 'no-print' : '' }}">
-                                {{ __($th) }}
-                            </x-table.heading>
+                        @foreach (['#', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده','عملیات','ویرایش بند'] as $th)
+                            @php
+                                $isEditColumn = $loop->last;
+                            @endphp
+                            @if ($isEditColumn)
+                                @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium && auth()->user()->user_info->position === $this->meetings->position_organization)
+                                    <x-table.heading
+                                        class="px-6 py-3 border-r border-gray-200 dark:border-gray-700 no-print">
+                                        {{ __($th) }}
+                                    </x-table.heading>
+                                @endif
+                            @else
+                                <x-table.heading
+                                    class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}  {{ in_array($loop->index, [4, 7,8]) ? 'no-print' : '' }}">
+                                    {{ __($th) }}
+                                </x-table.heading>
+                            @endif
                         @endforeach
                     </x-table.row>
                 </x-slot>
@@ -403,7 +415,7 @@
                                         {{ $loop->parent->iteration }}
                                     </td>
                                     {{-- Task Body --}}
-                                    <td class="px-6 py-2 border-r border-gray-300" rowspan="{{ $rowspan }}">
+                                    <td class="px-4 py-2 border-r border-gray-300" rowspan="{{ $rowspan }}">
                                         <span class="block text-gray-700">{{ $task->body }}</span>
                                     </td>
                                 @endif
@@ -427,48 +439,12 @@
                                 <td class="px-4 py-4 border-r border-gray-300 no-print screen-only">
                                     @if(!$isAfterTimeOut)
                                         @if($taskUser->body_task)
-                                            <!-- Content visible only on the page (screen-only) -->
-{{--                                            <div x-data="{ expanded: false }" class="screen-only">--}}
-{{--                                                <div x-show="!expanded" class="truncate">--}}
-{{--                                                    {{ Str::words($taskUser->body_task, 5, '...') }}--}}
-{{--                                                </div>--}}
-{{--                                                <div x-show="expanded"--}}
-{{--                                                     class="overflow-auto mt-2 text-sm text-gray-800 max-h-40">--}}
-{{--                                                    {{ $taskUser->body_task }}--}}
-{{--                                                </div>--}}
-{{--                                                <button @click="expanded = !expanded"--}}
-{{--                                                        class="mt-2 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition duration-200">--}}
-{{--                                                    <template x-if="!expanded">--}}
-{{--                                                                <span class="no-print flex items-center">--}}
-{{--                                                                    <svg class="w-4 h-4 ml-1" fill="none"--}}
-{{--                                                                         stroke="currentColor"--}}
-{{--                                                                         stroke-width="2" viewBox="0 0 24 24">--}}
-{{--                                                                        <path stroke-linecap="round"--}}
-{{--                                                                              stroke-linejoin="round"--}}
-{{--                                                                              d="M19 9l-7 7-7-7"></path>--}}
-{{--                                                                    </svg>--}}
-{{--                                                                    {{__('نمایش بیشتر')}}--}}
-{{--                                                                </span>--}}
-{{--                                                    </template>--}}
-{{--                                                    <template x-if="expanded">--}}
-{{--                                                                <span class="no-print flex items-center">--}}
-{{--                                                                    <svg class="w-4 h-4 ml-1" fill="none"--}}
-{{--                                                                         stroke="currentColor"--}}
-{{--                                                                         stroke-width="2" viewBox="0 0 24 24">--}}
-{{--                                                                        <path stroke-linecap="round"--}}
-{{--                                                                              stroke-linejoin="round"--}}
-{{--                                                                              d="M5 15l7-7 7 7"></path>--}}
-{{--                                                                    </svg>--}}
-{{--                                                                    {{__('نمایش کمتر')}}--}}
-{{--                                                                </span>--}}
-{{--                                                    </template>--}}
-{{--                                                </button>--}}
-{{--                                            </div>--}}
                                             <!-- Content only for printing (always visible in print) -->
                                             <div class="task-card print-only" style="display: none;">
                                                 {{ $taskUser->body_task }}
                                             </div>
-                                            <x-secondary-button wire:click="openParticipantTaskBodyModal({{$taskUser->id}})">
+                                            <x-secondary-button
+                                                wire:click="openParticipantTaskBodyModal({{$taskUser->id}})">
                                                 {{__('نمایش')}}
                                             </x-secondary-button>
                                         @else
@@ -508,7 +484,11 @@
 
                                 {{-- عملیات --}}
                                 <td class="px-4 py-4 border-r border-gray-300 text-center screen-only no-print">
-                                    @if($taskUser->user_id === auth()->id() || auth()->user()->hasRole(UserRole::SCRIPTORIUM->value))
+                                    @if($taskUser->task_status === TaskStatus::SENT_TO_SCRIPTORIUM)
+                                        <span>
+                                                {{__('اقدام تکمیل شد')}}
+                                        </span>
+                                    @else
                                         <x-dropdown>
                                             <x-slot name="trigger">
                                                 <button class="hover:bg-gray-200 rounded-full p-1 transition">
@@ -545,6 +525,7 @@
                                                     @endif
                                                 @endcan
                                                 @can('scriptoriumTask',$taskUser)
+                                                        @if(!$isAfterTimeOut)
                                                     <x-dropdown-link wire:click="opedEditModal({{ $taskUser->id }})">
                                                         {{ __('ویرایش') }}
                                                     </x-dropdown-link>
@@ -552,20 +533,24 @@
                                                                      wire:confirm="آیا مطمئن هستید که این اقدام کننده پاک شود؟">
                                                         {{ __('حذف') }}
                                                     </x-dropdown-link>
+                                                        @endif
                                                 @endcan
                                             </x-slot>
                                         </x-dropdown>
-                                    @elseif($taskUser->task_status === TaskStatus::SENT_TO_SCRIPTORIUM)
-                                        <span>
-                                                {{__('اقدام تکمیل شد')}}
-                                        </span>
-                                    @elseif(auth()->user()->hasRole(UserRole::SCRIPTORIUM->value))
-                                        <span>
-                                                {{__('اقدام تایید شد')}}
-                                        </span>
                                     @endif
-
                                 </td>
+
+                                @if(auth()->user()->user_info->full_name === $task->meeting->scriptorium && auth()->user()->user_info->position === $task->meeting->position_organization)
+                                    @if ($userIndex === 0)
+                                        <td class="px-4 py-4 border-r border-gray-300 text-center screen-only no-print"
+                                            rowspan="{{ $rowspan }}">
+                                            <x-edit-button wire:click="openEditTaskModal({{ $task->id }})">
+                                                {{ __('ویرایش') }}
+                                            </x-edit-button>
+                                        </td>
+                                    @endif
+                                @endif
+
                             </tr>
                         @endforeach
                     @endforeach
@@ -577,31 +562,32 @@
 
         {{--  Table to show the participants task rejection , this is gate --}}
         @if($this->taskUsers->whereNotNull('request_task')->count() > 0)
-            @can('view-denied-tasks')
-                <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
-                    <x-table.table>
-                        <x-slot name="head">
-                            <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                                @foreach (['نام', 'دلیل رد', ] as $th)
-                                    <x-table.heading
-                                        class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
-                                        {{ __($th) }}
-                                    </x-table.heading>
-                                @endforeach
-                            </x-table.row>
-                        </x-slot>
-                        <x-slot name="body">
-                            @foreach($this->taskUsers->where('task_status', TaskStatus::DENIED->value) as $taskRequest)
-                                <x-table.row wire:key="taskRequest-{{ $taskRequest->id }}"
-                                             class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                                    <x-table.cell>{{ $taskRequest->user->user_info->full_name }}</x-table.cell>
-                                    <x-table.cell>{{ $taskRequest->request_task }}</x-table.cell>
-                                </x-table.row>
+            {{--            @can('view-denied-tasks')--}}
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
+                <x-table.table>
+                    <x-slot name="head">
+                        <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                            @foreach (['نام', 'بند مذاکره','دلیل رد', ] as $th)
+                                <x-table.heading
+                                    class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                                    {{ __($th) }}
+                                </x-table.heading>
                             @endforeach
-                        </x-slot>
-                    </x-table.table>
-                </div>
-            @endcan
+                        </x-table.row>
+                    </x-slot>
+                    <x-slot name="body">
+                        @foreach($this->taskUsers->where('task_status', TaskStatus::DENIED->value) as $taskRequest)
+                            <x-table.row wire:key="taskRequest-{{ $taskRequest->id }}"
+                                         class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                                <x-table.cell>{{ $taskRequest->user->user_info->full_name }}</x-table.cell>
+                                <x-table.cell>{{ $taskRequest->task->body }}</x-table.cell>
+                                <x-table.cell>{{ $taskRequest->request_task }}</x-table.cell>
+                            </x-table.row>
+                        @endforeach
+                    </x-slot>
+                </x-table.table>
+            </div>
+            {{--            @endcan--}}
         @endif
 
 
@@ -629,10 +615,9 @@
                 </div>
             </div>
         @endif
-
     </div>
 
-    <x-modal name="participant-body-task"  maxWidth="4xl" :closable="false">
+    <x-modal name="participant-body-task" maxWidth="4xl" :closable="false">
         @if ($selectedTaskUser)
             <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                 <h2 class="text-2xl font-bold text-gray-800">{{ __('شرح اقدام') }}</h2>
@@ -646,7 +631,8 @@
             </div>
             <div class="px-6 py-6 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
                 <div class="grid grid-cols-2 gap-4">
-                    <x-meeting-info label="{{ __('اقدام کننده') }}" :value="$selectedTaskUser->user->user_info->full_name"/>
+                    <x-meeting-info label="{{ __('اقدام کننده') }}"
+                                    :value="$selectedTaskUser->user->user_info->full_name"/>
                     <x-meeting-info label="{{ __('سمت') }}" :value="$selectedTaskUser->user->user_info->position"/>
                 </div>
 
@@ -664,7 +650,6 @@
             </div>
         @endif
     </x-modal>
-
     {{--  Modal for participant to type their task--}}
     <x-modal name="view-task-details-modal" maxWidth="4xl" :closable="false">
         @if ($selectedTaskUser)
@@ -753,7 +738,6 @@
             @endcan
         @endif
     </x-modal>
-
     {{--  Modal for participant to update their task--}}
     <x-modal name="edit-task-details-modal" maxWidth="4xl" :closable="false">
         @if ($selectedTaskUser)
@@ -857,7 +841,6 @@
             @endcan
         @endif
     </x-modal>
-
     {{--          Modal for scriptorium to finish the meeting --}}
     @if($this->meetings->status === MeetingStatus::IS_IN_PROGRESS)
         @if ($meeting)
@@ -894,8 +877,6 @@
             {{--        @endcan--}}
         @endif
     @endif
-
-
     {{--          Modal for participants to type the task rejection --}}
     <x-modal name="deny-task" :closable="false">
         @if ($selectedTaskUser)
@@ -942,12 +923,9 @@
                         </x-cancel-button>
                     </div>
                 </form>
-
             @endcan
         @endif
     </x-modal>
-
-
     <x-modal name="edit-by-scriptorium" :closable="false">
         @if ($selectedTaskUser)
             {{--                @can('participantTask', $selectedTaskUser)--}}
@@ -1032,6 +1010,52 @@
                 </div>
             </form>
             {{--                @endcan--}}
+        @endif
+    </x-modal>
+
+    <x-modal name="edit-task-body" maxWidth="4xl" :closable="false">
+        @if($task_id)
+            <form wire:submit.prevent="editTaskBody">
+                <!-- Header -->
+                <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش بند مذاکره') }}</h2>
+                    <button type="button" x-on:click="$dispatch('close')"
+                            class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="px-6 py-4 space-y-6 text-sm text-gray-800 max-h-[70vh] overflow-y-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Textarea -->
+                        <div class="col-span-2">
+                            <x-input-label :value="__('متن بند مذاکره')" class="mb-1"/>
+                            <textarea wire:model="task_body" rows="6"
+                                      class="w-full border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            {{$task_body}}
+                        </textarea>
+                            <x-input-error :messages="$errors->get('task_body')" class="mt-2"/>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                    <x-primary-button type="submit" wire:loading.attr="disabled" wire:loading.class="opacity-50">
+                        <span wire:loading.remove>{{ __('ذخیره تغییرات') }}</span>
+                        <span wire:loading>{{ __('در حال ذخیره...') }}</span>
+                    </x-primary-button>
+
+                    <x-cancel-button x-on:click="$dispatch('close')">
+                        {{ __('انصراف') }}
+                    </x-cancel-button>
+                </div>
+            </form>
         @endif
     </x-modal>
 

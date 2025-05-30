@@ -87,6 +87,7 @@
                             </svg>
                             {{__('جدول جلسات')}}
                         </x-link.responsive-link>
+                        @can('has-permission', \App\Enums\UserPermission::TASK_REPORT_TABLE)
                         <x-link.responsive-link href="{{route('meeting.report')}}"
                                                 :active="request()->is('meeting/report')"
                                                 class="flex items-center gap-x-2">
@@ -95,8 +96,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
                             </svg>
-                            <h3 class="text-sm font-semibold"> {{__('گزارش اقدامات')}}</h3>
+                            <h3 class="text-sm font-semibold"> {{__('گزارش جلسات شرکت')}}</h3>
                         </x-link.responsive-link>
+                        @endcan
                     </div>
                 </div>
             </li>
@@ -156,11 +158,11 @@
                             </svg>
                             <span class="flex justify-between w-full">
                             <span>{{__('پیام های ارسالی')}}</span>
-                                @if($this->unreadSentCount() > 0)
-                                    <span class="text-gray-100 font-bold">
-                                        {{ $this->unreadSentCount() > 10 ? '+10' : $this->unreadSentCount() }}
-                                    </span>
-                                @endif
+{{--                                @if($this->unreadSentCount() > 0)--}}
+{{--                                    <span class="text-gray-100 font-bold">--}}
+{{--                                        {{ $this->unreadSentCount() > 10 ? '+10' : $this->unreadSentCount() }}--}}
+{{--                                    </span>--}}
+{{--                                @endif--}}
                             </span>
                         </x-link.responsive-link>
                     </div>
