@@ -21,7 +21,7 @@
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard.meeting')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>{{__('جدول جلسات')}}</span>
+                    <span>{{__('جلسات')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -77,18 +77,20 @@
                 </span>
             </div>
         </div>
-        @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium && auth()->user()->user_info->position === $this->meetings->position_organization)
+        @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium && auth()->user()->user_info->position === $this->meetings->scriptorium_position)
             <div class="flex justify-end items-center gap-4">
                 @if( $this->meetings->status == MeetingStatus::IS_IN_PROGRESS)
-                    <x-accept-button wire:click="showFinalCheck({{ $this->meetings->id}})"
-                                     class="flex gap-2 items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                             stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/>
-                        </svg>
-                        {{ __('خاتمه جلسه') }}
-                    </x-accept-button>
+                    @if (!$this->allTasksLocked)
+                        <x-accept-button wire:click="showFinalCheck({{ $this->meetings->id}})"
+                                         class="flex gap-2 items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="size-4">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/>
+                            </svg>
+                            {{ __('خاتمه جلسه') }}
+                        </x-accept-button>
+                    @endif
                 @endif
                 <!-- Print Button -->
                 <button onclick="printTable()"
@@ -96,306 +98,350 @@
                     {{__('چاپ صوتجلسه')}}
                 </button>
             </div>
-            <form action="{{route('tasks.store', $this->meetings->id)}}" method="post" class="border-t border-b py-3"
-                  enctype="multipart/form-data">
-                @csrf
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 pb-2">
-                    {{__('درج مذاکره جدید')}}
-                </h2>
-                <div class=" space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <x-input-label for="holders" class="mb-2"
-                                           :value="__('اقدام کننده')"/>
-                            <div class="custom-select">
-                                <div class="select-box">
-                                    <input type="text" class="tags_input" multiple name="holders" hidden>
-                                    <div class="selected-options"></div>
-                                    <div class="arrow">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                             stroke-width="1.5"
-                                             stroke="currentColor" class="size-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="options">
-                                    <div class="option-search-tags">
-                                        <input type="text" class="search-tags" placeholder="جست و جو ...">
-                                        <button type="button" class="clear">
+            @if (!$this->allTasksLocked)
+                <form action="{{route('tasks.store', $this->meetings->id)}}" method="post"
+                      class="border-t border-b py-3"
+                      enctype="multipart/form-data">
+                    @csrf
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 pb-2">
+                        {{__('درج بند جدید')}}
+                    </h2>
+                    <div class=" space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <x-input-label for="holders" class="mb-2"
+                                               :value="__('اقدام کننده')"/>
+                                <div class="custom-select">
+                                    <div class="select-box">
+                                        <input type="text" class="tags_input" multiple name="holders" hidden>
+                                        <div class="selected-options"></div>
+                                        <div class="arrow">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                  stroke-width="1.5"
                                                  stroke="currentColor" class="size-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M6 18 18 6M6 6l12 12"/>
+                                                      d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
                                             </svg>
-                                        </button>
-                                    </div>
-                                    <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                                    @foreach($this->employees as $employee)
-                                        <div class="option" data-value="{{$employee->user_id}}">
-                                            {{ $employee->user->user_info->full_name }}
                                         </div>
-                                    @endforeach
-                                    <div class="no-result-message" style="display:none;">No result match</div>
+                                    </div>
+                                    <div class="options">
+                                        <div class="option-search-tags">
+                                            <input type="text" class="search-tags" placeholder="جست و جو ...">
+                                            <button type="button" class="clear">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                     stroke-width="1.5"
+                                                     stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M6 18 18 6M6 6l12 12"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
+                                        @foreach($this->employees as $employee)
+                                            <div class="option" data-value="{{$employee->user_id}}">
+                                                {{ $employee->user->user_info->full_name }}
+                                            </div>
+                                        @endforeach
+                                        <div class="no-result-message" style="display:none;">No result match</div>
+                                    </div>
+                                </div>
+                                <x-input-error :messages="$errors->get('holders')" class="my-2"/>
+                            </div>
+                            <div>
+                                <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
+                                <div class="flex gap-2">
+                                    <div class="w-full">
+                                        <div class="flex items-center gap-1">
+                                            <select name="year" id="year" dir="ltr"
+                                                    class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                                <option value="">{{__(':سال')}}</option>
+                                                @for($i = 1404; $i <= 1430; $i++)
+                                                    <option value="{{$i}}" @if (old('year') == $i) selected @endif>
+                                                        {{$i}}
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <x-input-error :messages="$errors->get('year')" class="my-2"/>
+                                    </div>
+                                    <div class="w-full">
+                                        <div class="flex items-center gap-1">
+                                            @php
+                                                $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+                                            @endphp
+                                            <select name="month" id="month" dir="ltr"
+                                                    class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                                <option value="">{{__(':ماه')}}</option>
+                                                @for ($i = 1; $i <= 12; $i++)
+                                                    <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
+                                                        {{ $persian_months[$i - 1] }}
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <x-input-error :messages="$errors->get('month')" class="my-2"/>
+                                    </div>
+                                    <div class="w-full">
+                                        <div class="flex items-center gap-1">
+                                            <select name="day" id="day" dir="ltr"
+                                                    class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                                <option value="">{{__(':روز')}}</option>
+                                                @for($i = 1; $i <= 31; $i++)
+                                                    <option value="{{$i}}" @if (old('day') == $i) selected @endif>
+                                                        {{$i}}
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <x-input-error :messages="$errors->get('day')" class="my-2"/>
+                                    </div>
                                 </div>
                             </div>
-                            <x-input-error :messages="$errors->get('holders')" class="my-2"/>
                         </div>
 
                         <div>
-                            <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
-                            <div class="flex gap-2">
-                                <div class="w-full">
-                                    <div class="flex items-center gap-1">
-                                        <select name="year" id="year" dir="ltr"
-                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                            <option value="">{{__(':سال')}}</option>
-                                            @for($i = 1404; $i <= 1430; $i++)
-                                                <option value="{{$i}}" @if (old('year') == $i) selected @endif>
-                                                    {{$i}}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('year')" class="my-2"/>
-                                </div>
-                                <div class="w-full">
-                                    <div class="flex items-center gap-1">
-                                        @php
-                                            $persian_months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور","مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                                        @endphp
-                                        <select name="month" id="month" dir="ltr"
-                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                            <option value="">{{__(':ماه')}}</option>
-                                            @for ($i = 1; $i <= 12; $i++)
-                                                <option value="{{ $i }}" @if (old('month') == $i) selected @endif>
-                                                    {{ $persian_months[$i - 1] }}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('month')" class="my-2"/>
-                                </div>
-                                <div class="w-full">
-                                    <div class="flex items-center gap-1">
-                                        <select name="day" id="day" dir="ltr"
-                                                class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                            <option value="">{{__(':روز')}}</option>
-                                            @for($i = 1; $i <= 31; $i++)
-                                                <option value="{{$i}}" @if (old('day') == $i) selected @endif>
-                                                    {{$i}}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('day')" class="my-2"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <x-input-label for="body" :value="__('خلاصه مذاکرات و تصمیمات اتخاذ شده')" class="mb-2"/>
-                        <textarea type="text" name="body" rows="4"
-                                  class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                            <x-input-label for="body" :value="__('تصمیم اتخاذ شده')" class="mb-2"/>
+                            <textarea type="text" name="body" rows="4"
+                                      class="w-full h-auto min-h-[80px] p-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                                     {{old('body')}}
                                 </textarea>
-                        <x-input-error :messages="$errors->get('body')" class="mt-2"/>
+                            <x-input-error :messages="$errors->get('body')" class="mt-2"/>
+                        </div>
+                        <div class="flex space-x-2 rtl:space-x-reverse">
+                            <x-primary-button type="submit">
+                                {{ __('ارسال') }}
+                            </x-primary-button>
+                            <a href="{{ route('view.task.page', ['meeting' => $this->meetings->id]) }}">
+                                <x-cancel-button>
+                                    {{ __('انصراف') }}
+                                </x-cancel-button>
+                            </a>
+                        </div>
                     </div>
-                    <div class="flex space-x-2 rtl:space-x-reverse">
-                        <x-primary-button type="submit">
-                            {{ __('ارسال') }}
-                        </x-primary-button>
-                        <a href="{{ URL::signedRoute('view.task.page', ['meeting' => $this->meetings->id]) }}">
-                            <x-cancel-button>
-                                {{ __('انصراف') }}
-                            </x-cancel-button>
-                        </a>
-                    </div>
-                </div>
-            </form>
+                </form>
+            @endif
             <div class="flex justify-end items-center gap-4">
-                <x-secondary-button wire:click="openAddParticipantModal">
-                    {{ __('افزودن اقدام کننده') }}
-                </x-secondary-button>
-                <x-danger-button wire:click="openDeleteTaskModal">
-                    {{ __('حذف بند مذاکره') }}
-                </x-danger-button>
+                @if ($this->allTasksLocked)
+                    <x-secondary-button disabled>
+                        {{ __('این صورتجلسه قبلاً قفل شده است') }}
+                    </x-secondary-button>
+                @else
+                    <x-secondary-button wire:click="openAddParticipantModal">
+                        {{ __('افزودن اقدام کننده') }}
+                    </x-secondary-button>
+                    <x-danger-button wire:click="openDeleteTaskModal">
+                        {{ __('حذف بند مذاکره') }}
+                    </x-danger-button>
+                    <x-modal name="add-participant" maxWidth="4xl" :closable="false">
+                        <form wire:submit.prevent="submitParticipantForm">
+                            <!-- Header -->
+                            <div
+                                class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                <h2 class="text-2xl font-bold text-gray-800">{{ __('درج مشارکت‌کننده جدید') }}</h2>
+                                <button type="button" x-on:click="$dispatch('close')"
+                                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Body -->
+                            <div
+                                class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Select Task -->
+                                    <div>
+                                        <x-input-label :value="__('انتخاب بند مذاکره')" class="mb-2"/>
+                                        <x-select-input wire:model.defer="task_id">
+                                            <option value="">{{ __('انتخاب کنید') }}</option>
+                                            @foreach($this->tasks as $task)
+                                                <option value="{{ $task->id }}">
+                                                    {{$loop->index+1}} - {{ Str::words($task->body,10, '...') }}
+                                                </option>
+                                            @endforeach
+                                        </x-select-input>
+                                        <x-input-error :messages="$errors->get('task_id')" class="mt-2"/>
+                                    </div>
+
+                                    <!-- Select Employee -->
+                                    <div>
+                                        <x-input-label :value="__('اقدام‌کننده')" class="mb-2"/>
+                                        <x-select-input wire:model.defer="employee_id">
+                                            <option value="">{{ __('انتخاب کنید') }}</option>
+                                            @foreach($this->employees as $employee)
+                                                <option
+                                                    value="{{ $employee->user_id }}">{{ $employee->user->user_info->full_name }}</option>
+                                            @endforeach
+                                        </x-select-input>
+                                        <x-input-error :messages="$errors->get('employee_id')" class="mt-2"/>
+                                    </div>
+                                </div>
+
+                                <!-- Due Date -->
+                                <div>
+                                    <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
+                                    <div class="flex gap-2">
+                                        <div class="w-full">
+                                            <x-select-input wire:model.defer="year">
+                                                <option value="">{{ __('سال') }}</option>
+                                                @for($i = 1404; $i <= 1430; $i++)
+                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                @endfor
+                                            </x-select-input>
+                                            <x-input-error :messages="$errors->get('year')" class="mt-2"/>
+                                        </div>
+                                        <div class="w-full">
+                                            <x-select-input wire:model.defer="month">
+                                                <option value="">{{ __('ماه') }}</option>
+                                                @foreach(["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"] as $index => $monthName)
+                                                    <option value="{{ $index + 1 }}">{{ $monthName }}</option>
+                                                @endforeach
+                                            </x-select-input>
+                                            <x-input-error :messages="$errors->get('month')" class="mt-2"/>
+                                        </div>
+                                        <div class="w-full">
+                                            <x-select-input wire:model.defer="day">
+                                                <option value="">{{ __('روز') }}</option>
+                                                @for($i = 1; $i <= 31; $i++)
+                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                @endfor
+                                            </x-select-input>
+                                            <x-input-error :messages="$errors->get('day')" class="mt-2"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Footer -->
+                            <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                                <x-primary-button type="submit"
+                                                  wire:target="submitParticipantForm"
+                                                  wire:loading.attr="disabled"
+                                                  wire:loading.class="opacity-50">
+                                    <span wire:loading.remove
+                                          wire:target="submitParticipantForm">{{ __('ذخیره') }}</span>
+                                    <span wire:loading
+                                          wire:target="submitParticipantForm">{{ __('در حال ثبت...') }}</span>
+                                </x-primary-button>
+                                <x-cancel-button x-on:click="$dispatch('close')">
+                                    {{ __('انصراف') }}
+                                </x-cancel-button>
+                            </div>
+                        </form>
+                    </x-modal>
+                    <x-modal name="delete-task" maxWidth="4xl" :closable="false">
+                        <form wire:submit.prevent="deleteTask">
+                            <!-- Header -->
+                            <div
+                                class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                <h2 class="text-2xl font-bold text-gray-800">{{ __('حذف بند مذاکره') }}</h2>
+                                <button type="button" x-on:click="$dispatch('close')"
+                                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Body -->
+                            <div
+                                class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Warning Message -->
+                                    <div class="md:col-span-2">
+                                        <div
+                                            class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded">
+                                            <p class="font-semibold">{{ __('هشدار:') }}</p>
+                                            <p>{{ __('با حذف این بند مذاکره، تمام اقدام کنندگان تخصیص داده‌شده به آن نیز حذف خواهند شد.') }}</p>
+                                        </div>
+                                    </div>
+                                    <!-- Select Task -->
+                                    <div>
+                                        <x-input-label :value="__('انتخاب بند مذاکره')" class="mb-2"/>
+                                        <x-select-input wire:model.defer="task_id">
+                                            <option value="">{{ __('انتخاب کنید') }}</option>
+                                            @foreach($this->tasks as $task)
+                                                <option value="{{ $task->id }}">
+                                                    {{$loop->index+1}} -{{ Str::words($task->body,10, '...') }}
+                                                </option>
+                                            @endforeach
+                                        </x-select-input>
+                                        <x-input-error :messages="$errors->get('task_id')" class="mt-2"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Footer -->
+                            <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                                <x-primary-button type="submit"
+                                                  wire:target="submitParticipantForm"
+                                                  wire:loading.attr="disabled"
+                                                  wire:loading.class="opacity-50">
+                                    <span wire:loading.remove wire:target="submitParticipantForm">{{ __('حذف') }}</span>
+                                    <span wire:loading
+                                          wire:target="submitParticipantForm">{{ __('در حال حذف...') }}</span>
+                                </x-primary-button>
+                                <x-cancel-button x-on:click="$dispatch('close')">
+                                    {{ __('انصراف') }}
+                                </x-cancel-button>
+                            </div>
+                        </form>
+                    </x-modal>
+                    @can('lock-task', $this->meetings)
+                        <x-edit-button wire:click="openLockTaskModal">
+                            {{ __('بستن صورتجلسه') }}
+                        </x-edit-button>
+                        <x-modal name="lock-task" maxWidth="4xl" :closable="false">
+                            <form method="POST" action="{{ route('meeting.lockTasks',$this->meetings->id) }}">
+                                @csrf
+                                <!-- Header -->
+                                <div
+                                    class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                    <h2 class="text-2xl font-bold text-gray-800">{{ __('بستن صورتجلسه') }}</h2>
+                                    <a href="{{route('view.task.page',$this->meetings->id)}}"
+                                       class="text-gray-400 hover:text-red-500 transition duration-150">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="M6 18 18 6M6 6l12 12"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                                <!-- Body -->
+                                <div
+                                    class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
+                                    <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+                                            <p class="font-semibold">{{ __('هشدار:') }}</p>
+                                            <p>{{ __('با قفل کردن این بند مذاکره، امکان ویرایش یا تغییر توسط دبیر غیرفعال می‌شود.') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Footer -->
+                                <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                                    <x-primary-button type="submit">
+                                        {{ __('قفل کردن') }}
+                                    </x-primary-button>
+                                    <x-cancel-button x-on:click="$dispatch('close')">
+                                        {{ __('انصراف') }}
+                                    </x-cancel-button>
+                                </div>
+                            </form>
+                        </x-modal>
+                    @endcan
+                @endif
             </div>
-            <x-modal name="add-participant" maxWidth="4xl" :closable="false">
-                <form wire:submit.prevent="submitParticipantForm">
-                    <!-- Header -->
-                    <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
-                        <h2 class="text-2xl font-bold text-gray-800">{{ __('درج مشارکت‌کننده جدید') }}</h2>
-                        <button type="button" x-on:click="$dispatch('close')"
-                                class="text-gray-400 hover:text-red-500 transition duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <!-- Body -->
-                    <div
-                        class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Select Task -->
-                            <div>
-                                <x-input-label :value="__('انتخاب بند مذاکره')" class="mb-2"/>
-                                <x-select-input wire:model.defer="task_id">
-                                    <option value="">{{ __('انتخاب کنید') }}</option>
-                                    @foreach($this->tasks as $task)
-                                        <option value="{{ $task->id }}">
-                                            {{$loop->index+1}} - {{ Str::words($task->body,10, '...') }}
-                                        </option>
-                                    @endforeach
-                                </x-select-input>
-                                <x-input-error :messages="$errors->get('task_id')" class="mt-2"/>
-                            </div>
-
-                            <!-- Select Employee -->
-                            <div>
-                                <x-input-label :value="__('اقدام‌کننده')" class="mb-2"/>
-                                <x-select-input wire:model.defer="employee_id">
-                                    <option value="">{{ __('انتخاب کنید') }}</option>
-                                    @foreach($this->employees as $employee)
-                                        <option
-                                            value="{{ $employee->user_id }}">{{ $employee->user->user_info->full_name }}</option>
-                                    @endforeach
-                                </x-select-input>
-                                <x-input-error :messages="$errors->get('employee_id')" class="mt-2"/>
-                            </div>
-                        </div>
-
-                        <!-- Due Date -->
-                        <div>
-                            <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
-                            <div class="flex gap-2">
-                                <div class="w-full">
-                                    <x-select-input wire:model.defer="year">
-                                        <option value="">{{ __('سال') }}</option>
-                                        @for($i = 1404; $i <= 1430; $i++)
-                                            <option value="{{ $i }}">{{ $i }}</option>
-                                        @endfor
-                                    </x-select-input>
-                                    <x-input-error :messages="$errors->get('year')" class="mt-2"/>
-                                </div>
-                                <div class="w-full">
-                                    <x-select-input wire:model.defer="month">
-                                        <option value="">{{ __('ماه') }}</option>
-                                        @foreach(["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"] as $index => $monthName)
-                                            <option value="{{ $index + 1 }}">{{ $monthName }}</option>
-                                        @endforeach
-                                    </x-select-input>
-                                    <x-input-error :messages="$errors->get('month')" class="mt-2"/>
-                                </div>
-                                <div class="w-full">
-                                    <x-select-input wire:model.defer="day">
-                                        <option value="">{{ __('روز') }}</option>
-                                        @for($i = 1; $i <= 31; $i++)
-                                            <option value="{{ $i }}">{{ $i }}</option>
-                                        @endfor
-                                    </x-select-input>
-                                    <x-input-error :messages="$errors->get('day')" class="mt-2"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Footer -->
-                    <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
-                        <x-primary-button type="submit"
-                                          wire:target="submitParticipantForm"
-                                          wire:loading.attr="disabled"
-                                          wire:loading.class="opacity-50">
-                            <span wire:loading.remove wire:target="submitParticipantForm">{{ __('ذخیره') }}</span>
-                            <span wire:loading wire:target="submitParticipantForm">{{ __('در حال ثبت...') }}</span>
-                        </x-primary-button>
-                        <x-cancel-button x-on:click="$dispatch('close')">
-                            {{ __('انصراف') }}
-                        </x-cancel-button>
-                    </div>
-                </form>
-            </x-modal>
-            <x-modal name="delete-task" maxWidth="4xl" :closable="false">
-                <form wire:submit.prevent="deleteTask">
-                    <!-- Header -->
-                    <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
-                        <h2 class="text-2xl font-bold text-gray-800">{{ __('حذف بند مذاکره') }}</h2>
-                        <button type="button" x-on:click="$dispatch('close')"
-                                class="text-gray-400 hover:text-red-500 transition duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Body -->
-                    <div
-                        class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Warning Message -->
-                            <div class="md:col-span-2">
-                                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded">
-                                    <p class="font-semibold">{{ __('هشدار:') }}</p>
-                                    <p>{{ __('با حذف این بند مذاکره، تمام اقدام کنندگان تخصیص داده‌شده به آن نیز حذف خواهند شد.') }}</p>
-                                </div>
-                            </div>
-                            <!-- Select Task -->
-                            <div>
-                                <x-input-label :value="__('انتخاب بند مذاکره')" class="mb-2"/>
-                                <x-select-input wire:model.defer="task_id">
-                                    <option value="">{{ __('انتخاب کنید') }}</option>
-                                    @foreach($this->tasks as $task)
-                                        <option value="{{ $task->id }}">
-                                            {{$loop->index+1}} -{{ Str::words($task->body,10, '...') }}
-                                        </option>
-                                    @endforeach
-                                </x-select-input>
-                                <x-input-error :messages="$errors->get('task_id')" class="mt-2"/>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Footer -->
-                    <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
-                        <x-primary-button type="submit"
-                                          wire:target="submitParticipantForm"
-                                          wire:loading.attr="disabled"
-                                          wire:loading.class="opacity-50">
-                            <span wire:loading.remove wire:target="submitParticipantForm">{{ __('حذف') }}</span>
-                            <span wire:loading wire:target="submitParticipantForm">{{ __('در حال حذف...') }}</span>
-                        </x-primary-button>
-                        <x-cancel-button x-on:click="$dispatch('close')">
-                            {{ __('انصراف') }}
-                        </x-cancel-button>
-                    </div>
-                </form>
-            </x-modal>
         @endif
 
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" id="task-table">
             <x-table.table wire:poll.visible.60s>
                 <x-slot name="head">
                     <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                        @foreach (['#', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده','عملیات','ویرایش بند'] as $th)
-                            @php
-                                $isEditColumn = $loop->last;
-                            @endphp
-                            @if ($isEditColumn)
-                                @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium && auth()->user()->user_info->position === $this->meetings->position_organization)
-                                    <x-table.heading
-                                        class="px-6 py-3 border-r border-gray-200 dark:border-gray-700 no-print">
-                                        {{ __($th) }}
-                                    </x-table.heading>
-                                @endif
-                            @else
-                                <x-table.heading
-                                    class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}  {{ in_array($loop->index, [4, 7,8]) ? 'no-print' : '' }}">
-                                    {{ __($th) }}
-                                </x-table.heading>
-                            @endif
+                        @foreach (['#', 'خلاصه مذاکرات و تصمیمات اتخاذ شده', 'مهلت اقدام', 'اقدام کننده', 'شرح اقدام', 'تاریخ انجام اقدام','فایل های آپلود شده','عملیات'] as $th)
+                            <x-table.heading
+                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}  {{ in_array($loop->index, [4, 7,8]) ? 'no-print' : '' }}">
+                                {{ __($th) }}
+                            </x-table.heading>
                         @endforeach
                     </x-table.row>
                 </x-slot>
@@ -415,8 +461,16 @@
                                         {{ $loop->parent->iteration }}
                                     </td>
                                     {{-- Task Body --}}
-                                    <td class="px-4 py-2 border-r border-gray-300" rowspan="{{ $rowspan }}">
+                                    <td class="px-4 py-2 border-r border-gray-300 relative" rowspan="{{ $rowspan }}">
                                         <span class="block text-gray-700">{{ $task->body }}</span>
+                                        @if(auth()->user()->user_info->full_name === $task->meeting->scriptorium && auth()->user()->user_info->position === $task->meeting->scriptorium_position)
+                                            @if (!$this->allTasksLocked)
+                                                <x-secondary-button class="absolute bottom-2 left-2"
+                                                                    wire:click="openEditTaskModal({{ $task->id }})">
+                                                    {{ __('ویرایش') }}
+                                                </x-secondary-button>
+                                            @endif
+                                        @endif
                                     </td>
                                 @endif
 
@@ -483,73 +537,55 @@
                                 </td>
 
                                 {{-- عملیات --}}
-                                <td class="px-4 py-4 border-r border-gray-300 text-center screen-only no-print">
+                                <td class="px-4 py-4 border-r  border-gray-300 text-center screen-only no-print">
                                     @if($taskUser->task_status === TaskStatus::SENT_TO_SCRIPTORIUM)
                                         <span>
                                                 {{__('اقدام تکمیل شد')}}
                                         </span>
                                     @else
-                                        <x-dropdown>
-                                            <x-slot name="trigger">
-                                                <button class="hover:bg-gray-200 rounded-full p-1 transition">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                         class="w-5 h-5 text-gray-600">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                                                    </svg>
-                                                </button>
-                                            </x-slot>
-                                            <x-slot name="content">
-                                                @can('participantTask',$taskUser)
-                                                    @if($taskUser->task_status === TaskStatus::PENDING)
-                                                        <x-dropdown-link wire:click="acceptTask({{ $task->id }})">
-                                                            {{ __('تایید') }}
-                                                        </x-dropdown-link>
-                                                        <x-dropdown-link
-                                                            wire:click="openDenyModal({{ $taskUser->id }})">
-                                                            {{ __('رد') }}
-                                                        </x-dropdown-link>
-                                                    @elseif($taskUser->task_status === TaskStatus::ACCEPTED)
-                                                        <x-dropdown-link wire:click="showTaskForm({{ $taskUser->id }})">
-                                                            {{ __('انجام اقدام') }}
-                                                        </x-dropdown-link>
-                                                    @elseif($taskUser->task_status === TaskStatus::IS_COMPLETED)
-                                                        <x-dropdown-link
-                                                            wire:click="openUpdateModal({{$taskUser->id}})">
-                                                            {{ __('ویرایش') }}
-                                                        </x-dropdown-link>
-                                                        <x-dropdown-link wire:click="sendToScriptorium({{$task->id}})">
-                                                            {{ __('ارسال') }}
-                                                        </x-dropdown-link>
-                                                    @endif
-                                                @endcan
-                                                @can('scriptoriumTask',$taskUser)
-                                                        @if(!$isAfterTimeOut)
-                                                    <x-dropdown-link wire:click="opedEditModal({{ $taskUser->id }})">
+
+                                        @can('participantTask',$taskUser)
+                                            @if($taskUser->task_status === TaskStatus::PENDING)
+                                                <x-accept-button class="w-full mb-2"
+                                                                 wire:click="acceptTask({{ $taskUser->id }})">
+                                                    {{ __('تایید') }}
+                                                </x-accept-button>
+                                                <x-cancel-button class="w-full "
+                                                                 wire:click="openDenyModal({{ $taskUser->id }})">
+                                                    {{ __('رد') }}
+                                                </x-cancel-button>
+                                            @elseif($taskUser->task_status === TaskStatus::ACCEPTED)
+                                                <x-secondary-button wire:click="showTaskForm({{ $taskUser->id }})">
+                                                    {{ __('انجام اقدام') }}
+                                                </x-secondary-button>
+                                            @elseif($taskUser->task_status === TaskStatus::IS_COMPLETED)
+                                                <x-edit-button class="w-full mb-2"
+                                                               wire:click="openUpdateModal({{$taskUser->id}})">
+                                                    {{ __('ویرایش') }}
+                                                </x-edit-button>
+                                                <x-secondary-button class="w-full "
+                                                                    wire:click="sendToScriptorium({{$task->id}})">
+                                                    {{ __('ارسال') }}
+                                                </x-secondary-button>
+                                            @endif
+                                        @endcan
+                                        @if (!$this->allTasksLocked)
+                                            @can('scriptoriumTask',$taskUser)
+                                                @if(!$isAfterTimeOut)
+                                                    <x-edit-button class="w-full mb-2"
+                                                                   wire:click="opedEditModal({{ $taskUser->id }})">
                                                         {{ __('ویرایش') }}
-                                                    </x-dropdown-link>
-                                                    <x-dropdown-link wire:click="delete({{$taskUser->id}})"
+                                                    </x-edit-button>
+                                                    <x-cancel-button class="w-full "
+                                                                     wire:click="delete({{$taskUser->id}})"
                                                                      wire:confirm="آیا مطمئن هستید که این اقدام کننده پاک شود؟">
                                                         {{ __('حذف') }}
-                                                    </x-dropdown-link>
-                                                        @endif
-                                                @endcan
-                                            </x-slot>
-                                        </x-dropdown>
+                                                    </x-cancel-button>
+                                                @endif
+                                            @endcan
+                                        @endif
                                     @endif
                                 </td>
-
-                                @if(auth()->user()->user_info->full_name === $task->meeting->scriptorium && auth()->user()->user_info->position === $task->meeting->position_organization)
-                                    @if ($userIndex === 0)
-                                        <td class="px-4 py-4 border-r border-gray-300 text-center screen-only no-print"
-                                            rowspan="{{ $rowspan }}">
-                                            <x-edit-button wire:click="openEditTaskModal({{ $task->id }})">
-                                                {{ __('ویرایش') }}
-                                            </x-edit-button>
-                                        </td>
-                                    @endif
-                                @endif
 
                             </tr>
                         @endforeach
@@ -650,6 +686,7 @@
             </div>
         @endif
     </x-modal>
+
     {{--  Modal for participant to type their task--}}
     <x-modal name="view-task-details-modal" maxWidth="4xl" :closable="false">
         @if ($selectedTaskUser)
@@ -678,7 +715,8 @@
                         </div>
 
                         <div class="grid grid-cols-1 gap-4">
-                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTaskUser->task->body"/>
+                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}"
+                                            :value="$selectedTaskUser->task->body"/>
                         </div>
 
                         <div>
@@ -738,6 +776,7 @@
             @endcan
         @endif
     </x-modal>
+
     {{--  Modal for participant to update their task--}}
     <x-modal name="edit-task-details-modal" maxWidth="4xl" :closable="false">
         @if ($selectedTaskUser)
@@ -758,7 +797,8 @@
                     <!-- Body -->
                     <div class="px-6 py-4 space-y-6 text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
                         <div class="grid grid-cols-2 gap-4">
-                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTaskUser->task->body"/>
+                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}"
+                                            :value="$selectedTaskUser->task->body"/>
                             <x-meeting-info label="{{ __('اقدام کننده') }}"
                                             :value="$selectedTaskUser->user->user_info->full_name"/>
                         </div>
@@ -777,7 +817,8 @@
                              x-on:livewire-upload-error="progress = 0"
                              class="space-y-2">
 
-                            <x-input-label for="newFiles" :value="__('آپلود فایل جدید (در صورت نیاز)')" class="mb-2"/>
+                            <x-input-label for="newFiles" :value="__('آپلود فایل جدید (در صورت نیاز)')"
+                                           class="mb-2"/>
                             <input type="file" id="newFiles" wire:model="newFiles" multiple
                                    class="w-full text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none"/>
 
@@ -841,15 +882,52 @@
             @endcan
         @endif
     </x-modal>
-    {{--          Modal for scriptorium to finish the meeting --}}
-    @if($this->meetings->status === MeetingStatus::IS_IN_PROGRESS)
-        @if ($meeting)
-            {{--        @can('scriptoriumTask')--}}
-            <x-modal name="final-check" :closable="false">
-                <form wire:submit="finishMeeting" class="text-sm text-gray-800">
+
+
+    @if (!$this->allTasksLocked)
+        {{--          Modal for scriptorium to finish the meeting --}}
+        @if($this->meetings->status === MeetingStatus::IS_IN_PROGRESS)
+            @if ($meeting)
+                {{--        @can('scriptoriumTask')--}}
+                <x-modal name="final-check" :closable="false">
+                    <form wire:submit="finishMeeting" class="text-sm text-gray-800">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                            <h2 class="text-2xl font-bold text-gray-800">{{ __('آیا از خاتمه این جلسه مطمئن هستید؟') }}</h2>
+                            <button type="button" x-on:click="$dispatch('close')"
+                                    class="text-gray-400 hover:text-red-500 transition duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Body -->
+                        <div class="px-6 py-4 text-red-500 text-md">
+                            {{ __('این اقدام قابل بازگشت نیست!') }}
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                            <x-accept-button type="submit">
+                                {{ __('تایید') }}
+                            </x-accept-button>
+                            <x-cancel-button x-on:click="$dispatch('close')">
+                                {{ __('انصراف') }}
+                            </x-cancel-button>
+                        </div>
+                    </form>
+                </x-modal>
+                {{--        @endcan--}}
+            @endif
+        @endif
+        <x-modal name="edit-by-scriptorium" :closable="false">
+            @if ($selectedTaskUser)
+                {{--                @can('participantTask', $selectedTaskUser)--}}
+                <form wire:submit="editForm" class="text-sm text-gray-800">
                     <!-- Header -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
-                        <h2 class="text-2xl font-bold text-gray-800">{{ __('آیا از خاتمه این جلسه مطمئن هستید؟') }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش اقدام') }}</h2>
                         <button type="button" x-on:click="$dispatch('close')"
                                 class="text-gray-400 hover:text-red-500 transition duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -858,25 +936,127 @@
                             </svg>
                         </button>
                     </div>
+
                     <!-- Body -->
-                    <div class="px-6 py-4 text-red-500 text-md">
-                        {{ __('این اقدام قابل بازگشت نیست!') }}
+                    <div class="px-6 py-4 space-y-6 text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
+                        <div class="grid grid-cols-2 gap-4">
+                            <x-meeting-info label="{{ __('اقدام کننده') }}"
+                                            :value="$selectedTaskUser->user->user_info->full_name"/>
+                            <x-meeting-info label="{{ __('مهلت فعلی اقدام') }}" :value="$selectedTaskUser->time_out"/>
+                        </div>
+
+                        <div>
+                            <x-input-label for="time_out" :value="__('مهلت جدید اقدام')" class="mb-2"/>
+                            <div class="flex gap-2">
+                                <div class="w-full">
+                                    <x-select-input wire:model.defer="year">
+                                        <option value="">{{ __('سال') }}</option>
+                                        @for($i = 1404; $i <= 1430; $i++)
+                                            <option value="{{ $i }}">{{ $i }}</option>
+                                        @endfor
+                                    </x-select-input>
+                                    <x-input-error :messages="$errors->get('year')" class="mt-2"/>
+                                </div>
+                                <div class="w-full">
+                                    <x-select-input wire:model.defer="month">
+                                        <option value="">{{ __('ماه') }}</option>
+                                        @foreach(["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"] as $index => $monthName)
+                                            <option value="{{ $index + 1 }}">{{ $monthName }}</option>
+                                        @endforeach
+                                    </x-select-input>
+                                    <x-input-error :messages="$errors->get('month')" class="mt-2"/>
+                                </div>
+                                <div class="w-full">
+                                    <x-select-input wire:model.defer="day">
+                                        <option value="">{{ __('روز') }}</option>
+                                        @for($i = 1; $i <= 31; $i++)
+                                            <option value="{{ $i }}">{{ $i }}</option>
+                                        @endfor
+                                    </x-select-input>
+                                    <x-input-error :messages="$errors->get('day')" class="mt-2"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Editable Body -->
+                        <div>
+                            <x-input-label for="taskBody" :value="__('خلاصه مذاکره')" class="mb-2"/>
+                            <textarea id="taskBody" rows="4" wire:model.defer="taskBody"
+                                      class="w-full min-h-[100px] p-3 text-sm bg-white dark:bg-gray-800 border rounded-md border-gray-300 dark:border-gray-600 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500 focus:outline-none resize-none">
+                            {{$taskBody}}
+                        </textarea>
+                            <x-input-error :messages="$errors->get('taskBody')"/>
+                        </div>
                     </div>
 
                     <!-- Footer -->
                     <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
-                        <x-accept-button type="submit">
-                            {{ __('تایید') }}
-                        </x-accept-button>
+                        <x-primary-button type="submit"
+                                          wire:loading.attr="disabled"
+                                          wire:target="updateTaskForm"
+                                          wire:loading.class="opacity-50">
+                            <span wire:loading.remove wire:target="updateTaskForm">{{ __('به‌روزرسانی') }}</span>
+                            <span wire:loading wire:target="updateTaskForm"
+                                  class="ml-2">{{ __('در حال ثبت...') }}</span>
+                        </x-primary-button>
+
                         <x-cancel-button x-on:click="$dispatch('close')">
                             {{ __('انصراف') }}
                         </x-cancel-button>
                     </div>
                 </form>
-            </x-modal>
-            {{--        @endcan--}}
-        @endif
+                {{--                @endcan--}}
+            @endif
+        </x-modal>
+        <x-modal name="edit-task-body" maxWidth="4xl" :closable="false">
+            @if($task_id)
+                <form wire:submit.prevent="editTaskBody">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش بند مذاکره') }}</h2>
+                        <a href="{{route('view.task.page',$meeting)}}"
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="px-6 py-4 space-y-6 text-sm text-gray-800 max-h-[70vh] overflow-y-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Textarea -->
+                            <div class="col-span-2">
+                                <x-input-label :value="__('متن بند مذاکره')" class="mb-1"/>
+                                <textarea wire:model="task_body" rows="6"
+                                          class="w-full border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            {{$task_body}}
+                        </textarea>
+                                <x-input-error :messages="$errors->get('task_body')" class="mt-2"/>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                        <x-primary-button type="submit" wire:loading.attr="disabled" wire:loading.class="opacity-50">
+                            <span wire:loading.remove>{{ __('ذخیره تغییرات') }}</span>
+                            <span wire:loading>{{ __('در حال ذخیره...') }}</span>
+                        </x-primary-button>
+
+                        <a href="{{route('view.task.page',$meeting)}}">
+                            <x-cancel-button>
+                                {{ __('انصراف') }}
+                            </x-cancel-button>
+                        </a>
+                    </div>
+                </form>
+            @endif
+        </x-modal>
     @endif
+
     {{--          Modal for participants to type the task rejection --}}
     <x-modal name="deny-task" :closable="false">
         @if ($selectedTaskUser)
@@ -895,16 +1075,18 @@
                     </div>
 
                     <!-- Body -->
-                    <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
+                    <div
+                        class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-6">
                         <div class="grid grid-cols-1 gap-4">
                             <x-meeting-info label="{{ __('مهلت انجام') }}" :value="$selectedTaskUser->time_out"/>
                         </div>
                         <div class="grid grid-cols-1 gap-4">
-                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}" :value="$selectedTaskUser->task->body"/>
+                            <x-meeting-info label="{{ __('خلاصه مذاکره') }}"
+                                            :value="$selectedTaskUser->task->body"/>
                         </div>
                         <div>
                             <label for="request_task" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('دلیل رد خلاصه مذاکره') }}
+                                {{ __('دلیل رد بند خلاصه مصوب') }}
                             </label>
                             <textarea wire:model.defer="request_task" id="request_task" rows="4"
                                       class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
@@ -926,137 +1108,6 @@
             @endcan
         @endif
     </x-modal>
-    <x-modal name="edit-by-scriptorium" :closable="false">
-        @if ($selectedTaskUser)
-            {{--                @can('participantTask', $selectedTaskUser)--}}
-            <form wire:submit="editForm" class="text-sm text-gray-800">
-                <!-- Header -->
-                <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
-                    <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش اقدام') }}</h2>
-                    <button type="button" x-on:click="$dispatch('close')"
-                            class="text-gray-400 hover:text-red-500 transition duration-150">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
 
-                <!-- Body -->
-                <div class="px-6 py-4 space-y-6 text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
-                    <div class="grid grid-cols-2 gap-4">
-                        <x-meeting-info label="{{ __('اقدام کننده') }}"
-                                        :value="$selectedTaskUser->user->user_info->full_name"/>
-                        <x-meeting-info label="{{ __('مهلت فعلی اقدام') }}" :value="$selectedTaskUser->time_out"/>
-                    </div>
-
-                    <div>
-                        <x-input-label for="time_out" :value="__('مهلت جدید اقدام')" class="mb-2"/>
-                        <div class="flex gap-2">
-                            <div class="w-full">
-                                <x-select-input wire:model.defer="year">
-                                    <option value="">{{ __('سال') }}</option>
-                                    @for($i = 1404; $i <= 1430; $i++)
-                                        <option value="{{ $i }}">{{ $i }}</option>
-                                    @endfor
-                                </x-select-input>
-                                <x-input-error :messages="$errors->get('year')" class="mt-2"/>
-                            </div>
-                            <div class="w-full">
-                                <x-select-input wire:model.defer="month">
-                                    <option value="">{{ __('ماه') }}</option>
-                                    @foreach(["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"] as $index => $monthName)
-                                        <option value="{{ $index + 1 }}">{{ $monthName }}</option>
-                                    @endforeach
-                                </x-select-input>
-                                <x-input-error :messages="$errors->get('month')" class="mt-2"/>
-                            </div>
-                            <div class="w-full">
-                                <x-select-input wire:model.defer="day">
-                                    <option value="">{{ __('روز') }}</option>
-                                    @for($i = 1; $i <= 31; $i++)
-                                        <option value="{{ $i }}">{{ $i }}</option>
-                                    @endfor
-                                </x-select-input>
-                                <x-input-error :messages="$errors->get('day')" class="mt-2"/>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Editable Body -->
-                    <div>
-                        <x-input-label for="taskBody" :value="__('خلاصه مذاکره')" class="mb-2"/>
-                        <textarea id="taskBody" rows="4" wire:model.defer="taskBody"
-                                  class="w-full min-h-[100px] p-3 text-sm bg-white dark:bg-gray-800 border rounded-md border-gray-300 dark:border-gray-600 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500 focus:outline-none resize-none">
-                            {{$taskBody}}
-                        </textarea>
-                        <x-input-error :messages="$errors->get('taskBody')"/>
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
-                    <x-primary-button type="submit"
-                                      wire:loading.attr="disabled"
-                                      wire:target="updateTaskForm"
-                                      wire:loading.class="opacity-50">
-                        <span wire:loading.remove wire:target="updateTaskForm">{{ __('به‌روزرسانی') }}</span>
-                        <span wire:loading wire:target="updateTaskForm" class="ml-2">{{ __('در حال ثبت...') }}</span>
-                    </x-primary-button>
-
-                    <x-cancel-button x-on:click="$dispatch('close')">
-                        {{ __('انصراف') }}
-                    </x-cancel-button>
-                </div>
-            </form>
-            {{--                @endcan--}}
-        @endif
-    </x-modal>
-
-    <x-modal name="edit-task-body" maxWidth="4xl" :closable="false">
-        @if($task_id)
-            <form wire:submit.prevent="editTaskBody">
-                <!-- Header -->
-                <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
-                    <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش بند مذاکره') }}</h2>
-                    <button type="button" x-on:click="$dispatch('close')"
-                            class="text-gray-400 hover:text-red-500 transition duration-150">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Body -->
-                <div class="px-6 py-4 space-y-6 text-sm text-gray-800 max-h-[70vh] overflow-y-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Textarea -->
-                        <div class="col-span-2">
-                            <x-input-label :value="__('متن بند مذاکره')" class="mb-1"/>
-                            <textarea wire:model="task_body" rows="6"
-                                      class="w-full border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            {{$task_body}}
-                        </textarea>
-                            <x-input-error :messages="$errors->get('task_body')" class="mt-2"/>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
-                    <x-primary-button type="submit" wire:loading.attr="disabled" wire:loading.class="opacity-50">
-                        <span wire:loading.remove>{{ __('ذخیره تغییرات') }}</span>
-                        <span wire:loading>{{ __('در حال ذخیره...') }}</span>
-                    </x-primary-button>
-
-                    <x-cancel-button x-on:click="$dispatch('close')">
-                        {{ __('انصراف') }}
-                    </x-cancel-button>
-                </div>
-            </form>
-        @endif
-    </x-modal>
 
 </div>

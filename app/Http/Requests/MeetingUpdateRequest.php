@@ -25,10 +25,10 @@ class MeetingUpdateRequest extends FormRequest
     {
         return [
             'title' => ['required','string'],
-            'scriptorium' => ['required','string','max:255'],
-            'scriptorium_department' => ['required','string','min:5','max:255'],
-            'scriptorium_position' => ['required','string','max:255'],
-            'boss' => ['required'],
+            'scriptorium' => ['nullable','string','max:255'],
+            'scriptorium_department' => ['nullable','string','min:5','max:255'],
+            'scriptorium_position' => ['nullable','string','max:255'],
+            'boss' => ['nullable'],
             'location' => ['required','string','min:5','max:30'],
             'year' => ['required'],
             'month' => ['required'],

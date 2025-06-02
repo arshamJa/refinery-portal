@@ -73,10 +73,36 @@ class MeetingDashboardReport extends Component
     public function tasksOnTime()
     {
         return DB::table('task_users')
-            ->where('task_status', TaskStatus::IS_COMPLETED->value)
+            ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
             ->whereColumn('sent_date', '<=', 'time_out')
             ->count();
     }
+    #[Computed]
+    public function tasksDoneWithDelay()
+    {
+        return DB::table('task_users')
+            ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
+            ->whereColumn('sent_date', '>', 'time_out')
+            ->count();
+    }
+    #[Computed]
+    public function tasksNotDoneOnTime()
+    {
+        return DB::table('task_users')
+            ->where('task_status', TaskStatus::PENDING->value)
+            ->whereColumn('sent_date', '<=', 'time_out')
+            ->count();
+    }
+    #[Computed]
+    public function tasksNotDoneWithDelay()
+    {
+        return DB::table('task_users')
+            ->where('task_status', TaskStatus::PENDING->value)
+            ->whereColumn('sent_date', '>', 'time_out')
+            ->count();
+    }
+
+
 
     #[Computed]
     public function tasksOnTimePercentage()
@@ -85,13 +111,7 @@ class MeetingDashboardReport extends Component
         return $totalTasks ? (int)(($this->tasksOnTime() / $totalTasks) * 100) : 0;
     }
 
-    #[Computed]
-    public function tasksNotDone()
-    {
-        return DB::table('task_users')
-            ->where('task_status', TaskStatus::PENDING->value)
-            ->count();
-    }
+
 
     #[Computed]
     public function tasksNotDonePercentage()
@@ -100,14 +120,8 @@ class MeetingDashboardReport extends Component
         return $totalTasks ? (int)(($this->tasksNotDone() / $totalTasks) * 100) : 0;
     }
 
-    #[Computed]
-    public function tasksDoneWithDelay()
-    {
-        return DB::table('task_users')
-            ->where('task_status', TaskStatus::ACCEPTED->value)
-            ->whereColumn('sent_date', '>', 'time_out')
-            ->count();
-    }
+
+
 
     #[Computed]
     public function tasksDoneWithDelayPercentage()

@@ -33,7 +33,7 @@ class TasksReportController extends Controller
                 $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
             }
         ])
-            ->where('task_status', TaskStatus::IS_COMPLETED->value)
+            ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
             ->whereColumn('sent_date', '<=', 'time_out');
 
         // Get the start and end date inputs from the request.
@@ -92,7 +92,7 @@ class TasksReportController extends Controller
                 $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
             }
         ])
-            ->where('task_status', TaskStatus::IS_COMPLETED->value)
+            ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
             ->whereColumn('sent_date', '>', 'time_out');
 
         $startDate = trim($request->input('start_date'));
@@ -120,7 +120,7 @@ class TasksReportController extends Controller
             });
         }
         $tasks = $query->paginate(5);
-        return view('reports.report-delay-tasks', ['tasks' => $tasks]);
+        return view('reports.report-delay-tasks', ['taskUsers' => $tasks]);
     }
     public function downloadCompletedTasksWithDelayExcel(Request $request)
     {
@@ -132,6 +132,8 @@ class TasksReportController extends Controller
         // Trigger the export using the CompletedTasksWithDelayExport class with the filters
         return Excel::download(new CompletedTasksWithDelayExport($startDate, $endDate, $search), 'completed_tasks_with_delay.xlsx');
     }
+
+
 
     public function incompleteTasks(Request $request)
     {
@@ -152,7 +154,6 @@ class TasksReportController extends Controller
         ])
             ->where('task_status', TaskStatus::PENDING->value)
             ->where('sent_date', null);
-
 
         $startDate = trim($request->input('start_date'));
         $endDate = trim($request->input('end_date'));
@@ -176,14 +177,11 @@ class TasksReportController extends Controller
                     });
             });
         }
-
-
         $taskUsers = $query->paginate(5);
         // Calculate the difference for each task user
         foreach ($taskUsers as $taskUser) {
             $taskUser->formatted_diff = $this->calculateDateDifference($taskUser->time_out);
         }
-
         return view('reports.report-inComplete-tasks', ['taskUsers' => $taskUsers]);
     }
     public function downloadIncompleteTasksExcel(Request $request)
@@ -196,6 +194,18 @@ class TasksReportController extends Controller
         // Trigger the export using the IncompleteTasksExport class with the filters
         return Excel::download(new IncompleteTasksExport($startDate, $endDate, $search), 'incomplete_tasks.xlsx');
     }
+
+
+    public function incompleteTasksWithDelay(Request $request)
+    {
+
+    }
+
+
+
+
+
+
     private function calculateDateDifference($jalaliDate)
     {
         $dateParts = explode('/', $jalaliDate);

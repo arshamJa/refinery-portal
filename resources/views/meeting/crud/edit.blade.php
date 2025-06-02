@@ -172,7 +172,6 @@
                     </div>
                     <input type="hidden" name="boss" id="hidden-input" value="{{ old('boss', $meeting->boss) }}">
                     <div id="error-msg" class="mt-2 text-red-600 text-sm"></div>
-                    <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
                 </div>
 
 
@@ -205,7 +204,6 @@
                            value="{{ old('scriptorium', $meeting->scriptorium) }}">
                     <input type="hidden" name="scriptorium_department" id="scriptorium-hidden-department" value="">
                     <input type="hidden" name="scriptorium_position" id="scriptorium-hidden-position" value="">
-                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2"/>
                 </div>
 
 
@@ -224,19 +222,20 @@
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
-                <div class="col-span-4">
+                <div class="col-span-2">
                     <div class="mb-2">{{ __('اعضای جلسه فعلی') }}:</div>
                     <div class="flex flex-wrap gap-2">
                         @foreach($userIds as $meetingUser)
                             <div id="user-{{ $meetingUser->user_id }}"
-                                 class="flex items-center gap-4 p-2 bg-red-100 rounded-md">
+                                 class="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm">
                                 <span>{{ $meetingUser->user->user_info->full_name }}</span>
-                                <button
-                                    class="delete-user bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full"
-                                    onclick="deleteUser(event, {{ $meeting->id }}, {{ $meetingUser->user_id }})">
+                                <button type="button"
+                                        class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-300 rounded-full p-1.5"
+                                        onclick="deleteUser(event, {{ $meeting->id }}, {{ $meetingUser->user_id }})"
+                                        title="حذف">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                         stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
                                 </button>
                             </div>
@@ -272,7 +271,7 @@
                         </script>
                     </div>
                 </div>
-                <div id="participants_dropdown" data-users='@json($users)' class="relative w-full mb-4 col-span-3"
+                <div id="participants_dropdown" data-users='@json($users)' class="relative w-full mb-4 col-span-2"
                      style="direction: rtl;">
                     <x-input-label for="participants" class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
                     <button id="participants-dropdown-btn" type="button"
@@ -308,178 +307,169 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 mb-2 gap-4">
-                <div class="col-span-4 space-y-4">
-                    <div>
-                        <h2 class="text-lg font-semibold mb-2 text-gray-800">{{ __('لیست مهمان فعلی:') }}</h2>
-                    </div>
-                    <div>
-                        <div>
-                            <h3 class="text-md font-medium mb-2 text-gray-700">{{ __('لیست مهمان درون سازمانی:') }}</h3>
-                            <div class="flex flex-wrap gap-3">
-                                @foreach($innerGuests as $innerGuest)
-                                    <div id="guest-{{ $innerGuest->user_id }}"
-                                         class="flex items-center gap-3 p-3 bg-red-100 rounded-md">
-                                        <span class="text-sm font-medium text-gray-700">
-                                            {{ $innerGuest->user->user_info->full_name }} -
-                                            {{ $innerGuest->department_name }}
-                                        </span>
-                                        <button
-                                            class="delete-guest bg-red-500 text-white p-1 rounded-full focus:outline-none"
-                                            onclick="deleteGuest(event, {{ $meeting->id }}, {{ $innerGuest->user_id }})">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                 stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                @endforeach
-                                <script>
-                                    function deleteGuest(event, meetingId, guestId) {
-                                        event.preventDefault(); // Prevent any default behavior (like form submission)
 
-                                        // Confirmation message before deletion
-                                        if (!confirm("آیا مطمئن هستید که این مهمان را حذف می‌کنید؟")) {
-                                            return;
-                                        }
-
-                                        // Send a DELETE request to the backend
-                                        fetch(`/guests/${guestId}/delete`, {
-                                            method: 'DELETE',
-                                            headers: {
-                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',  // CSRF token for security
-                                                'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify({
-                                                meeting_id: meetingId,  // Pass the meeting ID
-                                                guest_id: guestId       // Pass the guest ID
-                                            })
-                                        })
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                if (data.status) {
-                                                    // If deletion is successful, remove the guest from the DOM
-                                                    document.getElementById(`guest-${guestId}`).remove();
-                                                    alert(data.status);
-                                                } else {
-                                                    alert(data.status);
-                                                }
-                                            })
-                                            .catch(error => {
-                                                console.error('Error:', error);
-                                                alert('مشکلی پیش آمده است.');
-                                            });
-                                    }
-                                </script>
-
+                <div class="col-span-2 space-y-4">
+                    <h3 class="text-md font-medium mb-2 text-gray-700">{{ __('لیست مهمان درون سازمانی فعلی:') }}</h3>
+                    <div class="flex flex-wrap gap-3">
+                        @foreach($innerGuests as $innerGuest)
+                            <div id="guest-{{ $innerGuest->user_id }}"
+                                 class="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm">
+                                <span class="truncate">
+                                    {{ $innerGuest->user->user_info->full_name }} - {{ $innerGuest->department_name }}
+                                </span>
+                                <button type="button"
+                                        class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-300 rounded-full p-1.5"
+                                        onclick="deleteGuest(event, {{ $meeting->id }}, {{ $innerGuest->user_id }})"
+                                        title="حذف مهمان">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
                             </div>
-                        </div>
-                    </div>
+                        @endforeach
+                        <script>
+                            function deleteGuest(event, meetingId, guestId) {
+                                event.preventDefault(); // Prevent any default behavior (like form submission)
 
-                    <div>
-                        <h3 class="text-md font-medium mb-2 text-gray-700">{{ __('لیست مهمان برون سازمانی:') }}</h3>
-                        <div class="flex flex-wrap gap-3">
-                            @foreach($meeting->guest ?? [] as $index => $guest)
-                                <div id="guest-{{ $index }}" class="flex items-center gap-3 p-3 bg-red-100 rounded-md">
-                                    <span class="text-sm font-medium text-gray-700">
-                                        {{ $guest['name'] ?? 'Unknown Guest' }} - {{ $guest['companyName'] ?? 'Unknown Company' }}
-                                    </span>
-                                    <button
-                                        class="delete-guest bg-red-500 text-white p-1 rounded-full focus:outline-none"
-                                        onclick="deleteOuterGuest(event, {{ $meeting->id }}, '{{ $index }}')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                             stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            @endforeach
-                            <script>
-                                function deleteOuterGuest(event, meetingId, guestIndex) {
-                                    event.preventDefault(); // Prevent any default behavior (like form submission)
+                                // Confirmation message before deletion
+                                if (!confirm("آیا مطمئن هستید که این مهمان را حذف می‌کنید؟")) {
+                                    return;
+                                }
 
-                                    // Confirmation message before deletion
-                                    if (!confirm("آیا مطمئن هستید که این مهمان را حذف می‌کنید؟")) {
-                                        return;
-                                    }
-
-                                    // Send a DELETE request to the backend
-                                    fetch(`/meetings/${meetingId}/guests/${guestIndex}/delete`, {
-                                        method: 'DELETE',
-                                        headers: {
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',  // CSRF token for security
+                                // Send a DELETE request to the backend
+                                fetch(`/guests/${guestId}/delete`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',  // CSRF token for security
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        meeting_id: meetingId,  // Pass the meeting ID
+                                        guest_id: guestId       // Pass the guest ID
+                                    })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.status) {
+                                            // If deletion is successful, remove the guest from the DOM
+                                            document.getElementById(`guest-${guestId}`).remove();
+                                            alert(data.status);
+                                        } else {
+                                            alert(data.status);
                                         }
                                     })
-                                        .then(response => {
-                                            if (!response.ok) {
-                                                throw new Error('Request failed');
-                                            }
-                                            return response.json();
-                                        })
-                                        .then(data => {
-                                            if (data.status) {
-                                                // If deletion is successful, remove the guest from the DOM
-                                                const guestElement = document.getElementById(`guest-${guestIndex}`);
-                                                if (guestElement) {
-                                                    guestElement.remove();
-                                                }
-                                                alert(data.status);
-                                            } else {
-                                                alert('حذف مهمان با مشکل مواجه شد.');
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error('Error:', error);
-                                            alert('مشکلی پیش آمده است.');
-                                        });
-                                }
-                            </script>
-
-                        </div>
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        alert('مشکلی پیش آمده است.');
+                                    });
+                            }
+                        </script>
                     </div>
                 </div>
 
-                <div class="col-span-2">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">{{__('لیست مهمانان جدید')}}</label>
-                        <div class="flex items-center space-x-4 mb-4">
-                            <input type="checkbox" id="outer-organization-checkbox" class="h-4 w-4 text-blue-600"/>
-                            <label for="outer-organization-checkbox"
-                                   class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
+                <div id="innerGuest_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
+                     style="direction: rtl;">
+                    <x-input-label for="innerGuest" class="mb-1.5" :value="__('مهمانان داخلی')"/>
+                    <button id="innerGuest-dropdown-btn" type="button"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
+                            aria-haspopup="listbox" aria-expanded="false">
+                        <span id="innerGuest-selected-text" class="truncate">انتخاب مهمانان داخلی</span>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="innerGuest-dropdown-menu"
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                        <div class="px-4 py-2">
+                            <input id="innerGuest-dropdown-search" type="text" placeholder="جست و جو"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
-                        <!-- Table for inner_organization (default table) -->
-                        <div id="inner-organization-table"
-                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
-                            <table id="guests-inner-table"
-                                   class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
-                                <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-right">#</th>
-                                    <th class="px-4 py-2 text-right">نام و نام خانوادگی</th>
-                                    <th class="px-4 py-2 text-right">واحد سازمانی</th>
-                                    <th class="px-4 py-2 text-center">عملیات</th>
-                                </tr>
-                                </thead>
-                                <tbody id="guests-inner-tbody" class="divide-y divide-gray-100">
-                                <!-- Dynamic rows for inner organization will be inserted here -->
-                                </tbody>
-                                <tfoot class="bg-gray-50">
-                                <tr>
-                                    <td colspan="5" class="px-4 py-3 text-left">
-                                        <button type="button" id="add-inner-guest-btn"
-                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
-                                            افزودن مهمان
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tfoot>
-                            </table>
+                        <ul id="innerGuest-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
+                            <!-- Options populated by JS -->
+                        </ul>
+                        <div id="innerGuest-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت
+                            نشد
                         </div>
+                    </div>
+                    <div id="innerGuest-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
+                    <input type="hidden" name="innerGuest" id="innerGuest-hidden-input"
+                           value="{{ old('innerGuest') ?? '' }}">
+                    <x-input-error :messages="$errors->get('innerGuest')" class="mt-2"/>
+                </div>
+                <div class="col-span-2 mt-2">
+                    <h3 class="text-md font-medium mb-2 text-gray-700">{{ __('لیست مهمان برون سازمانی فعلی:') }}</h3>
+                    <div class="flex flex-wrap gap-3">
+                        @foreach($meeting->guest ?? [] as $index => $guest)
+                            <div id="guest-{{ $index }}"
+                                 class="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm">
+                                    <span class="truncate">
+                                        {{ $guest['name'] ?? 'مهمان ناشناس' }} - {{ $guest['companyName'] ?? 'شرکت نامشخص' }}
+                                    </span>
+                                <button type="button"
+                                        class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-300 rounded-full p-1.5"
+                                        onclick="deleteOuterGuest(event, {{ $meeting->id }}, '{{ $index }}')"
+                                        title="حذف مهمان">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        @endforeach
+                        <script>
+                            function deleteOuterGuest(event, meetingId, guestIndex) {
+                                event.preventDefault(); // Prevent any default behavior (like form submission)
 
-                        <!-- Table for outer_organization (will appear when checkbox is checked) -->
+                                // Confirmation message before deletion
+                                if (!confirm("آیا مطمئن هستید که این مهمان را حذف می‌کنید؟")) {
+                                    return;
+                                }
+
+                                // Send a DELETE request to the backend
+                                fetch(`/meetings/${meetingId}/guests/${guestIndex}/delete`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',  // CSRF token for security
+                                    }
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Request failed');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        if (data.status) {
+                                            // If deletion is successful, remove the guest from the DOM
+                                            const guestElement = document.getElementById(`guest-${guestIndex}`);
+                                            if (guestElement) {
+                                                guestElement.remove();
+                                            }
+                                            alert(data.status);
+                                        } else {
+                                            alert('حذف مهمان با مشکل مواجه شد.');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        alert('مشکلی پیش آمده است.');
+                                    });
+                            }
+                        </script>
+
+                    </div>
+                </div>
+
+
+                <div class="col-span-2 mt-2">
+                    {{--  Guests --}}
+                    <div class="col-span-2">
+                        {{-- Hidden data element for JS --}}
+                        <div id="guests-data" data-outer-guests="{{ json_encode(old('guests.outer', [])) }}"></div>
                         <div id="outer-organization-table"
-                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
+                             class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
                             <table id="guests-outer-table"
                                    class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                                 <thead class="bg-gray-50">
@@ -505,11 +495,6 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <x-input-error :messages="$errors->get('guest')" class="mt-2"/>
-                        <div id="guests-data"
-                             data-inner-guests="{{ json_encode(old('guests.inner', $item->guests['inner'] ?? [])) }}"
-                             data-outer-guests="{{ json_encode(old('guests.outer', $item->guests['outer'] ?? [])) }}">
-                        </div>
                     </div>
                 </div>
             </div>
@@ -527,6 +512,6 @@
             </div>
         </div>
     </form>
-    <script src="{{ asset('js/createGuest.js') }}"></script>
+    <script src="{{ asset('js/outerGuest.js') }}"></script>
 </x-app-layout>
 

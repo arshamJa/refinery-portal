@@ -15,6 +15,16 @@
              stroke="currentColor" class="w-3 h-3 text-gray-400">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
         </svg>
+        <li class="flex items-center h-full">
+            <a href="{{route('dashboard.meeting')}}"
+               class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
+                <span>{{__('جلسات')}}</span>
+            </a>
+        </li>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+             stroke="currentColor" class="w-3 h-3 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+        </svg>
         <li>
         <span
             class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
@@ -154,7 +164,7 @@
                                        )
                                     <div class="flex gap-2 items-center justify-center mt-4 md:mt-0">
                                         <x-accept-button
-                                            wire:click="openModalAccept({{ $meeting->id }}, '{{ $notification->id }}')">
+                                            wire:click="acceptMeeting({{ $meeting->id }})">
                                             {{ __('تایید') }}
                                         </x-accept-button>
                                         <x-cancel-button
@@ -186,13 +196,13 @@
                                     {{ __('لغو جلسه توسط دبیر') }}
                                 </span>
                             @elseif ($notification->type === 'AssignedNewTask' || $notification->type === 'DeniedTaskNotification' || $notification->type === 'UpdatedTaskBody' || $notification->type === 'UpdatedTaskTimeOut')
-{{--                                @php--}}
-{{--                                $task = \App\Models\Task::where('meeting_id', $notification->notifiable_id)--}}
-{{--                                    ->whereHas('taskUsers', function ($query) {--}}
-{{--                                        $query->where('user_id', auth()->id());--}}
-{{--                                    })--}}
-{{--                                    ->first();--}}
-{{--                                @endphp--}}
+                                {{--                                @php--}}
+                                {{--                                $task = \App\Models\Task::where('meeting_id', $notification->notifiable_id)--}}
+                                {{--                                    ->whereHas('taskUsers', function ($query) {--}}
+                                {{--                                        $query->where('user_id', auth()->id());--}}
+                                {{--                                    })--}}
+                                {{--                                    ->first();--}}
+                                {{--                                @endphp--}}
                                 <a href="{{ route('view.task.page', ['meeting' => $notification->notifiable_id]) }}">
                                     <x-secondary-button>{{ __('نمایش صورتجلسه') }}</x-secondary-button>
                                 </a>
@@ -276,51 +286,27 @@
                     </div>
                 </div>
 
-                {{--                 Denial Reason--}}
-                <div>
-                    <x-input-label for="body" :value="__('دلیل رد درخواست')" class="mb-2"/>
-                    <textarea wire:model="body"
-                              class="w-full min-h-[80px] px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
-                              placeholder="{{ __('دلیل خود را وارد کنید...') }}"></textarea>
-                    <x-input-error :messages="$errors->get('body')" class="mt-2"/>
+                {{-- Denial Reason--}}
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" wire:model="reason" value="دلیل اول" name="reason" class="text-blue-600">
+                        <span>دلیل اول</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" wire:model="reason" value="دلیل دوم" name="reason" class="text-blue-600">
+                        <span>دلیل دوم</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" wire:model="reason" value="دلیل سوم" name="reason" class="text-blue-600">
+                        <span>دلیل سوم</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" wire:model="reason" value="دلیل چهارم" name="reason" class="text-blue-600">
+                        <span>دلیل چهارم</span>
+                    </label>
                 </div>
             </div>
-            {{--             Footer Buttons--}}
-            <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
-                <x-accept-button wire:click="deny({{ $meetingId }})">
-                    {{ __('تایید') }}
-                </x-accept-button>
-                <x-cancel-button wire:click="close">
-                    {{ __('لغو') }}
-                </x-cancel-button>
-            </div>
-        @endif
-    </x-modal>
 
-
-    <x-modal name="accept-invitation" maxWidth="4xl" :closable="false">
-        @if($meetingId)
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
-                {{--                 Header--}}
-                <div class="sm:flex sm:items-center mb-4 border-b pb-3">
-                    <div
-                        class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                        <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                        </svg>
-                    </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
-                        <h3 class="text-sm text-gray-900 dark:text-gray-100">
-                            {{ __('آیا مطمئن هستید که می‌خواهید در جلسه') }}
-                            <span class="font-medium">{{ $meeting->title }}</span>
-                            {{ __('شرکت کنید؟') }}
-                        </h3>
-                    </div>
-                </div>
-
-            </div>
             @if (!$this->isAlreadyRepresentative)
                 {{--  Replacement Section--}}
                 <div class="p-4 space-y-3">
@@ -345,16 +331,76 @@
                     </div>
                 </div>
             @endif
-            {{--  Footer Buttons--}}
+            {{--             Footer Buttons--}}
             <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
-                <x-accept-button wire:click="accept({{ $meetingId }})">
-                    {{ __('تایید') }}
+                <x-accept-button wire:click="deny({{ $meetingId }})">
+                    {{ __('ارسال') }}
                 </x-accept-button>
                 <x-cancel-button wire:click="close">
                     {{ __('لغو') }}
                 </x-cancel-button>
             </div>
-
         @endif
     </x-modal>
+
+
+    {{--    <x-modal name="accept-invitation" maxWidth="4xl" :closable="false">--}}
+    {{--        @if($meetingId)--}}
+    {{--            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">--}}
+    {{--                --}}{{--                 Header--}}
+    {{--                <div class="sm:flex sm:items-center mb-4 border-b pb-3">--}}
+    {{--                    <div--}}
+    {{--                        class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">--}}
+    {{--                        <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"--}}
+    {{--                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">--}}
+    {{--                            <path stroke-linecap="round" stroke-linejoin="round"--}}
+    {{--                                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>--}}
+    {{--                        </svg>--}}
+    {{--                    </div>--}}
+    {{--                    <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">--}}
+    {{--                        <h3 class="text-sm text-gray-900 dark:text-gray-100">--}}
+    {{--                            {{ __('آیا مطمئن هستید که می‌خواهید در جلسه') }}--}}
+    {{--                            <span class="font-medium">{{ $meeting->title }}</span>--}}
+    {{--                            {{ __('شرکت کنید؟') }}--}}
+    {{--                        </h3>--}}
+    {{--                    </div>--}}
+    {{--                </div>--}}
+
+    {{--            </div>--}}
+    {{--            @if (!$this->isAlreadyRepresentative)--}}
+    {{--                --}}{{--  Replacement Section--}}
+    {{--                <div class="p-4 space-y-3">--}}
+    {{--                    <input type="checkbox" wire:model="checkBox" class="mr-2">--}}
+    {{--                    <span>در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:</span>--}}
+    {{--                    <div class="space-y-3" x-show="$wire.checkBox">--}}
+    {{--                        <div class="flex items-center gap-2">--}}
+    {{--                            <label class="text-sm">--}}
+    {{--                                {{ __('در جلسه نمی‌توانم شرکت کنم ولی جانشین این جانب، آقا/خانم') }}--}}
+    {{--                            </label>--}}
+    {{--                            <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"--}}
+    {{--                                   class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">--}}
+    {{--                        </div>--}}
+    {{--                        <div class="flex items-center gap-2">--}}
+    {{--                            <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>--}}
+    {{--                            <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"--}}
+    {{--                                   class="w-40 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">--}}
+    {{--                            <span>{{ __('در جلسه مذکور شرکت می‌نماید.') }}</span>--}}
+    {{--                        </div>--}}
+    {{--                        <x-input-error :messages="$errors->get('full_name')" class="mt-2"/>--}}
+    {{--                        <x-input-error :messages="$errors->get('p_code')" class="mt-2"/>--}}
+    {{--                    </div>--}}
+    {{--                </div>--}}
+    {{--            @endif--}}
+    {{--            --}}{{--  Footer Buttons--}}
+    {{--            <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">--}}
+    {{--                <x-accept-button wire:click="accept({{ $meetingId }})">--}}
+    {{--                    {{ __('تایید') }}--}}
+    {{--                </x-accept-button>--}}
+    {{--                <x-cancel-button wire:click="close">--}}
+    {{--                    {{ __('لغو') }}--}}
+    {{--                </x-cancel-button>--}}
+    {{--            </div>--}}
+
+    {{--        @endif--}}
+    {{--    </x-modal>--}}
 </div>

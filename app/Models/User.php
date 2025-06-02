@@ -147,11 +147,11 @@ class User extends Authenticatable
         }
         return false;
     }
+
     // use this for checking which user has a specific permission
     function userHasPermission($permission): bool
     {
         $user = Auth::user()->load('permissions');
-
         // Check if the authenticated user has the specified permission
         return $user->permissions->contains('name', $permission);
     }

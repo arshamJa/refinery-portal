@@ -62,6 +62,11 @@ class AppServiceProvider extends ServiceProvider
 //            return $user->hasAnyRoles([UserRole::SCRIPTORIUM->value, UserRole::BOSS->value]);
 //        });
 
+        Gate::define('lock-task', function (User $user) {
+            return $user->permissions->contains('name', UserPermission::SCRIPTORIUM_PERMISSIONS);
+        });
+
+
         Gate::define('has-permission', function ($user, UserPermission|string $permission) {
             $permissionName = $permission instanceof UserPermission ? $permission->value : $permission;
             return $user->permissions->contains('name', $permissionName);

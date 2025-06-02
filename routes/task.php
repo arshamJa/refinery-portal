@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::post('/meeting/{meeting}/lock-tasks', [TaskManagementController::class, 'lockTasks'])
+        ->name('meeting.lockTasks');
+
+
     Route::get('/view/tasks/{meeting}', \App\Livewire\ViewTaskPage::class)
         ->name('view.task.page');
 
@@ -53,17 +57,22 @@ Route::middleware(['auth'])->group(function () {
 
     // tasks report on time
 //    Route::get('/tasks/onTime', \App\Livewire\Reports\ReportTasksDone::class)->name('tasksFinishedOnTime');
-    Route::get('completedTasks', [TasksReportController::class, 'completedTasks'])
+    Route::get('completedTasksOnTime', [TasksReportController::class, 'completedTasks'])
         ->name('completedTasks');
 
-    // tasks report not done on time
-    Route::get('incompleteTasks', [TasksReportController::class, 'incompleteTasks'])
-        ->name('incompleteTasks');
-
     // tasks report done with delay
-    Route::get('tasksWithDelay',
+    Route::get('completedTasksWithDelay',
         [TasksReportController::class, 'completedTasksWithDelay'])
         ->name('tasksWithDelay');
+
+    // tasks report not done on time
+    Route::get('incompleteTasksOnTime', [TasksReportController::class, 'incompleteTasks'])
+        ->name('incompleteTasksOnTime');
+
+    Route::get('incompleteTasksWithDelay',[TasksReportController::class,'incompleteTasksWithDelay'])
+        ->name('incompleteTasksWithDelay');
+
+
 
 
     // tasks report not done on time

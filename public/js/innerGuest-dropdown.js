@@ -1,24 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById('participants_dropdown');
-    if (!container) return; // safety check
+    const container = document.getElementById('innerGuest_dropdown');
+    if (!container) return;
 
     const users = JSON.parse(container.getAttribute('data-users'));
 
-    const dropdownBtn = document.getElementById("participants-dropdown-btn");
-    const dropdownMenu = document.getElementById("participants-dropdown-menu");
-    const dropdownSearch = document.getElementById("participants-dropdown-search");
-    const dropdownList = document.getElementById("participants-dropdown-list");
-    const noResult = document.getElementById("participants-no-result");
-    const selectedText = document.getElementById("participants-selected-text");
-    const selectedContainer = document.getElementById("participants-selected-container");
-    const hiddenInput = document.getElementById("participants-hidden-input");
+    const dropdownBtn = document.getElementById("innerGuest-dropdown-btn");
+    const dropdownMenu = document.getElementById("innerGuest-dropdown-menu");
+    const dropdownSearch = document.getElementById("innerGuest-dropdown-search");
+    const dropdownList = document.getElementById("innerGuest-dropdown-list");
+    const noResult = document.getElementById("innerGuest-no-result");
+    const selectedText = document.getElementById("innerGuest-selected-text");
+    const selectedContainer = document.getElementById("innerGuest-selected-container");
+    const hiddenInput = document.getElementById("innerGuest-hidden-input");
 
     let selectedUsers = [];
 
     function renderOptions(filter = "") {
         dropdownList.innerHTML = "";
-
-        // Filter users by search and exclude already selected ones
         const filteredUsers = users.filter(user => {
             const text = `${user.full_name} - ${user.department?.department_name ?? "بدون بخش"} - ${user.position ?? ""}`;
             const matchesFilter = text.toLowerCase().includes(filter.toLowerCase());
@@ -26,11 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return matchesFilter && notSelected;
         });
 
-        if (filteredUsers.length === 0) {
-            noResult.style.display = "block";
-        } else {
-            noResult.style.display = "none";
-        }
+        noResult.style.display = filteredUsers.length === 0 ? "block" : "none";
 
         filteredUsers.forEach(user => {
             const li = document.createElement("li");
@@ -58,13 +52,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateSelectedDisplay() {
         selectedContainer.innerHTML = "";
-
         if (selectedUsers.length === 0) {
-            selectedText.textContent = "انتخاب شرکت‌کنندگان";
+            selectedText.textContent = "انتخاب مهمانان داخلی";
             return;
         }
 
-        selectedText.textContent = `${selectedUsers.length} شرکت‌کننده انتخاب شده`;
+        selectedText.textContent = `${selectedUsers.length} مهمان انتخاب شده`;
 
         selectedUsers.forEach(user => {
             const badge = document.createElement("div");
@@ -109,11 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleDropdown() {
         const isHidden = dropdownMenu.classList.contains("hidden");
-        if (isHidden) {
-            openDropdown();
-        } else {
-            closeDropdown();
-        }
+        isHidden ? openDropdown() : closeDropdown();
     }
 
     function openDropdown() {
@@ -131,10 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     dropdownBtn.addEventListener("click", toggleDropdown);
-
-    dropdownSearch.addEventListener("input", (e) => {
-        renderOptions(e.target.value);
-    });
+    dropdownSearch.addEventListener("input", (e) => renderOptions(e.target.value));
 
     document.addEventListener("click", (e) => {
         if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
@@ -162,4 +148,3 @@ document.addEventListener("DOMContentLoaded", () => {
     initSelected();
     renderOptions();
 });
-

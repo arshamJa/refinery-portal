@@ -102,18 +102,18 @@
                 </x-table.row>
             </x-slot>
             <x-slot name="body">
-                @forelse($tasks as $task)
-                    <x-table.row wire:key="{{$task->id}}" class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                        <x-table.cell class="border-r-0">{{ ($tasks->currentPage() - 1) * $tasks->perPage() + $loop->iteration }}</x-table.cell>
-                        <x-table.cell>{{$task->meeting->title}}</x-table.cell>
-                        <x-table.cell>{{$task->meeting->scriptorium}}</x-table.cell>
-                        <x-table.cell>{{$task->full_name()}}</x-table.cell>
-                        <x-table.cell>{{$task->sent_date}}</x-table.cell>
-                        <x-table.cell>{{$task->time_out}}</x-table.cell>
+                @forelse($taskUsers as $taskUser)
+                    <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                        <x-table.cell class="border-r-0">{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
+                        <x-table.cell>{{$taskUser->task->meeting->title}}</x-table.cell>
+                        <x-table.cell>{{$taskUser->task->meeting->scriptorium}}</x-table.cell>
+                        <x-table.cell>{{$taskUser->full_name()}}</x-table.cell>
+                        <x-table.cell>{{$taskUser->sent_date}}</x-table.cell>
+                        <x-table.cell>{{$taskUser->time_out}}</x-table.cell>
                         <x-table.cell>
                             @php
-                                $date1 = Carbon::parse($task->sent_date);
-                                $date2 = Carbon::parse($task->time_out);
+                                $date1 = Carbon::parse($taskUser->sent_date);
+                                $date2 = Carbon::parse($taskUser->time_out);
                                 $diff = $date1->diff($date2);
                                 $formattedDiff = '';
                                 if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
@@ -141,7 +141,7 @@
 
     </div>
     <div class="mt-2">
-            {{ $tasks->withQueryString()->links(data:['scrollTo'=>false]) }}
+            {{ $taskUsers->withQueryString()->links(data:['scrollTo'=>false]) }}
         </div>
 
 </x-app-layout>

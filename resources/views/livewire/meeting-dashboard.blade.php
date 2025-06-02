@@ -1,4 +1,4 @@
-@php use App\Enums\MeetingStatus;use App\Enums\UserPermission;use App\Enums\UserRole; @endphp
+@php use App\Enums\MeetingStatus;use App\Enums\MeetingUserStatus;use App\Enums\UserPermission;use App\Enums\UserRole; @endphp
 <div>
     <x-breadcrumb>
         <li class="flex items-center h-full">
@@ -55,14 +55,11 @@
             </svg>
             <h3 class="text-sm font-semibold">  {{__('پیام های دریافتی')}}</h3>
             @if($this->unreadReceivedCount() > 0)
-                <span wire:poll.visible.60s
-                      class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                <span class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                 {{ $this->unreadReceivedCount() > 10 ? '+10' : $this->unreadReceivedCount() }}
             </span>
             @endif
         </a>
-
-
         <a href="{{route('sent.message')}}"
            class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -72,12 +69,6 @@
                       d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
             </svg>
             <h3 class="text-sm font-semibold">  {{__('پیام های ارسالی')}}</h3>
-            @if($this->unreadSentCount() > 0)
-                <span wire:poll.visible.60s
-                      class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                {{ $this->unreadSentCount() > 10 ? '+10' : $this->unreadSentCount() }}
-        </span>
-            @endif
         </a>
 
     </div>
@@ -200,20 +191,21 @@
                         </x-table.cell>
                         <x-table.cell>{{$meeting->scriptorium_department}}</x-table.cell>
                         <x-table.cell>{{$meeting->date}}</x-table.cell>
-                        <x-table.cell class="whitespace-nowrap">{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
-{{--                        @if( auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)--}}
-{{--                            <x-table.cell>--}}
-{{--                                <a href="{{route('presentUsers',$meeting->id)}}">--}}
-{{--                                    <x-secondary-button>--}}
-{{--                                        {{__('نمایش')}}--}}
-{{--                                    </x-secondary-button>--}}
-{{--                                </a>--}}
-{{--                            </x-table.cell>--}}
-{{--                        @else--}}
-{{--                            <x-table.cell>--}}
-{{--                                {{__('---')}}--}}
-{{--                            </x-table.cell>--}}
-{{--                        @endif--}}
+                        <x-table.cell
+                            class="whitespace-nowrap">{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
+                        {{--                        @if( auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)--}}
+                        {{--                            <x-table.cell>--}}
+                        {{--                                <a href="{{route('presentUsers',$meeting->id)}}">--}}
+                        {{--                                    <x-secondary-button>--}}
+                        {{--                                        {{__('نمایش')}}--}}
+                        {{--                                    </x-secondary-button>--}}
+                        {{--                                </a>--}}
+                        {{--                            </x-table.cell>--}}
+                        {{--                        @else--}}
+                        {{--                            <x-table.cell>--}}
+                        {{--                                {{__('---')}}--}}
+                        {{--                            </x-table.cell>--}}
+                        {{--                        @endif--}}
                         <x-table.cell class="whitespace-nowrap">
                             @switch($meeting->status)
                                 @case(App\Enums\MeetingStatus::PENDING)
@@ -307,62 +299,116 @@
     </div>
 
 
-    <x-modal name="view-meeting-modal" maxWidth="4xl">
+    <x-modal name="view-meeting-modal" maxWidth="4xl" :closable="false">
         @if ($selectedMeeting)
             @php
                 $guests = is_string($selectedMeeting->guest)
                     ? json_decode($selectedMeeting->guest, true)
                     : (is_array($selectedMeeting->guest) ? $selectedMeeting->guest : []);
+
                 $innerGuests = $selectedMeeting->meetingUsers->where('is_guest', true);
                 $participants = $selectedMeeting->meetingUsers->where('is_guest', false);
             @endphp
 
-            <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-8">
+            <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-10">
+
                 {{-- Meeting Title --}}
                 <div class="flex items-center justify-between border-b pb-4">
                     <div>
                         <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $selectedMeeting->title }}</h2>
-                        <p class="text-sm text-gray-500 mt-2">{{ __('جزئیات جلسه') }}</p>
                     </div>
-                    <!-- Close Button with X Icon -->
-                    <button
-                        class="text-gray-500 hover:text-gray-900 dark:hover:text-white focus:outline-none"
-                        x-on:click="$dispatch('close')"
-                        aria-label="Close modal">
+                    <a href="{{route('dashboard.meeting')}}"
+                       class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor"
-                             viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                             viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
-                    </button>
-
+                    </a>
                 </div>
-
                 {{-- Meeting Info --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[15px]">
-                    <x-meeting-info label="{{ __('رئیس جلسه') }}" :value="$selectedMeeting->boss"/>
-                    <x-meeting-info label="{{ __('دبیرجلسه') }}" :value="$selectedMeeting->scriptorium"/>
-                    <x-meeting-info label="{{ __('واحد سازمانی') }}" :value="$selectedMeeting->scriptorium_department"/>
-                    <x-meeting-info label="{{ __('سمت دبیرجلسه') }}" :value="$selectedMeeting->scriptorium_position"/>
-                    <x-meeting-info label="{{ __('مکان') }}" :value="$selectedMeeting->location"/>
-                    <x-meeting-info label="{{ __('تاریخ') }}" :value="$selectedMeeting->date"/>
-                    <x-meeting-info label="{{ __('زمان') }}" :value="$selectedMeeting->time"/>
-                    <x-meeting-info label="{{ __('کمیته یا واحد برگزار کننده') }}" :value="$selectedMeeting->unit_held"/>
-                    <x-meeting-info label="{{ __('پذیرایی') }}" :value="$selectedMeeting->treat ? 'دارد' : 'ندارد'"/>
+                    <div
+                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div><strong>{{ __('رئیس جلسه:') }}</strong>{{ $selectedMeeting->boss }}</div>
+                        <div><strong>{{ __('واحد رئیس:') }}</strong>{{ $bossInfo->department->department_name ?? '---' }}</div>
+                        <div><strong>{{ __('سمت رئیس:') }}</strong>{{ $bossInfo->position ?? '---' }}</div>
+                    </div>
+                    <div
+                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div><strong>{{ __('دبیر جلسه:') }}</strong>{{ $selectedMeeting->scriptorium }}</div>
+                        <div><strong>{{ __('واحد دبیر:') }}</strong>{{$selectedMeeting->scriptorium_department}}</div>
+                        <div><strong>{{ __('سمت دبیر:') }}</strong>{{$selectedMeeting->scriptorium_position}}</div>
+                    </div>
+                    <div
+                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div><strong>{{ __('مکان:') }}</strong> {{ $selectedMeeting->location }}</div>
+                        <div><strong>{{ __('زمان:') }}</strong> {{ $selectedMeeting->time }}</div>
+                        <div><strong>{{ __('تاریخ:') }}</strong>{{ $selectedMeeting->date}}</div>
+                    </div>
+                    <div
+                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div><strong>{{ __('کمیته یا واحد برگزار کننده:') }}</strong> {{ $selectedMeeting->unit_held}}
+                        </div>
+                        <div><strong>{{ __('پذیرایی:') }}</strong> {{ $selectedMeeting->treat ? 'دارد' : 'ندارد' }}
+                        </div>
+                    </div>
                 </div>
-
                 {{-- Participants --}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('اعضای جلسه') }}</h3>
                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach($participants as $user)
+                            @php
+                                $status = $user->is_present;
+                                $statusClass  = match($status) {
+                                    MeetingUserStatus::IS_PRESENT->value => 'bg-green-400',
+                                    MeetingUserStatus::IS_NOT_PRESENT->value => 'bg-[#E96742]',
+                                    MeetingUserStatus::PENDING->value => 'bg-gray-100 border-gray-200',
+                                };
+                                $replacement = ($user->is_present == -1 && $user->replacementName()) ? $user->replacementName() : null;
+                                $reason = $status == -1 ? $user->reason_for_absent : null;
+                            @endphp
                             <x-meeting-card
                                 :name="$user->user->user_info->full_name ?? 'N/A'"
                                 :unit="$user->user->user_info->department->department_name ?? 'N/A'"
-                                :position="$user->user->user_info->position ?? 'N/A'"/>
+                                :position="$user->user->user_info->position ?? 'N/A'"
+                                :statusClass="$statusClass"
+                                :replacement="$replacement"
+                                :reason="$reason"
+                            />
                         @endforeach
                     </div>
                 </div>
-
+                {{-- Inner Guests --}}
+                <div>
+                    <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('مهمانان درون سازمانی') }}</h3>
+                    @if ($innerGuests->isNotEmpty())
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            @foreach($innerGuests as $user)
+                                @php
+                                    $status = $user->is_present;
+                                    $statusClass = match($status) {
+                                        MeetingUserStatus::IS_PRESENT->value => 'bg-green-400',
+                                        MeetingUserStatus::IS_NOT_PRESENT->value => 'bg-[#E96742]',
+                                        MeetingUserStatus::PENDING->value => 'bg-gray-100 border-gray-200',
+                                    };
+                                    $replacement = ($status == -1 && $user->replacementName()) ? $user->replacementName() : null;
+                                    $reason = $status == -1 ? $user->reason_for_absent : null;
+                                @endphp
+                                <x-meeting-card
+                                    :name="$user->user->user_info->full_name ?? 'N/A'"
+                                    :unit="$user->user->user_info->department->department_name ?? 'N/A'"
+                                    :position="$user->user->user_info->position ?? 'N/A'"
+                                    :statusClass="$statusClass"
+                                    :replacement="$replacement"
+                                    :reason="$reason"
+                                />
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-gray-500">{{ __('مهمان درون سازمانی وجود ندارد') }}</p>
+                    @endif
+                </div>
                 {{-- Outer Guests --}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('مهمانان برون سازمانی') }}</h3>
@@ -383,29 +429,23 @@
                         <p class="text-gray-500">{{ __('مهمان برون سازمانی وجود ندارد') }}</p>
                     @endif
                 </div>
-
-                {{-- Inner Guests --}}
-                <div>
-                    <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('مهمانان درون سازمانی') }}</h3>
-                    @if ($innerGuests->isNotEmpty())
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            @foreach($innerGuests as $user)
-                                <x-meeting-card
-                                    :name="$user->user->user_info->full_name ?? 'N/A'"
-                                    :unit="$user->user->user_info->department->department_name ?? 'N/A'"
-                                    :position="$user->user->user_info->position ?? 'N/A'"/>
-                            @endforeach
-                        </div>
-                    @else
-                        <p class="text-gray-500">{{ __('مهمان درون سازمانی وجود ندارد') }}</p>
-                    @endif
-                </div>
+                {{-- Buttons --}}
+                @if($selectedMeeting->status === MeetingStatus::PENDING)
+                    <div class="flex justify-end gap-4 pt-6">
+                        <x-primary-button wire:click="acceptMeeting({{$selectedMeeting->id}})">
+                            {{ __('تایید جلسه') }}
+                        </x-primary-button>
+                        <x-danger-button wire:click="denyMeeting({{$selectedMeeting->id}})">
+                            {{ __('لغو جلسه') }}
+                        </x-danger-button>
+                    </div>
+                @endif
 
             </div>
         @endif
     </x-modal>
 
-    <x-modal name="delete-meeting-modal">
+    <x-modal name="delete-meeting-modal" maxWidth="4xl" :closable="false">
         @if ($selectedMeeting)
             @if(auth()->user()->user_info->full_name === $selectedMeeting->scriptorium && auth()->user()->user_info->position === $selectedMeeting->scriptorium_position)
                 <form method="POST" action="{{ route('meeting.destroy', $selectedMeeting->id) }}">
@@ -431,12 +471,12 @@
                         </div>
                     </div>
                     <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                        <x-danger-button type="submit">
+                        <x-primary-button type="submit">
                             {{ __('حذف جلسه') }}
-                        </x-danger-button>
-                        <x-secondary-button x-on:click="$dispatch('close')" class="text-gray-700 dark:text-gray-300">
+                        </x-primary-button>
+                        <x-cancel-button x-on:click="$dispatch('close')" class="text-gray-700 dark:text-gray-300">
                             {{ __('لغو') }}
-                        </x-secondary-button>
+                        </x-cancel-button>
                     </div>
                 </form>
             @endif

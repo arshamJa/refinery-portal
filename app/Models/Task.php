@@ -16,6 +16,7 @@ class Task extends Model
     protected $fillable = [
         'meeting_id',
         'body',
+        'is_locked'
     ];
 
     public function user(): BelongsTo

@@ -10,6 +10,7 @@ use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -89,4 +90,26 @@ class TaskManagementController extends Controller
         $uniqueWords = array_unique($words);               // Remove duplicate words
         return implode(' ', $uniqueWords);                 // Join back to string
     }
+    public function lockTasks($meetingId)
+    {
+        $meeting = Meeting::findOrFail($meetingId);
+
+        if (Gate::denies('lock-task')) {
+            abort(403, 'دسترسی غیرمجاز');
+        }
+
+        // Authorization check
+        if (
+            auth()->user()->user_info->full_name !== $meeting->scriptorium ||
+            auth()->user()->user_info->position !== $meeting->scriptorium_position
+        ) {
+            abort(403, 'دسترسی غیرمجاز');
+        }
+        // Lock all tasks related to the meeting
+        Task::where('meeting_id', $meetingId)->update(['is_locked' => true]);
+
+        session()->flash('status', 'وظایف این جلسه قفل شدند و دیگر قابل تغییر نیستند.');
+        return back();
+    }
+
 }

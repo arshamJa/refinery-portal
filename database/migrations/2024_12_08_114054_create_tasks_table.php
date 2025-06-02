@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('meeting_id')->constrained()->cascadeOnDelete();
             $table->longText('body');
+            $table->boolean('is_locked')->default(false);
             $table->timestamps();
         });
     }

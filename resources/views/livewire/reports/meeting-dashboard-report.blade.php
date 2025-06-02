@@ -28,71 +28,8 @@
 
 
 
-    <div class="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
-        <!-- Line Chart -->
-        <div class="py-6" id="pie-chart"></div>
-    </div>
-    @script
-    <script>
-        const getChartOptions = () => {
-            const tasksOnTime = {{$this->tasksOnTime()}};
-            const tasksWithDelay = {{$this->tasksDoneWithDelay()}};
-            const tasksNotDone = {{$this->tasksNotDone()}};
-            return {
-                series: [tasksOnTime, tasksWithDelay, tasksNotDone],
-                colors: ["#605C3C", "#1f4037", "#2C5364"],
-                chart: {
-                    height: 420,
-                    width: "100%",
-                    type: "pie",
-                    events: {
-                        dataPointSelection: function(event, chartContext, config) {
-                            const routes = [
-                                "{{ route('completedTasks') }}",
-                                "{{ route('tasksWithDelay') }}",
-                                "{{ route('incompleteTasks') }}"
-                            ];
-                            window.location.href = routes[config.dataPointIndex];
-                        }
-                    }
-                },
-                stroke: {
-                    colors: ["white"],
-                },
-                plotOptions: {
-                    pie: {
-                        size: "100%",
-                        dataLabels: {
-                            offset: -25
-                        }
-                    },
-                },
-                labels: [
-                    "{{__('انجام شده در مهلت مقرر')}}",
-                    "{{__('انجام شده خارج از مهلت مقرر')}}",
-                    "{{__('انجام نشده در مهلت مقرر')}}"
-                ],
-                dataLabels: {
-                    enabled: true,
-                    style: {
-                        fontFamily: "Inter, sans-serif",
-                    },
-                    formatter: function (val, opts) {
-                        return opts.w.config.series[opts.seriesIndex];
-                    }
-                },
-                legend: {
-                    position: "bottom",
-                    fontFamily: "Inter, sans-serif",
-                }
-            };
-        }
-        if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
-            const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
-            chart.render();
-        }
-    </script>
-    @endscript
+
+
 
 
 
@@ -118,53 +55,128 @@
                     </div>
                 </div>
             </div>
-            <div class="space-y-4 border rounded-md shadow-md p-4">
-                <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>
-                        <a href="{{route('completedTasks')}}"
-                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
-                            {{__('نمایش')}}
-                        </a>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-[#605C3C] h-2.5 rounded-full"
-                             style="width:{{$this->tasksOnTimePercentage()}}%;"></div>
-                    </div>
-                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksOnTimePercentage()}}%)</div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2 mt-2">
-                        <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>
-                        <a href="{{route('tasksWithDelay')}}"
-                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
-                            {{__('نمایش')}}
-                        </a>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-[#1f4037] h-2.5 rounded-full"
-                             style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>
-                    </div>
-                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksDoneWithDelayPercentage()}}%)
-                    </div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2 mt-2">
-                        <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>
-                        <a href="{{route('incompleteTasks')}}"
-                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">
-                            {{__('نمایش')}}
-                        </a>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-[#2C5364] h-2.5 rounded-full"
-                             style="width:{{$this->tasksNotDonePercentage()}}%;"></div>
-                    </div>
-                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksNotDonePercentage()}}%)</div>
-                </div>
+
+            <div class=" w-full bg-white rounded-lg shadow-sm dark:bg-gray-800">
+                <!-- Line Chart -->
+                <div class="py-6" id="pie-chart"></div>
             </div>
+
+            @script
+            <script>
+                const getChartOptions = () => {
+                    const tasksOnTime = {{$this->tasksOnTime()}};
+                    const tasksWithDelay = {{$this->tasksDoneWithDelay()}};
+                    const tasksNotDoneOnTime = {{$this->tasksNotDoneOnTime()}};
+                    const tasksNotDoneWithDelay = {{$this->tasksNotDoneWithDelay()}};
+
+                    return {
+                        series: [tasksOnTime, tasksWithDelay, tasksNotDoneOnTime, tasksNotDoneWithDelay],
+                        colors: ["#605C3C", "#1f4037", "#2C5364", "#B22222"],
+                        chart: {
+                            height: 420,
+                            width: "100%",
+                            type: "pie",
+                            events: {
+                                dataPointSelection: function(event, chartContext, config) {
+                                    const routes = [
+                                        "{{ route('completedTasks') }}",
+                                        "{{ route('tasksWithDelay') }}",
+                                        "{{ route('incompleteTasksOnTime') }}",
+                                        "{{ route('incompleteTasksWithDelay') }}"
+                                    ];
+                                    window.location.href = routes[config.dataPointIndex];
+                                }
+                            }
+                        },
+                        stroke: {
+                            colors: ["white"],
+                        },
+                        plotOptions: {
+                            pie: {
+                                size: "100%",
+                                dataLabels: {
+                                    offset: -25
+                                }
+                            },
+                        },
+                        labels: [
+                            "{{ __('انجام شده در مهلت مقرر') }}",
+                            "{{ __('انجام شده خارج از مهلت مقرر') }}",
+                            "{{ __('انجام نشده در مهلت مقرر') }}",
+                            "{{ __('انجام نشده خارج از مهلت مقرر') }}"
+                        ],
+                        dataLabels: {
+                            enabled: true,
+                            style: {
+                                fontFamily: "Inter, sans-serif",
+                            },
+                            formatter: function (val, opts) {
+                                return opts.w.config.series[opts.seriesIndex];
+                            }
+                        },
+                        legend: {
+                            position: "bottom",
+                            fontFamily: "Inter, sans-serif",
+                        }
+                    };
+                };
+
+                // ✅ Render chart here
+                if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
+                    const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
+                    chart.render();
+                }
+            </script>
+            @endscript
+{{--            <div class="space-y-4 border rounded-md shadow-md p-4">--}}
+{{--                <h2 class="text-2xl font-semibold mb-6">{{__('گزارش اقدامات')}}</h2>--}}
+{{--                <div>--}}
+{{--                    <div class="flex justify-between mb-2">--}}
+{{--                        <span class="text-sm font-medium">{{__('انجام شده در مهلت مقرر')}}</span>--}}
+{{--                        <a href="{{route('completedTasks')}}"--}}
+{{--                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">--}}
+{{--                            {{__('نمایش')}}--}}
+{{--                        </a>--}}
+{{--                    </div>--}}
+{{--                    <div class="w-full bg-gray-200 rounded-full h-2.5">--}}
+{{--                        <div class="bg-[#605C3C] h-2.5 rounded-full"--}}
+{{--                             style="width:{{$this->tasksOnTimePercentage()}}%;"></div>--}}
+{{--                    </div>--}}
+{{--                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksOnTimePercentage()}}%)</div>--}}
+{{--                </div>--}}
+{{--                <div>--}}
+{{--                    <div class="flex justify-between mb-2 mt-2">--}}
+{{--                        <span class="text-sm font-medium">{{__('انجام شده خارج از مهلت مقرر')}}</span>--}}
+{{--                        <a href="{{route('tasksWithDelay')}}"--}}
+{{--                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">--}}
+{{--                            {{__('نمایش')}}--}}
+{{--                        </a>--}}
+{{--                    </div>--}}
+{{--                    <div class="w-full bg-gray-200 rounded-full h-2.5">--}}
+{{--                        <div class="bg-[#1f4037] h-2.5 rounded-full"--}}
+{{--                             style="width:{{$this->tasksDoneWithDelayPercentage()}}%;"></div>--}}
+{{--                    </div>--}}
+{{--                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksDoneWithDelayPercentage()}}%)--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div>--}}
+{{--                    <div class="flex justify-between mb-2 mt-2">--}}
+{{--                        <span class="text-sm font-medium">{{__('انجام نشده در مهلت مقرر')}}</span>--}}
+{{--                        <a href="{{route('incompleteTasks')}}"--}}
+{{--                           class="cursor-pointer hover:underline hover:underline-offset-2 transition ease-in-out">--}}
+{{--                            {{__('نمایش')}}--}}
+{{--                        </a>--}}
+{{--                    </div>--}}
+{{--                    <div class="w-full bg-gray-200 rounded-full h-2.5">--}}
+{{--                        <div class="bg-[#2C5364] h-2.5 rounded-full"--}}
+{{--                             style="width:{{$this->tasksNotDonePercentage()}}%;"></div>--}}
+{{--                    </div>--}}
+{{--                    <div class="mt-2 text-right text-xs text-gray-500">({{$this->tasksNotDonePercentage()}}%)</div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
         </div>
+
+
 
         <div>
 
@@ -183,7 +195,6 @@
             <div class="w-full rounded-lg shadow-sm px-6 py-4" id="bar-chart"></div>
 
         </div>
-
         @script
         <script>
             const yearData = @json($yearData);
@@ -358,6 +369,29 @@
             }
         </script>
         @endscript
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         {{--        <script>--}}
         {{--            let currentYear = parseInt(document.getElementById("yearSelect").value);--}}

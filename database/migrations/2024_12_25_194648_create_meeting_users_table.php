@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('meeting_id')->constrained();
             $table->foreignId('user_id')->constrained(); //همون اعضای جلسه است
             $table->boolean('is_guest')->default(false);
-            $table->string('is_present')->default('0');
+            $table->tinyInteger('is_present')->default(\App\Enums\MeetingUserStatus::PENDING->value);
             $table->text('reason_for_absent')->nullable();
             $table->string('replacement')->nullable();
             $table->softDeletes()->index();

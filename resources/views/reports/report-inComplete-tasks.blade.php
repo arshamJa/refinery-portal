@@ -35,7 +35,7 @@
             </li>
         </ol>
     </nav>
-    <form method="GET" action="{{route('incompleteTasks')}}">
+    <form method="GET" action="{{route('incompleteTasksOnTime')}}">
         @csrf
         <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
             <!-- Search Input -->
@@ -69,7 +69,7 @@
             <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
                 <x-search-button>{{ __('جست و جو') }}</x-search-button>
                 @if(request()->has('search') || request()->has('start_date'))
-                    <x-view-all-link href="{{route('incompleteTasks')}}">
+                    <x-view-all-link href="{{route('incompleteTasksOnTime')}}">
                         {{ __('نمایش همه') }}
                     </x-view-all-link>
                 @endif
@@ -100,7 +100,7 @@
             </x-slot>
             <x-slot name="body">
                 @forelse($taskUsers as $taskUser)
-                    <x-table.row wire:key="taskUser-{{ $taskUser->id }}" class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                    <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                         <x-table.cell class="border-r-0">{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
                         <x-table.cell>{{ $taskUser->task->meeting->title }}</x-table.cell>
                         <x-table.cell>{{ $taskUser->task->meeting->scriptorium }}</x-table.cell>
@@ -119,7 +119,7 @@
                     </x-table.row>
                 @empty
                     <x-table.row>
-                        <x-table.cell colspan="6" class="py-6 text-center">
+                        <x-table.cell colspan="7" class="py-6 text-center">
                             {{ __('رکوردی یافت نشد ...') }}
                         </x-table.cell>
                     </x-table.row>

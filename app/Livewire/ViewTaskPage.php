@@ -10,6 +10,7 @@ use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\TaskUserFile;
 use App\Models\User;
+use App\Models\UserInfo;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -51,6 +52,14 @@ class ViewTaskPage extends Component
 
 
     public $request_task;
+
+
+
+    #[Computed]
+    public function allTasksLocked(): bool
+    {
+        return $this->tasks->every(fn ($task) => $task->is_locked);
+    }
 
 
     public function openAddParticipantModal()
@@ -308,11 +317,9 @@ class ViewTaskPage extends Component
                 'task_body.min' => 'متن بند مذاکره باید حداقل ۵ کاراکتر باشد.',]
         )->validate();
         $body = $this->normalizeText($validated['task_body']);
-
         DB::table('tasks')->where('id',$this->task_id)->update([
             'body' => $body,
         ]);
-
         session()->flash('status', 'بند مذاکره با موفقیت ویرایش شد.');
         return to_route('view.task.page',$this->meeting);
 
@@ -358,6 +365,7 @@ class ViewTaskPage extends Component
         }
         return $this->loadedEmployees;
     }
+
     #[Computed]
     public function tasks()
     {
@@ -392,21 +400,44 @@ class ViewTaskPage extends Component
      * To accept the Task by participant
      * @throws AuthorizationException
      */
-    public function acceptTask($taskId)
+    public function acceptTask($taskUserId)
     {
-        $task = Task::findOrFail($taskId);
+        // Load TaskUser with related task
+        $taskUser = TaskUser::with('task:id,meeting_id,body')->findOrFail($taskUserId);
 
-        $isParticipant = $task->taskUsers->contains('user_id', auth()->id());
-        abort_unless($isParticipant, 403);
+        // Select specific columns from related Meeting
+        $meeting = Meeting::select('id', 'title', 'scriptorium', 'scriptorium_position')
+            ->findOrFail($taskUser->task->meeting_id);
 
-        DB::table('task_users')
-            ->where('task_id', $task->id)
-            ->where('user_id', auth()->id())
-            ->update(['task_status' => TaskStatus::ACCEPTED->value]);
+        // Authorization: user must own this TaskUser record
+        abort_unless($taskUser->user_id === auth()->id(), 403);
 
+        // Get user info of meeting scriptorium
+        $userInfo = UserInfo::where('full_name', $meeting->scriptorium)
+            ->where('position', $meeting->scriptorium_position)
+            ->first();
 
-        session()->flash('status', 'خلاصه مذاکره تایید شد');
-        return to_route('view.task.page',$this->meeting);
+        // Update task status directly on the model
+        $taskUser->update(['task_status' => TaskStatus::ACCEPTED->value]);
+
+        // Prepare notification message
+        $notificationMessage = "آقا/خانم " . auth()->user()->user_info->full_name .
+            " بند با عنوان «" . $taskUser->task->body . "» را در جلسه «" . $meeting->title . "» قبول کرد.";
+
+        $recipientId = $userInfo->user_id;
+
+        // Create notification
+        Notification::create([
+            'type' => 'AcceptedTask',
+            'data' => json_encode(['message' => $notificationMessage]),
+            'notifiable_type' => Meeting::class,
+            'notifiable_id' => $meeting->id,
+            'sender_id' => auth()->id(),
+            'recipient_id' => $recipientId,
+        ]);
+
+        session()->flash('status', 'بند تایید شد');
+        return to_route('view.task.page', $taskUser->task->meeting_id);
     }
     /**
      * To show Task form model to the participant
@@ -459,11 +490,11 @@ class ViewTaskPage extends Component
                 'files.*.mimes' => 'فرمت فایل باید یکی از jpeg, png, pdf, docx, xlsx باشد.'
             ]
         )->validate();
-        if (!empty($this->files) && !$this->validateFilesSize($this->files)) {
+        if (!empty($validated['files']) && !$this->validateFilesSize($validated['files'])) {
             return;
         }
 
-        $participantTaskBody = $this->normalizeText($this->participantTaskBody);
+        $participantTaskBody = $this->normalizeText($validated['participantTaskBody']);
 
 
         // Update TaskUser via DB
@@ -617,6 +648,12 @@ class ViewTaskPage extends Component
     }
 
 
+    public function openLockTaskModal()
+    {
+        $this->dispatch('crud-modal', name: 'lock-task');
+    }
+
+
 
 
 
@@ -645,7 +682,7 @@ class ViewTaskPage extends Component
             ['required' => 'فیلد دلیل رد خلاصه مذاکره اجباری است.', 'min' => 'دلیل رد باید حداقل ۳ کاراکتر باشد.']
         )->validate();
 
-        $request_task = $this->normalizeText($this->request_task);
+        $request_task = $this->normalizeText($validated['request_task']);
 
         // Find the Task model
 
@@ -672,7 +709,7 @@ class ViewTaskPage extends Component
 
         if ($recipientId) {
             Notification::create([
-                'type' => 'DeniedTaskNotification',
+                'type' => 'DeniedTask',
                 'data' => json_encode(['message' => $notificationMessage]),
                 'notifiable_type' => Meeting::class,
                 'notifiable_id' => $meeting->id,

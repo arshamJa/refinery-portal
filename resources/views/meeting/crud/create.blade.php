@@ -38,7 +38,7 @@
         {{--        </a>--}}
     </nav>
 
-    <form action="{{route('meeting.store')}}" method="post" enctype="multipart/form-data">
+    <form action="{{route('meeting.store')}}" method="post" class="mb-12" enctype="multipart/form-data">
         @csrf
         <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
             {{--                        Meeting Information--}}
@@ -164,9 +164,6 @@
                     <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
                 </div>
 
-
-
-
                 <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
                     <x-input-label for="title" class="mb-1.5" :value="__('دبیرجلسه')"/>
                     <button id="scriptorium-dropdown-btn" type="button"
@@ -238,75 +235,67 @@
                     <x-input-error :messages="$errors->get('holders')" class="mt-2" />
                 </div>
 
-                {{--                            Guests--}}
-                <div class="col-span-2">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">{{__('لیست مهمانان')}}</label>
-                        <div class="flex items-center space-x-4 mb-4">
-                            <input type="checkbox" id="outer-organization-checkbox" class="h-4 w-4 text-blue-600"/>
-                            <label for="outer-organization-checkbox" class="cursor-pointer text-sm font-medium text-gray-700">{{__('برون سازمانی')}}</label>
-                        </div>
-                        <!-- Table for inner_organization (default table) -->
-                        <div id="inner-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
-                            <table id="guests-inner-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
-                                <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-right">#</th>
-                                    <th class="px-4 py-2 text-right">نام و نام خانوادگی</th>
-                                    <th class="px-4 py-2 text-right">واحد سازمانی</th>
-                                    <th class="px-4 py-2 text-center">عملیات</th>
-                                </tr>
-                                </thead>
-                                <tbody id="guests-inner-tbody" class="divide-y divide-gray-100">
-                                <!-- Dynamic rows for inner organization will be inserted here -->
-                                </tbody>
-                                <tfoot class="bg-gray-50">
-                                <tr>
-                                    <td colspan="5" class="px-4 py-3 text-left">
-                                        <button type="button" id="add-inner-guest-btn"
-                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
-                                            افزودن مهمان
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tfoot>
-                            </table>
-                        </div>
 
-                        <!-- Table for outer_organization (will appear when checkbox is checked) -->
-                        <div id="outer-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4 hidden">
-                            <table id="guests-outer-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
-                                <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-right">#</th>
-                                    <th class="px-4 py-2 text-right">نام و نام خانوادگی</th>
-                                    <th class="px-4 py-2 text-right">نام شرکت</th>
-                                    <th class="px-4 py-2 text-center">عملیات</th>
-                                </tr>
-                                </thead>
-                                <tbody id="guests-outer-tbody" class="divide-y divide-gray-100">
-                                <!-- Dynamic rows for outer organization will be inserted here -->
-                                </tbody>
-                                <tfoot class="bg-gray-50">
-                                <tr>
-                                    <td colspan="4" class="px-4 py-3 text-left">
-                                        <button type="button" id="add-outer-guest-btn"
-                                                class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
-                                            افزودن مهمان
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tfoot>
-                            </table>
+                <div id="innerGuest_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                    <x-input-label for="innerGuest" class="mb-1.5" :value="__('مهمانان داخلی')" />
+                    <button id="innerGuest-dropdown-btn" type="button"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
+                            aria-haspopup="listbox" aria-expanded="false">
+                        <span id="innerGuest-selected-text" class="truncate">انتخاب مهمانان داخلی</span>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="innerGuest-dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                        <div class="px-4 py-2">
+                            <input id="innerGuest-dropdown-search" type="text" placeholder="جست و جو"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
-                        <x-input-error :messages="$errors->get('guest')" class="mt-2"/>
+                        <ul id="innerGuest-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
+                            <!-- Options populated by JS -->
+                        </ul>
+                        <div id="innerGuest-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
                     </div>
-                    <div id="guests-data"
-                         data-inner-guests="{{ json_encode(old('guests.inner', [])) }}"
-                         data-outer-guests="{{ json_encode(old('guests.outer', [])) }}">
+                    <div id="innerGuest-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
+                    <input type="hidden" name="innerGuest" id="innerGuest-hidden-input" value="{{ old('innerGuest') ?? '' }}">
+                    <x-input-error :messages="$errors->get('innerGuest')" class="mt-2" />
+                </div>
+
+                {{--  Guests --}}
+                <div class="col-span-2">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 pb-2">
+                        {{ __('لیست مهمانان برون سازمانی') }}
+                    </h3>
+                    {{-- Hidden data element for JS --}}
+                    <div id="guests-data" data-outer-guests="{{ json_encode(old('guests.outer', [])) }}"></div>
+                    <div id="outer-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
+                        <table id="guests-outer-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-right">#</th>
+                                <th class="px-4 py-2 text-right">نام و نام خانوادگی</th>
+                                <th class="px-4 py-2 text-right">نام شرکت</th>
+                                <th class="px-4 py-2 text-center">عملیات</th>
+                            </tr>
+                            </thead>
+                            <tbody id="guests-outer-tbody" class="divide-y divide-gray-100">
+                            <!-- Dynamic rows for outer organization will be inserted here -->
+                            </tbody>
+                            <tfoot class="bg-gray-50">
+                            <tr>
+                                <td colspan="4" class="px-4 py-3 text-left">
+                                    <button type="button" id="add-outer-guest-btn"
+                                            class="inline-flex items-center px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                                        افزودن مهمان
+                                    </button>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
-                <div class="col-span-1 mt-12">
+                <div class="col-span-4 mt-12">
                     <x-primary-button type="submit" class="ml-2">
                         {{ __('ارسال') }}
                     </x-primary-button>
@@ -319,6 +308,5 @@
             </div>
         </div>
     </form>
-    <script src="{{ asset('js/createGuest.js') }}"></script>
 </x-app-layout>
 
