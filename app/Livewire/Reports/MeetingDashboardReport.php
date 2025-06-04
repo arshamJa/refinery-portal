@@ -90,7 +90,7 @@ class MeetingDashboardReport extends Component
     {
         return DB::table('task_users')
             ->where('task_status', TaskStatus::PENDING->value)
-            ->whereColumn('sent_date', '<=', 'time_out')
+            ->where('sent_date',null)
             ->count();
     }
     #[Computed]
@@ -98,7 +98,7 @@ class MeetingDashboardReport extends Component
     {
         return DB::table('task_users')
             ->where('task_status', TaskStatus::PENDING->value)
-            ->whereColumn('sent_date', '>', 'time_out')
+            ->where('sent_date',null)
             ->count();
     }
 

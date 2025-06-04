@@ -271,7 +271,7 @@
                         </script>
                     </div>
                 </div>
-                <div id="participants_dropdown" data-users='@json($users)' class="relative w-full mb-4 col-span-2"
+                <div id="participants_dropdown" data-users='@json($participants)' class="relative w-full mb-4 col-span-2"
                      style="direction: rtl;">
                     <x-input-label for="participants" class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
                     <button id="participants-dropdown-btn" type="button"
@@ -368,7 +368,7 @@
                     </div>
                 </div>
 
-                <div id="innerGuest_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
+                <div id="innerGuest_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
                      style="direction: rtl;">
                     <x-input-label for="innerGuest" class="mb-1.5" :value="__('مهمانان داخلی')"/>
                     <button id="innerGuest-dropdown-btn" type="button"

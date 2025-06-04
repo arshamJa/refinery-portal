@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('verification_codes', function (Blueprint $table) {
+        Schema::create('verify_codes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('two_factor_code')->nullable()->index();
+            $table->string('phone')->index();
+            $table->string('code_hash'); // store hashed code, not raw OTP
+            $table->timestamp('expires_at');
+            $table->timestamp('verified_at')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('verification_codes');
+        Schema::dropIfExists('verify_codes');
     }
 };

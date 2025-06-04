@@ -73,7 +73,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['#','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','شرح اقدام','تاریخ ارسال اقدام'] as $th)
+                    @foreach (['#','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','شرح اقدام','تاریخ ارسال اقدام','',''] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -93,7 +93,7 @@
                             <x-table.cell>{{ Str::words($taskUser->body_task ?? '---' , 5 , '...')}}</x-table.cell>
                             <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
                             <x-table.cell>
-                                <a href="{{route('tasks.create', $taskUser->task->meeting->id )}}">
+                                <a href="{{route('view.task.page', $taskUser->task->meeting->id )}}">
                                     <x-secondary-button>
                                         {{__('نمایش صورتجلسه')}}
                                     </x-secondary-button>

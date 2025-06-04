@@ -1,63 +1,67 @@
 <x-guest-layout>
         <img id="background" class="absolute -z-50 -left-20 top-0 max-w-[877px]" src="https://laravel.com/assets/img/welcome/background.svg" />
 
-        <form action="{{route('login.store')}}" method="post" dir="rtl">
-            @csrf
+    <div class="relative w-full max-w-sm mx-auto">
 
+        <!-- Tabs -->
+        <div class="relative inline-grid items-center justify-center w-full h-10 grid-cols-2 p-1 text-gray-500 bg-gray-100 rounded-lg select-none">
+            <a href="{{ route('login') }}"
+               class="relative z-20 inline-flex items-center justify-center w-full h-8 px-3 text-sm font-medium rounded-md transition-all bg-white shadow-sm text-gray-800">
+                {{ __('ورود با کد پرسنلی') }}
+            </a>
+            <a href="{{ route('otp.login') }}"
+               class="relative z-20 inline-flex items-center justify-center w-full h-8 px-3 text-sm font-medium rounded-md cursor-pointer hover:text-gray-700">
+                {{ __('ورود با رمز یکبارمصرف') }}
+            </a>
+        </div>
 
-            <!-- Title -->
-            <div class="text-center mb-2">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('ورود به پورتال') }}</h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('لطفاً اطلاعات خود را وارد کنید') }}</p>
-            </div>
+        <!-- Content -->
+        <div class="relative w-full mt-4">
+            <form action="{{ route('login.store') }}" method="POST" dir="rtl" class="space-y-4">
+                @csrf
 
-            <!-- Personal Code -->
-            <div>
-                <x-input-label for="p_code" :value="__('کدپرسنلی')" />
-                <x-text-input name="p_code" class="mt-2" autofocus/>
-                <x-input-error :messages="$errors->get('p_code')" class="mt-2" />
-            </div>
-
-            <!-- Password -->
-            <div x-data="{ show: true }">
-                <x-input-label for="p_code" class="mt-2" :value="__('رمز')" />
-                <div class="relative mt-2">
-                    <input name="password" autofocus
-                           class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
-                           :type="show ? 'password' : 'text'" type="password">
-                    <div class="absolute top-1/2 left-4 cursor-pointer" style="transform: translateY(-50%);">
-                        <svg class="h-4 text-gray-700 block" fill="none" @click="show = !show" :class="{'hidden': !show, 'block':show }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-                            <path fill="currentColor" d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z">
-                            </path>
-                        </svg>
-                        <svg class="h-4 text-gray-700 hidden" fill="none" @click="show = !show" :class="{'block': !show, 'hidden':show }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
-                            <path fill="currentColor" d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z">
-                            </path>
-                        </svg>
-                    </div>
+                <!-- Personal Code -->
+                <div>
+                    <x-input-label for="p_code" :value="__('کد پرسنلی')" />
+                    <x-text-input name="p_code" class="mt-2 w-full" autofocus />
+                    <x-input-error :messages="$errors->get('p_code')" class="mt-1" />
                 </div>
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
-            </div>
 
-            <!-- Remember Me -->
-            <div class="flex items-center justify-between mt-4">
-                <label for="remember" class="inline-flex items-center">
-                    <input name="remember" id="remember" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('بخاطر بسپار') }}</span>
-                </label>
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                   href="{{route('otp')}}">
-                    {{ __('فراموشی رمز؟') }}
-                </a>
-            </div>
+                <!-- Password -->
+                <div x-data="{ show: true }">
+                    <x-input-label for="p_code" class="mt-2" :value="__('رمز')" />
+                    <div class="relative mt-2">
+                        <input name="password" autofocus
+                               class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
+                               :type="show ? 'password' : 'text'" type="password">
+                        <div class="absolute top-1/2 left-4 cursor-pointer" style="transform: translateY(-50%);">
+                            <svg class="h-4 text-gray-700 block" fill="none" @click="show = !show" :class="{'hidden': !show, 'block':show }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                <path fill="currentColor" d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z">
+                                </path>
+                            </svg>
+                            <svg class="h-4 text-gray-700 hidden" fill="none" @click="show = !show" :class="{'block': !show, 'hidden':show }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                <path fill="currentColor" d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                </div>
 
-            <!-- Submit Button -->
-            <div class="my-3">
-                <button type="submit" class="w-full px-4 py-3 text-[#F5F0F1] bg-[#4332BD] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 border border-transparent rounded-md font-semibold text-sm uppercase transition ease-in-out duration-300">
+                <!-- Remember -->
+                <div class="flex items-center justify-between mt-2">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="remember" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                        <span class="ml-2 text-sm text-gray-600">بخاطر بسپار</span>
+                    </label>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="inline-flex justify-center w-full px-4 py-3 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-sm uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
                     {{ __('ورود') }}
                 </button>
-            </div>
-
-        </form>
+            </form>
+        </div>
+    </div>
 
 </x-guest-layout>

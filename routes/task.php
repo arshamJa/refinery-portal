@@ -1,13 +1,9 @@
 <?php
 
 
-use App\Http\Controllers\ParticipantsTaskController;
 use App\Http\Controllers\Reports\TasksReportController;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskManagementController;
 use App\Livewire\TaskList;
-use App\Livewire\TaskManagementTable;
-use App\Livewire\TaskSent;
 use Illuminate\Support\Facades\Route;
 
 
@@ -25,14 +21,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('tasks/{meeting}', [TaskManagementController::class, 'store'])->name('tasks.store');
 
-    // this is the route for each user to sent their task
-//    Route::post('/tasks/{taskUser}/submit', [TaskController::class, 'submitTaskForm'])->name('tasks.submit');
-//    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-//    Route::delete('/tasks/delete-file/{fileId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
-
-
-//    Route::post('/tasks/deny/{taskUserId}', [TaskController::class, 'denyTask'])->name('deny.task');
-
 
     // this is my task table
     Route::get('my/task/table',\App\Livewire\MyTasks::class)->name('my.task.table');
@@ -49,14 +37,7 @@ Route::middleware(['auth'])->group(function () {
     // End of Route to Export for all 3 Tasks
 
 
-    // route to participantsTask
-//    Route::get('participants/task', [ParticipantsTaskController::class, 'index'])
-//        ->name('participants.task');
-
-
-
     // tasks report on time
-//    Route::get('/tasks/onTime', \App\Livewire\Reports\ReportTasksDone::class)->name('tasksFinishedOnTime');
     Route::get('completedTasksOnTime', [TasksReportController::class, 'completedTasks'])
         ->name('completedTasks');
 
@@ -73,42 +54,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('incompleteTasksWithDelay');
 
 
-
-
-    // tasks report not done on time
-//    Route::get('/tasks/notDone/onTime', \App\Livewire\Reports\ReportTaskNotDoneOnTime::class)
-//        ->name('tasksNotFinishedOnTime');
-
-    // tasks report done with delay
-//    Route::get('/tasks/doneWithDelay', \App\Livewire\Reports\ReportTaskDoneWithDelay::class)
-//        ->name('tasksDoneWithDelay');
-
-
-
-
-//    Route::post('/tasks/{meetingId}', [TaskManagementController::class, 'store'])->name('tasks.store');
-
-//
-//    Route::post('/editTask/{task}', [TaskManagementController::class, 'edit'])
-//        ->name('editTask');
-//
-//    Route::get('/editUserTask/{task}', [TaskManagementController::class, 'editUserTask'])
-//        ->name('editUserTask');
-//
-//    Route::put('/editUserTask/{task}', [TaskManagementController::class, 'updateUserTask'])
-//        ->name('updateUserTask');
-
-//    Route::get('/tasks/create',[TaskManagementController::class,'create'])->name('tasks.create');
-
-//    Route::get('/tasks/{task}', [TaskManagementController::class, 'show'])->name('tasks.show');
-
-//    Route::post('/tasks/{task}', [TaskManagementController::class, 'complete'])->name('tasks.complete');
-
-//    Route::get('/tasks/{task}/edit', [TaskManagementController::class, 'edit'])->name('tasks.edit');
-
-//    Route::patch('/tasks/{task}', [TaskManagementController::class, 'update'])->name('tasks.update');
-
-//    Route::delete('/tasks/{task}', [TaskManagementController::class, 'destroy'])->name('tasks.destroy');
 
 });
 

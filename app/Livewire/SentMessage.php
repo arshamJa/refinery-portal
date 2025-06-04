@@ -116,7 +116,7 @@ class SentMessage extends Component
                 $recipient = User::find($notification->recipient_id);
                 $fullName = $recipient?->user_info?->full_name ?? 'نامشخص';
 
-                return 'شما این جلسه را پذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
+                return 'شما این جلسه را نپذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
             }
         }
         if ($notification->type === 'MeetingGuestInvitation' || $notification->type === 'MeetingInvitation') {

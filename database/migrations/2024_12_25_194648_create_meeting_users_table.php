@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('is_guest')->default(false);
             $table->tinyInteger('is_present')->default(\App\Enums\MeetingUserStatus::PENDING->value);
             $table->text('reason_for_absent')->nullable();
-            $table->string('replacement')->nullable();
+            $table->foreignId('replacement')->nullable();
             $table->softDeletes()->index();
             $table->timestamps();
             $table->index(['meeting_id', 'user_id']);

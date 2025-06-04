@@ -12,6 +12,7 @@ use Livewire\Component;
 class SideBar extends Component
 {
     use HasNotificationCount;
+
     protected $listeners = ['notificationRead' => '$refresh'];
     public function render()
     {

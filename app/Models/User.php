@@ -175,10 +175,7 @@ class User extends Authenticatable
 
 
 
-    public function otp(): HasOne
-    {
-        return $this->hasOne(VerificationCode::class)->chaperone();
-    }
+
     public function organizations():BelongsToMany
     {
         return $this->belongsToMany(Organization::class);

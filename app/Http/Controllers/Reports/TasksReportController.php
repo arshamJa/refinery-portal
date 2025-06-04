@@ -179,8 +179,11 @@ class TasksReportController extends Controller
         }
         $taskUsers = $query->paginate(5);
         // Calculate the difference for each task user
+//        foreach ($taskUsers as $taskUser) {
+//            $taskUser->formatted_diff = $this->calculateDateDifference($taskUser->time_out);
+//        }
         foreach ($taskUsers as $taskUser) {
-            $taskUser->formatted_diff = $this->calculateDateDifference($taskUser->time_out);
+            $taskUser->remaining_diff = $this->calculateRemainingDifference($taskUser->time_out);
         }
         return view('reports.report-inComplete-tasks', ['taskUsers' => $taskUsers]);
     }
@@ -199,6 +202,56 @@ class TasksReportController extends Controller
     public function incompleteTasksWithDelay(Request $request)
     {
 
+        $query = TaskUser::with([
+            'task' => function($query) {
+                $query->select('id', 'meeting_id'); // Select specific columns from the task table
+            },
+            'task.meeting' => function($query) {
+                $query->select('id', 'title', 'scriptorium'); // Select specific columns from the meeting table
+            },
+            'user' => function($query) {
+                // Only select the user id to avoid duplicate queries for user_info
+                $query->select('id');
+            },
+            'user.user_info' => function($query) {
+                $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
+            }
+        ])
+            ->where('task_status', TaskStatus::PENDING->value)
+            ->where('sent_date', null);
+
+        $startDate = trim($request->input('start_date'));
+        $endDate = trim($request->input('end_date'));
+        $search = trim($request->input('search'));
+
+        if ($startDate && $endDate) {
+            $query->where('time_out', '>=', $startDate)
+                ->where('time_out', '<=', $endDate);
+        }
+        // Apply the search filter if a search term is provided.
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('time_out', 'like', '%' . $search . '%')
+                    ->orWhere('sent_date', 'like', '%' . $search . '%')
+                    ->orWhereHas('task.meeting', function ($meetingQuery) use ($search) {
+                        $meetingQuery->where('title', 'like', '%' . $search . '%')
+                            ->orWhere('scriptorium', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
+                        $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+        $taskUsers = $query->paginate(5);
+
+        // Calculate the difference for each task user
+//        foreach ($taskUsers as $taskUser) {
+//            $taskUser->formatted_diff = $this->calculateDateDifference($taskUser->time_out);
+//        }
+        foreach ($taskUsers as $taskUser) {
+            $taskUser->past_diff = $this->calculatePastDifference($taskUser->time_out);
+        }
+        return view('reports.report-inComplete-tasks-withDelay', ['taskUsers' => $taskUsers]);
     }
 
 
@@ -206,42 +259,88 @@ class TasksReportController extends Controller
 
 
 
-    private function calculateDateDifference($jalaliDate)
+
+
+//    private function calculateDateDifference($jalaliDate)
+//    {
+//        $dateParts = explode('/', $jalaliDate);
+//        $year = $dateParts[0] ?? null;
+//        $month = $dateParts[1] ?? null;
+//        $day = $dateParts[2] ?? null;
+//
+//        if (!$year || !$month || !$day) {
+//            return 'Invalid Date';
+//        }
+//
+//        // Convert Jalali to Gregorian date
+//        $gregorianDateString = jalali_to_gregorian($year, $month, $day, '/');
+//        $gregorianDate = Carbon::parse($gregorianDateString);
+//
+//        // Current Gregorian Date (now)
+//        $currentDate = Carbon::now();
+//
+//        // Calculate the difference and determine past or remaining
+//        if ($currentDate->greaterThan($gregorianDate)) {
+//            $diff = $currentDate->diff($gregorianDate);
+//            $formattedDiff = 'گذشته: ';
+//        } else {
+//            $diff = $gregorianDate->diff($currentDate);
+//            $formattedDiff = 'باقی مانده: ';
+//        }
+//
+//        // Build the difference string
+////        $formattedDiff .= ($diff->y > 0) ? $diff->y . ' سال ' : '';
+//        $formattedDiff .= ($diff->m > 0) ? $diff->m . ' ماه ' : '';
+//        $formattedDiff .= ($diff->d > 0) ? $diff->d . ' روز ' : '';
+////        $formattedDiff .= ($diff->h > 0) ? $diff->h . ' ساعت ' : '';
+////        $formattedDiff .= ($diff->i > 0) ? $diff->i . ' دقیقه ' : '';
+////        $formattedDiff .= ($diff->s > 0) ? $diff->s . ' ثانیه ' : '';
+//
+//        // If no difference found, show less than a second
+//        return trim($formattedDiff) ?: 'کمتر از یک ثانیه';
+//    }
+
+    private function calculatePastDifference($jalaliDate)
     {
         $dateParts = explode('/', $jalaliDate);
-        $year = $dateParts[0] ?? null;
-        $month = $dateParts[1] ?? null;
-        $day = $dateParts[2] ?? null;
+        [$year, $month, $day] = [$dateParts[0] ?? null, $dateParts[1] ?? null, $dateParts[2] ?? null];
 
         if (!$year || !$month || !$day) {
-            return 'Invalid Date';
+            return 'تاریخ نامعتبر';
         }
 
-        // Convert Jalali to Gregorian date
-        $gregorianDateString = jalali_to_gregorian($year, $month, $day, '/');
-        $gregorianDate = Carbon::parse($gregorianDateString);
+        $gregorianDate = Carbon::parse(jalali_to_gregorian($year, $month, $day, '/'));
+        $now = Carbon::now();
 
-        // Current Gregorian Date (now)
-        $currentDate = Carbon::now();
-
-        // Calculate the difference and determine past or remaining
-        if ($currentDate->greaterThan($gregorianDate)) {
-            $diff = $currentDate->diff($gregorianDate);
-            $formattedDiff = 'گذشته: ';
-        } else {
-            $diff = $gregorianDate->diff($currentDate);
-            $formattedDiff = 'باقی مانده: ';
+        if ($now->lessThanOrEqualTo($gregorianDate)) {
+            return null; // Not in the past
         }
 
-        // Build the difference string
-//        $formattedDiff .= ($diff->y > 0) ? $diff->y . ' سال ' : '';
-        $formattedDiff .= ($diff->m > 0) ? $diff->m . ' ماه ' : '';
-        $formattedDiff .= ($diff->d > 0) ? $diff->d . ' روز ' : '';
-//        $formattedDiff .= ($diff->h > 0) ? $diff->h . ' ساعت ' : '';
-//        $formattedDiff .= ($diff->i > 0) ? $diff->i . ' دقیقه ' : '';
-//        $formattedDiff .= ($diff->s > 0) ? $diff->s . ' ثانیه ' : '';
+        $diff = $now->diff($gregorianDate);
+        $text = ($diff->m > 0 ? $diff->m . ' ماه ' : '') . ($diff->d > 0 ? $diff->d . ' روز ' : '');
 
-        // If no difference found, show less than a second
-        return trim($formattedDiff) ?: 'کمتر از یک ثانیه';
+        return 'گذشته: ' . ($text ?: 'کمتر از یک روز');
+    }
+
+    private function calculateRemainingDifference($jalaliDate)
+    {
+        $dateParts = explode('/', $jalaliDate);
+        [$year, $month, $day] = [$dateParts[0] ?? null, $dateParts[1] ?? null, $dateParts[2] ?? null];
+
+        if (!$year || !$month || !$day) {
+            return 'تاریخ نامعتبر';
+        }
+
+        $gregorianDate = Carbon::parse(jalali_to_gregorian($year, $month, $day, '/'));
+        $now = Carbon::now();
+
+        if ($now->greaterThanOrEqualTo($gregorianDate)) {
+            return null; // Not remaining
+        }
+
+        $diff = $gregorianDate->diff($now);
+        $text = ($diff->m > 0 ? $diff->m . ' ماه ' : '') . ($diff->d > 0 ? $diff->d . ' روز ' : '');
+
+        return 'باقی مانده: ' . ($text ?: 'امروز');
     }
 }

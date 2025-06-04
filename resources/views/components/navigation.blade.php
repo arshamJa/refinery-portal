@@ -2,20 +2,7 @@
     class="absolute top-0 right-0 md:px-12 px-4 md:mr-64 md:border-b left-0 z-50 pt-4 mb-20 flex justify-between items-center">
     <nav class="hidden md:flex items-center gap-x-10 w-full">
         <x-link.link href="{{route('dashboard')}}" :active="request()->is('dashboard')">
-            {{__('داشبورد')}}
-        <span class="mr-2">
-            @if (auth()->check())
-                @if (auth()->user()->hasRole(\App\Enums\UserRole::SUPER_ADMIN->value))
-                    {{ __('Samael') }}
-                @elseif (auth()->user()->hasRole('ادمین'))
-                    {{__('ادمین')}}
-                @elseif (auth()->user()->hasRole(\App\Enums\UserRole::OPERATOR->value))
-                    {{__('اپراتور')}}
-                @elseif (auth()->user()->hasRole(\App\Enums\UserRole::USER->value))
-                    {{__('کاربر')}}
-                @endif
-            @endif
-        </span>
+            {{__('داشبورد ')}}{{ auth()->user()->getTranslatedRole() }}
         </x-link.link>
 
         <x-link.link href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}" :active="request()->is('profile')">

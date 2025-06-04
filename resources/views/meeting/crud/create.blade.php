@@ -207,7 +207,7 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
 
-                <div id="participants_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                <div id="participants_dropdown" data-users='@json($participants)' class="relative w-full col-span-2" style="direction: rtl;">
                     <x-input-label for="participants" class="mb-1.5" :value="__('شرکت‌کنندگان')" />
                     <button id="participants-dropdown-btn" type="button"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
@@ -236,7 +236,7 @@
                 </div>
 
 
-                <div id="innerGuest_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                <div id="innerGuest_dropdown" data-users='@json($participants)' class="relative w-full col-span-2" style="direction: rtl;">
                     <x-input-label for="innerGuest" class="mb-1.5" :value="__('مهمانان داخلی')" />
                     <button id="innerGuest-dropdown-btn" type="button"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"

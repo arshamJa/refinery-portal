@@ -207,34 +207,9 @@
                         {{--                            </x-table.cell>--}}
                         {{--                        @endif--}}
                         <x-table.cell class="whitespace-nowrap">
-                            @switch($meeting->status)
-                                @case(App\Enums\MeetingStatus::PENDING)
-                                    <span
-                                        class="bg-yellow-100 text-yellow-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                            {{ __('درحال بررسی دعوتنامه') }}
-                                        </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_CANCELLED)
-                                    <span class="bg-red-100 text-red-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                            {{ __('جلسه لغو شد') }}
-                                        </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_NOT_CANCELLED)
-                                    <span class="bg-green-100 text-green-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                            {{ __('جلسه برگزار میشود') }}
-                                        </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_IN_PROGRESS)
-                                    <span class="bg-blue-100 text-blue-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                            {{ __('جلسه درحال برگزاری است') }}
-                                        </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_FINISHED)
-                                    <span class="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-lg">
-                                            {{ __('جلسه خاتمه یافت') }}
-                                        </span>
-                                    @break
-                            @endswitch
+                            <span class="{{ $meeting->status->badgeColor() }} text-xs font-medium px-3 py-1 rounded-lg">
+                                {{ $meeting->status->label() }}
+                            </span>
                         </x-table.cell>
                         <!-- Start Meeting Button (New Column) -->
                         <x-table.cell class="whitespace-nowrap">
@@ -298,7 +273,6 @@
         {{ $this->meetings->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
 
-
     <x-modal name="view-meeting-modal" maxWidth="4xl" :closable="false">
         @if ($selectedMeeting)
             @php
@@ -330,7 +304,9 @@
                     <div
                         class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
                         <div><strong>{{ __('رئیس جلسه:') }}</strong>{{ $selectedMeeting->boss }}</div>
-                        <div><strong>{{ __('واحد رئیس:') }}</strong>{{ $bossInfo->department->department_name ?? '---' }}</div>
+                        <div>
+                            <strong>{{ __('واحد رئیس:') }}</strong>{{ $bossInfo->department->department_name ?? '---' }}
+                        </div>
                         <div><strong>{{ __('سمت رئیس:') }}</strong>{{ $bossInfo->position ?? '---' }}</div>
                     </div>
                     <div
@@ -431,16 +407,17 @@
                 </div>
                 {{-- Buttons --}}
                 @if($selectedMeeting->status === MeetingStatus::PENDING)
-                    <div class="flex justify-end gap-4 pt-6">
-                        <x-primary-button wire:click="acceptMeeting({{$selectedMeeting->id}})">
-                            {{ __('تایید جلسه') }}
-                        </x-primary-button>
-                        <x-danger-button wire:click="denyMeeting({{$selectedMeeting->id}})">
-                            {{ __('لغو جلسه') }}
-                        </x-danger-button>
-                    </div>
+                    @can('handle-own-meeting',$meeting)
+                        <div class="flex justify-end gap-4 pt-6">
+                            <x-primary-button wire:click="acceptMeeting({{$selectedMeeting->id}})">
+                                {{ __('تایید جلسه') }}
+                            </x-primary-button>
+                            <x-danger-button wire:click="denyMeeting({{$selectedMeeting->id}})">
+                                {{ __('لغو جلسه') }}
+                            </x-danger-button>
+                        </div>
+                    @endcan
                 @endif
-
             </div>
         @endif
     </x-modal>

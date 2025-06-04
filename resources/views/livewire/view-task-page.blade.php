@@ -546,16 +546,16 @@
 
                                         @can('participantTask',$taskUser)
                                             @if($taskUser->task_status === TaskStatus::PENDING)
-                                                <x-accept-button class="w-full mb-2"
+                                                <x-accept-button class="inline-flex justify-center w-full mb-2"
                                                                  wire:click="acceptTask({{ $taskUser->id }})">
                                                     {{ __('تایید') }}
                                                 </x-accept-button>
-                                                <x-cancel-button class="w-full "
+                                                <x-cancel-button class="inline-flex justify-center w-full"
                                                                  wire:click="openDenyModal({{ $taskUser->id }})">
                                                     {{ __('رد') }}
                                                 </x-cancel-button>
                                             @elseif($taskUser->task_status === TaskStatus::ACCEPTED)
-                                                <x-secondary-button wire:click="showTaskForm({{ $taskUser->id }})">
+                                                <x-secondary-button class="whitespace-nowrap" wire:click="showTaskForm({{ $taskUser->id }})">
                                                     {{ __('انجام اقدام') }}
                                                 </x-secondary-button>
                                             @elseif($taskUser->task_status === TaskStatus::IS_COMPLETED)
@@ -586,7 +586,6 @@
                                         @endif
                                     @endif
                                 </td>
-
                             </tr>
                         @endforeach
                     @endforeach

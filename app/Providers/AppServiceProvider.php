@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
+use App\Models\Meeting;
 use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskUser;
@@ -72,17 +73,24 @@ class AppServiceProvider extends ServiceProvider
             return $user->permissions->contains('name', $permissionName);
         });
 
+
+        // Gate for the scriptorium to handle only his meeting
+        Gate::define('handle-own-meeting', function (User $user, Meeting $meeting) {
+            $userInfo = $user->user_info;
+            return $userInfo
+                && $userInfo->full_name === $meeting->scriptorium
+                && $userInfo->position === $meeting->scriptorium_position;
+        });
+
         Gate::define('has-permission-and-role', function ($user, UserPermission|string $permission, UserRole|string $role = null) {
             $permissionName = $permission instanceof UserPermission ? $permission->value : $permission;
             $hasPermission = $user->permissions->contains('name', $permissionName);
-
             if ($role === null) {
                 // Only permission check
                 return $hasPermission;
             }
             $roleName = $role instanceof UserRole ? $role->value : $role;
             $hasRole = $user->roles->contains('name', $roleName);
-
             // Return true if user has either the permission OR the role
             return $hasPermission || $hasRole;
         });

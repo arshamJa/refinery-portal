@@ -39,6 +39,7 @@ class MeetingDashboard extends Component
             ->where('meeting_id', $meeting->id)
             ->pluck('user_id');
 
+        $meetingName = $meeting->title ?? 'بدون عنوان';
         $meetingDate = $meeting->date ?? 'تاریخ مشخص نشده';
         $meetingTime = $meeting->time ?? 'ساعت مشخص نشده';
 
@@ -49,7 +50,7 @@ class MeetingDashboard extends Component
             // Update existing notification
             $notification->type = 'MeetingConfirmed';
             $notification->data = json_encode([
-                'message' => "این جلسه در تاریخ {$meetingDate} و ساعت {$meetingTime} برگزار خواهد شد."
+                'message' => "جلسه '{$meetingName}' در تاریخ {$meetingDate} و ساعت {$meetingTime} برگزار خواهد شد."
             ]);
             $notification->recipient_read_at = null;
             $notification->updated_at = now();
@@ -58,6 +59,7 @@ class MeetingDashboard extends Component
         $this->dispatch('close-modal');
         return to_route('dashboard.meeting')->with('status', 'جلسه با موفقیت تایید نهایی شد و شرکت‌کنندگان مطلع شدند.');
     }
+
     public function denyMeeting($meetingId)
     {
         $meeting = Meeting::findOrFail($meetingId);
@@ -69,6 +71,7 @@ class MeetingDashboard extends Component
             ->where('meeting_id', $meeting->id)
             ->pluck('user_id');
 
+        $meetingName = $meeting->title ?? 'بدون عنوان';
         $meetingDate = $meeting->date ?? 'تاریخ مشخص نشده';
         $meetingTime = $meeting->time ?? 'ساعت مشخص نشده';
 
@@ -80,7 +83,7 @@ class MeetingDashboard extends Component
             // Update existing notification
             $notification->type = 'MeetingCancelled';
             $notification->data = json_encode([
-                'message' => "این جلسه در تاریخ {$meetingDate} و ساعت {$meetingTime} لغو شد."
+                'message' => "جلسه '{$meetingName}' در تاریخ {$meetingDate} و ساعت {$meetingTime} لغو شد."
             ]);
             $notification->recipient_read_at = null;
             $notification->updated_at = now();
@@ -117,13 +120,6 @@ class MeetingDashboard extends Component
     {
         return Notification::where('recipient_id', auth()->id())
             ->whereNull('recipient_read_at')
-            ->count();
-    }
-    #[Computed]
-    public function unreadSentCount()
-    {
-        return Notification::where('sender_id', auth()->id())
-            ->whereNull('sender_read_at')
             ->count();
     }
 

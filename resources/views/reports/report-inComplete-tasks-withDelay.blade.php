@@ -35,6 +35,7 @@
             </li>
         </ol>
     </nav>
+
     <form method="GET" action="{{route('incompleteTasksOnTime')}}">
         @csrf
         <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
@@ -115,8 +116,8 @@
                         <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
                         <x-table.cell>
 {{--                            {{ $taskUser->formatted_diff ?? 'N/A' }}--}}
-                            @if($taskUser->remaining_diff)
-                                <span class="text-green-600 font-bold">{{ $taskUser->remaining_diff }}</span>
+                            @if($taskUser->past_diff)
+                                <span class="text-red-600 font-bold">{{ $taskUser->past_diff }}</span>
                             @endif
                         </x-table.cell>
                     </x-table.row>

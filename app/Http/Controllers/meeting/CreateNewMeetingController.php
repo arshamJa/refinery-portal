@@ -11,6 +11,7 @@ use App\Models\Department;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Notification;
+use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -70,7 +71,11 @@ class CreateNewMeetingController extends Controller
                 ->select('id', 'user_id', 'full_name', 'department_id', 'position')
                 ->get();
         });
-        return view('meeting.crud.create' , ['users' => $users]);
+        $participants = $users->filter(function ($userInfo) {
+            return $userInfo->user_id !== auth()->id();
+        })->values();
+
+        return view('meeting.crud.create' , ['users' => $users,'participants'=>$participants]);
     }
 
     /**
@@ -105,9 +110,9 @@ class CreateNewMeetingController extends Controller
         $scriptorium = UserInfo::where('user_id',$validated['scriptorium'])->where('position',$validated['scriptorium_position'])->first();
         $scriptoriumName = $scriptorium ? $scriptorium->full_name : 'Unknown';
 
-        $request->merge([
-            'time' => str_contains($validated['time'], ':') ? $validated['time'] : sprintf('%02d:00', intval($validated['time']))
-        ]);
+        $validated['time'] = str_contains($validated['time'], ':')
+            ? $validated['time']
+            : sprintf('%02d:00', intval($validated['time']));
 
         if (Meeting::where('date', $newDate)->where('time', $validated['time'])->exists()) {
             throw ValidationException::withMessages([
@@ -257,6 +262,11 @@ class CreateNewMeetingController extends Controller
             ->select('id', 'user_id', 'full_name', 'department_id', 'position')
             ->get();
 
+
+        $participants = $users->filter(function ($userInfo) {
+            return $userInfo->user_id !== auth()->id();
+        })->values();
+
         return view('meeting.crud.edit', [
             'meeting' => $meeting,
             'users' => $users,
@@ -266,6 +276,7 @@ class CreateNewMeetingController extends Controller
             'month' => $month,
             'day' => $day,
             'bossInfo' => $bossInfo,
+            'participants' => $participants
         ]);
     }
 
@@ -276,6 +287,10 @@ class CreateNewMeetingController extends Controller
     {
 
         $validated = $request->validated();
+
+        $validated['time'] = str_contains($validated['time'], ':')
+            ? $validated['time']
+            : sprintf('%02d:00', intval($validated['time']));
 
         $newDate = $this->getCurrentDate($validated['year'], $validated['month'], $validated['day']);
 
@@ -416,7 +431,7 @@ class CreateNewMeetingController extends Controller
             $notificationMessage = 'شما ' . ($isGuest ? 'به عنوان مهمان ' : '') .
                 'در جلسه: ' . $meeting->title .
                 ' در تاریخ ' . $newDate .
-                ' و در ساعت ' . $request->time . ' دعوت شده اید';
+                ' و در ساعت ' . $validated['time'] . ' دعوت شده اید';
 
             $notificationsData[] = [
                 'type' => $notificationType,

@@ -1,3 +1,5 @@
+@php use App\Models\MeetingUser; @endphp
+@php use App\Enums\MeetingUserStatus;use App\Models\User; @endphp
 <div>
     <x-breadcrumb>
         <li class="flex items-center h-full">
@@ -96,7 +98,9 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده(دبیر/کاربر)', 'متن', 'اقدامات', 'وضعیت جلسه','وضعیت پیام'] as $th)
+                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده(دبیر/کاربر)', 'متن',
+// 'وضعیت جلسه'
+ 'اقدامات','وضعیت پیام'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -111,134 +115,75 @@
                         wire:click="markAsRead({{ $notification->id }})"
                         class="cursor-pointer {{ !$notification->isReadByRecipient() ? 'bg-yellow-100 font-bold' : 'bg-white' }} hover:bg-gray-50 transition-colors duration-200">
                         <x-table.cell class="border-none">
-                            @if($notification->type === 'MeetingInvitation')
-                                <span class="text-blue-600 font-bold">{{ __('دعوتنامه') }}</span>
-                            @elseif($notification->type === 'MeetingGuestInvitation')
-                                <span class="text-pink-600 font-bold">{{ __('دعوتنامه مهمان') }}</span>
-                            @elseif($notification->type === 'ReplacementForMeeting')
-                                <span class="text-pink-600 font-bold">{{ __('دعوتنامه جانشین') }}</span>
-                            @elseif($notification->type === 'AcceptInvitation')
-                                <span class="text-green-600 font-bold">{{ __('تایید دعوتنامه') }}</span>
-                            @elseif($notification->type === 'DenyInvitation')
-                                <span class="text-green-600 font-bold">{{ __('رد دعوتنامه') }}</span>
-                            @elseif($notification->type === 'MeetingConfirmed')
-                                <span class="text-green-700 font-semibold">{{ __(' برگزاری جلسه') }}</span>
-                            @elseif($notification->type === 'MeetingCancelled')
-                                <span class="text-red-600 font-semibold">{{ __(' لغو جلسه') }}</span>
-                            @elseif($notification->type === 'AssignedNewTask')
-                                <span class="text-red-600 font-semibold">{{ __('دریافت اقدام') }}</span>
-                            @elseif($notification->type === 'UpdatedTaskTimeOut')
-                                <span class="text-cyan-700 font-semibold">{{ __('ویرایش مهلت اقدام') }}</span>
-                            @elseif($notification->type === 'UpdatedTaskBody')
-                                <span class="text-sky-700 font-semibold">{{ __('ویرایش بند مذاکره') }}</span>
-                            @elseif($notification->type === 'DeniedTaskNotification')
-                                <span class="text-red-600 font-semibold">{{ __('رد اقدام') }}</span>
-                            @endif
+                            @php
+                                $attrs = $notification->getTypeLabelAttributes();
+                            @endphp
+                            <span class="text-sm font-bold {{ $attrs['text'] }}">
+                            {{ $attrs['label'] }}
+                        </span>
                         </x-table.cell>
                         <x-table.cell
                             class="whitespace-nowrap">{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
-                        <x-table.cell>{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>
-                        <x-table.cell>{{ $this->getNotificationMessage($notification) }}</x-table.cell>
+                        <x-table.cell >{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>
+                        <x-table.cell class="whitespace-normal break-words max-w-xs">
+                            {{ $notification->getNotificationMessage() }}
+                        </x-table.cell>
+{{--                        <x-table.cell class="whitespace-nowrap">--}}
+{{--                             <span--}}
+{{--                                 class="{{$notification->notifiable->status->badgeColor() }} text-sm font-medium px-3 py-1 rounded-lg">--}}
+{{--                                {{ $notification->notifiable->status->label() }}--}}
+{{--                            </span>--}}
+{{--                        </x-table.cell>--}}
                         <x-table.cell class="whitespace-nowrap">
-                            @if (in_array($notification->type, ['MeetingInvitation', 'ReplacementForMeeting', 'MeetingGuestInvitation']) &&
-                                       $notification->notifiable
-                                   )
+                            @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation')
                                 @php
                                     $meeting = $notification->notifiable;
-
-                                    // Try to get the meeting user where current user is the original invitee
-                                    $meetingUser = $meeting->meetingUsers
-                                        ->where('user_id', auth()->id())
-                                        ->where('meeting_id', $meeting->id)
-                                        ->first();
-
-                                    // If not found, maybe the current user is a replacement
-                                    if (! $meetingUser) {
-                                        $meetingUser = $meeting->meetingUsers
-                                            ->firstWhere(fn ($mu) => $mu->replacementUser?->id === auth()->id());
-                                    }
+                                    $meetingUser = MeetingUser::where('user_id',auth()->id())->where('meeting_id',$meeting->id)->first();
+                                    $replacementUserFullName = null;
+                                    if ($meetingUser->replacement) {
+                                        $replacementUser = User::with('user_info')->find($meetingUser->replacement);
+                                        $replacementUserFullName = $replacementUser?->user_info?->full_name ?? 'N/A';
+                                        }
                                 @endphp
-                                @if (
-                                           ($meetingUser && ! $meetingUser->is_present() && ! $meetingUser->is_absent()) ||
-                                           $notification->type === 'MeetingGuestInvitation'
-                                       )
+                                @if( $meetingUser->is_present === MeetingUserStatus::PENDING->value)
                                     <div class="flex gap-2 items-center justify-center mt-4 md:mt-0">
                                         <x-accept-button
                                             wire:click="acceptMeeting({{ $meeting->id }})">
                                             {{ __('تایید') }}
                                         </x-accept-button>
                                         <x-cancel-button
-                                            wire:click="openModalDeny({{ $meeting->id }})">
+                                            wire:click="openModalDeny({{ $meetingUser->id }})">
                                             {{ __('رد') }}
                                         </x-cancel-button>
                                     </div>
-                                @elseif ($meetingUser && $meetingUser->is_present())
+                                @elseif ($meetingUser->is_present === MeetingUserStatus::IS_PRESENT->value)
                                     <span class="text-green-600 font-bold">
-                                    {{ __('شما دعوت به این جلسه را پذیرفتید') }}
-                                    </span>
-                                    @if ($meetingUser->replacementUser)
-                                        <span class="text-green-700">
-                                            {{ __('و آقا/خانم') }}
-                                            {{ $meetingUser->replacementUser->user_info->full_name ?? 'N/A' }}
+                                        {{ __('شما دعوت به این جلسه را پذیرفتید') }}
+                                        </span>
+                                    @if ($replacementUserFullName)
+                                        <span class="text-green-700">{{ __('و آقا/خانم') }}{{ $replacementUserFullName}}
                                             {{ __('به عنوان جانشین خود انتخاب کردید') }}
                                         </span>
                                     @endif
-                                @elseif ($meetingUser && $meetingUser->is_absent())
+                                @elseif ($meetingUser->is_present === MeetingUserStatus::IS_NOT_PRESENT->value)
                                     <span
                                         class="text-red-600 font-bold">{{ __('شما دعوت به این جلسه را نپذیرفتید') }}</span>
                                 @endif
-                            @elseif ($notification->type === 'MeetingConfirmed')
+                            @endif
+
+                            @if ($notification->type === 'MeetingConfirmed')
                                 <span class="text-green-600 font-bold">
-                                    {{ __('تایید جلسه توسط دبیر') }}
-                                </span>
+                                                                    {{ __('تایید جلسه توسط دبیر') }}
+                                                                </span>
                             @elseif ($notification->type === 'MeetingCancelled')
                                 <span class="text-red-600 font-bold">
-                                    {{ __('لغو جلسه توسط دبیر') }}
-                                </span>
-                            @elseif ($notification->type === 'AssignedNewTask' || $notification->type === 'DeniedTaskNotification' || $notification->type === 'UpdatedTaskBody' || $notification->type === 'UpdatedTaskTimeOut')
-                                {{--                                @php--}}
-                                {{--                                $task = \App\Models\Task::where('meeting_id', $notification->notifiable_id)--}}
-                                {{--                                    ->whereHas('taskUsers', function ($query) {--}}
-                                {{--                                        $query->where('user_id', auth()->id());--}}
-                                {{--                                    })--}}
-                                {{--                                    ->first();--}}
-                                {{--                                @endphp--}}
+                                                                    {{ __('لغو جلسه توسط دبیر') }}
+                                                                </span>
+                            @elseif (($notification->isTaskRelated()))
                                 <a href="{{ route('view.task.page', ['meeting' => $notification->notifiable_id]) }}">
                                     <x-secondary-button>{{ __('نمایش صورتجلسه') }}</x-secondary-button>
                                 </a>
                             @endif
-                        </x-table.cell>
-                        <x-table.cell class="whitespace-nowrap">
-                            @switch($notification->notifiable->status ?? null)
-                                @case(App\Enums\MeetingStatus::PENDING)
-                                    <span
-                                        class="bg-yellow-100 text-yellow-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                    {{ __('درحال بررسی دعوتنامه') }}
-                                </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_CANCELLED)
-                                    <span class="bg-red-100 text-red-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                    {{ __('جلسه لغو شد') }}
-                                </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_NOT_CANCELLED)
-                                    <span class="bg-green-100 text-green-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                    {{ __('جلسه برگزار میشود') }}
-                                </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_IN_PROGRESS)
-                                    <span class="bg-blue-100 text-blue-600 text-sm font-medium px-3 py-1 rounded-lg">
-                                    {{ __('جلسه درحال برگزاری است') }}
-                                </span>
-                                    @break
-                                @case(App\Enums\MeetingStatus::IS_FINISHED)
-                                    <span class="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-lg">
-                                    {{ __('جلسه خاتمه یافت') }}
-                                </span>
-                                    @break
-                                @default
-                                    <span class="text-gray-500">---</span>
-                            @endswitch
                         </x-table.cell>
                         <x-table.cell class="whitespace-nowrap">
                             <div id="read-status-{{ $notification->id }}">
@@ -265,83 +210,79 @@
 
 
     <x-modal name="deny-invitation" maxWidth="4xl" :closable="false">
-        @if($meetingId)
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
-                {{--                 Header--}}
-                <div class="sm:flex sm:items-center mb-4 border-b pb-3">
-                    <div
-                        class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                        <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                        </svg>
+        @if($meetingUserId)
+            <form wire:submit="deny">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
+                    {{-- Header --}}
+                    <div class="sm:flex sm:items-center mb-4 border-b pb-3">
+                        <div class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                            <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
+                            <h3 class="text-sm text-gray-900 dark:text-gray-100">
+                                {{ __('آیا مطمئن هستید که می‌خواهید جلسه') }}
+                                <span class="font-medium">{{ $title }}</span>
+                                {{ __('را رد کنید؟') }}
+                            </h3>
+                        </div>
                     </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
-                        <h3 class="text-sm text-gray-900 dark:text-gray-100">
-                            {{ __('آیا مطمئن هستید که می‌خواهید جلسه') }}
-                            <span class="font-medium">{{ $meeting->title }}</span>
-                            {{ __('را رد کنید؟') }}
-                        </h3>
-                    </div>
-                </div>
 
-                {{-- Denial Reason--}}
-                <div class="space-y-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" wire:model="reason" value="دلیل اول" name="reason" class="text-blue-600">
-                        <span>دلیل اول</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" wire:model="reason" value="دلیل دوم" name="reason" class="text-blue-600">
-                        <span>دلیل دوم</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" wire:model="reason" value="دلیل سوم" name="reason" class="text-blue-600">
-                        <span>دلیل سوم</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" wire:model="reason" value="دلیل چهارم" name="reason" class="text-blue-600">
-                        <span>دلیل چهارم</span>
-                    </label>
-                </div>
-            </div>
-
-            @if (!$this->isAlreadyRepresentative)
-                {{--  Replacement Section--}}
-                <div class="p-4 space-y-3">
-                    <input type="checkbox" wire:model="checkBox" class="mr-2">
-                    <span>در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:</span>
-                    <div class="space-y-3" x-show="$wire.checkBox">
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm">
-                                {{ __('در جلسه نمی‌توانم شرکت کنم ولی جانشین این جانب، آقا/خانم') }}
+                    {{-- Denial Reason --}}
+                    <div class="space-y-2">
+                        @foreach (['دلیل اول', 'دلیل دوم', 'دلیل سوم', 'دلیل چهارم'] as $reasonOption)
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" wire:model="reason" value="{{ $reasonOption }}" name="reason" class="text-blue-600">
+                                <span>{{ $reasonOption }}</span>
                             </label>
-                            <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"
-                                   class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>
-                            <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"
-                                   class="w-40 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                            <span>{{ __('در جلسه مذکور شرکت می‌نماید.') }}</span>
-                        </div>
-                        <x-input-error :messages="$errors->get('full_name')" class="mt-2"/>
-                        <x-input-error :messages="$errors->get('p_code')" class="mt-2"/>
+                        @endforeach
+                            <x-input-error :messages="$errors->get('reason')" class="mt-2"/>
                     </div>
                 </div>
-            @endif
-            {{--             Footer Buttons--}}
-            <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
-                <x-accept-button wire:click="deny({{ $meetingId }})">
-                    {{ __('ارسال') }}
-                </x-accept-button>
-                <x-cancel-button wire:click="close">
-                    {{ __('لغو') }}
-                </x-cancel-button>
-            </div>
+
+                @if (!$this->isAlreadyRepresentative)
+                    {{-- Replacement Section --}}
+                    <div class="p-4 space-y-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" wire:model="checkBox" class="mr-2">
+                            <span>در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:</span>
+                        </label>
+                        <div class="space-y-3" x-show="$wire.checkBox">
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm">
+                                    {{ __('در جلسه نمی‌توانم شرکت کنم ولی جانشین این جانب، آقا/خانم') }}
+                                </label>
+                                <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"
+                                       class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>
+                                <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"
+                                       class="w-40 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                <span>{{ __('در جلسه مذکور شرکت می‌نماید.') }}</span>
+                            </div>
+                            <x-input-error :messages="$errors->get('full_name')" class="mt-2"/>
+                            <x-input-error :messages="$errors->get('p_code')" class="mt-2"/>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Footer Buttons --}}
+                <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
+                    <x-accept-button type="submit">
+                        {{ __('ارسال') }}
+                    </x-accept-button>
+                    <x-cancel-button type="button" wire:click="close">
+                        {{ __('لغو') }}
+                    </x-cancel-button>
+                </div>
+            </form>
         @endif
     </x-modal>
+
 
 
     {{--    <x-modal name="accept-invitation" maxWidth="4xl" :closable="false">--}}

@@ -58,10 +58,11 @@ class ViewTaskPage extends Component
     #[Computed]
     public function allTasksLocked(): bool
     {
+        if ($this->tasks->isEmpty()) {
+            return false; // or true if you consider "all locked" vacuously true
+        }
         return $this->tasks->every(fn ($task) => $task->is_locked);
     }
-
-
     public function openAddParticipantModal()
     {
         $this->dispatch('crud-modal', name: 'add-participant');
@@ -169,6 +170,7 @@ class ViewTaskPage extends Component
                 return;
             }
         }
+
         $taskUser = $this->selectedTaskUser;
         $oldDate = $taskUser->time_out;
         $oldBody = $taskUser->task->body;
@@ -177,36 +179,11 @@ class ViewTaskPage extends Component
         if ($validated['year'] && $validated['month'] && $validated['day']) {
             $newDate = sprintf('%04d/%02d/%02d', $validated['year'], $validated['month'], $validated['day']);
         }
-        // Notification data to send later
-        $notificationsData = [];
-        // Case 1: Date changed → update TaskUser
-        if ($newDate && $newDate !== $oldDate) {
-            $targetTaskUser = \App\Models\TaskUser::where('user_id', $taskUser->user_id)
-                ->where('task_id', $taskUser->task_id)
-                ->first();
-            if ($targetTaskUser) {
-                $targetTaskUser->time_out = $newDate;
-                $targetTaskUser->task_status = TaskStatus::PENDING->value;
-                $targetTaskUser->request_task = null;
-                $targetTaskUser->save();
 
-                $meetingId = $taskUser->task->meeting_id;
+        $notificationMessage = null;
+        $meetingId = $taskUser->task->meeting_id;
 
-                // Prepare notification message for time_out update
-                $notificationMessage = "مهلت انجام اقدام شما به تاریخ {$newDate} تغییر کرد.";
-                $notificationsData[] = [
-                    'type' => 'UpdatedTaskTimeOut',
-                    'data' => json_encode(['message' => $notificationMessage]),
-                    'notifiable_type' => \App\Models\Meeting::class,
-                    'notifiable_id' => $meetingId,
-                    'sender_id' => auth()->id(),
-                    'recipient_id' => $targetTaskUser->user_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-        }
-        // Case 2: taskBody changed → create new Task and TaskUser
+        // Case: taskBody changed
         if ($newBody && trim($newBody) !== trim($oldBody)) {
             $taskUsersCount = $taskUser->task->taskUsers()->count();
 
@@ -223,43 +200,58 @@ class ViewTaskPage extends Component
             $newTaskUser->request_task = null;
             $newTaskUser->save();
 
-            // Always delete old task_user for the same user
+            // Delete old task_user for the same user
             $taskUser->delete();
 
             // Delete old task if no other users left
             if ($taskUsersCount === 1) {
                 $taskUser->task->delete();
             }
+
+            $taskUser = $newTaskUser; // Update reference to new taskUser
             $meetingId = $newTask->meeting_id;
-            // Prepare notification message for body update
-            $notificationMessage = "متن وظیفه شما به روز رسانی شد.";
-            $notificationsData[] = [
-                'type' => 'UpdatedTaskBody',
+
+            $notificationMessage = 'متن بند برای شما به روز رسانی شد.';
+
+            // Append message if time changed too
+            if ($newDate && $newDate !== $oldDate) {
+                $notificationMessage .= " مهلت انجام آن تا {$newDate} تعیین شد.";
+            }
+        }
+        // Only date changed
+        elseif ($newDate && $newDate !== $oldDate) {
+            $taskUser->time_out = $newDate;
+            $taskUser->task_status = TaskStatus::PENDING->value;
+            $taskUser->request_task = null;
+            $taskUser->save();
+            $notificationMessage = "مهلت انجام اقدام شما به تاریخ {$newDate} تغییر کرد.";
+        }
+
+        // Clear previous notifications of these types for this user and meeting
+        \App\Models\Notification::where('recipient_id', $taskUser->user_id)
+            ->whereIn('type', ['UpdatedTaskTimeOut', 'UpdatedTaskBody'])
+            ->where('notifiable_type', \App\Models\Meeting::class)
+            ->where('notifiable_id', $meetingId)
+            ->delete();
+
+        // Insert one combined notification if any changes were made
+        if ($notificationMessage) {
+            \App\Models\Notification::create([
+                'type' => 'UpdatedTask',
                 'data' => json_encode(['message' => $notificationMessage]),
                 'notifiable_type' => \App\Models\Meeting::class,
                 'notifiable_id' => $meetingId,
                 'sender_id' => auth()->id(),
-                'recipient_id' => $newTaskUser->user_id,
+                'recipient_id' => $taskUser->user_id,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ]);
         }
-        \App\Models\Notification::where('recipient_id', $taskUser->user_id)
-            ->where(function ($query) use ($taskUser) {
-                $query->where('type', 'UpdatedTaskTimeOut')
-                    ->orWhere('type', 'UpdatedTaskBody');
-            })
-            ->where('notifiable_type', \App\Models\Meeting::class)
-            ->where('notifiable_id', $taskUser->task->meeting_id)
-            ->delete();
 
-        // Insert notifications if any
-        if (!empty($notificationsData)) {
-            \App\Models\Notification::insert($notificationsData);
-        }
         session()->flash('status', 'اطلاعات با موفقیت ویرایش شد');
-        return to_route('view.task.page',$this->meeting);
+        return to_route('view.task.page', $this->meeting);
     }
+
     public function delete($taskUserId)
     {
         TaskUser::findOrFail($taskUserId)->delete();
@@ -421,7 +413,7 @@ class ViewTaskPage extends Component
         $taskUser->update(['task_status' => TaskStatus::ACCEPTED->value]);
 
         // Prepare notification message
-        $notificationMessage = "آقا/خانم " . auth()->user()->user_info->full_name .
+        $notificationMessage = "این شخص ".
             " بند با عنوان «" . $taskUser->task->body . "» را در جلسه «" . $meeting->title . "» قبول کرد.";
 
         $recipientId = $userInfo->user_id;
@@ -699,8 +691,10 @@ class ViewTaskPage extends Component
         // Get the related meeting
         $meeting = $taskUser->task->meeting;
 
-        // Prepare the notification message
-        $notificationMessage = $request_task;
+        $meetingTitle = $meeting->title ?? 'بدون عنوان';
+        $taskBody = $taskUser->task->body ?? 'بدون توضیح';
+
+        $notificationMessage = "بند مذاکره با عنوان «{$taskBody}» در جلسه «{$meetingTitle}» توسط این شخص رد شده است. دلیل: {$request_task}";
 
         // Find the scriptorium (recipient) user ID
         $recipientId = User::whereHas('user_info', function ($query) use ($meeting) {
@@ -745,8 +739,38 @@ class ViewTaskPage extends Component
                 'task_status' => TaskStatus::SENT_TO_SCRIPTORIUM->value,
             ]);
 
+        // === Notification Logic ===
+        $task = \App\Models\Task::with('meeting')->findOrFail($taskId);
+        $meeting = $task->meeting;
 
-        session()->flash('status', 'شرح اقدام به دبیر جلسه ارسال شد.');
+        // Extract scriptorium full name and position from meeting
+        $scriptoriumName = $meeting->scriptorium;
+        $scriptoriumPosition = $meeting->scriptorium_position;
+
+        // Find the corresponding user_id from user_info
+        $scriptoriumUser = DB::table('user_infos')
+            ->where('full_name', $scriptoriumName)
+            ->where('position', $scriptoriumPosition)
+            ->first();
+
+        $scriptoriumId = $scriptoriumUser?->user_id ?? null;
+
+        if ($scriptoriumId) {
+            $senderName = auth()->user()->user_info->full_name ?? 'کاربر';
+            $message = "{$senderName} وظیفه خود را برای جلسه «{$meeting->title}» در تاریخ {$newTime} تکمیل کرد.";
+
+            \App\Models\Notification::create([
+                'type' => 'TaskSentToScriptorium',
+                'data' => json_encode(['message' => $message]),
+                'notifiable_type' => \App\Models\Meeting::class,
+                'notifiable_id' => $meeting->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $scriptoriumId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        session()->flash('status', 'شرح اقدام تکمیل و دبیرجلسه مطلع شد');
         return to_route('view.task.page',$this->meeting);
     }
 

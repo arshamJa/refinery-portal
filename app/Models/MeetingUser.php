@@ -42,18 +42,16 @@ class MeetingUser extends Model
         return (int) $this->attributes['is_present'];
     }
 
-    public function is_present(): bool
-    {
-        return $this->attributes['is_present'] == MeetingUserStatus::IS_PRESENT->value;
-    }
-
-    public function is_absent(): bool
-    {
-        return $this->attributes['is_present'] == MeetingUserStatus::IS_NOT_PRESENT->value;
-    }
+//    public function is_present(): bool
+//    {
+//        return $this->attributes['is_present'] == MeetingUserStatus::IS_PRESENT->value;
+//    }
+//    public function is_absent(): bool
+//    {
+//        return $this->attributes['is_present'] == MeetingUserStatus::IS_NOT_PRESENT->value;
+//    }
     public function replacementName(): ?string
     {
-
         if (! $this->replacement) {
             return null;
         }

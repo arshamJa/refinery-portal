@@ -1,26 +1,30 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ExportPDFController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SendInvitationToReplacementController;
-use App\Livewire\admin\AdminDashboard;
-use App\Livewire\admin\EmployeeAccess;
-use App\Livewire\employee\EmployeeDashboard;
+use App\Http\Controllers\VerificationCodeController;
 use App\Livewire\employee\EmployeesOrganization;
-use App\Livewire\Message;
-use App\Livewire\operator\OperatorDashboard;
-use App\Livewire\TranslatePage;
+use App\Livewire\ReceivedMessage;
+use App\Livewire\SentMessage;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
 
     Route::get('/', [AuthController::class, 'create'])->name('login');
     Route::post('/login', [AuthController::class, 'store'])->name('login.store');
+
+
+    Route::get('/login/otp', [VerificationCodeController::class, 'showVerifyCodeLogin'])
+        ->name('otp.login');
+    Route::post('/otp/send', [VerificationCodeController::class, 'send'])
+        ->name('otp.send');
+    Route::post('/otp/verify', [VerificationCodeController::class, 'verify'])
+        ->name('otp.verify');
+
 });
 
 Route::middleware('auth')->group(function () {
-
 
 
     Route::post('/logout', [AuthController::class, 'logout'])
@@ -36,8 +40,8 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard');
 
 
-    Route::get('received/message',\App\Livewire\ReceivedMessage::class)->name('received.message');
-    Route::get('sent/message',\App\Livewire\SentMessage::class)->name('sent.message');
+    Route::get('received/message', ReceivedMessage::class)->name('received.message');
+    Route::get('sent/message', SentMessage::class)->name('sent.message');
 
     Route::get('employee/organization', EmployeesOrganization::class)
         ->name('employee.organization');
