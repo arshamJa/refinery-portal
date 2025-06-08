@@ -54,6 +54,7 @@
                     @break
             @endswitch
         </div>
+
         <div id="meeting-info"
              class="grid grid-cols-2 gap-x-6 gap-y-2 bg-gray-50 border border-gray-300 rounded-md p-4 text-gray-700 text-sm print:text-[16px] print:leading-[1.4] print:grid print:grid-cols-2 print:gap-2 print:border print:border-gray-400">
             <div><strong>{{ __('واحد/کمیته: ') }}</strong><span>{{ $this->meetings->unit_held }}</span></div>

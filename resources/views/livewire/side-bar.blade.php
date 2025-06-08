@@ -1,4 +1,4 @@
-@php use App\Enums\UserRole;use App\Models\Notification; @endphp
+@php use App\Enums\UserPermission;use App\Enums\UserRole;use App\Models\Notification; @endphp
 <div class="h-full flex flex-col">
     <!-- Profile Image and Name -->
     <div class="flex flex-col justify-center items-center text-gray-100 px-3 pb-4 font-bold border-b border-gray-500">
@@ -27,9 +27,9 @@
         <ul class="w-full mt-2">
             <li class="mb-2">
                 <x-link.responsive-link wire:navigate href="{{route('dashboard')}}"
-                                        :active="request()->is('dashboard')" class="flex items-center gap-x-2">
+                                        :active="request()->is('dashboard')" class="flex items-center gap-2 pr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-5 ">
+                         stroke="currentColor" class="size-5">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                     </svg>
@@ -59,7 +59,7 @@
                     <div x-show="openMeeting" x-transition class="mt-1 space-y-1 pr-3">
                         <x-link.responsive-link href="{{route('meeting.create')}}"
                                                 :active="request()->is('create/new/meeting')"
-                                                class="flex items-center gap-x-2">
+                                                class="flex items-center gap-x-2 text-xs">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="size-4">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -69,7 +69,7 @@
                         </x-link.responsive-link>
                         <x-link.responsive-link wire:navigate href="{{route('my.task.table')}}"
                                                 :active="request()->is('my/task/table')"
-                                                class="flex items-center gap-x-2">
+                                                class="flex items-center gap-x-2 text-xs">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="size-4">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -79,7 +79,7 @@
                         </x-link.responsive-link>
                         <x-link.responsive-link wire:navigate href="{{route('dashboard.meeting')}}"
                                                 :active="request()->is('dashboard/meeting')"
-                                                class="flex items-center gap-x-2">
+                                                class="flex items-center gap-x-2 text-xs">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="size-4">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -87,17 +87,18 @@
                             </svg>
                             {{__('جدول جلسات')}}
                         </x-link.responsive-link>
-                        @can('has-permission', \App\Enums\UserPermission::TASK_REPORT_TABLE)
-                        <x-link.responsive-link href="{{route('meeting.report')}}"
-                                                :active="request()->is('meeting/report')"
-                                                class="flex items-center gap-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
-                            </svg>
-                            <h3 class="text-sm font-semibold"> {{__('گزارش جلسات شرکت')}}</h3>
-                        </x-link.responsive-link>
+                        @can('has-permission', UserPermission::TASK_REPORT_TABLE)
+                            <x-link.responsive-link href="{{route('meeting.report')}}"
+                                                    :active="request()->is('meeting/report')"
+                                                    class="flex items-center gap-x-2 text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
+                                </svg>
+                                {{__('گزارش جلسات شرکت')}}
+                            </x-link.responsive-link>
                         @endcan
                     </div>
                 </div>
@@ -115,6 +116,14 @@
                                     <span class="relative inline-flex h-3 w-3 rounded-full bg-sky-50"></span>
                                 </span>
                                 </div>
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+                                </svg>
                             @endif
                             <span>{{__('پیام ها')}}</span>
                         </div>
@@ -129,13 +138,7 @@
                     <div x-show="openMessage" x-transition class="mt-1 space-y-1 pr-3">
                         <x-link.responsive-link wire:navigate href="{{route('received.message')}}"
                                                 :active="request()->is('received/message')"
-                                                class="flex items-center gap-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-4">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-                            </svg>
+                                                class="flex items-center gap-x-2 text-xs">
                             <span class="flex justify-between w-full">
                                 <span>
                                     {{__('پیام های دریافتی')}}
@@ -149,21 +152,9 @@
                         </x-link.responsive-link>
                         <x-link.responsive-link wire:navigate href="{{route('sent.message')}}"
                                                 :active="request()->is('sent/message')"
-                                                class="flex items-center gap-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="size-4">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-                            </svg>
+                                                class="flex items-center gap-x-2 text-xs">
                             <span class="flex justify-between w-full">
-                            <span>{{__('پیام های ارسالی')}}</span>
-{{--                                @if($this->unreadSentCount() > 0)--}}
-{{--                                    <span class="text-gray-100 font-bold">--}}
-{{--                                        {{ $this->unreadSentCount() > 10 ? '+10' : $this->unreadSentCount() }}--}}
-{{--                                    </span>--}}
-{{--                                @endif--}}
-                            </span>
+                            <span>{{__('پیام های ارسالی')}}</span></span>
                         </x-link.responsive-link>
                     </div>
                 </div>
@@ -227,7 +218,7 @@
                         <div x-show="openSetting" x-transition class="mt-1 space-y-1 pr-3">
                             <x-link.responsive-link href="{{route('users.create')}}"
                                                     :active="request()->is('users/create')"
-                                                    class="flex items-center text-sm gap-x-2">
+                                                    class="flex items-center text-sm gap-x-2 text-xs">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" class="size-4">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -237,7 +228,7 @@
                             </x-link.responsive-link>
                             <x-link.responsive-link href="{{route('users.index')}}"
                                                     :active="request()->is('users/table')"
-                                                    class="flex items-center gap-x-2">
+                                                    class="flex items-center gap-x-2 text-xs">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5"
                                      stroke="currentColor" class="size-4">
@@ -249,7 +240,7 @@
                             <x-link.responsive-link
                                 href="{{route('organization.department.manage')}}"
                                 :active="request()->is('department/organization/manage')"
-                                class="flex items-center gap-x-2">
+                                class="flex items-center gap-x-2 text-xs">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5"
                                      stroke="currentColor" class="size-4">
@@ -261,7 +252,7 @@
                             @if(auth()->user()->hasRole(UserRole::SUPER_ADMIN->value))
                                 <x-link.responsive-link href="{{route('role.permission.table')}}"
                                                         :active="request()->is('roles/permissions')"
-                                                        class="flex items-center gap-x-2">
+                                                        class="flex items-center gap-x-2 text-xs">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5"
                                          stroke="currentColor" class="size-4">

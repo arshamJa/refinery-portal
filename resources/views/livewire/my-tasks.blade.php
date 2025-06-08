@@ -51,9 +51,9 @@
             <div class="col-span-6 sm:col-span-1 ">
                 <x-input-label for="statusFilter" value="{{ __('وضعیت اقدامات') }}"/>
                 <x-select-input id="statusFilter" wire:model="statusFilter">
-                    <option value="">{{__('همه وضعیت‌ها')}}</option>
-                    <option value="1">{{__('انجام دادم')}}</option>
-                    <option value="0">{{__('انجام ندادم')}}</option>
+                    <option value="">{{ __('همه وضعیت‌ها') }}</option>
+                    <option value="SENT_TO_SCRIPTORIUM">{{ __('انجام دادم') }}</option>
+                    <option value="PENDING">{{ __('انجام ندادم') }}</option>
                 </x-select-input>
             </div>
             <!-- Search + Show All Buttons -->
@@ -73,7 +73,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['#','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','شرح اقدام','تاریخ ارسال اقدام','',''] as $th)
+                    @foreach (['#','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','تاریخ ارسال اقدام',''] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -82,68 +82,81 @@
                 </x-table.row>
             </x-slot>
             <x-slot name="body">
-                    @forelse($this->taskUsers as $taskUser)
-                        <x-table.row wire:key="task-{{ $taskUser->id }}" class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                            <x-table.cell>{{ ($this->taskUsers->currentPage() - 1) * $this->taskUsers->perPage() + $loop->iteration }}</x-table.cell>
-                            <x-table.cell>{{ $taskUser->task->meeting->title ?? '-' }}</x-table.cell>
-                            <x-table.cell>
-                                {{ Str::words($taskUser->task->body?? '---' , 5 , '...')}}
-                            </x-table.cell>
-                            <x-table.cell>{{ $taskUser->task->time_out ?? '-' }}</x-table.cell>
-                            <x-table.cell>{{ Str::words($taskUser->body_task ?? '---' , 5 , '...')}}</x-table.cell>
-                            <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
-                            <x-table.cell>
-                                <a href="{{route('view.task.page', $taskUser->task->meeting->id )}}">
-                                    <x-secondary-button>
-                                        {{__('نمایش صورتجلسه')}}
-                                    </x-secondary-button>
-                                </a>
-                            </x-table.cell>
-                            <x-table.cell>
-                                <x-primary-button wire:click.prevent="view({{$taskUser->id}})">
-                                    {{ __('نمایش جزئیات') }}
-                                </x-primary-button>
-                                {{--                                <x-dropdown>--}}
-                                {{--                                    <x-slot name="trigger">--}}
-                                {{--                                        <button class="hover:bg-gray-200 rounded-full p-1 transition">--}}
-                                {{--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"--}}
-                                {{--                                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"--}}
-                                {{--                                                 class="w-5 h-5 text-gray-600">--}}
-                                {{--                                                <path stroke-linecap="round" stroke-linejoin="round"--}}
-                                {{--                                                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>--}}
-                                {{--                                            </svg>--}}
-                                {{--                                        </button>--}}
-                                {{--                                    </x-slot>--}}
-                                {{--                                    <x-slot name="content">--}}
-                                {{--                                        <x-dropdown-link wire:click.prevent="view({{$taskUser->id}})">--}}
-                                {{--                                            {{ __('نمایش جزئیات') }}--}}
-                                {{--                                        </x-dropdown-link>--}}
-                                {{--                                        @if($meeting->status != MeetingStatus::IS_CANCELLED->value and $meeting->status != MeetingStatus::IS_NOT_CANCELLED->value)--}}
-                                {{--                                            <x-dropdown-link href="#">--}}
-                                {{--                                                {{ __('ویرایش') }}--}}
-                                {{--                                            </x-dropdown-link>--}}
-                                {{--                                        @endif--}}
-                                {{--                                        @if($meeting->status == MeetingStatus::PENDING->value or $meeting->status == MeetingStatus::IS_CANCELLED->value)--}}
-                                {{--                                            <x-dropdown-link wire:click.prevent="deleteMeeting({{$meeting->id}})"--}}
-                                {{--                                                             class="text-red-600 ">--}}
-                                {{--                                                {{ __('حذف') }}--}}
-                                {{--                                            </x-dropdown-link>--}}
-                                {{--                                        @endif--}}
-                                {{--                                    </x-slot>--}}
-                                {{--                                </x-dropdown>--}}
-                            </x-table.cell>
-                        </x-table.row>
-                    @empty
-                        <x-table.row>
-                            <x-table.cell colspan="7"
-                                          class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
-                        </x-table.row>
-                    @endforelse
+                @forelse($this->taskUsers as $taskUser)
+                    <x-table.row wire:key="task-{{ $taskUser->id }}"
+                                 class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                        <x-table.cell>{{ ($this->taskUsers->currentPage() - 1) * $this->taskUsers->perPage() + $loop->iteration }}</x-table.cell>
+                        <x-table.cell>{{ $taskUser->task->meeting->title ?? '-' }}</x-table.cell>
+                        <x-table.cell>
+                            {{$taskUser->task->body}}
+                        </x-table.cell>
+                        <x-table.cell>{{ $taskUser->time_out ?? '-' }}</x-table.cell>
+                        <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
+                        <x-table.cell class="flex flex-col gap-2">
+                            <a href="{{route('view.task.page', $taskUser->task->meeting->id )}}">
+                                <x-secondary-button >
+                                    {{__('نمایش صورتجلسه')}}
+                                </x-secondary-button>
+                            </a>
+                            <x-edit-button wire:click.prevent="view({{$taskUser->id}})">
+                                {{ __('نمایش جزئیات') }}
+                            </x-edit-button>
+                        </x-table.cell>
+                    </x-table.row>
+                @empty
+                    <x-table.row>
+                        <x-table.cell colspan="7"
+                                      class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
+                    </x-table.row>
+                @endforelse
             </x-slot>
         </x-table.table>
     </div>
     <div class="mt-2">
         {{ $this->taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
+
+
+    <x-modal name="view-task-details" maxWidth="4xl" :closable="false">
+        @if ($selectedTaskUser)
+            <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800">{{ __('جزئیات') }}</h2>
+                <button type="button" x-on:click="$dispatch('close')"
+                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="px-6 py-6 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
+                {{-- Task Info --}}
+                <div class="grid grid-cols-2 gap-4">
+                    <x-meeting-info label="{{ __('عنوان جلسه') }}"
+                                    :value="$selectedTaskUser->task->meeting->title ?? '---'"/>
+                    <x-meeting-info label="{{ __('تاریخ ارسال') }}"
+                                    :value="$selectedTaskUser->sent_date ?? '---'"/>
+                    <x-meeting-info label="{{ __('تاریخ مهلت اقدام') }}"
+                                    :value="$selectedTaskUser->time_out ?? '---'"/>
+                </div>
+
+                {{-- Task Description --}}
+                <div>
+                    <x-input-label :value="__('شرح اقدام')" class="mb-2"/>
+                    <p class="p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md min-h-[100px]">
+                        {{ $selectedTaskUser->body_task ?? '---' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end px-6 py-4 bg-gray-100 border-t border-gray-200">
+                <x-cancel-button x-on:click="$dispatch('close')">
+                    {{ __('بستن') }}
+                </x-cancel-button>
+            </div>
+        @endif
+    </x-modal>
+
 
 </div>

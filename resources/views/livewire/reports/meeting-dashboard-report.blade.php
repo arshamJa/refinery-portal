@@ -19,11 +19,12 @@
             <li>
              <span
                  class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                 {{__('گزارش اقدامات')}}
+                 {{__('گزارش جلسات شرکت')}}
              </span>
             </li>
         </ol>
     </nav>
+
 
 
 

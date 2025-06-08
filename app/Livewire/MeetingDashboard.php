@@ -183,6 +183,7 @@ class MeetingDashboard extends Component
                 $query->where('scriptorium', auth()->user()->user_info->full_name); // Assuming the scriptorium is the authenticated user's name
             });
     }
+
     public function exportExcel()
     {
         // Get the filters from the request

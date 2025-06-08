@@ -34,7 +34,7 @@ class UpdateNewUserRequest extends FormRequest
             'phone' => ['bail', 'required', 'digits:11', new PhoneNumberRule()],
             'house_phone' => ['bail', 'required', 'numeric'],
             'work_phone' => ['bail', 'required', 'numeric'],
-            'position' => ['bail', 'required', 'string','max:255',new farsi_chs()],
+            'position' => ['bail', 'required', 'string','max:255'],
             'department' => ['required'],
             'password' => ['bail', 'nullable', 'numeric', 'digits:8', Rules\Password::defaults()],
         ];

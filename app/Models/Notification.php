@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 
 class Notification extends Model
 {
@@ -90,6 +91,13 @@ class Notification extends Model
             return 'این شخص دعوت به جلسه را قبول کرده است';
         }
 
+        if ($this->type === "MeetingCancelled"){
+            $meeting = $this->notifiable;
+            if ($meeting) {
+                return "جلسه \"{$meeting->title}\" که قرار بود در تاریخ {$meeting->date} و ساعت {$meeting->time} برگزار شود، لغو شده‌است.";
+            }
+        }
+
         if ($this->type === 'DenyInvitation') {
             $meeting = $this->notifiable;
             if ($meeting) {
@@ -127,15 +135,12 @@ class Notification extends Model
                 $replacementUserId = $this->recipient_id;
                 $replacementUser = User::with('user_info')->find($replacementUserId);
                 $replacementName = $replacementUser?->user_info?->full_name ?? 'نامشخص';
-
                 $meetingUser = $meeting->meetingUsers()
                     ->where('replacement', $replacementUserId)
                     ->with('user.user_info')
                     ->first();
-
                 $assignerName = $meetingUser?->user?->user_info?->full_name ?? 'فرد ناشناس';
-
-                return "{$assignerName} شما را به عنوان جانشین خود برای جلسه «{$meeting->title}» در تاریخ {$meeting->date} ساعت {$meeting->time} انتخاب کرده است.";
+                return "{$assignerName} شما را به عنوان جانشین خود برای جلسه «{$meeting->title}» برای تاریخ {$meeting->date} ساعت {$meeting->time} انتخاب کرده است.";
             }
         }
 
@@ -167,6 +172,141 @@ class Notification extends Model
         return $message;
     }
 
+
+
+
+    public function getSentMessage(): string
+    {
+        $message = json_decode($this->data)->message ?? 'N/A';
+
+        if ($this->type === 'AcceptInvitation') {
+            $userId = $this->recipient_id;
+            $meeting = $this->notifiable;
+
+            $date = $meeting->date;
+            $time = $meeting->time;
+            $title = $meeting->title;
+
+            $meetingUser = \App\Models\MeetingUser::where('meeting_id', $meeting->id)
+                ->where('user_id', $userId)
+                ->first();
+
+            if ($meetingUser && $meetingUser->replacement) {
+                $replacementUserInfo = \App\Models\UserInfo::where('user_id', $meetingUser->replacement)->first();
+                $replacementName = $replacementUserInfo->full_name ?? 'نامشخص';
+                return "شما دعوت به جلسه «{$title}» برای تاریخ {$date} و ساعت {$time} را قبول کردید و آقای/خانم {$replacementName} به جای شما در جلسه شرکت خواهد کرد.";
+            } else {
+                return "شما دعوت به جلسه «{$title}» برای تاریخ {$date} و ساعت {$time} را قبول کردید.";
+            }
+        }
+
+        if ($this->type === 'DenyInvitation') {
+            $meeting = $this->notifiable;
+            return "شما دعوت به جلسه «{$meeting->title}» برای تاریخ {$meeting->date} و ساعت {$meeting->time} را رد کردید.";
+        }
+
+        if ($this->type === 'ReplacementForMeeting') {
+            $meeting = $this->notifiable;
+            if ($meeting) {
+                $recipient = \App\Models\User::find($this->recipient_id);
+                $fullName = $recipient?->user_info?->full_name ?? 'نامشخص';
+                return 'شما این جلسه را نپذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
+            }
+        }
+
+        if (in_array($this->type, ['MeetingGuestInvitation', 'MeetingInvitation'])) {
+            $meeting = $this->notifiable;
+            $roleText = $this->type === 'MeetingGuestInvitation' ? 'به عنوان مهمان ' : '';
+            return "این شخص {$roleText}در جلسه \"{$meeting->title}\" و در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌است.";
+        }
+
+        if (in_array($this->type, ['MeetingConfirmed', 'MeetingCancelled'])) {
+            $meeting = $this->notifiable;
+            if ($this->type === 'MeetingConfirmed') {
+                return "جلسه \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} برگزار خواهد شد.";
+            } else {
+                return "جلسه \"{$meeting->title}\" که قرار بود در تاریخ {$meeting->date} و ساعت {$meeting->time} برگزار شود، لغو شده‌است.";
+            }
+        }
+
+        if ($this->type === 'AcceptedTask') {
+            $meeting = $this->notifiable;
+            $task = \App\Models\Task::where('meeting_id', $meeting->id)
+                ->whereHas('taskUsers', function ($query) {
+                    $query->where('user_id', auth()->id())
+                        ->where('task_status', \App\Enums\TaskStatus::ACCEPTED->value);
+                })->first();
+            return "شما این اقدام «{$task?->body}» را از جلسه «{$meeting->title}» پذیرفته‌اید.";
+        }
+
+        if ($this->type === 'DeniedTask') {
+            $meeting = $this->notifiable;
+            $task = \App\Models\Task::where('meeting_id', $meeting->id)
+                ->whereHas('taskUsers', function ($query) {
+                    $query->where('user_id', auth()->id())
+                        ->where('task_status', \App\Enums\TaskStatus::DENIED->value);
+                })->first();
+            return "شما این اقدام «{$task?->body}» را از جلسه «{$meeting->title}» نپذیرفته‌اید.";
+        }
+
+        if ($this->type === 'AssignedNewTask') {
+            $meeting = $this->notifiable;
+            $recipientFullName = $this->recipient?->user_info?->full_name ?? 'نامشخص';
+            $task = \App\Models\Task::where('meeting_id', $meeting->id)
+                ->whereHas('taskUsers', function ($query) {
+                    $query->where('user_id', $this->recipient_id);
+                })->first();
+            $taskUser = \App\Models\TaskUser::where('task_id', $task->id ?? null)
+                ->where('user_id', $this->recipient_id)->first();
+            $timeOut = $taskUser?->time_out ?? 'زمان مشخص نشده';
+            return "شما وظیفه‌ای را به آقای/خانم {$recipientFullName} ارسال کرده‌اید برای جلسه «{$meeting->title}». تاریخ مهلت اقدام: {$timeOut}.";
+        }
+
+        if ($this->type === 'UpdatedTask') {
+            $meeting = $this->notifiable;
+            $taskUser = \App\Models\TaskUser::whereHas('task', function ($query) use ($meeting) {
+                $query->where('meeting_id', $meeting->id);
+            })->where('user_id', $this->recipient_id)->first();
+            $updaterFullName = $this->sender?->user_info?->full_name ?? 'نامشخص';
+            return "متن/مهلت اقدام مربوط به جلسه «{$meeting->title}» برای آقای/خانم {$updaterFullName} به‌روزرسانی شد.";
+        }
+
+        if ($this->type === 'TaskSentToScriptorium') {
+            $meeting = $this->notifiable;
+            $taskUser = \App\Models\TaskUser::whereHas('task', function ($query) use ($meeting) {
+                $query->where('meeting_id', $meeting->id);
+            })->where('user_id', auth()->id())->first();
+            $sent_date = $taskUser->sent_date ?? 'null';
+            return "شما این بند را برای جلسه «{$meeting->title}» به {$meeting->scriptorium} ارسال کرده‌اید. تاریخ ارسال: {$sent_date }.";
+        }
+
+        // Fallback if sender initiated the notification
+        if (auth()->id() === $this->sender_id) {
+            $meeting = $this->notifiable;
+            return "شما آقای/خانم " . ($this->recipient->user_info->full_name ?? 'N/A')
+                . " را به جلسه \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت کرده‌اید.";
+        }
+
+        return $message;
+    }
+
+
+    public function getNotificationDateTime(): string
+    {
+        $datetime = $this->created_at;
+        list($date, $time) = explode(' ', $datetime);
+        // Separate the date into year, month, and day
+        list($year, $month, $day) = explode('-', $date);
+        // Convert the Gregorian date to Jalali
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali($year, $month, $day, '/'));
+        // Format the Jalali date
+        $newDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
+        // Extract hour and minute from time
+        list($hour, $minute) = explode(':', $time);
+        // Combine Jalali date with hour and minute only
+        return $newDate . ' - ' . $hour . ':' . $minute;
+    }
+
     public function getTypeLabelAttributes(): array
     {
         return match ($this->type) {
@@ -178,9 +318,6 @@ class Notification extends Model
             'MeetingConfirmed' => ['label' => __('برگزاری جلسه'), 'text' => 'text-emerald-600'],
             'MeetingCancelled' => ['label' => __('لغو جلسه'), 'text' => 'text-gray-600'],
             'AssignedNewTask' => ['label' => __('دریافت اقدام'), 'text' => 'text-yellow-600'],
-            'UpdatedTaskTimeOut' => ['label' => __('ویرایش مهلت اقدام'), 'text' => 'text-yellow-600'],
-            'UpdatedTaskBody' => ['label' => __('ویرایش بند مذاکره'), 'text' => 'text-purple-600'],
-            'DeniedTaskNotification' => ['label' => __('رد اقدام'), 'text' => 'text-rose-600'],
             'AcceptedTask' => ['label' => __('تایید بند مذاکره'), 'text' => 'text-cyan-600'],
             'DeniedTask' => ['label' => __('رد بند مذاکره'), 'text' => 'text-red-600'],
             'UpdatedTask'=> ['label' => __('بروزرسانی بند'), 'text' => 'text-emerald-600'],

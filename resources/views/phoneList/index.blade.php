@@ -1,4 +1,4 @@
-@php use App\Enums\UserRole;use App\Models\User;use App\Models\UserInfo; @endphp
+@php use App\Enums\UserPermission;use App\Enums\UserRole;use App\Models\User;use App\Models\UserInfo; @endphp
 <x-app-layout>
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -20,8 +20,10 @@
             <li>
                 <a href="{{route('dashboard')}}"
                    class="inline-flex items-center px-2 py-1.5 cursor-default active-breadcrumb space-x-1.5 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75v-4.5m0 4.5h4.5m-4.5 0 6-6m-3 18c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M14.25 9.75v-4.5m0 4.5h4.5m-4.5 0 6-6m-3 18c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"/>
                     </svg>
                     <span>{{__('دفترچه تلفنی')}}</span>
                 </a>
@@ -29,124 +31,104 @@
         </ol>
     </nav>
 
-        <form method="GET" action="{{ route('phone-list.index') }}" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4  pt-3">
-                <div>
-                    <x-input-label for="department">{{ __('دپارتمان') }}</x-input-label>
-                    <x-text-input type="text" name="department" id="department" value="{{ request('department') }}"/>
-                </div>
-                <div>
-                    <x-input-label for="full_name">{{ __('نام و نام حانوادگی') }}</x-input-label>
-                    <x-text-input type="text" name="full_name" id="full_name" value="{{ request('full_name') }}"/>
-                </div>
-                <div>
-                    <x-input-label for="work_phone">{{ __('تلفن محل کار') }}</x-input-label>
-                    <x-text-input type="text" name="work_phone" id="work_phone" value="{{ request('work_phone') }}"/>
-                </div>
-                @can('viewAny',User::class)
-                    <div>
-                        <x-input-label for="phone">{{ __('تلفن همراه') }}</x-input-label>
-                        <x-text-input type="text" name="phone" id="phone" value="{{ request('phone') }}"/>
-                    </div>
-                    <div>
-                        <x-input-label for="house_phone">{{ __('تلفن منزل') }}</x-input-label>
-                        <x-text-input type="text" name="house_phone" id="house_phone"
-                                      value="{{ request('house_phone') }}"/>
-                    </div>
-                    <div>
-                        <x-label for="role">{{ __('نقش') }}</x-label>
-                        <select name="role" id="role"
-                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full">
-                            <option value="">{{ __('همه نقش ها') }}</option>
-                            @foreach($roles as $role)
-                                <option value="{{ $role->id }}">{{ $role->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endcan
-
+    <form method="GET" action="{{ route('phone-list.index') }}" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4  pt-3">
+            <div>
+                <x-input-label for="department">{{ __('دپارتمان') }}</x-input-label>
+                <x-text-input type="text" name="department" id="department" value="{{ request('department') }}"/>
             </div>
-            <div class="w-full flex gap-4 items-center px-3 pb-3">
-                <x-search-button>{{__('جست و جو')}}</x-search-button>
-                @if ($originalUsersCount != $filteredUsersCount)
-                    <x-view-all-link href="{{route('phone-list.index')}}">{{__('نمایش همه')}}</x-view-all-link>
-                @endif
+            <div>
+                <x-input-label for="full_name">{{ __('نام و نام حانوادگی') }}</x-input-label>
+                <x-text-input type="text" name="full_name" id="full_name" value="{{ request('full_name') }}"/>
             </div>
-        </form>
+            <div>
+                <x-input-label for="work_phone">{{ __('تلفن محل کار') }}</x-input-label>
+                <x-text-input type="text" name="work_phone" id="work_phone" value="{{ request('work_phone') }}"/>
+            </div>
+            @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
+                <div>
+                    <x-input-label for="phone">{{ __('تلفن همراه') }}</x-input-label>
+                    <x-text-input type="text" name="phone" id="phone" value="{{ request('phone') }}"/>
+                </div>
+                <div>
+                    <x-input-label for="house_phone">{{ __('تلفن منزل') }}</x-input-label>
+                    <x-text-input type="text" name="house_phone" id="house_phone"
+                                  value="{{ request('house_phone') }}"/>
+                </div>
+                <div>
+                    <x-label for="role">{{ __('نقش') }}</x-label>
+                    <select name="role" id="role"
+                            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full">
+                        <option value="">{{ __('همه نقش ها') }}</option>
+                        @foreach($roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endcan
 
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
+        </div>
+        <div class="w-full flex gap-4 items-center pb-3">
+            <x-search-button>{{__('جست و جو')}}</x-search-button>
+            @if ($originalUsersCount != $filteredUsersCount)
+                <x-view-all-link href="{{route('phone-list.index')}}">{{__('نمایش همه')}}</x-view-all-link>
+            @endif
+        </div>
+    </form>
+
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                        @foreach (['ردیف', 'دپارتمان', 'نام و نام خانوادگی','تلفن محل کار'] as $th)
-                            <x-table.heading
-                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
-                                {{ __($th) }}
-                            </x-table.heading>
-                        @endforeach
-                        @can('viewAny',User::class)
-                            <x-table.heading class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('تلفن همراه') }}</x-table.heading>
-                            <x-table.heading class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('تلفن منزل') }}</x-table.heading>
-                            <x-table.heading class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('قابلیت') }}</x-table.heading>
-                        @endcan
+                    @foreach (['ردیف', 'نام و نام خانوادگی', 'دپارتمان','تلفن محل کار'] as $th)
+                        <x-table.heading
+                            class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                            {{ __($th) }}
+                        </x-table.heading>
+                    @endforeach
+                    @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
+                        <x-table.heading
+                            class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('تلفن همراه') }}</x-table.heading>
+                        <x-table.heading
+                            class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('تلفن منزل') }}</x-table.heading>
+                        <x-table.heading
+                            class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('قابلیت') }}</x-table.heading>
+                    @endcan
                 </x-table.row>
             </x-slot>
             <x-slot name="body">
-{{--                <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">--}}
-                    @forelse($userInfos as $userInfo)
-                        <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                            <x-table.cell>{{ ($userInfos->currentPage() - 1) * $userInfos->perPage() + $loop->iteration }}</x-table.cell>
-                            <x-table.cell>{{ $userInfo->department->department_name ?? 'بدون واحد'}}</x-table.cell>
-                            <x-table.cell> {{ $userInfo->full_name }}</x-table.cell>
-                            <x-table.cell>{{ $userInfo->work_phone }}</x-table.cell>
-                            @can('viewAny',User::class)
-                                <x-table.cell> {{ $userInfo->phone }}</x-table.cell>
-                                <x-table.cell>{{ $userInfo->house_phone }}</x-table.cell>
-                                <x-table.cell>
-                                    <a href="{{route('phone-list.edit',$userInfo->id)}}">
-                                        <x-secondary-button>
-                                            {{__('ویرایش')}}
-                                        </x-secondary-button>
-                                    </a>
-                                </x-table.cell>
-                                {{--                                @endcan--}}
-                                {{--                                <x-dropdown>--}}
-                                {{--                                    <x-slot name="trigger">--}}
-                                {{--                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"--}}
-                                {{--                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"--}}
-                                {{--                                             class="size-6 hover:cursor-pointer">--}}
-                                {{--                                            <path stroke-linecap="round" stroke-linejoin="round"--}}
-                                {{--                                                  d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>--}}
-                                {{--                                        </svg>--}}
-                                {{--                                    </x-slot>--}}
-                                {{--                                    <x-slot name="content">--}}
-                                {{--                                        <x-dropdown-link--}}
-                                {{--                                            href="{{route('users.show',$userInfo->id)}}">--}}
-                                {{--                                            {{__('نمایش')}}--}}
-                                {{--                                        </x-dropdown-link>--}}
-                                {{--                                        <x-dropdown-link--}}
-                                {{--                                            href="{{route('users.edit',$userInfo->id)}}">--}}
-                                {{--                                            {{__('ویرایش')}}--}}
-                                {{--                                        </x-dropdown-link>--}}
-                                {{--                                    </x-slot>--}}
-                                {{--                                </x-dropdown>--}}
-                            @endcan
-                        </x-table.row>
-                    @empty
-                        <x-table.row>
-                            <x-table.cell colspan="7" class="py-6">
-                                {{__('رکوردی یافت نشد...')}}
+                @forelse($userInfos as $userInfo)
+                    <x-table.row
+                        class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                        <x-table.cell>{{ ($userInfos->currentPage() - 1) * $userInfos->perPage() + $loop->iteration }}</x-table.cell>
+                        <x-table.cell> {{ $userInfo->full_name }}</x-table.cell>
+                        <x-table.cell>{{ $userInfo->department->department_name ?? 'بدون واحد'}}</x-table.cell>
+                        <x-table.cell>{{ $userInfo->work_phone }}</x-table.cell>
+                        @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
+                            <x-table.cell> {{ $userInfo->phone }}</x-table.cell>
+                            <x-table.cell>{{ $userInfo->house_phone }}</x-table.cell>
+                            <x-table.cell>
+                                <a href="{{route('phone-list.edit',$userInfo->id)}}">
+                                    <x-secondary-button>
+                                        {{__('ویرایش')}}
+                                    </x-secondary-button>
+                                </a>
                             </x-table.cell>
-                        </x-table.row>
-                    @endforelse
-{{--                </x-table.row>--}}
+                        @endcan
+                    </x-table.row>
+                @empty
+                    <x-table.row>
+                        <x-table.cell colspan="7" class="py-6">
+                            {{__('رکوردی یافت نشد...')}}
+                        </x-table.cell>
+                    </x-table.row>
+                @endforelse
             </x-slot>
         </x-table.table>
     </div>
     <div class="mt-2 mb-12">
         {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
-
 
 
 </x-app-layout>

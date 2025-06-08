@@ -14,7 +14,6 @@
                     </h2>
                 </header>
                 <div class="my-2">
-                    <x-input-label :value="__('دپارتمان')" class="mb-2"/>
                     <div class="custom-select">
                         <div class="select-box">
                             <input type="text" class="tags_input" multiple name="departmentId" hidden>

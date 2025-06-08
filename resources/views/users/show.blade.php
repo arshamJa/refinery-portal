@@ -36,101 +36,112 @@
             </li>
         </ol>
     </nav>
+    @can('users-info')
+        <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
+            <!-- Personal Info -->
+            <div class="border-b pb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">{{__('اطلاعات شخصی')}}</h2>
+                    <a href="{{ route('users.edit', $userInfo->id) }}">
+                    <x-edit-button>
+                        {{__('ویرایش اطلاعات و دسترسی های کاربر')}}
+                    </x-edit-button>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
+                    <div><span class="font-medium">{{__('نقش:')}}</span>
+                        @if($userRoles->isNotEmpty())
+                            {{ $userRoles->pluck('name')->implode(', ') }}
+                        @else
+                            {{ __('بدون نقش') }}
+                        @endif</div>
+                    <div>
+                        <span class="font-medium">{{__('نام و نام خانوادگی:')}}</span>
+                        {{ $userInfo->full_name }}
+                    </div>
+                    <div>
+                        <span class="font-medium">{{__('کد پرسنلی:')}}</span>
+                        {{ $userInfo->user->p_code }}
+                    </div>
+                    <div>
+                        <span class="font-medium">{{__('کد ملی:')}}</span>
+                        {{ $userInfo->n_code }}
+                    </div>
+                    <div>
+                        <span class="font-medium">{{__('شماره همراه:')}}</span>
+                        {{ $userInfo->phone }}
+                    </div>
+                    <div>
+                        <span class="font-medium">{{__('شماره منزل:')}}</span>
+                        {{ $userInfo->house_phone }}
+                    </div>
+                    <div>
+                        <span class="font-medium">{{__('شماره محل کار:')}}</span>
+                        {{ $userInfo->work_phone }}
+                    </div>
+                    <div>
+                        <span class="font-medium">{{__('سمت:')}}</span>
+                        {{ $userInfo->position }}
+                    </div>
+                    <div>
+                        <span class="font-medium">{{__('دپارتمان:')}}</span>
+                        @if($userInfo->department_id)
+                            {{ $userInfo->department->department_name }}
+                        @else
+                            {{ __('دپارتمان وجود ندارد') }}
+                        @endif
+                    </div>
+                </div>
+            </div>
 
-    <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
-        <!-- Personal Info -->
-        <div class="border-b pb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">اطلاعات شخصی</h2>
-                <a href="{{ route('users.edit', $userInfo->id) }}"
-                   class="text-sm text-white bg-[#001BC9] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 transition duration-300 ease-in-out px-3 py-2 rounded-md shadow-sm">
-                     ویرایش اطلاعات و دسترسی های کاربر
+
+            <!-- Active Systems -->
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('سامانه های فعال')}}</h2>
+                <ul class="list-disc list-inside text-gray-700">
+                    <li>
+                        @if($user->organizations->isNotEmpty())
+                            {{ $user->organizations->pluck('organization_name')->implode(' - ') }}
+                        @else
+                            {{ __('کاربر هیچ سامانه فعالی ندارد.') }}
+                        @endif
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('امضای کاربر')}}</h2>
+                @if($userInfo->signature)
+                    <img src="{{$userInfo->getImageUrl()}}" class="rounded-md w-24 h-24" alt="">
+                @endif
+            </div>
+
+
+            <!-- User Access Section -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('بخش دسترسی کاربر')}}</h2>
+                @if($allPermissions->isNotEmpty())
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($allPermissions as $permission)
+                            <span class="inline-block bg-green-100 text-green-800 px-3 py-2 rounded-full">
+                    {{ $permission->name }}
+                        </span>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-600">{{ __('کاربر هیچ دسترسی ندارد') }}</p>
+                @endif
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-2">
+                <a href="{{ route('users.index') }}">
+                    <x-primary-button>
+                        {{__('جدول کاربران')}}
+                    </x-primary-button>
                 </a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
-                <div><span class="font-medium">نقش:</span>
-                    @if($userRoles->isNotEmpty())
-                        {{ $userRoles->pluck('name')->implode(', ') }}
-                    @else
-                        {{ __('بدون نقش') }}
-                    @endif</div>
-                <div>
-                    <span class="font-medium">{{__('نام و نام خانوادگی:')}}</span>
-                    {{ $userInfo->full_name }}
-                </div>
-                <div>
-                    <span class="font-medium">{{__('کد پرسنلی:')}}</span>
-                    {{ $userInfo->user->p_code }}
-                </div>
-                <div>
-                    <span class="font-medium">{{__('کد ملی:')}}</span>
-                    {{ $userInfo->n_code }}
-                </div>
-                <div>
-                    <span class="font-medium">{{__('شماره همراه:')}}</span>
-                    {{ $userInfo->phone }}
-                </div>
-                <div>
-                    <span class="font-medium">{{__('شماره منزل:')}}</span>
-                    {{ $userInfo->house_phone }}
-                </div>
-                <div>
-                    <span class="font-medium">{{__('شماره محل کار:')}}</span>
-                    {{ $userInfo->work_phone }}
-                </div>
-                <div>
-                    <span class="font-medium">{{__('سمت:')}}</span>
-                    {{ $userInfo->position }}
-                </div>
-                <div>
-                    <span class="font-medium">{{__('دپارتمان:')}}</span>
-                    @if($userInfo->department_id)
-                        {{ $userInfo->department->department_name }}
-                    @else
-                        {{ __('دپارتمان وجود ندارد') }}
-                    @endif
-                </div>
-            </div>
         </div>
-
-
-        <!-- Active Systems -->
-        <div class="border-b pb-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('سامانه های فعال')}}</h2>
-            <ul class="list-disc list-inside text-gray-700">
-                <li>
-                    @if($user->organizations->isNotEmpty())
-                        {{ $user->organizations->pluck('organization_name')->implode(' - ') }}
-                    @else
-                        {{ __('کاربر هیچ سامانه فعالی ندارد.') }}
-                    @endif
-                </li>
-            </ul>
-        </div>
-
-
-        <div class="border-b pb-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('امضای کاربر')}}</h2>
-            @if($userInfo->signature)
-                <img src="{{$userInfo->getImageUrl()}}" class="rounded-md w-24 h-24" alt="">
-            @endif
-        </div>
-
-
-        <!-- User Access Section -->
-        <div>
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('بخش دسترسی کاربر')}}</h2>
-            @if($allPermissions->isNotEmpty())
-                <div class="flex flex-wrap gap-2">
-                    @foreach($allPermissions as $permission)
-                        <span class="bg-[#001BC9] text-white px-4 py-2 rounded-xl shadow text-sm">
-                    {{ $permission->name }}
-                </span>
-                    @endforeach
-                </div>
-            @else
-                <p class="text-gray-600">{{ __('کاربر هیچ دسترسی ندارد') }}</p>
-            @endif
-        </div>
-    </div>
+    @endcan
 </x-app-layout>

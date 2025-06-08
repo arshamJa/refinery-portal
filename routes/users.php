@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
 
     Route::put('users/{user}', [UsersTableController::class, 'update'])
         ->name('users.update');
+
+    Route::delete('uses/{user}', [UsersTableController::class, 'destroy'])
+        ->name('users.destroy');
+
 });
 
 

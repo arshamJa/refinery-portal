@@ -15,6 +15,12 @@
                         <form action="{{route('addOrganization.store',$id)}}" method="post"
                               enctype="multipart/form-data">
                             @csrf
+
+
+
+
+
+
                             <section>
                                 <div>
                                     <x-input-label :value="__('سامانه')" class="mb-2"/>

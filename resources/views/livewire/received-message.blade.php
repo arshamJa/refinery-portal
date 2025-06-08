@@ -118,12 +118,11 @@
                             @php
                                 $attrs = $notification->getTypeLabelAttributes();
                             @endphp
-                            <span class="text-sm font-bold {{ $attrs['text'] }}">
+                            <span class="font-bold {{ $attrs['text'] }}">
                             {{ $attrs['label'] }}
                         </span>
                         </x-table.cell>
-                        <x-table.cell
-                            class="whitespace-nowrap">{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
+                        <x-table.cell class="whitespace-nowrap">{{ $notification->getNotificationDateTime() }}</x-table.cell>
                         <x-table.cell >{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>
                         <x-table.cell class="whitespace-normal break-words max-w-xs">
                             {{ $notification->getNotificationMessage() }}
@@ -135,7 +134,7 @@
 {{--                            </span>--}}
 {{--                        </x-table.cell>--}}
                         <x-table.cell class="whitespace-nowrap">
-                            @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation')
+                            @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation' || $notification->type === 'ReplacementForMeeting')
                                 @php
                                     $meeting = $notification->notifiable;
                                     $meetingUser = MeetingUser::where('user_id',auth()->id())->where('meeting_id',$meeting->id)->first();
@@ -211,25 +210,26 @@
 
     <x-modal name="deny-invitation" maxWidth="4xl" :closable="false">
         @if($meetingUserId)
-            <form wire:submit="deny">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
-                    {{-- Header --}}
-                    <div class="sm:flex sm:items-center mb-4 border-b pb-3">
-                        <div class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                            <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
-                            <h3 class="text-sm text-gray-900 dark:text-gray-100">
-                                {{ __('آیا مطمئن هستید که می‌خواهید جلسه') }}
-                                <span class="font-medium">{{ $title }}</span>
-                                {{ __('را رد کنید؟') }}
-                            </h3>
-                        </div>
-                    </div>
+            <form wire:submit="deny" class="text-sm text-gray-800">
+
+                {{-- Header --}}
+                <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">{{ __('رد دعوت به جلسه') }}</h2>
+                    <a href="{{route('received.message')}}"  class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                        </svg>
+                    </a>
+                </div>
+                {{-- Body --}}
+                <div class="px-6 py-4 space-y-6 text-gray-800 max-h-[70vh] overflow-y-auto" dir="rtl">
+                    {{-- Question --}}
+                    <h3 class="text-sm text-gray-900">
+                        {{ __('آیا مطمئن هستید که می‌خواهید جلسه') }}
+                        <span class="font-medium">{{ $title }}</span>
+                        {{ __('را رد کنید؟') }}
+                    </h3>
 
                     {{-- Denial Reason --}}
                     <div class="space-y-2">
@@ -239,49 +239,60 @@
                                 <span>{{ $reasonOption }}</span>
                             </label>
                         @endforeach
-                            <x-input-error :messages="$errors->get('reason')" class="mt-2"/>
+                        <x-input-error :messages="$errors->get('reason')" class="mt-2"/>
                     </div>
-                </div>
 
-                @if (!$this->isAlreadyRepresentative)
-                    {{-- Replacement Section --}}
-                    <div class="p-4 space-y-3">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" wire:model="checkBox" class="mr-2">
-                            <span>در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:</span>
-                        </label>
-                        <div class="space-y-3" x-show="$wire.checkBox">
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm">
-                                    {{ __('در جلسه نمی‌توانم شرکت کنم ولی جانشین این جانب، آقا/خانم') }}
-                                </label>
-                                <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"
-                                       class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                    {{-- Replacement Fields --}}
+                    @if (!$this->hasNotificationType('ReplacementForMeeting'))
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" wire:model="checkBox" class="mr-2">
+                                <span>{{__('در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:')}}</span>
+                            </label>
+                            <div class="space-y-3" x-show="$wire.checkBox">
+                                <div class="flex items-center gap-2">
+                                    <label class="text-sm">
+                                        {{ __('در جلسه نمی‌توانم شرکت کنم ولی جانشین این جانب، آقا/خانم') }}
+                                    </label>
+                                    <input type="text" wire:model="full_name" placeholder="نام و نام خانوادگی"
+                                           class="w-52 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>
+                                    <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"
+                                           class="w-40 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                                    <span>{{ __('در جلسه مذکور شرکت می‌نماید.') }}</span>
+                                </div>
+                                <x-input-error :messages="$errors->get('full_name')" class="mt-2"/>
+                                <x-input-error :messages="$errors->get('p_code')" class="mt-2"/>
+                                <x-input-error :messages="$errors->get('checkBox')" class="mt-2"/>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm">{{ __('و شماره پرسنلی') }}</label>
-                                <input type="text" wire:model="p_code" placeholder="شماره پرسنلی"
-                                       class="w-40 text-sm bg-white border rounded-md border-neutral-300 placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                <span>{{ __('در جلسه مذکور شرکت می‌نماید.') }}</span>
-                            </div>
-                            <x-input-error :messages="$errors->get('full_name')" class="mt-2"/>
-                            <x-input-error :messages="$errors->get('p_code')" class="mt-2"/>
                         </div>
-                    </div>
-                @endif
-
-                {{-- Footer Buttons --}}
-                <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100">
-                    <x-accept-button type="submit">
-                        {{ __('ارسال') }}
-                    </x-accept-button>
-                    <x-cancel-button type="button" wire:click="close">
-                        {{ __('لغو') }}
-                    </x-cancel-button>
+                    @else
+                        <div class="p-4 text-sm text-red-600 bg-red-100 rounded-md">
+                            {{__('شما قبلاً به عنوان جانشین برای این جلسه انتخاب شده‌اید و نمی‌توانید جانشین دیگری معرفی کنید.')}}
+                        </div>
+                    @endif
                 </div>
+
+                {{-- Footer --}}
+                <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100 border-t border-gray-200">
+                    <x-accept-button type="submit" wire:loading.attr="disabled" wire:target="deny" wire:loading.class="opacity-50">
+                        <span wire:loading.remove wire:target="deny">{{ __('ارسال') }}</span>
+                        <span wire:loading wire:target="deny" class="ml-2">{{ __('در حال ارسال...') }}</span>
+                    </x-accept-button>
+                    <a href="{{route('received.message')}}">
+                        <x-cancel-button type="button">
+                            {{ __('لغو') }}
+                        </x-cancel-button>
+                    </a>
+
+                </div>
+
             </form>
         @endif
     </x-modal>
+
 
 
 

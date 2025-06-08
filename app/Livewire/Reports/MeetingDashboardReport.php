@@ -88,17 +88,27 @@ class MeetingDashboardReport extends Component
     #[Computed]
     public function tasksNotDoneOnTime()
     {
+        $getDate = list($ja_year, $ja_month, $ja_day) = explode('/',
+            gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $now = sprintf('%04d/%02d/%02d', $ja_year,$ja_month,$ja_day);
+
         return DB::table('task_users')
             ->where('task_status', TaskStatus::PENDING->value)
             ->where('sent_date',null)
+            ->where('time_out', '>=' , $now)
             ->count();
     }
     #[Computed]
     public function tasksNotDoneWithDelay()
     {
+        $getDate = list($ja_year, $ja_month, $ja_day) = explode('/',
+            gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $now = sprintf('%04d/%02d/%02d', $ja_year,$ja_month,$ja_day);
+
         return DB::table('task_users')
             ->where('task_status', TaskStatus::PENDING->value)
             ->where('sent_date',null)
+            ->where('time_out', '<=' , $now)
             ->count();
     }
 

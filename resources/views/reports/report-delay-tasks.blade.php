@@ -21,7 +21,7 @@
             <li class="flex items-center h-full">
                 <a href="{{route('meeting.report')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>  {{__('گزارش اقدامات')}}</span>
+                    <span> {{__('گزارش جلسات شرکت')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -91,9 +91,8 @@
     <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
         <x-table.table>
             <x-slot name="head">
-                <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['ردیف', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
-                               'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان تاخیر'] as $th)
+                <x-table.row class="bg-gray-100 dark:bg-gray-800 whitespace-nowrap">
+                    @foreach (['ردیف', 'موضوع جلسه و دبیر جلسه','افدام کننده','تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان تاخیر','قابلیت'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -101,45 +100,81 @@
                     @endforeach
                 </x-table.row>
             </x-slot>
-            <x-slot name="body">
-                @forelse($taskUsers as $taskUser)
-                    <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                        <x-table.cell class="border-r-0">{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
-                        <x-table.cell>{{$taskUser->task->meeting->title}}</x-table.cell>
-                        <x-table.cell>{{$taskUser->task->meeting->scriptorium}}</x-table.cell>
-                        <x-table.cell>{{$taskUser->full_name()}}</x-table.cell>
-                        <x-table.cell>{{$taskUser->sent_date}}</x-table.cell>
-                        <x-table.cell>{{$taskUser->time_out}}</x-table.cell>
-                        <x-table.cell>
-                            @php
-                                $date1 = Carbon::parse($taskUser->sent_date);
-                                $date2 = Carbon::parse($taskUser->time_out);
-                                $diff = $date1->diff($date2);
-                                $formattedDiff = '';
-                                if ($diff->y > 0) {$formattedDiff .= $diff->y . ' سال';}
-                                if ($diff->m > 0) {$formattedDiff .= $diff->m . ' ماه';}
-                                if ($diff->d > 0) {$formattedDiff .= $diff->d . ' روز';}
-                                if ($diff->h > 0) {$formattedDiff .= $diff->h . ' ساعت';}
-                                if ($diff->i > 0) {$formattedDiff .= $diff->i . ' دقیقه';}
-                                if ($diff->s > 0) {$formattedDiff .= $diff->s . ' ثانیه';}
 
-                                // Remove the trailing comma and space if there's any output.
-                                $formattedDiff = rtrim($formattedDiff, ', ');
-                            @endphp
-                            {{ $formattedDiff }}
-                        </x-table.cell>
-                    </x-table.row>
+            <x-slot name="body">
+                @php
+                    $grouped = $taskUsers->groupBy(fn($item) => $item->task->meeting->id);
+                    $rowIndex = ($taskUsers->currentPage() - 1) * $taskUsers->perPage();
+                @endphp
+
+                @forelse($grouped as $meetingId => $group)
+                    @php
+                        $meeting = $group->first()->task->meeting;
+                        $rowspan = $group->count();
+                    @endphp
+
+                    @foreach ($group as $i => $taskUser)
+                        <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-100">
+                            {{-- Row number --}}
+                            <x-table.cell>{{ ++$rowIndex }}</x-table.cell>
+                            {{-- Meeting summary + Scriptorium (only for first row in group) --}}
+                            @if ($i === 0)
+                                <x-table.cell class="text-right align-top" rowspan="{{ $rowspan }}">
+                                    <div>
+                                        <strong>{{ $taskUser->task->meeting->title  }}</strong>
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        دبیر جلسه: {{$taskUser->task->meeting->scriptorium}}
+                                    </div>
+                                </x-table.cell>
+                            @endif
+
+                            {{-- Action taker --}}
+                            <x-table.cell>{{ $taskUser->user->user_info->full_name ?? '---' }}</x-table.cell>
+
+                            {{-- Sent Date --}}
+                            <x-table.cell>{{ $taskUser->sent_date }}</x-table.cell>
+
+                            {{-- Deadline --}}
+                            <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
+
+                            {{-- Delay Duration --}}
+                            <x-table.cell>
+                                @php
+                                    $date1 = Carbon::parse($taskUser->sent_date);
+                                    $date2 = Carbon::parse($taskUser->time_out);
+                                    $diff = $date1->diff($date2);
+                                    $formattedDiff = '';
+                                    if ($diff->y > 0) $formattedDiff .= $diff->y . ' سال ';
+                                    if ($diff->m > 0) $formattedDiff .= $diff->m . ' ماه ';
+                                    if ($diff->d > 0) $formattedDiff .= $diff->d . ' روز ';
+                                    if ($diff->h > 0) $formattedDiff .= $diff->h . ' ساعت ';
+                                    if ($diff->i > 0) $formattedDiff .= $diff->i . ' دقیقه ';
+                                    if ($diff->s > 0) $formattedDiff .= $diff->s . ' ثانیه ';
+                                @endphp
+                                {{ trim($formattedDiff) }}
+                            </x-table.cell>
+                            <x-table.cell>
+                                <a href="{{route('participant.task.report',
+                                ['meeting_id'=>$taskUser->task->meeting_id,'user_id'=>$taskUser->user_id])}}">
+                                    <x-edit-button>
+                                        {{__('نمایش جزئیات')}}
+                                    </x-edit-button>
+                                </a>
+                            </x-table.cell>
+                        </x-table.row>
+                    @endforeach
                 @empty
                     <x-table.row>
-                        <x-table.cell colspan="8" class="py-6 text-center">
+                        <x-table.cell colspan="7" class="py-6 text-center">
                             {{ __('رکوردی یافت نشد ...') }}
                         </x-table.cell>
                     </x-table.row>
                 @endforelse
             </x-slot>
         </x-table.table>
-
     </div>
+
     <div class="mt-2">
             {{ $taskUsers->withQueryString()->links(data:['scrollTo'=>false]) }}
         </div>

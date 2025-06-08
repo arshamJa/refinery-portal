@@ -2,12 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Meeting;
+use App\Models\UserInfo;
 
 class ParticipantsTaskController extends Controller
 {
-    public function index()
+    public function index($meeting_id, $user_id)
     {
-        return view('participantsTask.index');
+        $userInfo = UserInfo::with([
+                'user:id',
+                'department:id,department_name'
+            ])
+            ->select('id', 'user_id', 'position', 'department_id','full_name')
+            ->findOrFail($user_id);
+
+        $meeting = Meeting::with([
+            'tasks.taskUsers' => function ($q) use ($userInfo) {
+                $q->where('user_id', $userInfo->user_id)
+                    ->with(['user.user_info:id,user_id,full_name', 'taskUserFiles']);
+            },
+        ])->findOrFail($meeting_id);
+
+        return view('reports.participant-task', [
+            'userInfo' => $userInfo,
+            'meeting' => $meeting,
+        ]);
     }
 }

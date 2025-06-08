@@ -30,9 +30,17 @@ class MyTasks extends Component
         ]);
     }
 
+
+    public $selectedTaskUser = null;
+
+    public function view($id)
+    {
+        $this->selectedTaskUser = TaskUser::with(['task.meeting'])->find($id);
+        $this->dispatch('crud-modal', name:'view-task-details');
+    }
+
     public function updatedStatusFilter()
     {
-        // Reset pagination when filters change
         $this->resetPage();
     }
 
@@ -84,10 +92,14 @@ class MyTasks extends Component
             })
 
             // Apply status filter if selected
-            ->when($this->statusFilter !== null, function ($query) {
-                $query->where('is_completed', $this->statusFilter);
+            ->when($this->statusFilter, function ($query) {
+                if ($this->statusFilter === 'SENT_TO_SCRIPTORIUM') {
+                    $query->where('task_status', \App\Enums\TaskStatus::SENT_TO_SCRIPTORIUM->value);
+                } elseif ($this->statusFilter === 'PENDING') {
+                    $query->where('task_status', \App\Enums\TaskStatus::PENDING->value);
+                }
             })
-            ->select('id', 'task_id', 'user_id', 'sent_date', 'task_status', 'body_task', 'request_task')
+            ->select('id', 'time_out','task_id', 'user_id', 'sent_date', 'task_status', 'body_task', 'request_task')
             ->paginate(5);
     }
 }

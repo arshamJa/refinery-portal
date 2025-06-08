@@ -103,25 +103,6 @@ class ReceivedMessage extends Component
         $this->resetPage();
     }
 
-    public function getSentNotificationDateTime($notification)
-    {
-        // Extract the date and time from created_at
-        $datetime = $notification->created_at;
-        list($date, $time) = explode(' ', $datetime);
-        // Separate the date into year, month, and day
-        list($year, $month, $day) = explode('-', $date);
-        // Convert the Gregorian date to Jalali
-        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali($year, $month, $day, '/'));
-        // Format the Jalali date
-        $newDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
-        // Extract hour and minute from time
-        list($hour, $minute) = explode(':', $time);
-        // Combine Jalali date with hour and minute only
-        return $newDate . ' - ' . $hour . ':' . $minute;
-    }
-
-
-
     #[Computed]
     public function meetingUsers()
     {
@@ -143,14 +124,7 @@ class ReceivedMessage extends Component
         $this->title = $meetingUser->meeting->title;
         $this->dispatch('crud-modal', name: 'deny-invitation');
     }
-    #[Computed]
-    public function IsAlreadyRepresentative()
-    {
-        return DB::table('meeting_users')
-            ->where('meeting_id', $this->meetingId)
-            ->where('replacement', auth()->id())
-            ->exists();
-    }
+
 
     /**
      * @throws ValidationException
@@ -213,7 +187,20 @@ class ReceivedMessage extends Component
     }
 
 
-
+    protected $cachedNotifications;
+    #[Computed]
+    public function getNotifications()
+    {
+        if (! $this->cachedNotifications) {
+            $this->cachedNotifications = $this->userNotifications();
+        }
+        return $this->cachedNotifications;
+    }
+    #[Computed]
+    public function hasNotificationType(string $type)
+    {
+        return $this->getNotifications()->getCollection()->contains('type', $type);
+    }
     /**
      * @throws ValidationException
      */
@@ -229,7 +216,14 @@ class ReceivedMessage extends Component
             ]
         )->validate();
 
+        // Block users who are already a replacement for this meeting
+        if ($this->IsAlreadyRepresentative()) {
+            $this->addError('checkBox', 'شما قبلاً به عنوان جانشین انتخاب شده‌اید و نمی‌توانید جانشین دیگری معرفی کنید.');
+            return;
+        }
+
         if ($this->checkBox) {
+
             $validated = Validator::make(
                 ['full_name' => $this->full_name, 'p_code' => $this->p_code, 'checkBox' => $this->checkBox],
                 [

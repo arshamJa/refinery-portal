@@ -20,7 +20,7 @@
             <li class="flex items-center h-full">
                 <a href="{{route('meeting.report')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>  {{__('گزارش اقدامات')}}</span>
+                    <span> {{__('گزارش جلسات شرکت')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -28,10 +28,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li>
-                        <span
-                            class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                            {{__('گزارش اقدامات انجام نشده در مهلت مقرر')}}
-                        </span>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                {{__('گزارش اقدامات انجام نشده خارج از مهلت مقرر')}}
+            </span>
             </li>
         </ol>
     </nav>
@@ -89,9 +89,8 @@
     <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
         <x-table.table>
             <x-slot name="head">
-                <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['#', 'موضوع جلسه','دبیر جلسه', 'افدام کننده',
-                          'تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان'] as $th)
+                <x-table.row class="bg-gray-100 dark:bg-gray-800 whitespace-nowrap">
+                    @foreach (['#','موضوع جلسه و دبیر جلسه','اقدام کننده','تاریخ انجام اقدام','تاریخ مهلت اقدام','مدت زمان','قابلیت'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -99,39 +98,79 @@
                     @endforeach
                 </x-table.row>
             </x-slot>
+
             <x-slot name="body">
-                @forelse($taskUsers as $taskUser)
-                    <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                        <x-table.cell class="border-r-0">{{ ($taskUsers->currentPage() - 1) * $taskUsers->perPage() + $loop->iteration }}</x-table.cell>
-                        <x-table.cell>{{ $taskUser->task->meeting->title }}</x-table.cell>
-                        <x-table.cell>{{ $taskUser->task->meeting->scriptorium }}</x-table.cell>
-                        <x-table.cell>{{ $taskUser->full_name() }}</x-table.cell>
-                        <x-table.cell>
-                            @if(!$taskUser->sent_date)
-                                <span class="text-red-500">{{__('اقدامی انجام نشده')}}</span>
-                            @else
-                                {{$taskUsersk->sent_date}}
+                @php
+                    $grouped = $taskUsers->groupBy(fn($item) => $item->task->meeting->id);
+                    $rowIndex = ($taskUsers->currentPage() - 1) * $taskUsers->perPage();
+                @endphp
+
+                @forelse ($grouped as $meetingId => $group)
+                    @php
+                        $meeting = $group->first()->task->meeting;
+                        $rowspan = $group->count();
+                    @endphp
+
+                    @foreach ($group as $i => $taskUser)
+                        <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-100">
+
+                            {{-- Row number --}}
+                            <x-table.cell>{{ ++$rowIndex }}</x-table.cell>
+
+                            {{-- Meeting summary + Scriptorium (only for first row in group) --}}
+                            @if ($i === 0)
+                                <x-table.cell class="text-right align-top" rowspan="{{ $rowspan }}">
+                                    <div>
+                                        <strong>{{ $taskUser->task->meeting->title  }}</strong>
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        دبیر جلسه: {{$taskUser->task->meeting->scriptorium}}
+                                    </div>
+                                </x-table.cell>
                             @endif
-                        </x-table.cell>
-                        <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
-                        <x-table.cell>
-{{--                            {{ $taskUser->formatted_diff ?? 'N/A' }}--}}
-                            @if($taskUser->past_diff)
-                                <span class="text-red-600 font-bold">{{ $taskUser->past_diff }}</span>
-                            @endif
-                        </x-table.cell>
-                    </x-table.row>
+
+                            {{-- Action taker --}}
+                            <x-table.cell>{{ $taskUser->user->user_info->full_name ?? '---' }}</x-table.cell>
+
+                            {{-- Sent date --}}
+                            <x-table.cell>
+                                @if(!$taskUser->sent_date)
+                                    <span class="text-red-500">{{__('اقدامی انجام نشده')}}</span>
+                                @else
+                                    {{ $taskUser->sent_date }}
+                                @endif
+                            </x-table.cell>
+
+                            {{-- Deadline --}}
+                            <x-table.cell>{{ $taskUser->time_out }}</x-table.cell>
+
+                            {{-- Duration / Past Diff --}}
+                            <x-table.cell>
+                                @if($taskUser->past_diff)
+                                    <span class="text-red-600 font-bold">{{ $taskUser->past_diff }}</span>
+                                @endif
+                            </x-table.cell>
+                            <x-table.cell>
+                                <a href="{{route('participant.task.report',
+                                ['meeting_id'=>$taskUser->task->meeting_id,'user_id'=>$taskUser->user_id])}}">
+                                    <x-edit-button>
+                                        {{__('نمایش جزئیات')}}
+                                    </x-edit-button>
+                                </a>
+                            </x-table.cell>
+                        </x-table.row>
+                    @endforeach
                 @empty
                     <x-table.row>
-                        <x-table.cell colspan="7" class="py-6 text-center">
+                        <x-table.cell colspan="7" class="text-center py-6">
                             {{ __('رکوردی یافت نشد ...') }}
                         </x-table.cell>
                     </x-table.row>
                 @endforelse
             </x-slot>
         </x-table.table>
-
     </div>
+
     <div class="mt-2">
         {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>

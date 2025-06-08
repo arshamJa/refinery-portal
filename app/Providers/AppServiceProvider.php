@@ -53,6 +53,16 @@ class AppServiceProvider extends ServiceProvider
         });
 
 
+        Gate::define('users-info', function (User $user){
+            return $user->hasRole(UserRole::ADMIN->value);
+        });
+
+        // Gate For Side Bar
+        Gate::define('side-bar-notifications',function (User $user){
+            return $user->hasRole(UserRole::ADMIN->value);
+        });
+
+
 
         Gate::define('scriptorium-role', function ($user) {
             return $user->hasRole(UserRole::SCRIPTORIUM->value);
@@ -95,39 +105,17 @@ class AppServiceProvider extends ServiceProvider
             return $hasPermission || $hasRole;
         });
 
-        // Gate For Side Bar
-        Gate::define('side-bar-notifications',function (User $user){
-            return $user->hasRole(UserRole::SUPER_ADMIN->value) || $user->hasRole(UserRole::ADMIN->value);
-        });
+
 
         //gate definition for profile page
         Gate::define('view-profile-page',[ProfilePolicy::class,'view']);
         Gate::define('update-profile-page',[ProfilePolicy::class,'update']);
 
 
-
-        //gate definition for phone list via phoneListPolicy...
-        Gate::define('view-phone-list', [PhoneListPolicy::class, 'view']);
-        Gate::define('create-phone-list', [PhoneListPolicy::class, 'create']);
-        Gate::define('update-phone-list', [PhoneListPolicy::class, 'update']);
-
         //gate definition for Blog
         Gate::define('create-blog',[BlogPolicy::class,'create']);
         Gate::define('update-blog',[BlogPolicy::class,'update']);
         Gate::define('delete-blog',[BlogPolicy::class,'delete']);
-
-        //gate definition for users table - employee access table
-        Gate::define('view-any',[UserPolicy::class,'viewAny']);
-        Gate::define('view-user',[UserPolicy::class,'view']);
-        Gate::define('create-user',[UserPolicy::class,'create']);
-        Gate::define('update-user',[UserPolicy::class,'update']);
-        Gate::define('delete-user',[UserPolicy::class,'delete']);
-
-        //gate definition for department and organization
-//        Gate::define('view-department-organization',[DepartmentOrganizationPolicy::class,'view']);
-//        Gate::define('create-department-organization',[DepartmentOrganizationPolicy::class,'create']);
-//        Gate::define('update-department-organization',[DepartmentOrganizationPolicy::class,'update']);
-//        Gate::define('delete-department-organization',[DepartmentOrganizationPolicy::class,'delete']);
 
 
         Gate::define('admin-dashboard',function (User $user){

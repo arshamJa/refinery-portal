@@ -19,19 +19,10 @@ class TasksReportController extends Controller
     public function completedTasks(Request $request)
     {
         $query = TaskUser::with([
-            'task' => function($query) {
-                $query->select('id', 'meeting_id'); // Select specific columns from the task table
-            },
-            'task.meeting' => function($query) {
-                $query->select('id', 'title', 'scriptorium'); // Select specific columns from the meeting table
-            },
-            'user' => function($query) {
-                // Only select the user id to avoid duplicate queries for user_info
-                $query->select('id');
-            },
-            'user.user_info' => function($query) {
-                $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
-            }
+            'task:id,meeting_id',
+            'task.meeting:id,title,scriptorium',
+            'user:id', // Must include 'id' for the relation to work
+            'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
         ])
             ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
             ->whereColumn('sent_date', '<=', 'time_out');
@@ -61,7 +52,7 @@ class TasksReportController extends Controller
                     });
             });
         }
-        $taskUsers = $query->paginate(5);
+        $taskUsers = $query->paginate(10);
         return view('reports.report-completed-tasks', ['taskUsers' => $taskUsers]);
     }
     public function downloadCompletedTasksExcel(Request $request)
@@ -78,19 +69,10 @@ class TasksReportController extends Controller
     public function completedTasksWithDelay(Request $request)
     {
         $query = TaskUser::with([
-            'task' => function($query) {
-                $query->select('id', 'meeting_id'); // Select specific columns from the task table
-            },
-            'task.meeting' => function($query) {
-                $query->select('id', 'title', 'scriptorium'); // Select specific columns from the meeting table
-            },
-            'user' => function($query) {
-                // Only select the user id to avoid duplicate queries for user_info
-                $query->select('id');
-            },
-            'user.user_info' => function($query) {
-                $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
-            }
+            'task:id,meeting_id',
+            'task.meeting:id,title,scriptorium',
+            'user:id', // Must include 'id' for the relation to work
+            'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
         ])
             ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
             ->whereColumn('sent_date', '>', 'time_out');
@@ -119,7 +101,7 @@ class TasksReportController extends Controller
                     });
             });
         }
-        $tasks = $query->paginate(5);
+        $tasks = $query->paginate(10);
         return view('reports.report-delay-tasks', ['taskUsers' => $tasks]);
     }
     public function downloadCompletedTasksWithDelayExcel(Request $request)
@@ -137,23 +119,20 @@ class TasksReportController extends Controller
 
     public function incompleteTasks(Request $request)
     {
+
+        $getDate = list($ja_year, $ja_month, $ja_day) = explode('/',
+            gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $now = sprintf('%04d/%02d/%02d', $ja_year,$ja_month,$ja_day);
+
         $query = TaskUser::with([
-            'task' => function($query) {
-                $query->select('id', 'meeting_id'); // Select specific columns from the task table
-            },
-            'task.meeting' => function($query) {
-                $query->select('id', 'title', 'scriptorium'); // Select specific columns from the meeting table
-            },
-            'user' => function($query) {
-                // Only select the user id to avoid duplicate queries for user_info
-                $query->select('id');
-            },
-            'user.user_info' => function($query) {
-                $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
-            }
+            'task:id,meeting_id',
+            'task.meeting:id,title,scriptorium',
+            'user:id', // Must include 'id' for the relation to work
+            'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
         ])
             ->where('task_status', TaskStatus::PENDING->value)
-            ->where('sent_date', null);
+            ->where('sent_date', null)
+            ->where('time_out', '>=' , $now);
 
         $startDate = trim($request->input('start_date'));
         $endDate = trim($request->input('end_date'));
@@ -177,7 +156,7 @@ class TasksReportController extends Controller
                     });
             });
         }
-        $taskUsers = $query->paginate(5);
+        $taskUsers = $query->paginate(10);
         // Calculate the difference for each task user
 //        foreach ($taskUsers as $taskUser) {
 //            $taskUser->formatted_diff = $this->calculateDateDifference($taskUser->time_out);
@@ -201,24 +180,18 @@ class TasksReportController extends Controller
 
     public function incompleteTasksWithDelay(Request $request)
     {
-
+        $getDate = list($ja_year, $ja_month, $ja_day) = explode('/',
+            gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $now = sprintf('%04d/%02d/%02d', $ja_year,$ja_month,$ja_day);
         $query = TaskUser::with([
-            'task' => function($query) {
-                $query->select('id', 'meeting_id'); // Select specific columns from the task table
-            },
-            'task.meeting' => function($query) {
-                $query->select('id', 'title', 'scriptorium'); // Select specific columns from the meeting table
-            },
-            'user' => function($query) {
-                // Only select the user id to avoid duplicate queries for user_info
-                $query->select('id');
-            },
-            'user.user_info' => function($query) {
-                $query->select('id', 'full_name', 'user_id'); // Select specific columns from the user_info table
-            }
+            'task:id,meeting_id',
+            'task.meeting:id,title,scriptorium',
+            'user:id', // Must include 'id' for the relation to work
+            'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
         ])
             ->where('task_status', TaskStatus::PENDING->value)
-            ->where('sent_date', null);
+            ->where('sent_date', null)
+            ->where('time_out', '<=' , $now);
 
         $startDate = trim($request->input('start_date'));
         $endDate = trim($request->input('end_date'));
@@ -242,7 +215,7 @@ class TasksReportController extends Controller
                     });
             });
         }
-        $taskUsers = $query->paginate(5);
+        $taskUsers = $query->paginate(10);
 
         // Calculate the difference for each task user
 //        foreach ($taskUsers as $taskUser) {
@@ -257,48 +230,6 @@ class TasksReportController extends Controller
 
 
 
-
-
-
-
-//    private function calculateDateDifference($jalaliDate)
-//    {
-//        $dateParts = explode('/', $jalaliDate);
-//        $year = $dateParts[0] ?? null;
-//        $month = $dateParts[1] ?? null;
-//        $day = $dateParts[2] ?? null;
-//
-//        if (!$year || !$month || !$day) {
-//            return 'Invalid Date';
-//        }
-//
-//        // Convert Jalali to Gregorian date
-//        $gregorianDateString = jalali_to_gregorian($year, $month, $day, '/');
-//        $gregorianDate = Carbon::parse($gregorianDateString);
-//
-//        // Current Gregorian Date (now)
-//        $currentDate = Carbon::now();
-//
-//        // Calculate the difference and determine past or remaining
-//        if ($currentDate->greaterThan($gregorianDate)) {
-//            $diff = $currentDate->diff($gregorianDate);
-//            $formattedDiff = 'گذشته: ';
-//        } else {
-//            $diff = $gregorianDate->diff($currentDate);
-//            $formattedDiff = 'باقی مانده: ';
-//        }
-//
-//        // Build the difference string
-////        $formattedDiff .= ($diff->y > 0) ? $diff->y . ' سال ' : '';
-//        $formattedDiff .= ($diff->m > 0) ? $diff->m . ' ماه ' : '';
-//        $formattedDiff .= ($diff->d > 0) ? $diff->d . ' روز ' : '';
-////        $formattedDiff .= ($diff->h > 0) ? $diff->h . ' ساعت ' : '';
-////        $formattedDiff .= ($diff->i > 0) ? $diff->i . ' دقیقه ' : '';
-////        $formattedDiff .= ($diff->s > 0) ? $diff->s . ' ثانیه ' : '';
-//
-//        // If no difference found, show less than a second
-//        return trim($formattedDiff) ?: 'کمتر از یک ثانیه';
-//    }
 
     private function calculatePastDifference($jalaliDate)
     {

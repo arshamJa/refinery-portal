@@ -1,7 +1,5 @@
 @php use Illuminate\Support\Facades\DB; @endphp
 <div>
-
-    <x-sessionMessage name="status"/>
     <x-organizationDepartmentHeader/>
     <!-- Start coding here -->
     <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">

@@ -58,7 +58,7 @@ require __DIR__.'/otp.php';
 require __DIR__.'/importExport.php';
 require __DIR__.'/blog.php';
 require __DIR__.'/phoneList.php';
-require __DIR__.'/newUser.php';
+require __DIR__.'/users.php';
 require __DIR__.'/task.php';
 require __DIR__.'/meeting.php';
 require __DIR__.'/profile.php';

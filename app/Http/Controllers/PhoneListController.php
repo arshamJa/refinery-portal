@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Http\Requests\StorePhoneRequest;
 use App\Models\Role;
@@ -62,38 +63,14 @@ class PhoneListController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePhoneRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
+        Gate::authorize('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value]);
         $userInfo = UserInfo::with(['user', 'department'])
             ->select('id','user_id','department_id','full_name','work_phone','house_phone','phone')
             ->findOrFail($id);
-//        Gate::authorize('update', $userInfo);
         return view('phoneList.edit',[
             'userInfo' => $userInfo
         ]);
@@ -102,11 +79,10 @@ class PhoneListController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StorePhoneRequest $request, string $id)
     {
-//        dd($request->all());
+        Gate::authorize('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value]);
         $userInfo = UserInfo::findOrFail($id);
-//        Gate::authorize('update', $userInfo);
         $validatedData = $request->validated();
         $userInfo->update([
             'house_phone' => $validatedData['house_phone'],
@@ -114,13 +90,5 @@ class PhoneListController extends Controller
             'phone' => $validatedData['phone'],
         ]);
         return to_route('phone-list.index')->with('status', 'اطلاعات با موفقیت آپدیت شد');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

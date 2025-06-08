@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\DepOrgConnectionController;
 use App\Http\Controllers\Admin\OrgDepManagementController;
 use App\Livewire\admin\DepartmentTable;
 use App\Livewire\admin\OrganizationTable;
-use App\Livewire\employee\EmployeesOrganization;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'adminMiddleware'])->group(function () {

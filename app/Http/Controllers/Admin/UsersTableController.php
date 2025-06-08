@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreNewUserRequest;
 use App\Http\Requests\UpdateNewUserRequest;
@@ -13,7 +14,6 @@ use App\Models\User;
 use App\Models\UserInfo;
 use App\Traits\UserSearchTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
@@ -27,7 +27,7 @@ class UsersTableController extends Controller
     public function index(Request $request)
     {
 
-        Gate::authorize('viewUserTable', UserInfo::class);
+        Gate::authorize('users-info');
 
         $user = auth()->user();
 
@@ -39,7 +39,7 @@ class UsersTableController extends Controller
             'user.roles.permissions:id,name',
         ])
             ->where('full_name', '!=', 'Arsham Jamali')
-            ->select(['id', 'user_id', 'department_id', 'full_name', 'n_code', 'position']);
+            ->select(['id', 'user_id', 'department_id', 'full_name', 'n_code', 'position'])->oldest();
 
 
          $originalUsersCount = $query->count();
@@ -64,10 +64,8 @@ class UsersTableController extends Controller
                 $directPermissions = $userModel->permissions;
                 $allPermissions = $rolePermissions->merge($directPermissions)->unique('id')->pluck('name')->values(); // reset keys
                 $userInfo->all_permissions = $allPermissions; // Virtual property for Blade\
-
                 $userInfo->display_permission = $allPermissions->first();
                 $userInfo->more_permissions_count = max($allPermissions->count() - 1, 0);
-
             } else {
                 $userInfo->all_permissions = collect(); // Empty collection fallback
                 $userInfo->display_permission = null;
@@ -91,7 +89,7 @@ class UsersTableController extends Controller
      */
     public function create()
     {
-        Gate::authorize('createNewUser', UserInfo::class);
+        Gate::authorize('users-info');
         $user = auth()->user();
         $roles = Role::select(['id', 'name'])
             ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
@@ -111,7 +109,7 @@ class UsersTableController extends Controller
     public function store(StoreNewUserRequest $request)
     {
         // Authorization check
-        Gate::authorize('createNewUser', UserInfo::class);
+        Gate::authorize('users-info');
 
         $validatedData = $request->validated();
         $newUser = User::create([
@@ -157,8 +155,8 @@ class UsersTableController extends Controller
      */
     public function show(string $id)
     {
+        Gate::authorize('users-info');
         $userInfo = UserInfo::findOrFail($id);
-        Gate::authorize('viewUsers', $userInfo);
 
         // Load user with related roles and direct permissions
         $user = User::with(['organizations:id,organization_name', 'permissions', 'roles.permissions', 'roles:id,name'])
@@ -188,10 +186,10 @@ class UsersTableController extends Controller
      */
     public function edit(string $id)
     {
+        Gate::authorize('users-info');
+
         $userInfo = UserInfo::with(['user:id,p_code', 'department:id,department_name'])
             ->findOrFail($id);
-
-        Gate::authorize('updateUsers', $userInfo);
 
         // Fetch departments and permissions
         $departments = Department::select(['id', 'department_name'])->get();
@@ -219,6 +217,8 @@ class UsersTableController extends Controller
      */
     public function update(UpdateNewUserRequest $request, string $id)
     {
+        Gate::authorize('users-info');
+
         $request->validated();
 
         $userInfo = UserInfo::findOrFail($id);
@@ -274,6 +274,14 @@ class UsersTableController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Gate::authorize('has-permission-and-role',UserRole::SUPER_ADMIN->value);
+
+        $user = User::with('user_info')->findOrFail($id);
+        // Delete related info first
+        if ($user->user_info) {
+            $user->user_info->delete();
+        }
+        // Then delete the user
+        $user->delete();
     }
 }

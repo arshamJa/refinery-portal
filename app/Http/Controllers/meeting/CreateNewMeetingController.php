@@ -4,14 +4,12 @@ namespace App\Http\Controllers\meeting;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\meeting\MeetingStoreRequest;
+use App\Http\Requests\MeetingStoreRequest;
 use App\Http\Requests\MeetingUpdateRequest;
-use App\Jobs\SendNotificationJob;
 use App\Models\Department;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Notification;
-use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;

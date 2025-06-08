@@ -22,6 +22,11 @@ class OrganizationTable extends Component
     public ?string $search = '';
     public $organizationId = null;
 
+    public function filterOrganizations()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         return view('livewire.admin.organization-table');

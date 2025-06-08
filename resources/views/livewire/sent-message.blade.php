@@ -100,33 +100,15 @@
                     <x-table.row wire:key="notification-{{ $notification->id }}"
                                  class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                         <x-table.cell class="border-none">
-                            @if($notification->type === 'MeetingInvitation')
-                                <span class="text-indigo-600 font-semibold">{{ __('دعوتنامه') }}</span>
-                            @elseif($notification->type === 'MeetingGuestInvitation')
-                                <span class="text-purple-600 font-semibold">{{ __('دعوتنامه به مهمان') }}</span>
-                            @elseif($notification->type === 'MeetingConfirmed')
-                                <span class="text-green-700 font-semibold">{{ __(' برگزاری جلسه') }}</span>
-                            @elseif($notification->type === 'MeetingCancelled')
-                                <span class="text-red-600 font-semibold">{{ __(' لغو جلسه') }}</span>
-                            @elseif($notification->type === 'AcceptInvitation')
-                                <span class="text-emerald-600 font-semibold">{{ __('تایید دعوتنامه') }}</span>
-                            @elseif($notification->type === 'ReplacementForMeeting')
-                                <span class="text-yellow-600 font-semibold">{{ __('انتخاب جانشین') }}</span>
-                            @elseif($notification->type === 'DenyInvitation')
-                                <span class="text-orange-600 font-semibold">{{ __('رد دعوتنامه') }}</span>
-                            @elseif($notification->type === 'AssignedNewTask')
-                                <span class="text-blue-700 font-semibold">{{ __('ارسال اقدام') }}</span>
-                            @elseif($notification->type === 'UpdatedTaskTimeOut')
-                                <span class="text-cyan-700 font-semibold">{{ __('ویرایش مهلت اقدام') }}</span>
-                            @elseif($notification->type === 'UpdatedTaskBody')
-                                <span class="text-sky-700 font-semibold">{{ __('ویرایش بند مذاکره') }}</span>
-                                @elseif($notification->type === 'DeniedTaskNotification')
-                                    <span class="text-red-600 font-semibold">{{ __('رد اقدام') }}</span>
-                            @endif
+                            @php
+                                $attrs = $notification->getTypeLabelAttributes();
+                            @endphp
+                            <span class="font-bold {{ $attrs['text'] }}">
+                            {{ $attrs['label'] }}
                         </x-table.cell>
-                        <x-table.cell class="whitespace-nowrap">{{ $this->getSentNotificationDateTime($notification) }}</x-table.cell>
+                        <x-table.cell class="whitespace-nowrap">{{ $notification->getNotificationDateTime() }}</x-table.cell>
                         <x-table.cell>{{ $notification->recipient->user_info->full_name ?? 'N/A' }}</x-table.cell>
-                        <x-table.cell>{{ $this->getNotificationMessage($notification) }}</x-table.cell>
+                        <x-table.cell>{{ $notification->getSentMessage() }}</x-table.cell>
                     </x-table.row>
                 @empty
                     <x-table.row>

@@ -8,6 +8,7 @@ use App\Rules\PhoneNumberRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Password;
 
 class StoreNewUserRequest extends FormRequest
 {
@@ -35,10 +36,10 @@ class StoreNewUserRequest extends FormRequest
             'phone' => ['bail', 'required', 'digits:11', new PhoneNumberRule()],
             'house_phone' => ['bail', 'required', 'numeric'],
             'work_phone' => ['bail', 'required', 'numeric'],
-            'position' => ['bail', 'required', 'string', 'max:255', new farsi_chs()],
+            'position' => ['bail', 'required', 'string', 'max:255'],
             'departmentId' => ['bail', 'required'],
             'signature' => ['bail', 'required'],
-            'password' => ['bail', 'required', 'numeric', 'digits:8', Rules\Password::defaults()],
+            'password' => ['bail', 'required', 'string', Password::min(8)->mixedCase()->numbers()],
         ];
     }
 }
