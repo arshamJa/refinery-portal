@@ -157,10 +157,7 @@ class TasksReportController extends Controller
             });
         }
         $taskUsers = $query->paginate(10);
-        // Calculate the difference for each task user
-//        foreach ($taskUsers as $taskUser) {
-//            $taskUser->formatted_diff = $this->calculateDateDifference($taskUser->time_out);
-//        }
+
         foreach ($taskUsers as $taskUser) {
             $taskUser->remaining_diff = $this->calculateRemainingDifference($taskUser->time_out);
         }

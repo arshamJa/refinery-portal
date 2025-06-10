@@ -9,20 +9,12 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>[x-cloak] {display: none !important;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="{{asset('flowBiteChart.js')}}"></script>
+
     @livewireStyles
     <link rel="stylesheet" href="{{asset('multiSelect.css')}}">
-    {{--    <link rel="stylesheet" href="{{asset('richText.css')}}">--}}
-    {{--    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>--}}
-    {{--    <script src="{{asset('jalali-moment.js')}}" ></script>--}}
-    <script src="{{asset('flowBiteChart.js')}}"></script>
 </head>
 <body>
 <div dir="rtl" x-data="{ open: true }" x-cloak>
@@ -70,12 +62,18 @@
 
 
 @livewireScripts
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script src="{{ asset('js/bossScriptorium-dropdown.js') }}"></script>
 <script src="{{ asset('js/scriptorium-dropdown.js') }}"></script>
 <script src="{{ asset('js/innerGuest-dropdown.js') }}"></script>
 <script src="{{ asset('js/outerGuest.js') }}"></script>
-<script src="{{asset('js/multiSelectUsers.js')}}"></script>
-<script src="{{asset('js/holders-dropdown.js')}}"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('js/multiSelectUsers.js') }}"></script>
+<script src="{{ asset('js/holders-dropdown.js') }}"></script>
+
 </body>
 </html>

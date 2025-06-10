@@ -1,3 +1,4 @@
+@php use App\Enums\MeetingUserStatus; @endphp
 <x-app-layout>
 
     <nav class="flex justify-between mb-4 mt-20">
@@ -23,7 +24,7 @@
 
                     <span> {{__('گزارش جلسات شرکت')}}</span>
                 </a>
-            </span>
+                </span>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
                  stroke="currentColor" class="w-3 h-3 text-gray-400">
@@ -39,11 +40,15 @@
     </nav>
 
 
-    <div id="meeting-summary" class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
+
+
+    <div id="meeting-summary"
+         class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
         {{-- Meeting Overview --}}
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {{-- Boss Info --}}
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+            <div
+                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
                 <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">رئیس جلسه</h4>
                 <div class="space-y-1 text-sm">
                     <p>
@@ -62,7 +67,8 @@
             </div>
 
             {{-- Scriptorium --}}
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+            <div
+                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
                 <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">دبیر جلسه</h4>
                 <div class="space-y-1 text-sm">
                     <p>
@@ -81,7 +87,8 @@
             </div>
 
             {{-- Time / Location --}}
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+            <div
+                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
                 <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">زمان و مکان</h4>
                 <div class="space-y-1 text-sm">
                     <p>
@@ -100,7 +107,8 @@
             </div>
 
             {{-- Committee / Treat --}}
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+            <div
+                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
                 <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">اطلاعات تکمیلی</h4>
                 <div class="space-y-1 text-sm">
                     <p>
@@ -130,7 +138,8 @@
                 </x-slot>
                 <x-slot name="body">
                     @foreach($participants as $user)
-                        <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                        <x-table.row
+                            class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                             <x-table.cell>{{  $loop->iteration }}</x-table.cell>
                             <x-table.cell>{{$user->user->user_info->full_name ?? 'N/A'}}</x-table.cell>
                             <x-table.cell>{{$user->user->user_info->department->department_name ?? 'N/A'}}</x-table.cell>
@@ -139,9 +148,9 @@
                                 @php
                                     $status = $user->is_present;
                                     $statusText = match($status) {
-                                        \App\Enums\MeetingUserStatus::IS_PRESENT->value => 'حاضر',
-                                        \App\Enums\MeetingUserStatus::IS_NOT_PRESENT->value => 'غایب',
-                                        \App\Enums\MeetingUserStatus::PENDING->value => 'نامشخص',
+                                        MeetingUserStatus::IS_PRESENT->value => 'حاضر',
+                                        MeetingUserStatus::IS_NOT_PRESENT->value => 'غایب',
+                                        MeetingUserStatus::PENDING->value => 'نامشخص',
                                     };
                                 @endphp
                                 {{ $statusText }}
@@ -198,139 +207,6 @@
 
         <script src="{{ asset('js/printMeeting.js') }}"></script>
     </div>
-
-
-
-
-    {{--    <div id="meeting-summary" class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">--}}
-{{--        --}}{{-- Meeting Overview --}}
-{{--        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">--}}
-{{--            --}}{{-- Boss Info --}}
-{{--            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">--}}
-{{--                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">رئیس جلسه</h4>--}}
-{{--                <div class="space-y-1 text-sm">--}}
-{{--                    <p><span class="font-medium">نام:</span> {{ $meeting->boss }}</p>--}}
-{{--                    <p><span class="font-medium">واحد:</span> {{ $bossInfo->department->department_name ?? '---' }}</p>--}}
-{{--                    <p><span class="font-medium">سمت:</span> {{ $bossInfo->position ?? '---' }}</p>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-
-{{--            --}}{{-- Scriptorium --}}
-{{--            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">--}}
-{{--                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">دبیر جلسه</h4>--}}
-{{--                <div class="space-y-1 text-sm">--}}
-{{--                    <p><span class="font-medium">نام:</span> {{ $meeting->scriptorium }}</p>--}}
-{{--                    <p><span class="font-medium">واحد:</span> {{ $meeting->scriptorium_department }}</p>--}}
-{{--                    <p><span class="font-medium">سمت:</span> {{ $meeting->scriptorium_position }}</p>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-
-{{--            --}}{{-- Time / Location --}}
-{{--            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">--}}
-{{--                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">زمان و مکان</h4>--}}
-{{--                <div class="space-y-1 text-sm">--}}
-{{--                    <p><span class="font-medium">تاریخ:</span> {{ $meeting->date }}</p>--}}
-{{--                    <p><span class="font-medium">ساعت:</span> {{ $meeting->time }}</p>--}}
-{{--                    <p><span class="font-medium">مکان:</span> {{ $meeting->location }}</p>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-
-{{--            --}}{{-- Committee / Treat --}}
-{{--            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">--}}
-{{--                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">اطلاعات تکمیلی</h4>--}}
-{{--                <div class="space-y-1 text-sm">--}}
-{{--                    <p><span class="font-medium">برگزار کننده:</span> {{ $meeting->unit_held }}</p>--}}
-{{--                    <p><span class="font-medium">پذیرایی:</span> {{ $meeting->treat ? 'دارد' : 'ندارد' }}</p>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-
-{{--        <div class="relative overflow-x-auto shadow-md sm:rounded-lg my-12">--}}
-{{--            <x-table.table>--}}
-{{--                <caption class="caption-top">{{__('اعضای جلسه')}}</caption>--}}
-{{--                <x-slot name="head">--}}
-{{--                    <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">--}}
-{{--                        @foreach (['#','نام','واحد','سمت','وضعیت','جایگزین','دلیل غیبت'] as $th)--}}
-{{--                            <x-table.heading--}}
-{{--                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">--}}
-{{--                                {{ __($th) }}--}}
-{{--                            </x-table.heading>--}}
-{{--                        @endforeach--}}
-{{--                    </x-table.row>--}}
-{{--                </x-slot>--}}
-{{--                <x-slot name="body">--}}
-{{--                    @foreach($participants as $user)--}}
-{{--                        <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">--}}
-{{--                            <x-table.cell>{{  $loop->iteration }}</x-table.cell>--}}
-{{--                            <x-table.cell>{{$user->user->user_info->full_name ?? 'N/A'}}</x-table.cell>--}}
-{{--                            <x-table.cell>{{$user->user->user_info->department->department_name ?? 'N/A'}}</x-table.cell>--}}
-{{--                            <x-table.cell>{{$user->user->user_info->position ?? 'N/A'}}</x-table.cell>--}}
-{{--                            <x-table.cell>--}}
-{{--                                @php--}}
-{{--                                    $status = $user->is_present;--}}
-{{--                                    $statusText = match($status) {--}}
-{{--                                        \App\Enums\MeetingUserStatus::IS_PRESENT->value => 'حاضر',--}}
-{{--                                        \App\Enums\MeetingUserStatus::IS_NOT_PRESENT->value => 'غایب',--}}
-{{--                                        \App\Enums\MeetingUserStatus::PENDING->value => 'نامشخص',--}}
-{{--                                    };--}}
-{{--                                @endphp--}}
-{{--                                {{ $statusText }}--}}
-{{--                            </x-table.cell>--}}
-{{--                            <x-table.cell>{{$user->replacementName() ?? '-' }}</x-table.cell>--}}
-{{--                            <x-table.cell>{{ $status == -1 ? $user->reason_for_absent : '-' }}</x-table.cell>--}}
-{{--                        </x-table.row>--}}
-{{--                    @endforeach--}}
-{{--                </x-slot>--}}
-{{--            </x-table.table>--}}
-{{--        </div>--}}
-{{--        --}}{{-- Inner Guests --}}
-{{--        <div class="mb-10">--}}
-{{--            <h3 class="text-lg font-semibold border-b pb-1 mb-3">مهمانان درون سازمانی</h3>--}}
-{{--            @if ($innerGuests->isNotEmpty())--}}
-{{--                <ul class="space-y-1 list-disc pl-5">--}}
-{{--                    @foreach($innerGuests as $user)--}}
-{{--                        <li>--}}
-{{--                            {{ $user->user->user_info->full_name ?? 'N/A' }} ---}}
-{{--                            {{ $user->user->user_info->department->department_name ?? '---' }} ---}}
-{{--                            {{ $user->user->user_info->position ?? '---' }}--}}
-{{--                        </li>--}}
-{{--                    @endforeach--}}
-{{--                </ul>--}}
-{{--            @else--}}
-{{--                <p class="text-gray-500">مهمان درون سازمانی وجود ندارد</p>--}}
-{{--            @endif--}}
-{{--        </div>--}}
-
-{{--        --}}{{-- Outer Guests --}}
-{{--        <div>--}}
-{{--            <h3 class="text-lg font-semibold border-b pb-1 mb-3">مهمانان برون سازمانی</h3>--}}
-{{--            @if (!empty($guests))--}}
-{{--                <ul class="space-y-1 list-disc pl-5">--}}
-{{--                    @foreach ($guests as $guest)--}}
-{{--                        <li>--}}
-{{--                            {{ $guest['name'] ?? 'نام ندارد' }}--}}
-{{--                            @if (!empty($guest['companyName']))--}}
-{{--                                - شرکت: {{ $guest['companyName'] }}--}}
-{{--                            @endif--}}
-{{--                        </li>--}}
-{{--                    @endforeach--}}
-{{--                </ul>--}}
-{{--            @else--}}
-{{--                <p class="text-gray-500">مهمان برون سازمانی وجود ندارد</p>--}}
-{{--            @endif--}}
-{{--        </div>--}}
-
-{{--        <button onclick="printMeetingSummary(`{{ $meeting->title }}`)"--}}
-{{--                class=" px-4 py-2 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-xs uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">--}}
-{{--            {{__('چاپ اطلاعات جلسه')}}--}}
-{{--        </button>--}}
-
-{{--        <script src="{{ asset('js/printMeeting.js') }}"></script>--}}
-
-
-{{--    </div>--}}
-
-
 
 
 </x-app-layout>

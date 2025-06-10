@@ -73,5 +73,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/meeting/{meeting}/details', [MeetingReportTableController::class, 'show'])
         ->name('meeting.details.show');
 
+
+    Route::get('refinery/reports',[\App\Http\Controllers\RefineryReportController::class,'index'])
+        ->name('refinery.report');
+
 });
 

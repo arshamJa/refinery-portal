@@ -27,6 +27,9 @@
         </ol>
     </nav>
 
+
+
+
     <form method="GET" action="{{ route('meeting.report.table') }}">
         <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
 
@@ -86,9 +89,6 @@
 
         </div>
     </form>
-
-
-
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12 mt-4">
         <x-table.table>
             <x-slot name="head">
@@ -136,11 +136,8 @@
             </x-slot>
         </x-table.table>
     </div>
-
     <div class="mt-4">
         {{ $meetings->withQueryString()->links() }}
     </div>
-
-
 
 </x-app-layout>
