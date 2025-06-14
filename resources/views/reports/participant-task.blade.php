@@ -19,9 +19,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li class="flex items-center h-full">
-                <a href="{{route('dashboard')}}"
+                <a href="{{route('task.report.table')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>{{__('گزارش کل اقدامات')}}</span>
+                    <span>{{__('گزارش اقدامات شرکت')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -37,7 +37,7 @@
         </ol>
     </nav>
 
-    @can('has-permission',UserPermission::TASK_REPORT_TABLE)
+    @can('refinery-report')
         {{-- Meeting Info --}}
         <div id="meeting-info"
              class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border border-gray-300 rounded-xl p-6 shadow-sm text-gray-800 text-sm">
@@ -118,7 +118,7 @@
                     {{ __('هیچ اقدامی برای این کاربر در این جلسه ثبت نشده است.') }}
                 </div>
             @endforelse
-            <a href="{{route('incompleteTasksOnTime')}}">
+            <a href="{{route('task.report.table')}}">
                 <x-secondary-button>
                     {{__('بازگشت')}}
                 </x-secondary-button>

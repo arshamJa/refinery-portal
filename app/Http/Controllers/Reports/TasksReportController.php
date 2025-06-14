@@ -85,7 +85,6 @@ class TasksReportController extends Controller
             $query->where('time_out', '>=', $startDate)
                 ->where('time_out', '<=', $endDate);
         }
-
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('time_out', 'like', '%'.$search.'%')
@@ -110,11 +109,9 @@ class TasksReportController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $search = $request->input('search');
-
         // Trigger the export using the CompletedTasksWithDelayExport class with the filters
         return Excel::download(new CompletedTasksWithDelayExport($startDate, $endDate, $search), 'completed_tasks_with_delay.xlsx');
     }
-
 
 
     public function incompleteTasks(Request $request)

@@ -6,6 +6,7 @@ use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Models\Meeting;
 use App\Models\Notification;
+use App\Models\Permission;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\User;
@@ -78,10 +79,18 @@ class AppServiceProvider extends ServiceProvider
         });
 
 
-        Gate::define('has-permission', function ($user, UserPermission|string $permission) {
-            $permissionName = $permission instanceof UserPermission ? $permission->value : $permission;
-            return $user->permissions->contains('name', $permissionName);
+        // Gate for only the bosses to see the refinery report
+        Gate::define('refinery-report', function (User $user) {
+            return $user->permissions->contains('name', UserPermission::TASK_REPORT_TABLE->value);
         });
+
+//
+//        Gate::define('has-permission', function (User $user, UserPermission $permission) {
+//            return $user->permissions->contains('name', $permission->value);
+//        });
+
+
+
 
 
         // Gate for the scriptorium to handle only his meeting

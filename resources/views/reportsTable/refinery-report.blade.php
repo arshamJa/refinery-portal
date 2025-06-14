@@ -19,7 +19,7 @@
             <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-               <span> {{__('گزارش شرکت')}}</span>
+                 <span>{{__('نمودار جلسات/اقدامات')}}</span>
             </span>
             </li>
         </ol>
@@ -31,9 +31,10 @@
         <div
             class="w-full bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700 p-4 md:p-6">
             <div class="flex justify-between items-start w-full mb-4">
+                <p>{{__('نمودار جلسات')}}</p>
                 <div class="flex-col items-center">
                     <div class="flex items-center">
-                        <a href="#">
+                        <a href="{{route('meeting.report.table')}}">
                             <x-primary-button>
                                 {{__('نمایش جدول جلسات')}}
                             </x-primary-button>
@@ -48,9 +49,10 @@
         <div
             class="w-full bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700 p-4 md:p-6">
             <div class="flex justify-between items-start w-full mb-4">
+                <p>{{__('نمودار اقدامات')}}</p>
                 <div class="flex-col items-center">
                     <div class="flex items-center">
-                        <a href="#">
+                        <a href="{{route('task.report.table')}}">
                             <x-primary-button>
                                 {{__('نمایش جدول اقدامات')}}
                             </x-primary-button>
@@ -76,7 +78,7 @@
                 IS_FINISHED: 3
             };
             const meetingLabels = {
-                [MeetingStatus.PENDING]: "در حال بررسی",
+                [MeetingStatus.PENDING]: "در حال بررسی دعوتنامه",
                 [MeetingStatus.IS_CANCELLED]: "لغو شد",
                 [MeetingStatus.IS_NOT_CANCELLED]: "برگزار می‌شود",
                 [MeetingStatus.IS_IN_PROGRESS]: "در حال برگزاری",

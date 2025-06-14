@@ -103,6 +103,67 @@
                     </div>
                 </div>
             </li>
+            @can('refinery-report')
+                <li class="mb-2">
+                    <div x-data="{ openReport: false }" class="w-full">
+                        <button @click="openReport = !openReport"
+                                class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                                </svg>
+                                <span>{{__('گزارش شرکت')}}</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': openReport}"
+                                 class="h-4 w-4 transition-transform"
+                                 viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div x-show="openReport" x-transition class="mt-1 space-y-1 pr-3">
+                            <a href="{{route('refinery.report')}}"
+                               class="flex items-center gap-x-2 text-xs text-right rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white
+                             {{ request()->is('refinery/reports') ? 'text-white bg-gray-700' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
+                                </svg>
+                                {{__('نموارد جلسات/اقدامات')}}
+                            </a>
+                            <a href="{{route('meeting.report.table')}}"
+                               class="flex items-center gap-x-2 text-xs text-right rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white
+                            {{ request()->is('meeting/report/table') ? 'text-white bg-gray-700' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
+                                </svg>
+                                {{__('گزارش جلسات شرکت')}}
+                            </a>
+                            <a href="{{route('task.report.table')}}"
+                               class="flex items-center gap-x-2 text-xs text-right rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white
+                            {{ request()->is('task/report/table') ? 'text-white bg-gray-700' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
+                                </svg>
+                                {{__('گزارش اقدامات شرکت')}}
+                            </a>
+
+                        </div>
+                    </div>
+                </li>
+            @endcan
             <li class="mb-2">
                 <div x-data="{ openMessage: false }" class="w-full" wire:poll.visible.60s>
                     <button @click="openMessage = !openMessage"

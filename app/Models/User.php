@@ -130,16 +130,22 @@ class User extends Authenticatable
     }
     public function hasPermissionTo($permission): bool
     {
-        // Eager load roles before checking permissions
-        if (!$this->relationLoaded('roles')) {
-            $this->load('roles.permissions'); // Eager load roles and their permissions
-        }
+        // If permission is passed as a string, get Permission model
         if (is_string($permission)) {
             $permission = Permission::where('name', $permission)->first();
             if ($permission === null) {
                 return false;
             }
         }
+        // Check direct permissions assigned to user
+        if ($this->permissions->contains('id', $permission->id)) {
+            return true;
+        }
+        // Eager load roles and their permissions if not already loaded
+        if (!$this->relationLoaded('roles')) {
+            $this->load('roles.permissions');
+        }
+        // Check permissions assigned via roles
         foreach ($this->roles as $role) {
             if ($role->hasPermissionTo($permission)) {
                 return true;
@@ -147,6 +153,7 @@ class User extends Authenticatable
         }
         return false;
     }
+
 
     // use this for checking which user has a specific permission
     function userHasPermission($permission): bool

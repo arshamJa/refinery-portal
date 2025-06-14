@@ -62,20 +62,28 @@ Route::middleware(['auth'])->group(function () {
         [ParticipantsTaskController::class, 'index'])
         ->name('participant.task.report');
 
-    // this is the table for all the meeting in refinery
-    Route::get('meeting/report/table', [MeetingReportTableController::class, 'index'])
-        ->name('meeting.report.table');
-
-    Route::get('task/report/table',[MeetingReportTableController::class,'taskTable'])
-        ->name('task.report.table');
-
     // the details of each participant with their task
     Route::get('/meeting/{meeting}/details', [MeetingReportTableController::class, 'show'])
         ->name('meeting.details.show');
 
+    // this is the table for all the meeting in refinery
+    Route::get('meeting/report/table', [MeetingReportTableController::class, 'index'])
+        ->name('meeting.report.table')
+        ->can('refinery-report');
+
+    Route::get('task/report/table',[MeetingReportTableController::class,'taskTable'])
+        ->name('task.report.table')
+        ->can('refinery-report');
+
+
+    Route::get('/tasks/report/export', [MeetingReportTableController::class, 'exportTasks'])
+        ->name('tasks.report.download');
+
+
 
     Route::get('refinery/reports',[\App\Http\Controllers\RefineryReportController::class,'index'])
-        ->name('refinery.report');
+        ->name('refinery.report')
+        ->can('refinery-report');
 
 });
 
