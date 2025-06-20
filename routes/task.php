@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('meeting.details.show');
 
     // this is the table for all the meeting in refinery
-    Route::get('meeting/report/table', [MeetingReportTableController::class, 'index'])
+    Route::get('meeting/report/table', [MeetingReportTableController::class, 'meetingTable'])
         ->name('meeting.report.table')
         ->can('refinery-report');
 

@@ -11,13 +11,14 @@ Route::middleware('auth')->group(function (){
     Route::get('blogs/create',[BlogController::class,'create'])
         ->name('blogs.create');
 
-    Route::post('upload-image', [App\Http\Controllers\BlogController::class, 'uploadImage'])->name('upload.image');
+    Route::post('upload-image', [App\Http\Controllers\BlogController::class, 'uploadImage'])
+        ->name('upload.image');
 
 
     Route::post('blogs',[BlogController::class,'store'])
         ->name('blogs.store');
 
-    Route::get('blogs/{blog}',[BlogController::class,'show']);
+    Route::get('blogs/{blog}',[BlogController::class,'show'])->name('blogs.show');
 
     Route::get('blogs/{blog}/edit',[BlogController::class,'edit'])
         ->name('blogs.edit');

@@ -8,4 +8,5 @@ enum UserPermission: string
     case TASK_REPORT_TABLE = 'گزارش جلسات شرکت';
     case SCRIPTORIUM_PERMISSIONS = 'دسترسی های دبیر جلسه';
     case PHONE_PERMISSIONS = 'دسترسی های دفترچه تلفنی';
+    case NEWS_PERMISSIONS = 'دسترسی های اخبارواطلاعیه';
 }

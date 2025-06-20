@@ -1,8 +1,8 @@
 @php use App\Models\Department; @endphp
 <div>
-    <x-sessionMessage name="status"/>
+    @can('admin-role')
+        <x-sessionMessage name="status"/>
 
-{{--    @can('create-department-organization')--}}
         <x-modal name="create">
             <form wire:submit="createNewDepartment">
                 <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
@@ -28,10 +28,6 @@
                 </div>
             </form>
         </x-modal>
-{{--    @endcan--}}
-
-
-{{--    @can('update-department-organization')--}}
         <x-modal name="update">
             @if($departmentId)
                 <form wire:submit="updateDep({{$departmentId}})">
@@ -60,9 +56,6 @@
                 </form>
             @endif
         </x-modal>
-{{--    @endcan--}}
-
-{{--    @can('delete-department-organization')--}}
         <x-modal name="delete">
             @if($departmentId)
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
@@ -93,129 +86,95 @@
                 </div>
             @endif
         </x-modal>
-{{--    @endcan--}}
 
+        <x-organizationDepartmentHeader/>
+        <form wire:submit="filterDepartments"
+              class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
+            <div class="grid gap-4 px-3 w-full sm:px-0 lg:grid-cols-6 items-end">
+                <!-- Search Input -->
+                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                    <x-search-input>
+                        <x-text-input type="text" id="search" wire:model.debounce="search" class="block ps-10"
+                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                    </x-search-input>
+                </div>
 
-    <x-organizationDepartmentHeader/>
+                <!-- Status Filter -->
+                <div class="col-span-6 sm:col-span-1 ">
+                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                    @if($search !== '')
+                        <x-view-all-link href="{{ route('organizations') }}">
+                            {{ __('نمایش همه') }}
+                        </x-view-all-link>
+                    @endif
 
-
-    <!-- Start coding here -->
-    <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
-        <div
-            class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-            <div class="w-full md:w-3/6">
-                <form class="flex items-center">
-                    <label for="simple-search" class="sr-only">Search</label>
-                    <div class="relative w-full">
-                        <div
-                            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg aria-hidden="true" class="w-5 h-5 text-gray-500"
-                                 fill="currentColor" viewbox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                      clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <input wire:model.live.debounce.500ms="search" type="text" dir="rtl"
-                               placeholder="جست و جو ..."
-                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500">
-                    </div>
-                </form>
-            </div>
-            <div
-                class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                <div class="flex items-center justify-center w-full md:w-auto gap-2">
-{{--                    @can('create-department-organization')--}}
-{{--                        <a href="{{route('department.export')}}">--}}
-{{--                            <x-secondary-button>--}}
-{{--                                Export--}}
-{{--                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
-{{--                                     stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">--}}
-{{--                                    <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>--}}
-{{--                                </svg>--}}
-{{--                            </x-secondary-button>--}}
-{{--                        </a>--}}
-{{--                        <x-secondary-button wire:click="openModalImport">--}}
-{{--                            Import--}}
-{{--                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
-{{--                                 stroke-width="1.5"--}}
-{{--                                 stroke="currentColor" class="size-4 mr-1">--}}
-{{--                                <path stroke-linecap="round" stroke-linejoin="round"--}}
-{{--                                      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>--}}
-{{--                            </svg>--}}
-{{--                        </x-secondary-button>--}}
-
-                        <x-primary-button wire:click="openModalCreate">
-                            {{__('دپارتمان')}}
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                            </svg>
-                        </x-primary-button>
-{{--                    @endcan--}}
+                </div>
+                <!-- Search + Show All Buttons -->
+                <div class="col-span-6 lg:col-span-3 flex justify-start md:justify-end flex-row gap-4 mt-4 lg:mt-0">
+                    <x-dropdown>
+                        <x-slot name="trigger">
+                            <x-secondary-button class="flex items-center gap-2">
+                                {{ __('عملیات') }}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
+                                </svg>
+                            </x-secondary-button>
+                        </x-slot>
+                        <x-slot name="content">
+                            <x-dropdown-link wire:click="openModalCreate"> {{__('افزودن دپارتمان')}}</x-dropdown-link>
+                            <x-dropdown-link href="{{route('department.export')}}">Export</x-dropdown-link>
+                            <x-dropdown-link wire:click="openModalImport">Import</x-dropdown-link>
+                        </x-slot>
+                    </x-dropdown>
                 </div>
             </div>
-        </div>
-
-
-        <div class="pt-4 sm:px-10 sm:pt-6 border shadow-md rounded-md">
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead
-                    class="text-sm text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    @foreach (['ردیف', 'دپارتمان', 'قابلیت'] as $th)
-                        <th class="px-4 py-3">{{ __($th) }}</th>
-                    @endforeach
-                </tr>
-                </thead>
-                <tbody>
-                @forelse($this->departments as $department)
-                    <tr class="px-4 py-3 border-b text-center"
-                        wire:key="{{$department->id}}">
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            {{$loop->index+1}}
-                        </td>
-                        <td class="px-4 py-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            {{$department->department_name}}
-                        </td>
-                        <td class="px-4 py-4 flex gap-x-3 justify-center whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-{{--                            @can('update-department-organization')--}}
-                                <x-primary-button class="flex gap-x-1"
-                                                  wire:click="openModalEdit({{$department->id}})">
+        </form>
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
+            <x-table.table>
+                <x-slot name="head">
+                    <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                        @foreach (['#', 'دپارتمان', 'قابلیت'] as $th)
+                            <x-table.heading
+                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                                {{ __($th) }}
+                            </x-table.heading>
+                        @endforeach
+                    </x-table.row>
+                </x-slot>
+                <x-slot name="body">
+                    @forelse($this->departments as $department)
+                        <x-table.row wire:key="{{$department->id}}"
+                                     class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                            <x-table.cell>{{ ($this->departments->currentPage() - 1) * $this->departments->perPage() + $loop->iteration }}</x-table.cell>
+                            <x-table.cell>{{$department->department_name}}</x-table.cell>
+                            <x-table.cell>
+                                <x-primary-button class="ml-2" wire:click="openModalEdit({{$department->id}})">
                                     {{__('ویرایش')}}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                         viewBox="0 0 24 24"
-                                         stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
-                                    </svg>
                                 </x-primary-button>
-{{--                            @endcan--}}
-{{--                            @can('delete-department-organization')--}}
                                 <x-danger-button wire:click="openModalDelete({{$department->id}})">
                                     {{__('حذف')}}
                                 </x-danger-button>
-{{--                            @endcan--}}
-                        </td>
-                    </tr>
-                @empty
-                    <tr class="px-4 py-3 border-b text-center">
-                        <td colspan="6"
-                            class="py-6 px-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
-                            {{__('رکوردی یافت نشد...')}}
-                        </td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
-            <span class="p-2 mx-2">
-                {{ $this->departments->withQueryString()->links(data:['scrollTo'=>false]) }}
-            </span>
+                            </x-table.cell>
+                        </x-table.row>
+                    @empty
+                        <tr class="px-4 py-3 border-b text-center">
+                            <td colspan="6"
+                                class="py-6 px-4 whitespace-no-wrap text-sm leading-5 text-coll-gray-900">
+                                {{__('رکوردی یافت نشد...')}}
+                            </td>
+                        </tr>
+                    @endforelse
+                </x-slot>
+            </x-table.table>
         </div>
-    </div>
+        <div class="mt-2">
+            {{ $this->departments->withQueryString()->links(data:['scrollTo'=>false]) }}
+        </div>
 
+    @endcan
 
 </div>

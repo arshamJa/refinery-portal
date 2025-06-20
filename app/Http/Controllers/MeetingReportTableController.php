@@ -9,43 +9,57 @@ use App\Models\TaskUser;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MeetingReportTableController extends Controller
 {
-    public function index(Request $request)
+    public function meetingTable(Request $request)
     {
         $search = trim($request->input('search'));
         $startDate = trim($request->input('start_date'));
         $endDate = trim($request->input('end_date'));
         $statusFilter = $request->input('statusFilter');
-        $meetings = Meeting::select([
+
+        // Generate a unique cache key based on filters
+        $cacheKey = 'meeting_info_' . md5(json_encode([
+                'search' => $search,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'status' => $statusFilter,
+                'page' => $request->input('page', 1), // Include pagination page
+            ]));
+
+        $meetings = Cache::remember($cacheKey, 3600, function () use ($search, $startDate, $endDate, $statusFilter) {
+            return Meeting::select([
                 'id', 'title', 'scriptorium', 'boss', 'date', 'time', 'end_time', 'status',
             ])
-            ->when(!empty($search), function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('scriptorium', 'like', "%{$search}%")
-                        ->orWhere('boss', 'like', "%{$search}%")
-                        ->orWhere('date', 'like', "%{$search}%")
-                        ->orWhere('time', 'like', "%{$search}%");
-                });
-            })
-            ->when($statusFilter !== null && $statusFilter !== '', function ($query) use ($statusFilter) {
-                $query->where('status', $statusFilter);
-            })
-            ->when(!empty($startDate), function ($query) use ($startDate) {
-                $query->where('date', '>=', $startDate);
-            })
-            ->when(!empty($endDate), function ($query) use ($endDate) {
-                $query->where('date', '<=', $endDate);
-            })
-            ->paginate(5);
+                ->when(!empty($search), function ($query) use ($search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                            ->orWhere('scriptorium', 'like', "%{$search}%")
+                            ->orWhere('boss', 'like', "%{$search}%")
+                            ->orWhere('date', 'like', "%{$search}%")
+                            ->orWhere('time', 'like', "%{$search}%");
+                    });
+                })
+                ->when($statusFilter !== null && $statusFilter !== '', function ($query) use ($statusFilter) {
+                    $query->where('status', $statusFilter);
+                })
+                ->when(!empty($startDate), function ($query) use ($startDate) {
+                    $query->where('date', '>=', $startDate);
+                })
+                ->when(!empty($endDate), function ($query) use ($endDate) {
+                    $query->where('date', '<=', $endDate);
+                })
+                ->paginate(10);
+        });
 
         return view('reportsTable.meeting-report-table', [
             'meetings' => $meetings
         ]);
     }
+
 
     public function show(Meeting $meeting)
     {
@@ -75,66 +89,68 @@ class MeetingReportTableController extends Controller
         $search = trim($request->input('search') ?? '');
         $statusFilter = $request->input('statusFilter');
 
-        $query = TaskUser::with([
-            'task:id,meeting_id',
-            'task.meeting:id,title,scriptorium',
-            'user:id',
-            'user.user_info:id,user_id,full_name',
-        ]);
+        // Generate a unique cache key
+        $cacheKey = 'task_table_' . md5(json_encode([
+                'start' => $startDate,
+                'end' => $endDate,
+                'search' => $search,
+                'status' => $statusFilter,
+                'page' => $request->input('page', 1),
+            ]));
 
-        // Apply status filtering based on statusFilter input
-        switch ($statusFilter) {
-            case '1': // Completed on time
-                $query->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
-                    ->whereColumn('sent_date', '<=', 'time_out');
-                break;
+        // Try to retrieve from cache
+        $taskUsers = Cache::remember($cacheKey, 3600, function () use ($search, $startDate, $endDate, $statusFilter, $now) {
+            $query = TaskUser::with([
+                'task:id,meeting_id',
+                'task.meeting:id,title,scriptorium',
+                'user:id',
+                'user.user_info:id,user_id,full_name',
+            ]);
 
-            case '2': // Completed with delay
-                $query->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
-                    ->whereColumn('sent_date', '>', 'time_out');
-                break;
+            switch ($statusFilter) {
+                case '1':
+                    $query->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
+                        ->whereColumn('sent_date', '<=', 'time_out');
+                    break;
+                case '2':
+                    $query->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
+                        ->whereColumn('sent_date', '>', 'time_out');
+                    break;
+                case '3':
+                    $query->where('task_status', TaskStatus::PENDING->value)
+                        ->whereNull('sent_date')
+                        ->where('time_out', '>=', $now);
+                    break;
+                case '4':
+                    $query->where('task_status', TaskStatus::PENDING->value)
+                        ->whereNull('sent_date')
+                        ->where('time_out', '<=', $now);
+                    break;
+            }
 
-            case '3': // Incomplete within deadline
-                $query->where('task_status', TaskStatus::PENDING->value)
-                    ->whereNull('sent_date')
-                    ->where('time_out', '>=', $now);
-                break;
+            if ($startDate && $endDate) {
+                $query->whereBetween('time_out', [$startDate, $endDate]);
+            }
 
-            case '4': // Incomplete and delayed
-                $query->where('task_status', TaskStatus::PENDING->value)
-                    ->whereNull('sent_date')
-                    ->where('time_out', '<=', $now);
-                break;
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('time_out', 'like', '%' . $search . '%')
+                        ->orWhere('sent_date', 'like', '%' . $search . '%')
+                        ->orWhereHas('task.meeting', function ($q2) use ($search) {
+                            $q2->where('title', 'like', '%' . $search . '%')
+                                ->orWhere('scriptorium', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('user.user_info', function ($q3) use ($search) {
+                            $q3->where('full_name', 'like', '%' . $search . '%');
+                        });
+                });
+            }
 
-            default:
-                // No specific status filter, fetch all
-                break;
-        }
+            $query->orderBy('created_at');
+            return $query->paginate(10);
+        });
 
-        // Date filter
-        if ($startDate && $endDate) {
-            $query->where('time_out', '>=', $startDate)
-                ->where('time_out', '<=', $endDate);
-        }
-
-        // Search filter
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('time_out', 'like', '%' . $search . '%')
-                    ->orWhere('sent_date', 'like', '%' . $search . '%')
-                    ->orWhereHas('task.meeting', function ($meetingQuery) use ($search) {
-                        $meetingQuery->where('title', 'like', '%' . $search . '%')
-                            ->orWhere('scriptorium', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
-                        $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
-                    });
-            });
-        }
-
-        $query->orderBy('created_at');
-        $taskUsers = $query->paginate(10);
-
+        // Manually calculate timing differences (not cached)
         foreach ($taskUsers as $taskUser) {
             if (empty($taskUser->sent_date)) {
                 $taskUser->remaining_diff = $this->calculateRemainingDifference($taskUser->time_out);
@@ -143,10 +159,10 @@ class MeetingReportTableController extends Controller
         }
 
         return view('reportsTable.task-report-table', [
-
             'taskUsers' => $taskUsers
         ]);
     }
+
 
     public function exportTasks(Request $request)
     {

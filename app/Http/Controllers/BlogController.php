@@ -6,11 +6,7 @@ use App\Http\Requests\StoreBlogRequest;
 use App\Http\Requests\UpdateBlogRequest;
 use App\Models\Blog;
 use App\Models\BlogImage;
-use App\Models\Organization;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
-use function PHPUnit\Framework\throwException;
 
 class BlogController extends Controller
 {

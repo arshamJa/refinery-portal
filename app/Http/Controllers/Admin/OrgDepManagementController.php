@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class OrgDepManagementController extends Controller
 {
@@ -19,8 +20,7 @@ class OrgDepManagementController extends Controller
             'organizations:id,organization_name',
             'user_info.department:id,department_name'
         ])
-            ->whereDoesntHave('roles', fn ($q) =>
-            $q->where('name', UserRole::SUPER_ADMIN->value)
+            ->whereDoesntHave('roles', fn($q) => $q->where('name', UserRole::SUPER_ADMIN->value)
             )
             ->select('id');
 
@@ -34,19 +34,19 @@ class OrgDepManagementController extends Controller
             $query->where(function ($q) use ($request) {
                 if ($request->filled('full_name')) {
                     $q->whereHas('user_info', function ($userInfoQuery) use ($request) {
-                        $userInfoQuery->where('full_name', 'like', '%' . $request->input('full_name') . '%');
+                        $userInfoQuery->where('full_name', 'like', '%'.$request->input('full_name').'%');
                     });
                 }
 
                 if ($request->filled('department_name')) {
                     $q->whereHas('user_info.department', function ($departmentQuery) use ($request) {
-                        $departmentQuery->where('department_name', 'like', '%' . $request->input('department_name') . '%');
+                        $departmentQuery->where('department_name', 'like', '%'.$request->input('department_name').'%');
                     });
                 }
 
                 if ($request->filled('organization')) {
                     $q->whereHas('organizations', function ($orgQuery) use ($request) {
-                        $orgQuery->where('organization_name', 'like', '%' . $request->input('organization') . '%');
+                        $orgQuery->where('organization_name', 'like', '%'.$request->input('organization').'%');
                     });
                 }
             });
@@ -64,7 +64,7 @@ class OrgDepManagementController extends Controller
 
     public function departmentOrganizationConnection()
     {
-//        Gate::authorize('create-department-organization');
+        Gate::authorize('admin-role');
         $departments = DB::table('departments')->select('id', 'department_name')->get();
         $organizations = DB::table('organizations')->select('id', 'organization_name')->get();
         $userInfos = DB::table('user_infos')->select('id', 'user_id', 'full_name')
@@ -76,19 +76,18 @@ class OrgDepManagementController extends Controller
             'userInfos' => $userInfos
         ]);
     }
+
     public function store(Request $request)
     {
-//        Gate::authorize('create-department-organization');
-
+        Gate::authorize('admin-role');
         $validated = $request->validate([
             'departmentId' => 'required',
             'organization_ids' => 'required',
         ]);
-
         $departmentId = $validated['departmentId'];
         $organizationIds = $validated['organization_ids'];
 
-        if(!is_array($organizationIds)){
+        if (!is_array($organizationIds)) {
             $organizationIds = explode(',', $organizationIds);
             $organizationIds = array_map('trim', $organizationIds);
         }
@@ -100,20 +99,19 @@ class OrgDepManagementController extends Controller
             // Update organization's department_id
             Organization::where('id', $organization_id)->update(['department_id' => $departmentId]);
 
-            foreach ($users as $user){
+            foreach ($users as $user) {
                 if (DB::table('organization_user')
-                    ->where('organization_id',$organization_id)
-                    ->where('user_id',$user->id)->exists())
-                {
+                    ->where('organization_id', $organization_id)
+                    ->where('user_id', $user->id)->exists()) {
                     DB::table('organization_user')
-                        ->where('organization_id',$organization_id)
-                        ->where('user_id',$user->id)
-                        ->update(['updated_at' => now() ]);
-                }else{
-                   DB::table('organization_user')->insert([
-                       'organization_id' => $organization_id,
-                       'user_id' => $user->id
-                   ]);
+                        ->where('organization_id', $organization_id)
+                        ->where('user_id', $user->id)
+                        ->update(['updated_at' => now()]);
+                } else {
+                    DB::table('organization_user')->insert([
+                        'organization_id' => $organization_id,
+                        'user_id' => $user->id
+                    ]);
                 }
             }
         }

@@ -63,10 +63,12 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole(UserRole::ADMIN->value);
         });
 
+//        Gate::define('scriptorium-role', function ($user) {
+//            return $user->hasRole(UserRole::SCRIPTORIUM->value);
+//        });
 
-
-        Gate::define('scriptorium-role', function ($user) {
-            return $user->hasRole(UserRole::SCRIPTORIUM->value);
+        Gate::define('admin-role',function (User $user){
+           return $user->hasRole(UserRole::ADMIN->value);
         });
 
         //  for Boss & Scriptorium
@@ -122,20 +124,20 @@ class AppServiceProvider extends ServiceProvider
 
 
         //gate definition for Blog
-        Gate::define('create-blog',[BlogPolicy::class,'create']);
-        Gate::define('update-blog',[BlogPolicy::class,'update']);
-        Gate::define('delete-blog',[BlogPolicy::class,'delete']);
+//        Gate::define('create-blog',[BlogPolicy::class,'create']);
+//        Gate::define('update-blog',[BlogPolicy::class,'update']);
+//        Gate::define('delete-blog',[BlogPolicy::class,'delete']);
 
 
-        Gate::define('admin-dashboard',function (User $user){
-           return $user->role === 'admin';
-        });
-        Gate::define('operator-dashboard',function (User $user){
-            return $user->role === 'operator';
-        });
-        Gate::define('employee-dashboard',function (User $user){
-            return $user->role === 'employee';
-        });
+//        Gate::define('admin-dashboard',function (User $user){
+//           return $user->role === 'admin';
+//        });
+//        Gate::define('operator-dashboard',function (User $user){
+//            return $user->role === 'operator';
+//        });
+//        Gate::define('employee-dashboard',function (User $user){
+//            return $user->role === 'employee';
+//        });
 
     }
     /**

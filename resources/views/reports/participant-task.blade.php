@@ -37,93 +37,180 @@
         </ol>
     </nav>
 
-    @can('refinery-report')
-        {{-- Meeting Info --}}
-        <div id="meeting-info"
-             class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border border-gray-300 rounded-xl p-6 shadow-sm text-gray-800 text-sm">
+    <div id="printable-meeting-content"
+         class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
 
-            @foreach([
-                'واحد/کمیته' => $meeting->unit_held,
-                'تهیه کننده (دبیر جلسه)' => $meeting->scriptorium,
-                'رئیس جلسه' => $meeting->boss,
-                'پیوست' => $meeting->tasks->flatMap->taskUsers->flatMap->taskUserFiles->count() > 0 ? 'دارد' : 'ندارد',
-                'تاریخ جلسه' => $meeting->date,
-                'زمان جلسه' => $meeting->end_time ? "{$meeting->time} - {$meeting->end_time}" : $meeting->time,
-                'مکان جلسه' => $meeting->location,
-                'موضوع جلسه' => $meeting->title,
-                'سمت' => $userInfo->position ?? 'نامشخص',
-                'دپارتمان/واحد' => $userInfo->department->department_name ?? 'نامشخص'
-            ] as $label => $value)
-                <div class="flex items-start gap-2">
-                    <span class="font-semibold">{{ __($label) }}:</span>
-                    <span class="text-gray-700">{{ $value }}</span>
-                </div>
-            @endforeach
-        </div>
+        @can('refinery-report')
 
-        {{-- Task Cards --}}
-        <div class="mt-8 grid grid-cols-1 gap-6 mb-8">
-            @forelse ($meeting->tasks as $task)
-                @php
-                    $taskUsers = $task->taskUsers->where('user_id', $userInfo->user_id);
-                @endphp
-
-                @foreach ($taskUsers as $taskUser)
-                    <div class="bg-white border border-gray-200 rounded-xl shadow p-6 space-y-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-indigo-700 mb-2">{{ __('خلاصه مذاکرات') }}</h3>
-                            <p class="text-sm text-gray-800">{{ $task->body }}</p>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                            <div><span
-                                    class="font-medium text-gray-700">{{ __('اقدام کننده:') }}</span> {{ $taskUser->user->user_info->full_name ?? '---' }}
-                            </div>
-                            <div><span
-                                    class="font-medium text-gray-700">{{ __('مهلت اقدام:') }}</span> {{ $taskUser->time_out ?? '---' }}
-                            </div>
-                            <div><span
-                                    class="font-medium text-gray-700">{{ __('تاریخ انجام اقدام:') }}</span> {{ $taskUser->sent_date ?? '---' }}
-                            </div>
-                            <div>
-                                <span class="font-medium text-gray-700">{{ __('شرح اقدام:') }}</span>
-                                @if ($taskUser->body_task)
-                                    <p class="mt-1 text-gray-700 leading-relaxed">{{ $taskUser->body_task }}</p>
-                                @else
-                                    <p class="mt-1 text-red-500">{{ __('هنوز اقدامی ثبت نشده') }}</p>
-                                @endif
-                            </div>
-                            <div class="md:col-span-2">
-                                <span class="font-medium text-gray-700">{{ __('فایل‌ها:') }}</span>
-                                @if ($taskUser->taskUserFiles->isNotEmpty())
-                                    <ul class="list-disc list-inside mt-1 text-blue-600 text-xs space-y-1">
-                                        @foreach ($taskUser->taskUserFiles as $file)
-                                            <li>
-                                                <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
-                                                   class="hover:underline">
-                                                    {{ $file->original_name }}
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @else
-                                    <p class="text-gray-400 text-xs mt-1">{{ __('بدون فایل') }}</p>
-                                @endif
-                            </div>
-                        </div>
+            {{-- Meeting Overview --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                {{-- Boss Info --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">رئیس جلسه</h4>
+                    <div class="space-y-1 text-sm">
+                        <p>
+                            <span class="font-medium">{{__('نام:')}}</span>
+                            <span data-role="boss-name">{{ $meeting->boss }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('واحد:')}}</span>
+                            <span data-role="boss-unit">{{ $bossInfo->department->department_name ?? '---' }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('سمت:')}}</span>
+                            <span data-role="boss-position">{{ $bossInfo->position ?? '---' }}</span>
+                        </p>
                     </div>
-                @endforeach
-            @empty
-                <div class="text-center text-gray-500 text-sm mt-6">
-                    {{ __('هیچ اقدامی برای این کاربر در این جلسه ثبت نشده است.') }}
                 </div>
-            @endforelse
-            <a href="{{route('task.report.table')}}">
-                <x-secondary-button>
-                    {{__('بازگشت')}}
-                </x-secondary-button>
-            </a>
-        </div>
-    @endcan
+
+                {{-- Scriptorium --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">دبیر جلسه</h4>
+                    <div class="space-y-1 text-sm">
+                        <p>
+                            <span class="font-medium">{{__('نام:')}}</span>
+                            <span data-role="scriptorium-name">{{ $meeting->scriptorium }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('واحد:')}}</span>
+                            <span data-role="scriptorium-unit">{{ $meeting->scriptorium_department }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('سمت:')}}</span>
+                            <span data-role="scriptorium-position">{{ $meeting->scriptorium_position }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Time / Location --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">زمان و مکان</h4>
+                    <div class="space-y-1 text-sm">
+                        <p>
+                            <span class="font-medium">{{__('تاریخ:')}}</span>
+                            <span data-role="meeting-date">{{ $meeting->date }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('ساعت:')}}</span>
+                            <span data-role="meeting-time">{{ $meeting->time }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('مکان:')}}</span>
+                            <span data-role="meeting-location">{{ $meeting->location }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Committee / Treat --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">اطلاعات تکمیلی</h4>
+                    <div class="space-y-1 text-sm">
+                        <p>
+                            <span class="font-medium">{{__('موضوع جلسه: ')}}</span>
+                            <span data-role="meeting-unit">{{ $meeting->title }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('برگزار کننده:')}}</span>
+                            <span data-role="meeting-unit">{{ $meeting->unit_held }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('پذیرایی:')}}</span>
+                            <span data-role="meeting-treat">{{ $meeting->treat ? 'دارد' : 'ندارد' }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Task Cards --}}
+            <section class="mt-12 grid grid-cols-1 gap-8">
+                @forelse ($meeting->tasks as $task)
+                    @php
+                        $taskUsers = $task->taskUsers->where('user_id', $userInfo->user_id);
+                    @endphp
+
+                    @foreach ($taskUsers as $taskUser)
+                        <article
+                            class="bg-white border border-gray-200 rounded-2xl shadow-md p-6 space-y-5 transition-shadow hover:shadow-lg">
+                            <header>
+                                <h3 class="text-indigo-700 font-bold text-md mb-3 pb-2">
+                                    {{ __('بند مذاکره: ') }}
+                                    <p class="text-gray-800 leading-relaxed select-text">{{ $task->body }}</p>
+                                </h3>
+                            </header>
+
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-gray-600 select-text leading-snug">
+
+                                <div>
+                                    <span class="font-semibold text-gray-700">{{ __('اقدام کننده:') }}</span>
+                                    {{ $taskUser->user->user_info->full_name ?? '---' }}
+                                </div>
+                                <div>
+                                    <span class="font-semibold text-gray-700">{{ __('مهلت اقدام:') }}</span>
+                                    {{ $taskUser->time_out ?? '---' }}
+                                </div>
+                                <div>
+                                    <span class="font-semibold text-gray-700">{{ __('تاریخ انجام اقدام:') }}</span>
+                                    {{ $taskUser->sent_date ?? '---' }}
+                                </div>
+                                <div>
+                                    <span class="font-semibold text-gray-700">{{ __('شرح اقدام:') }}</span>
+                                    @if ($taskUser->body_task)
+                                        <p class="mt-1 text-gray-700 leading-relaxed">{{ $taskUser->body_task }}</p>
+                                    @else
+                                        <p class="mt-1 text-red-500 font-semibold">{{ __('هنوز اقدامی ثبت نشده') }}</p>
+                                    @endif
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <span class="font-semibold text-gray-700">{{ __('فایل‌ها:') }}</span>
+                                    @if ($taskUser->taskUserFiles->isNotEmpty())
+                                        <ul class="list-disc list-inside mt-1 text-blue-600 text-xs space-y-1">
+                                            @foreach ($taskUser->taskUserFiles as $file)
+                                                <li>
+                                                    <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
+                                                       class="hover:underline">
+                                                        {{ $file->original_name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <p class="text-gray-400 text-xs mt-1">{{ __('بدون فایل') }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                @empty
+                    <div class="text-center text-gray-500 text-base mt-6 italic">
+                        {{ __('هیچ اقدامی برای این کاربر در این جلسه ثبت نشده است.') }}
+                    </div>
+                @endforelse
+            </section>
+
+            {{-- Controls --}}
+            <div class="no-print flex flex-wrap items-center gap-4 mt-10">
+                <a href="{{ route('task.report.table') }}">
+                    <x-cancel-button>
+                        {{ __('بازگشت') }}
+                    </x-cancel-button>
+                </a>
+
+                <button onclick="printTask('{{ $meeting->title }}', '{{ $userInfo->full_name }}')"
+                        class=" px-4 py-2 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-xs uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
+                    {{ __('چاپ اطلاعات') }}
+                </button>
+            </div>
+
+            <script src="{{ asset('js/printParticipantTask.js') }}"></script>
+
+        @endcan
+    </div>
+
 
 </x-app-layout>

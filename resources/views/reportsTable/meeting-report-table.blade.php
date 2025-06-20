@@ -56,7 +56,7 @@
             {{-- Status Filter --}}
             <div class="col-span-6 sm:col-span-1">
                 <x-input-label for="statusFilter" value="{{ __('وضعیت جلسه') }}"/>
-                <x-select-input id="statusFilter" wire:model="statusFilter">
+                <x-select-input id="statusFilter" name="statusFilter">
                     <option value="">{{__('همه وضعیت‌ها')}}</option>
                     <option value="{{MeetingStatus::PENDING->value}}">{{__('در حال بررسی دعوتنامه')}}</option>
                     <option value="{{MeetingStatus::IS_CANCELLED->value}}">{{__('لغو شد')}}</option>
@@ -65,7 +65,6 @@
                     <option value="{{MeetingStatus::IS_FINISHED->value}}">{{__('خاتمه یافت')}}</option>
                 </x-select-input>
             </div>
-
 
             {{-- Date Inputs (Start & End) --}}
             <div class="col-span-6 sm:col-span-3 lg:col-span-2">
@@ -99,6 +98,7 @@
 
         </div>
     </form>
+
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12 mt-4">
         <x-table.table>
             <x-slot name="head">

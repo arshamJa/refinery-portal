@@ -1,10 +1,9 @@
 <x-app-layout>
 
-    <x-organizationDepartmentHeader/>
-
-    {{-- Relation Department & Organization--}}
-    <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-        <div class="max-w-xl">
+    @can('admin-role')
+        <x-organizationDepartmentHeader/>
+        {{-- Relation Department & Organization--}}
+        <div class="max-w-xl mt-4">
             <form action="{{route('departments.organizations.store')}}" method="post"
                   enctype="multipart/form-data">
                 @csrf
@@ -92,5 +91,5 @@
                 </x-primary-button>
             </form>
         </div>
-    </div>
+    @endcan
 </x-app-layout>

@@ -18,6 +18,16 @@
                  stroke="currentColor" class="w-3 h-3 text-gray-400">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
+            <li class="flex items-center h-full">
+                <a href="{{route('refinery.report')}}"
+                   class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
+                    <span>{{__('نمودار جلسات/اقدامات')}}</span>
+                </a>
+            </li>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                 stroke="currentColor" class="w-3 h-3 text-gray-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+            </svg>
             <li>
                 <a href="{{route('meeting.report.table')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
@@ -201,7 +211,7 @@
         </div>
 
         <button onclick="printMeetingSummary(`{{ $meeting->title }}`)"
-                class="px-4 py-2 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-xs uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
+                class="px-4 py-2 mt-4 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-xs uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
             {{__('چاپ اطلاعات جلسه')}}
         </button>
 

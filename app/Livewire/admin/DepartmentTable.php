@@ -19,7 +19,10 @@ class DepartmentTable extends Component
     public $isUpdate = false;
     public ?string $search = '';
 
-
+    public function filterDepartments()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {

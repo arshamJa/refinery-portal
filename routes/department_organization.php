@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\AddOrganizationController;
-use App\Http\Controllers\Admin\DepOrgConnectionController;
 use App\Http\Controllers\Admin\OrgDepManagementController;
 use App\Livewire\admin\DepartmentTable;
 use App\Livewire\admin\OrganizationTable;
@@ -11,27 +10,13 @@ Route::middleware(['auth', 'adminMiddleware'])->group(function () {
 
     Route::get('department/organization/manage',[OrgDepManagementController::class, 'index'])
         ->name('organization.department.manage');
-//        ->can('view-department-organization');
 
     Route::get('department/organization/connection', [OrgDepManagementController::class, 'departmentOrganizationConnection'])
         ->name('department.organization.connection');
-//        ->can('create-department-organization');
 
     Route::post('/department/organization/connection', [OrgDepManagementController::class, 'store'])
         ->name('departments.organizations.store');
 
-//    Route::get('/departments/organizations', organizationManage::class)
-//        ->name('organization.department.manage')
-//        ->can('view-department-organization');
-
-//    Route::get('/department/organization/connection', DepOrgConnection::class)
-//        ->name('department-organization-connection');
-
-//    Route::get('/dep/org', [DepOrgConnectionController::class, 'create'])
-//        ->name('departments.organizations')
-//        ->can('create-department-organization');
-//    Route::post('/departments/users', [DepOrgConnectionController::class, 'storeDepUser'])
-//        ->name('departments.users');
 
     Route::get('/addOrganization/{id}', [AddOrganizationController::class, 'index'])
         ->name('addOrganization');
@@ -47,12 +32,14 @@ Route::middleware(['auth', 'adminMiddleware'])->group(function () {
     // Department Route
     Route::get('/departments', DepartmentTable::class)
         ->name('departments.index');
-//        ->can('view-department-organization');
 
     // Organization Route
     Route::get('organizations', OrganizationTable::class)
         ->name('organizations');
-//        ->can('view-department-organization');
+
+    // this is for deleting the organization
+    Route::delete('organization',[AddOrganizationController::class,'deleteOrganization'])
+        ->name('organization.destroy');
 
 
 

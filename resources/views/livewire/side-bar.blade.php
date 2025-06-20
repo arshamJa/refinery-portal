@@ -87,19 +87,19 @@
                             </svg>
                             {{__('جدول جلسات')}}
                         </x-link.responsive-link>
-                        @can('has-permission', UserPermission::TASK_REPORT_TABLE)
-                            <x-link.responsive-link href="{{route('meeting.report')}}"
-                                                    :active="request()->is('meeting/report')"
-                                                    class="flex items-center gap-x-2 text-xs">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5"
-                                     stroke="currentColor" class="size-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>
-                                </svg>
-                                {{__('گزارش جلسات شرکت')}}
-                            </x-link.responsive-link>
-                        @endcan
+{{--                        @can('has-permission', UserPermission::TASK_REPORT_TABLE)--}}
+{{--                            <x-link.responsive-link href="{{route('meeting.report')}}"--}}
+{{--                                                    :active="request()->is('meeting/report')"--}}
+{{--                                                    class="flex items-center gap-x-2 text-xs">--}}
+{{--                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
+{{--                                     stroke-width="1.5"--}}
+{{--                                     stroke="currentColor" class="size-5">--}}
+{{--                                    <path stroke-linecap="round" stroke-linejoin="round"--}}
+{{--                                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/>--}}
+{{--                                </svg>--}}
+{{--                                {{__('گزارش جلسات شرکت')}}--}}
+{{--                            </x-link.responsive-link>--}}
+{{--                        @endcan--}}
                     </div>
                 </div>
             </li>
@@ -255,7 +255,7 @@
                 </x-link.responsive-link>
             </li>
             <li class="mb-2">
-                @can('side-bar-notifications')
+                @can('admin-role')
                     <div x-data="{ openSetting: false }" class="w-full mb-4">
                         <button @click="openSetting = !openSetting"
                                 class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition">

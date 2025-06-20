@@ -240,8 +240,7 @@
     <div class="bg-white dark:bg-gray-900  px-4 sm:px-8 lg:px-16" dir="rtl" x-data="{ openModal: false, selectedBlog: null }">
         <!-- Hero Title -->
         <div class="max-w-6xl mx-auto mb-12 text-center">
-            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">مرکز اخبار</h1>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">با جدیدترین رویدادها و اطلاعیه‌ها همراه شوید</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">{{__('اخبار و اطلاعیه')}}</h1>
             <!-- Search -->
             <input wire:model.live.debounce.500ms="search" type="text" dir="rtl"
                    placeholder="جستجو در عنوان اخبار..."
@@ -259,7 +258,6 @@
                              loading="lazy"
                              class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
                     </div>
-
                     <!-- Content -->
                     <div class="p-5 flex flex-col flex-grow">
                         <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -274,10 +272,12 @@
                         <div class="flex items-center mt-4">
                             <span class="text-xs text-gray-500 dark:text-gray-400">{{ $blog->author->name ?? 'نویسنده ناشناس' }}</span>
                         </div>
-                        <button @click="openModal = true; selectedBlog = @js($blog)"
+                        <a href="{{route('blogs.show',$blog->id)}}">
+                            <button
                                 class="mt-auto text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium text-right">
-                            مشاهده خبر →
-                        </button>
+                                مشاهده خبر →
+                            </button>
+                        </a>
                     </div>
                 </article>
             @empty
