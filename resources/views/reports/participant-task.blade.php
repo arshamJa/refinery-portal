@@ -50,15 +50,15 @@
                     <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">رئیس جلسه</h4>
                     <div class="space-y-1 text-sm">
                         <p>
-                            <span class="font-medium">{{__('نام:')}}</span>
+                            <span class="font-medium">نام:</span>
                             <span data-role="boss-name">{{ $meeting->boss }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">{{__('واحد:')}}</span>
+                            <span class="font-medium">واحد:</span>
                             <span data-role="boss-unit">{{ $bossInfo->department->department_name ?? '---' }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">{{__('سمت:')}}</span>
+                            <span class="font-medium">سمت:</span>
                             <span data-role="boss-position">{{ $bossInfo->position ?? '---' }}</span>
                         </p>
                     </div>
@@ -70,15 +70,15 @@
                     <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">دبیر جلسه</h4>
                     <div class="space-y-1 text-sm">
                         <p>
-                            <span class="font-medium">{{__('نام:')}}</span>
+                            <span class="font-medium">نام:</span>
                             <span data-role="scriptorium-name">{{ $meeting->scriptorium }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">{{__('واحد:')}}</span>
+                            <span class="font-medium">واحد:</span>
                             <span data-role="scriptorium-unit">{{ $meeting->scriptorium_department }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">{{__('سمت:')}}</span>
+                            <span class="font-medium">سمت:</span>
                             <span data-role="scriptorium-position">{{ $meeting->scriptorium_position }}</span>
                         </p>
                     </div>
@@ -90,35 +90,30 @@
                     <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">زمان و مکان</h4>
                     <div class="space-y-1 text-sm">
                         <p>
-                            <span class="font-medium">{{__('تاریخ:')}}</span>
+                            <span class="font-medium">تاریخ:</span>
                             <span data-role="meeting-date">{{ $meeting->date }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">{{__('ساعت:')}}</span>
+                            <span class="font-medium">ساعت:</span>
                             <span data-role="meeting-time">{{ $meeting->time }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">{{__('مکان:')}}</span>
+                            <span class="font-medium">مکان:</span>
                             <span data-role="meeting-location">{{ $meeting->location }}</span>
                         </p>
                     </div>
                 </div>
-
                 {{-- Committee / Treat --}}
                 <div
                     class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
                     <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">اطلاعات تکمیلی</h4>
                     <div class="space-y-1 text-sm">
                         <p>
-                            <span class="font-medium">{{__('موضوع جلسه: ')}}</span>
-                            <span data-role="meeting-unit">{{ $meeting->title }}</span>
-                        </p>
-                        <p>
-                            <span class="font-medium">{{__('برگزار کننده:')}}</span>
+                            <span class="font-medium">برگزار کننده:</span>
                             <span data-role="meeting-unit">{{ $meeting->unit_held }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">{{__('پذیرایی:')}}</span>
+                            <span class="font-medium">پذیرایی:</span>
                             <span data-role="meeting-treat">{{ $meeting->treat ? 'دارد' : 'ندارد' }}</span>
                         </p>
                     </div>

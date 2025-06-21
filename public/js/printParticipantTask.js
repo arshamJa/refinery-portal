@@ -1,232 +1,184 @@
-// function printTask(title = 'بدون عنوان جلسه', personName = 'نامشخص') {
-//     const meetingInfo = document.getElementById("meeting-info")?.innerHTML || '';
-//     const taskCards = document.querySelectorAll('.mt-8 > div.bg-white'); // task cards container
-//     const printWindow = window.open('', '', 'height=900,width=1000');
-//
-//     printWindow.document.write('<html lang="fa" dir="rtl"><head><meta charset="UTF-8"><title>پرینت صورتجلسه</title>');
-//     printWindow.document.write('<style>');
-//     printWindow.document.write(`
-//         @import url('https://cdn.fontcdn.ir/Fonts/Vazir/Vazir.css');
-//         body {
-//             font-family: 'Vazir', Tahoma, sans-serif;
-//             background: #f9fafb;
-//             color: #222;
-//             margin: 40px 30px;
-//             font-size: 15px;
-//             line-height: 1.6;
-//         }
-//         .header-container {
-//             display: flex;
-//             justify-content: space-between;
-//             align-items: center;
-//             border-bottom: 3px solid #0c63e4;
-//             padding-bottom: 14px;
-//             margin-bottom: 30px;
-//             gap: 10px;
-//         }
-//         .header-container h1 {
-//             font-size: 26px;
-//             font-weight: 900;
-//             color: #0c63e4;
-//             margin: 0;
-//             white-space: nowrap;
-//         }
-//         .header-container img {
-//             max-width: 130px;
-//             height: auto;
-//         }
-//         .meeting-info-grid {
-//             background: white;
-//             border-radius: 12px;
-//             box-shadow: 0 3px 8px rgb(12 99 228 / 0.15);
-//             padding: 20px 30px;
-//             display: grid;
-//             grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-//             gap: 18px 35px;
-//             color: #333;
-//             margin-bottom: 40px;
-//         }
-//         .meeting-info-grid > div {
-//             display: flex;
-//             flex-direction: column;
-//             gap: 6px;
-//         }
-//         .meeting-info-grid span:first-child {
-//             font-weight: 700;
-//             color: #0c63e4;
-//             font-size: 14.5px;
-//             user-select: text;
-//         }
-//         .meeting-info-grid span:last-child {
-//             color: #444;
-//             font-size: 14px;
-//             user-select: text;
-//         }
-//         .task-card {
-//             background: white;
-//             border-radius: 14px;
-//             box-shadow: 0 2px 10px rgb(0 0 0 / 0.05);
-//             padding: 24px 28px;
-//             margin-bottom: 28px;
-//             border-left: 6px solid #0c63e4;
-//             transition: box-shadow 0.3s ease;
-//             page-break-inside: avoid;
-//         }
-//         .task-card:hover {
-//             box-shadow: 0 6px 20px rgb(12 99 228 / 0.25);
-//         }
-//         .task-card h3 {
-//             color: #0c63e4;
-//             font-size: 18px;
-//             font-weight: 800;
-//             margin-bottom: 12px;
-//             border-bottom: 1px solid #ddd;
-//             padding-bottom: 6px;
-//         }
-//         .task-card p {
-//             font-size: 14.5px;
-//             color: #555;
-//             line-height: 1.5;
-//             user-select: text;
-//         }
-//         .task-details {
-//             display: grid;
-//             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-//             gap: 10px 24px;
-//             font-size: 14px;
-//             color: #666;
-//             margin-top: 18px;
-//         }
-//         .task-details div {
-//             line-height: 1.3;
-//         }
-//         .task-details span.label {
-//             font-weight: 700;
-//             color: #0c63e4;
-//         }
-//         .task-details .files-list {
-//             grid-column: 1 / -1;
-//             margin-top: 8px;
-//         }
-//         .task-details ul {
-//             padding-inline-start: 20px;
-//             color: #0b5ed7;
-//             font-size: 13px;
-//         }
-//         .task-details ul li {
-//             margin-bottom: 6px;
-//         }
-//         .task-details ul li a {
-//             text-decoration: none;
-//             color: #0b5ed7;
-//         }
-//         .task-details ul li a:hover {
-//             text-decoration: underline;
-//         }
-//         p.no-action {
-//             font-style: italic;
-//             color: #cc0000;
-//             font-weight: 700;
-//         }
-//         p.no-files {
-//             color: #999;
-//             font-size: 13px;
-//         }
-//         @media print {
-//             body {
-//                 margin: 10mm 10mm 10mm 10mm;
-//                 -webkit-print-color-adjust: exact;
-//             }
-//             .task-card:hover {
-//                 box-shadow: none;
-//             }
-//         }
-//     `);
-//     printWindow.document.write('</style></head><body>');
-//
-//     // Header with meeting title and logo
-//     printWindow.document.write(`
-//         <div class="header-container">
-//             <h1>گزارش اقدامات: ${personName}</h1>
-//             <img src="/fajrgam-b.png" alt="لوگو" />
-//         </div>
-//     `);
-//
-//     // Meeting Info
-//     if (meetingInfo) {
-//         printWindow.document.write('<div class="meeting-info-grid">');
-//         printWindow.document.write(meetingInfo);
-//         printWindow.document.write('</div>');
-//     }
-//
-//     // Task Cards
-//     if (taskCards.length) {
-//         taskCards.forEach(card => {
-//             printWindow.document.write('<div class="task-card">');
-//             printWindow.document.write(card.innerHTML);
-//             printWindow.document.write('</div>');
-//         });
-//     } else {
-//         printWindow.document.write('<p class="no-action">هیچ اقدامی برای چاپ وجود ندارد.</p>');
-//     }
-//
-//     printWindow.document.write('</body></html>');
-//     printWindow.document.close();
-//
-//     setTimeout(() => {
-//         printWindow.print();
-//     }, 1000);
-// }
-
 function printTask(title = 'بدون عنوان جلسه', personName = 'نامشخص') {
-    const printableContent = document.getElementById("printable-meeting-content")?.innerHTML;
+    const printableContent = document.getElementById("printable-meeting-content")?.cloneNode(true);
     if (!printableContent) {
         alert("هیچ محتوایی برای چاپ وجود ندارد.");
         return;
     }
 
-    const printWindow = window.open('', '', 'height=900,width=1000');
+    function getText(selector) {
+        const el = document.querySelector(selector);
+        return el ? el.textContent.trim() : '';
+    }
+
+    const bossName = getText('[data-role="boss-name"]');
+    const bossUnit = getText('[data-role="boss-unit"]');
+    const bossPosition = getText('[data-role="boss-position"]');
+
+    const scriptoriumName = getText('[data-role="scriptorium-name"]');
+    const scriptoriumUnit = getText('[data-role="scriptorium-unit"]');
+    const scriptoriumPosition = getText('[data-role="scriptorium-position"]');
+
+    const date = getText('[data-role="meeting-date"]');
+    const time = getText('[data-role="meeting-time"]');
+    const location = getText('[data-role="meeting-location"]');
+
+    const heldBy = getText('[data-role="meeting-unit"]');
+    const treat = getText('[data-role="meeting-treat"]');
+
+    const overviewParagraph = `
+    <div class="info-box print:break-inside-avoid-page">
+        <p><span>رئیس جلسه: </span><span>${bossName}</span>، <span>واحد: </span><span>${bossUnit}</span>، <span>سمت: </span><span>${bossPosition}</span></p>
+        <p><span>دبیر جلسه: </span><span>${scriptoriumName}</span>، <span>واحد: </span><span>${scriptoriumUnit}</span>، <span>سمت: </span><span>${scriptoriumPosition}</span></p>
+        <p><span>تاریخ: </span><span>${date}</span>، <span>ساعت: </span><span>${time}</span>، <span>مکان: </span><span>${location}</span></p>
+        <p><span>برگزار کننده: </span><span>${heldBy}</span>، <span>پذیرایی: </span><span>${treat}</span></p>
+    </div>
+    `;
+
+    printableContent.querySelectorAll('.no-print').forEach(el => el.remove());
+
+    const gridContainer = printableContent.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.xl\\:grid-cols-4.gap-6');
+    if (gridContainer) {
+        gridContainer.remove();
+    }
+
+    // Add <hr> after each article inside the cloned content for print separation
+    printableContent.querySelectorAll('article').forEach(article => {
+        const hr = document.createElement('hr');
+        hr.style.margin = '30px 0';
+        hr.style.border = 'none';
+        hr.style.borderTop = '1px solid #ccc';
+        article.after(hr);
+
+        // Remove background color and border for print
+        article.style.background = 'transparent';
+        article.style.border = 'none';
+        article.style.boxShadow = 'none';
+        article.style.padding = '0';  // Optional: adjust padding if needed
+    });
+
+    // Separate "بند مذاکره:" label and content in header h3
+    printableContent.querySelectorAll('article header h3').forEach(h3 => {
+        const originalText = h3.textContent.trim();
+        h3.innerHTML = '';  // Clear current content
+
+        const labelSpan = document.createElement('span');
+        labelSpan.classList.add('label');
+        labelSpan.textContent = 'بند مذاکره:';
+
+        const contentP = document.createElement('p');
+        contentP.textContent = originalText.replace('بند مذاکره:', '').trim();
+
+        h3.appendChild(labelSpan);
+        h3.appendChild(contentP);
+    });
+
+    const printWindow = window.open('', '', 'height=1000,width=1100');
+    printWindow.document.title = `چاپ اقدامات جلسه: ${title}`;
 
     printWindow.document.write(`
         <html lang="fa" dir="rtl">
         <head>
-            <meta charset="UTF-8">
-            <title>پرینت صورتجلسه</title>
-            <link href="https://cdn.fontcdn.ir/Fonts/Vazir/Vazir.css" rel="stylesheet" type="text/css" />
+            <meta charset="UTF-8" />
+            <title>چاپ اقدامات جلسه</title>
             <style>
+                @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css');
                 body {
-                    font-family: 'Vazir', Tahoma, sans-serif;
-                    background: #f9fafb;
-                    color: #222;
-                    margin: 40px 30px;
-                    font-size: 14px;
-                    line-height: 1.6;
+                    font-family: "Vazir", sans-serif;
                     direction: rtl;
+                    background: #fff;
+                    color: #333;
+                    font-size: 15px;
+                    line-height: 1.8;
+                    margin: 40px 50px;
                 }
-
+                .header-container {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px solid #007acc;
+                    padding-bottom: 12px;
+                    margin-bottom: 30px;
+                }
+                .header-container h1 {
+                    font-size: 26px;
+                    font-weight: bold;
+                    color: #005e91;
+                    margin: 0;
+                }
+                .header-container img {
+                    max-width: 120px;
+                    height: auto;
+                }
+                .info-box {
+                    background: #f9f9f9;
+                    border: 1px solid #ddd;
+                    border-radius: 12px;
+                    padding: 18px;
+                    margin-bottom: 24px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                }
+                .info-box p {
+                    margin: 6px 0;
+                }
+                .info-box span {
+                    font-weight: 600;
+                    color: #555;
+                    display: inline;
+                    margin: 0;
+                    padding: 0;
+                    white-space: nowrap;
+                }
+                article header h3 {
+                    font-size: 20px;
+                    color: #1e40af;
+                    font-weight: 700;
+                    margin-bottom: 12px;
+                    /*border-bottom: 2px solid #3b82f6;*/
+                    padding-bottom: 8px;
+                }
+                article header h3 span.label {
+                    font-weight: 900;
+                    color: #2563eb;
+                    /*margin-right: 8px;*/
+                }
+                article header h3 p {
+                    font-size: 17px;
+                    color: #1e293b;
+                    margin: 0;
+                    line-height: 1.5;
+                    user-select: text;
+                }
+                hr {
+                    border: none;
+                    border-top: 1px solid #ccc;
+                    margin: 30px 0;
+                }
+                button, .no-print, .screen-only {
+                    display: none !important;
+                }
                 @media print {
-                    body {
-                        margin: 10mm;
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
+                    .print\\:flex-nowrap {
+                        flex-wrap: nowrap !important;
+                    }
+                    .print\\:break-inside-avoid-page {
+                        break-inside: avoid-page !important;
+                        page-break-inside: avoid !important;
+                    }
+                    .info-box, p, table, h3, ul, li {
+                        page-break-inside: avoid !important;
                     }
                 }
-
-                /* Optional: Style fixes to override dark mode or apply clean layout */
-                .dark\\:bg-gray-800 { background-color: white !important; }
-                .dark\\:text-white { color: black !important; }
-                .text-indigo-700 { color: #0c63e4 !important; }
-                a { color: #0b5ed7; text-decoration: none; }
-                a:hover { text-decoration: underline; }
             </style>
         </head>
         <body>
-            <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0c63e4; padding-bottom: 14px; margin-bottom: 30px;">
-                <h1 style="font-size: 24px; color: #0c63e4;">گزارش اقدامات: ${personName}</h1>
-                <img src="/fajrgam-b.png" alt="لوگو" style="max-width: 130px; height: auto;" />
+            <div class="header-container">
+                <h1>گزارش اقدامات: ${personName}</h1>
+                <img src="/fajrgam-b.png" alt="لوگو" />
             </div>
-
-            <div id="printable-meeting-content">${printableContent}</div>
+            ${overviewParagraph}
+            <div id="printable-meeting-content">
+                ${printableContent.innerHTML}
+            </div>
         </body>
         </html>
     `);
@@ -237,4 +189,3 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
         printWindow.print();
     }, 1000);
 }
-
