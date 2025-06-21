@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TaskStatus;
+use App\Exports\MeetingsExport;
 use App\Exports\TaskUserExport;
 use App\Models\Meeting;
 use App\Models\TaskUser;
@@ -58,6 +59,38 @@ class MeetingReportTableController extends Controller
         return view('reportsTable.meeting-report-table', [
             'meetings' => $meetings
         ]);
+    }
+
+
+    public function downloadMeetingReport(Request $request)
+    {
+        $search = trim($request->input('search'));
+        $startDate = trim($request->input('start_date'));
+        $endDate = trim($request->input('end_date'));
+        $statusFilter = $request->input('statusFilter');
+
+        $meetings = Meeting::with(['meetingUsers.user.user_info']) // Include relationships for export
+        ->when(!empty($search), function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('scriptorium', 'like', "%{$search}%")
+                    ->orWhere('boss', 'like', "%{$search}%")
+                    ->orWhere('date', 'like', "%{$search}%")
+                    ->orWhere('time', 'like', "%{$search}%");
+            });
+        })
+            ->when($statusFilter !== null && $statusFilter !== '', function ($query) use ($statusFilter) {
+                $query->where('status', $statusFilter);
+            })
+            ->when(!empty($startDate), function ($query) use ($startDate) {
+                $query->where('date', '>=', $startDate);
+            })
+            ->when(!empty($endDate), function ($query) use ($endDate) {
+                $query->where('date', '<=', $endDate);
+            })
+            ->get();
+
+        return Excel::download(new MeetingsExport($meetings), 'meeting_report.xlsx');
     }
 
 

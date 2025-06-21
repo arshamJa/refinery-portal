@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\MeetingReportTableController;
 use App\Http\Controllers\ParticipantsTaskController;
+use App\Http\Controllers\RefineryReportController;
 use App\Http\Controllers\Reports\TasksReportController;
 use App\Http\Controllers\TaskManagementController;
 use App\Livewire\MyTasks;
@@ -71,7 +72,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('meeting.report.table')
         ->can('refinery-report');
 
-    Route::get('task/report/table',[MeetingReportTableController::class,'taskTable'])
+    Route::get('meeting/report/export', [MeetingReportTableController::class, 'downloadMeetingReport'])
+        ->name('meeting.report.download');
+
+    Route::get('task/report/table', [MeetingReportTableController::class, 'taskTable'])
         ->name('task.report.table')
         ->can('refinery-report');
 
@@ -80,8 +84,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('tasks.report.download');
 
 
-
-    Route::get('refinery/reports',[\App\Http\Controllers\RefineryReportController::class,'index'])
+    Route::get('refinery/reports', [RefineryReportController::class, 'index'])
         ->name('refinery.report')
         ->can('refinery-report');
 

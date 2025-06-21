@@ -133,13 +133,11 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
                     color: #1e40af;
                     font-weight: 700;
                     margin-bottom: 12px;
-                    /*border-bottom: 2px solid #3b82f6;*/
                     padding-bottom: 8px;
                 }
                 article header h3 span.label {
                     font-weight: 900;
                     color: #2563eb;
-                    /*margin-right: 8px;*/
                 }
                 article header h3 p {
                     font-size: 17px;

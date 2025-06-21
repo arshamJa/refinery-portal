@@ -95,6 +95,11 @@
                     </x-view-all-link>
                 @endif
             </div>
+            <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
+                <x-export-link href="{{ route('meeting.report.download', request()->query()) }}">
+                    {{ __('خروجی Excel') }}
+                </x-export-link>
+            </div>
 
         </div>
     </form>
