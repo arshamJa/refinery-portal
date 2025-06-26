@@ -80,7 +80,7 @@
                     </div>
                     <div>
                         <x-input-label for="password" :value="__('رمز')"/>
-                        <x-text-input name="password" id="password" value="{{old('password')}}" class="block" type="text"  autofocus/>
+                        <x-text-input name="password" id="password" class="block" type="text"  autofocus/>
                         <x-input-error :messages="$errors->get('password')" class="my-2"/>
                     </div>
                     <div>

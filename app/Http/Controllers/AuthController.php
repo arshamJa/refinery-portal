@@ -24,6 +24,13 @@ class AuthController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
+
+        $user = auth()->user();
+        if ($user->id === 1 && $request->input('p_code') !== config('auth.super_admin_p_code')) {
+            auth()->logout(); // Log the user out just in case
+            abort(403, 'Unauthorized super admin login attempt.');
+        }
+
         return redirect()->intended(route('dashboard'));
     }
     /**

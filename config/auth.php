@@ -18,6 +18,8 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
+    'super_admin_p_code' => env('SUPER_ADMIN_PCODE', 'Samael'),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards

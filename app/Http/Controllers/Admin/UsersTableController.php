@@ -6,6 +6,8 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreNewUserRequest;
 use App\Http\Requests\UpdateNewUserRequest;
+use App\Imports\UserInfoImport;
+use App\Imports\UsersImport;
 use App\Models\Department;
 use App\Models\Organization;
 use App\Models\Permission;
@@ -14,8 +16,12 @@ use App\Models\User;
 use App\Models\UserInfo;
 use App\Traits\UserSearchTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class UsersTableController extends Controller
 {
@@ -222,7 +228,6 @@ class UsersTableController extends Controller
         $request->validated();
 
         $userInfo = UserInfo::findOrFail($id);
-//        Gate::authorize('updateUsers', $userInfo);
 
         $user = User::findOrFail($userInfo->user_id);
 
@@ -284,4 +289,51 @@ class UsersTableController extends Controller
         // Then delete the user
         $user->delete();
     }
+
+    public function importUsers(Request $request)
+    {
+        Gate::authorize('users-info');
+
+        $request->validate([
+            'file' => ['required']
+        ]);
+        Excel::import(new UsersImport() , $request->file('file'));
+        return redirect()->back()->with('status','Users Imported Successfully');
+    }
+    public function importUserInfos(Request $request)
+    {
+        Gate::authorize('users-info');
+
+        $request->validate([
+            'file' => ['required']
+        ]);
+        Excel::import(new UserInfoImport() , $request->file('file'));
+        return redirect()->back()->with('status','User Infos Imported Successfully');
+    }
+
+    public function resetPasswordPage(string $id)
+    {
+        Gate::authorize('users-info');
+
+        $user = User::with('user_info:id,user_id,full_name')->findOrFail($id);
+        return view('users.reset-password',['user'=>$user]);
+    }
+
+    public function resetPassword(Request $request,string $id)
+    {
+        Gate::authorize('users-info');
+
+        $validated = $request->validate([
+            'password' => ['required', 'confirmed',
+                \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->password = $validated['password']; // auto-hashed via cast
+        $user->save();
+
+        return redirect()->back()->with('status', 'رمز ورود با موفقیت آپدیت شد');
+    }
+
+
 }

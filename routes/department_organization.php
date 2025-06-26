@@ -38,7 +38,7 @@ Route::middleware(['auth', 'adminMiddleware'])->group(function () {
         ->name('organizations');
 
     // this is for deleting the organization
-    Route::delete('organization',[AddOrganizationController::class,'deleteOrganization'])
+    Route::delete('organization/{organizationId}',[AddOrganizationController::class,'deleteOrganization'])
         ->name('organization.destroy');
 
 

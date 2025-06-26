@@ -24,7 +24,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'password' => static::$password ??= Hash::make('12345678'),
+            'password' => static::$password ??= Hash::make('123456t'),
             'p_code' => fake()->randomNumber(6, true),
         ];
     }

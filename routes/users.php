@@ -28,6 +28,18 @@ Route::middleware('auth')->group(function () {
     Route::delete('uses/{user}', [UsersTableController::class, 'destroy'])
         ->name('users.destroy');
 
+    Route::post('import/users',[UsersTableController::class,'importUsers'])
+        ->name('import.users');
+
+    Route::post('import/user/infos',[UsersTableController::class,'importUserInfos'])
+        ->name('import.user.infos');
+
+    // Route for resting users password by admin
+    Route::get('users/reset-password/{user}',[UsersTableController::class,'resetPasswordPage'])
+        ->name('reset.password');
+    Route::put('admin/users/{user}/reset-password', [UsersTableController::class, 'resetPassword'])
+        ->name('admin.users.reset-password');
+
 });
 
 

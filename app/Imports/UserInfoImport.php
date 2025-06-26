@@ -4,33 +4,39 @@ namespace App\Imports;
 
 use App\Models\User;
 use App\Models\UserInfo;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class UserInfoImport implements ToCollection
+class UserInfoImport implements ToModel, WithHeadingRow
 {
-    /**
-    * @param Collection $collection
-    */
-    public function collection(Collection $rows)
+    public function model(array $row)
     {
-        foreach ($rows as $row) {
-            // Find the user using p_code instead of email
-            $user = User::where('p_code', $row['p_code'])->first();
-
-            if ($user) {
-                UserInfo::create([
-                    'user_id' => $user->id,
-                    'department_id' => null,
-                    'full_name' => $row['full_name'],
-                    'work_phone' => $row['work_phone'],
-                    'house_phone' => $row['house_phone'],
-                    'phone' => $row['phone'],
-                    'n_code' => $row['n_code'],
-                    'position' => $row['position'],
-                    'signature' => null,
-                ]);
+        $userId = null;
+        if ($row['user_id'] && !empty($row['user_id']) !== null) {
+            $userId = $row['user_id'];
+        } else {
+            if (isset($row['p_code']) && !empty($row['p_code'])) {
+                $user = User::where('p_code', $row['p_code'])->first();
+                if ($user) {
+                    $userId = $user->id;
+                } else {
+                    return null;
+                }
+            }else{
+                return null;
             }
         }
+        return new UserInfo([
+            'user_id' => $userId,
+            'department_id' => null,
+            'full_name' => $row['full_name'] ?? null,
+            'work_phone' => $row['work_phone'] ?? null,
+            'house_phone' => $row['house_phone'] ?? null,
+            'phone' => $row['phone'] ?? null,
+            'n_code' => $row['n_code'] ?? null,
+            'position' => $row['position'] ?? null,
+            'signature' => null,
+        ]);
+
     }
 }

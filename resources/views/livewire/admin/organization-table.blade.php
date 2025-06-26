@@ -176,7 +176,6 @@
         <x-modal name="import" maxWidth="2xl" :closable="false">
             <form action="/organization_import" method="POST" enctype="multipart/form-data">
                 @csrf
-
                 <!-- Header -->
                 <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                     <h2 class="text-2xl font-bold text-gray-800">{{ __('درون‌ریزی فایل اکسل') }}</h2>
@@ -188,13 +187,12 @@
                         </svg>
                     </a>
                 </div>
-
                 <!-- Body -->
                 <div class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200" dir="rtl">
                     <div>
                         <x-input-label for="excel_file" :value="__('فایل اکسل')"/>
                         <input type="file" name="excel_file" id="excel_file"
-                               class="block my-2 w-full text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none"/>
+                               class="block my-2 w-full p-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none"/>
                         <x-input-error :messages="$errors->get('excel_file')" class="my-2"/>
                     </div>
                 </div>
@@ -212,8 +210,6 @@
                 </div>
             </form>
         </x-modal>
-
-
 
         <x-modal name="delete" maxWidth="2xl" :closable="false">
             @if($organizationId)
@@ -261,41 +257,83 @@
             @endif
         </x-modal>
 
-
-
-        <x-modal name="update">
+        <x-modal name="update" maxWidth="2xl" :closable="false">
             @if($organizationId)
-                <form wire:submit="updateOrg({{$organizationId}})" enctype="multipart/form-data">
-                    <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 text-start">
-                        {{__('ویرایش سامانه')}}
+                <form wire:submit="updateOrg" enctype="multipart/form-data">
+
+                    <!-- Header -->
+                    <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش سامانه') }}</h2>
+                        <a href="{{route('organizations')}}"
+                                class="text-gray-400 hover:text-red-500 transition duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
                     </div>
-                    <div class="px-6 py-4" dir="rtl">
-                        <div class="mt-4 text-sm text-gray-600">
-                            <div class="w-full">
-                                <x-input-label for="organization" :value="__('سامانه')"/>
-                                <x-text-input wire:model="organization" id="organization" class="block my-2 w-full"
-                                              type="text" autofocus/>
-                                <x-input-error :messages="$errors->get('organization')" class="mt-2"/>
 
-                                <x-input-label for="url" :value="__('لینک سامانه')"/>
-                                <x-text-input wire:model="url" id="url" dir="ltr" class="block my-2 w-full"
-                                              type="text" autofocus/>
-                                <x-input-error :messages="$errors->get('url')" class="my-2"/>
+                    <!-- Body -->
+                    <div class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200" dir="rtl">
 
-                                <x-input-label for="newImage" :value="__('آپلود عکس')"/>
-                                <x-text-input wire:model="newImage" id="newImage" class="block my-2 p-2 w-full"
-                                              type="file" autofocus/>
-                                <x-input-error :messages="$errors->get('newImage')" class="my-2"/>
+                        <div>
+                            <x-input-label for="organization" :value="__('سامانه')"/>
+                            <x-text-input wire:model="organization" id="organization" class="block my-2 w-full"
+                                          type="text" autofocus/>
+                            <x-input-error :messages="$errors->get('organization')" class="my-2"/>
+                        </div>
+
+                        <div>
+                            <x-input-label for="url" :value="__('لینک سامانه')"/>
+                            <x-text-input wire:model="url" id="url" dir="ltr" class="block my-2 w-full" type="text"/>
+                            <x-input-error :messages="$errors->get('url')" class="my-2"/>
+                        </div>
+
+                        <!-- File Upload with progress -->
+                        <div x-data="{ progress: 0 }"
+                             x-on:livewire-upload-start="progress = 0"
+                             x-on:livewire-upload-progress="progress = $event.detail.progress"
+                             x-on:livewire-upload-finish="progress = 100"
+                             x-on:livewire-upload-error="progress = 0"
+                             class="space-y-2">
+
+                            <x-input-label for="image" :value="__('آپلود عکس')"/>
+                            <input type="file" wire:model="image" id="image"
+                                   class="w-full text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none"/>
+
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                                <div class="bg-green-500 h-2 transition-all duration-300"
+                                     :style="`width: ${progress}%`"></div>
                             </div>
+                            <div x-text="progress + '%'"
+                                 class="text-xs text-right text-gray-600 dark:text-gray-400"></div>
+
+                            <div wire:loading wire:target="image" class="text-blue-500 text-sm">
+                                {{ __('در حال آپلود فایل...') }}
+                            </div>
+                            <div wire:loading.remove wire:target="image" class="text-green-600 text-sm" x-cloak>
+                                @if (!empty($newImage))
+                                    {{ __('فایل با موفقیت آپلود شد.') }}
+                                @endif
+                            </div>
+
+                            <x-input-error :messages="$errors->get('image')"/>
                         </div>
                     </div>
-                    <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                        <x-secondary-button wire:click="close">
-                            {{ __('لفو') }}
-                        </x-secondary-button>
-                        <x-primary-button type="submit" class="px-6">
-                            {{ __('ثبت') }}
+
+                    <!-- Footer -->
+                    <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                        <x-primary-button type="submit"
+                                          wire:target="updateOrg"
+                                          wire:loading.attr="disabled"
+                                          wire:loading.class="opacity-50">
+                            <span wire:loading.remove wire:target="updateOrg">{{ __('ثبت') }}</span>
+                            <span wire:loading wire:target="updateOrg">{{ __('در حال ثبت...') }}</span>
                         </x-primary-button>
+
+                        <x-cancel-button wire:click.prevent="close">
+                            {{ __('لغو') }}
+                        </x-cancel-button>
                     </div>
                 </form>
             @endif

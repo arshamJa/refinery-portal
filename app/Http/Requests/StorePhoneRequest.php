@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PhoneNumberRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePhoneRequest extends FormRequest
@@ -22,9 +23,9 @@ class StorePhoneRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required', 'numeric', 'digits:11'],
-            'house_phone' => ['required', 'numeric', 'max:15'],
-            'work_phone' => ['required', 'numeric', 'max:15'],
+            'phone' => ['bail','required', 'numeric', 'digits:11',new PhoneNumberRule()],
+            'house_phone' => ['bail', 'required', 'numeric', 'digits_between:5,10'],
+            'work_phone'  => ['bail', 'required', 'numeric', 'digits_between:5,10'],
         ];
     }
     protected function prepareForValidation(): void
@@ -37,6 +38,6 @@ class StorePhoneRequest extends FormRequest
     }
     private function cleanPhone($value): ?string
     {
-        return $value ? preg_replace('/[^\d+]/', '', $value) : null;
+        return $value ? preg_replace('/(?!^\+)[^\d]/', '', $value) : null;
     }
 }

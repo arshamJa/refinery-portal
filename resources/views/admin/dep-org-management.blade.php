@@ -55,7 +55,7 @@
                                 @endforeach
                             </x-table.cell>
                             <x-table.cell>
-                                <a href="{{Illuminate\Support\Facades\URL::signedRoute('addOrganization',$user->id)}}">
+                                <a href="{{route('addOrganization',$user->id)}}">
                                     <x-secondary-button>{{__('درج سامانه')}}</x-secondary-button>
                                 </a>
                             </x-table.cell>

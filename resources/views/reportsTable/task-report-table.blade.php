@@ -162,9 +162,9 @@
                                         @if(!empty($taskUser->sent_date))
                                             ---
                                         @elseif($taskUser->remaining_diff)
-                                            {{ $taskUser->remaining_diff }}
+                                            <span class="font-bold text-green-500">{{ $taskUser->remaining_diff }}</span>
                                         @elseif($taskUser->past_diff)
-                                            {{ $taskUser->past_diff }}
+                                            <span class="font-bold text-red-600">{{ $taskUser->past_diff }}</span>
                                         @else
                                             ---
                                         @endif
@@ -191,7 +191,7 @@
             </x-slot>
         </x-table.table>
     </div>
-    <div class="mt-2">
+    <div class="mt-2 mb-4">
         {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
 

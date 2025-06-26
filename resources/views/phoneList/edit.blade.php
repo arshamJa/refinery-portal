@@ -21,17 +21,19 @@
                             </p>
                             <x-input-label for="phone" :value="__('شماره همراه')"/>
                             <x-text-input name="phone" id="phone" maxlength="11"
-                                          value="{{$userInfo->phone}}" class="block my-2 w-full"
+                                          value="{{ old('phone', $userInfo->phone) }}" class="block my-2 w-full"
                                           type="text" autofocus/>
                             <x-input-error :messages="$errors->get('phone')" class="my-2"/>
 
                             <x-input-label for="house_phone" :value="__('شماره منزل')"/>
-                            <x-text-input name="house_phone" id="house_phone" value="{{$userInfo->house_phone}}"
+                            <x-text-input name="house_phone" id="house_phone"
+                                          value="{{ old('house_phone', $userInfo->house_phone) }}"
                                           class="block my-2 w-full" type="text" autofocus/>
                             <x-input-error :messages="$errors->get('house_phone')" class="my-2"/>
 
                             <x-input-label for="work_phone" :value="__('شماره محل کار')"/>
-                            <x-text-input name="work_phone" id="work_phone" value="{{$userInfo->work_phone}}"
+                            <x-text-input name="work_phone" id="work_phone"
+                                          value="{{ old('work_phone', $userInfo->work_phone) }}"
                                           class="block my-2 w-full" type="text" autofocus/>
                             <x-input-error :messages="$errors->get('work_phone')" class="my-2"/>
                         </div>

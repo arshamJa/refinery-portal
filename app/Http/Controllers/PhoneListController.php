@@ -26,8 +26,6 @@ class PhoneListController extends Controller
         ])
             ->whereDoesntHave('user.roles', fn ($q) => $q->where('name', UserRole::SUPER_ADMIN->value))
             ->select('id', 'user_id', 'department_id', 'full_name', 'work_phone', 'house_phone', 'phone');
-
-
         $originalUsersCount = $query->count();
 
         $query->when($request->filled('department'), fn ($q) =>

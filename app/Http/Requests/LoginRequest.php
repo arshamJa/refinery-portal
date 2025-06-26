@@ -33,13 +33,14 @@ class LoginRequest extends FormRequest
         // Default rules
         $rules = [
             'p_code' => ['required', 'numeric', 'digits:6', 'exists:users,p_code'],
-            'password' => ['required', 'string', 'digits:8'],
+            'password' => ['required',
+                \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],
             'remember' => ['boolean'],
         ];
 
         if ($this->isSuperAdmin()) {
             $rules['password'] = ['required', 'string','max:30'];
-            $rules['p_code'] = ['required', 'string','max:30'];
+            $rules['p_code'] = ['required', 'string','min:6','max:30'];
         }
 
         return $rules;

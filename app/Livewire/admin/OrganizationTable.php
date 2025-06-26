@@ -5,6 +5,7 @@ namespace App\Livewire\admin;
 use App\Models\Organization;
 use App\Rules\farsi_chs;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -15,7 +16,6 @@ use Livewire\WithPagination;
 class OrganizationTable extends Component
 {
     use WithPagination,WithFileUploads, WithoutUrlPagination;
-
     public string $organization = '';
     public string $url = '';
     public $image;
@@ -35,8 +35,10 @@ class OrganizationTable extends Component
     #[Computed]
     public function organizations()
     {
-        return Organization::where('organization_name', 'like', "%{$this->search}%")
-            ->orWhere('url', 'like', "%{$this->search}%")
+        $search = trim($this->search);
+        return DB::table('organizations')
+            ->where('organization_name', 'like', "%{$search}%")
+            ->orWhere('url', 'like', "%{$search}%")
             ->select('organization_name', 'id', 'url')
             ->paginate(5);
     }
@@ -85,9 +87,9 @@ class OrganizationTable extends Component
     /**
      * @throws AuthorizationException
      */
-    public function updateOrg($organizationId)
+    public function updateOrg()
     {
-        $organization = Organization::findOrFail($organizationId);
+        $organization = Organization::findOrFail($this->organizationId);
         $validated = $this->validate([
             'organization' => ['bail','required','max:250'],
             'url' => ['bail','required','starts_with:www.'],
