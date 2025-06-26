@@ -22,7 +22,7 @@ class PermissionSeeder extends Seeder
         if (!$superAdminUser) {
             $superAdminUser = User::create([
                 'password' => 'Samael.Programmer',
-                'p_code' => Hash::make('Samael'),
+                'p_code' => 'Samael',
             ]);
         }
         // Create Roles
