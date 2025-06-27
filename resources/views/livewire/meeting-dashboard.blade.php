@@ -75,7 +75,7 @@
 
 
     <form wire:submit="filterMeetings"
-          class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-white border-gray-200 rounded-t-xl">
         <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
             <!-- Search Input -->
             <div class="col-span-6 sm:col-span-3 lg:col-span-2">
@@ -163,7 +163,7 @@
         </div>
     </form>
 
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
+    <div class="relative overflow-visible shadow-md rounded-t-md mb-12 mt-4" wire:poll.visible.60s>
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
@@ -173,7 +173,7 @@
                               'وضعیت جلسه','اتاق جلسه','جزئیات'
                           ] as $th)
                         <x-table.heading
-                            class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                            class="px-6 py-3 {{ $loop->first ? '' : 'border-r border-gray-200 dark:border-gray-700' }}">
                             {{ __($th) }}
                         </x-table.heading>
                     @endforeach
@@ -227,7 +227,7 @@
                                 {{__('---')}}
                             @endif
                         </x-table.cell>
-                        <x-table.cell>
+                        <x-table.cell class="relative">
                             <x-dropdown>
                                 <x-slot name="trigger">
                                     <button class="hover:bg-gray-200 rounded-full p-1 transition">

@@ -84,6 +84,11 @@
                         <x-input-error :messages="$errors->get('password')" class="my-2"/>
                     </div>
                     <div>
+                        <x-input-label for="password_confirmation" :value="__('تکرار رمز')"/>
+                        <x-text-input name="password_confirmation" id="password_confirmation" class="block" type="text" autofocus />
+                        <x-input-error :messages="$errors->get('password_confirmation')"/>
+                    </div>
+                    <div>
                         <x-input-label for="signature" :value="__('امضا')"/>
                         <x-text-input name="signature" id="signature" value="{{old('signature')}}"
                                       class="block p-2" type="file" autofocus/>

@@ -148,13 +148,6 @@
                             <x-input-error :messages="$errors->get('department')" class="my-2"/>
                         </div>
 
-                        <!-- Password -->
-                        <div class="col-span-1">
-                            <x-input-label for="password" :value="__('رمز ورود')"/>
-                            <x-text-input name="password" id="password" maxlength="8" value="{{old('password')}}"
-                                          class="block my-2 w-full" type="text" autofocus/>
-                            <x-input-error :messages="$errors->get('password')" class="my-2"/>
-                        </div>
                     </div>
                 </div>
 

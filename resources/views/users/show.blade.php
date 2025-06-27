@@ -42,11 +42,18 @@
             <div class="border-b pb-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-semibold text-gray-800">{{__('اطلاعات شخصی')}}</h2>
-                    <a href="{{ route('users.edit', $userInfo->id) }}">
-                    <x-edit-button>
-                        {{__('ویرایش اطلاعات و دسترسی های کاربر')}}
-                    </x-edit-button>
-                    </a>
+                    <div>
+                        <a href="{{ route('users.edit', $userInfo->id) }}" class="ml-2">
+                            <x-edit-button>
+                                {{__('ویرایش اطلاعات و دسترسی های کاربر')}}
+                            </x-edit-button>
+                        </a>
+                        <a href="{{ route('reset.password', $userInfo->user->id) }}">
+                            <x-secondary-button>
+                                {{__('ویرایش رمز ورود کاربر')}}
+                            </x-secondary-button>
+                        </a>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
                     <div><span class="font-medium">{{__('نقش:')}}</span>
@@ -99,40 +106,38 @@
             <div class="border-b pb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('سامانه های فعال')}}</h2>
                 <ul class="list-disc list-inside text-gray-700">
-                    <li>
-                        @if($user->organizations->isNotEmpty())
-                            {{ $user->organizations->pluck('organization_name')->implode(' - ') }}
-                        @else
-                            {{ __('کاربر هیچ سامانه فعالی ندارد.') }}
-                        @endif
-                    </li>
+                    @if($user->organizations->isNotEmpty())
+                        @foreach($user->organizations as $organization)
+                            <li>{{ $organization->organization_name }}</li>
+                        @endforeach
+                    @else
+                        <li class="text-gray-600">{{ __('کاربر هیچ سامانه فعالی ندارد.') }}</li>
+                    @endif
+                </ul>
+            </div>
+
+            <!-- User Access Section -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('بخش دسترسی کاربر')}}</h2>
+                <ul class="list-disc list-inside text-gray-700">
+                    @if($allPermissions->isNotEmpty())
+                        @foreach($allPermissions as $permission)
+                            <li>{{ $permission->name }}</li>
+                        @endforeach
+                    @else
+                        <li class="text-gray-600">{{ __('کاربر هیچ دسترسی ندارد') }}</li>
+                    @endif
                 </ul>
             </div>
 
 
-            <div class="border-b pb-6">
+            <div class="border-t pt-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('امضای کاربر')}}</h2>
                 @if($userInfo->signature)
                     <img src="{{$userInfo->getImageUrl()}}" class="rounded-md w-24 h-24" alt="">
                 @endif
             </div>
 
-
-            <!-- User Access Section -->
-            <div>
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('بخش دسترسی کاربر')}}</h2>
-                @if($allPermissions->isNotEmpty())
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($allPermissions as $permission)
-                            <span class="inline-block bg-green-100 text-green-800 px-3 py-2 rounded-full">
-                    {{ $permission->name }}
-                        </span>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="text-gray-600">{{ __('کاربر هیچ دسترسی ندارد') }}</p>
-                @endif
-            </div>
 
             <!-- Action Buttons -->
             <div class="mt-2">

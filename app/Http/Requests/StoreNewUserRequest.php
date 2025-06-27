@@ -29,7 +29,7 @@ class StoreNewUserRequest extends FormRequest
     {
         return [
             'role' => ['bail','required', 'exists:roles,id'],
-            'permissions' => ['bail', 'required'],
+            'permissions' => ['bail', 'nullable'],
             'full_name' => ['bail', 'required', 'string', 'min:5', 'max:255', new farsi_chs()],
             'p_code' => ['bail', 'required', 'numeric', 'digits:6'],
             'n_code' => ['bail', 'required', 'numeric', 'digits:10', new NationalCodeRule()],
@@ -39,7 +39,7 @@ class StoreNewUserRequest extends FormRequest
             'position' => ['bail', 'required', 'string', 'max:255'],
             'departmentId' => ['bail', 'required'],
             'signature' => ['bail', 'required'],
-            'password' => ['bail','required',
+            'password' => ['bail','required','confirmed',
                 \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],
         ];
     }

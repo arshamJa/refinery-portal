@@ -26,8 +26,8 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
 
 
 //    this is for creating new meeting and send invitation to participants
-    Route::get('meeting/table', [CreateNewMeetingController::class, 'index'])
-        ->name('meeting.table');
+//    Route::get('meeting/table', [CreateNewMeetingController::class, 'index'])
+//        ->name('meeting.table');
     Route::get('create/new/meeting', [CreateNewMeetingController::class, 'create'])
         ->name('meeting.create');
     Route::post('create/new/meeting', [CreateNewMeetingController::class, 'store'])

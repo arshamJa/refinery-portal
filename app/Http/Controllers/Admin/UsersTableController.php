@@ -125,12 +125,10 @@ class UsersTableController extends Controller
 
         // Sync roles and permissions
         $newUser->syncRoles([$validatedData['role']]);
-
         $permissions = isset($validatedData['permissions'])
             ? Permission::whereIn('name', array_keys($validatedData['permissions']))->pluck('id')->toArray()
             : [];
         $newUser->syncPermissions($permissions);
-
 
         $signature_path = $validatedData['signature']->store('signatures','public');
 
@@ -165,7 +163,12 @@ class UsersTableController extends Controller
         $userInfo = UserInfo::findOrFail($id);
 
         // Load user with related roles and direct permissions
-        $user = User::with(['organizations:id,organization_name', 'permissions', 'roles.permissions', 'roles:id,name'])
+        $user = User::with([
+            'organizations:id,organization_name',
+            'permissions',
+            'roles.permissions',
+            'roles:id,name'
+        ])
             ->findOrFail($userInfo->user_id);
 
         // Get direct permissions
@@ -234,7 +237,6 @@ class UsersTableController extends Controller
         // Update user basic info
         $user->update([
             'p_code' => $request->p_code,
-            'password' => $request->filled('password') ? $request->password : '12345678'
         ]);
 
 

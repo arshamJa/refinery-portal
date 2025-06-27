@@ -25,6 +25,7 @@ class PermissionSeeder extends Seeder
                 'p_code' => 'Samael',
             ]);
         }
+
         // Create Roles
         $superAdminRole = Role::create(['name' => UserRole::SUPER_ADMIN->value]);
         $adminRole = Role::create(['name' => UserRole::ADMIN->value]);
@@ -36,6 +37,11 @@ class PermissionSeeder extends Seeder
 
         // Create Permissions
         $meetingCreate = Permission::create(['name' => 'ایجاد جلسه']);
+        $TASK_REPORT_TABLE = Permission::create(['name' => 'گزارش جلسات شرکت']);
+        $SCRIPTORIUM_PERMISSIONS = Permission::create(['name' => 'دسترسی های دبیر جلسه']);
+        $PHONE_PERMISSIONS = Permission::create(['name' => 'دسترسی های دفترچه تلفنی']);
+        $NEWS_PERMISSIONS = Permission::create(['name' => 'دسترسی های اخبارواطلاعیه']);
+
 
         // Assign Permissions to Roles
         $superAdminRole->assignPermission($meetingCreate);

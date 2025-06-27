@@ -91,8 +91,8 @@
             </form>
         @endcan
 
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12 mt-4">
-            <x-table.table>
+        <div class="relative overflow-visible shadow-md sm:rounded-lg mb-12 mt-4">
+        <x-table.table>
                 <x-slot name="head">
                     <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
                         @foreach (['ردیف', 'نقش', 'نام و نام خانوادگی', 'سطح دسترسی', 'کد پرسنلی', 'کد ملی', 'سمت', 'دپارتمان', 'قابلیت'] as $th)
@@ -138,8 +138,8 @@
                             <x-table.cell>{{ $userInfo->n_code }}</x-table.cell>
                             <x-table.cell>{{ $userInfo->position }}</x-table.cell>
                             <x-table.cell>{{ $userInfo->department->department_name ?? __('دپارتمان وجود ندارد') }}</x-table.cell>
-                            <x-table.cell>
-                                <x-dropdown>
+                            <x-table.cell class="relative">
+                            <x-dropdown>
                                     <x-slot name="trigger">
                                         <button class="hover:bg-gray-200 rounded-full p-1 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
