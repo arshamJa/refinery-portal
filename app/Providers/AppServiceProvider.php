@@ -5,15 +5,9 @@ namespace App\Providers;
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Models\Meeting;
-use App\Models\Notification;
-use App\Models\Permission;
-use App\Models\Task;
-use App\Models\TaskUser;
 use App\Models\User;
 use App\Policies\BlogPolicy;
 use App\Policies\PhoneListPolicy;
-use App\Policies\ProfilePolicy;
-use App\Policies\TaskUserPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -116,11 +110,11 @@ class AppServiceProvider extends ServiceProvider
             return $hasPermission || $hasRole;
         });
 
-
-
         //gate definition for profile page
-        Gate::define('view-profile-page',[ProfilePolicy::class,'view']);
-        Gate::define('update-profile-page',[ProfilePolicy::class,'update']);
+        Gate::define('profile-page', function (User $user) {
+            return $user->id === auth()->id();
+        });
+
 
 
         //gate definition for Blog

@@ -292,31 +292,9 @@ class UsersTableController extends Controller
         $user->delete();
     }
 
-    public function importUsers(Request $request)
-    {
-        Gate::authorize('users-info');
-
-        $request->validate([
-            'file' => ['required']
-        ]);
-        Excel::import(new UsersImport() , $request->file('file'));
-        return redirect()->back()->with('status','Users Imported Successfully');
-    }
-    public function importUserInfos(Request $request)
-    {
-        Gate::authorize('users-info');
-
-        $request->validate([
-            'file' => ['required']
-        ]);
-        Excel::import(new UserInfoImport() , $request->file('file'));
-        return redirect()->back()->with('status','User Infos Imported Successfully');
-    }
-
     public function resetPasswordPage(string $id)
     {
         Gate::authorize('users-info');
-
         $user = User::with('user_info:id,user_id,full_name')->findOrFail($id);
         return view('users.reset-password',['user'=>$user]);
     }
@@ -324,12 +302,10 @@ class UsersTableController extends Controller
     public function resetPassword(Request $request,string $id)
     {
         Gate::authorize('users-info');
-
         $validated = $request->validate([
             'password' => ['required', 'confirmed',
                 \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],
         ]);
-
         $user = User::findOrFail($id);
         $user->password = $validated['password']; // auto-hashed via cast
         $user->save();

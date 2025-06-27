@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UsersTableController;
-use App\Models\UserInfo;
 use Illuminate\Support\Facades\Route;
-
 
 Route::middleware('auth')->group(function () {
 
@@ -28,11 +26,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('uses/{user}', [UsersTableController::class, 'destroy'])
         ->name('users.destroy');
 
-    Route::post('import/users',[UsersTableController::class,'importUsers'])
-        ->name('import.users');
-
-    Route::post('import/user/infos',[UsersTableController::class,'importUserInfos'])
-        ->name('import.user.infos');
 
     // Route for resting users password by admin
     Route::get('users/reset-password/{user}',[UsersTableController::class,'resetPasswordPage'])

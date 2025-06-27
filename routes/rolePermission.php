@@ -1,11 +1,15 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\TaskManagementController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['auth', 'super_admin'])->group(function () {
+
+
 
     // this is the table for role and permission
     Route::get('roles/permissions', [RolePermissionController::class, 'table'])
@@ -44,7 +48,8 @@ Route::middleware(['auth', 'super_admin'])->group(function () {
     Route::delete('permissions/{permission}', [RolePermissionController::class, 'destroy_permission'])
         ->name('permissions.destroy');
 
-    Route::get('create-permissions',[RolePermissionController::class,'connect'])->name('connect-permissions');
+    Route::get('create-permissions', [RolePermissionController::class, 'connect'])
+        ->name('connect-permissions');
 
 });
 

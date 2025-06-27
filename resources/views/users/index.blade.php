@@ -75,21 +75,7 @@
             </div>
         </form>
 
-        @can('has-permission-and-role',UserRole::SUPER_ADMIN->value)
-            <form action="{{route('import.users')}}" method="post" enctype="multipart/form-data">
-                @csrf
-                <input type="file" name="file">
-                <x-input-error :messages="$errors->get('file')"/>
-                <x-primary-button type="submit">Import Users</x-primary-button>
-            </form>
-            <br>
-            <form action="{{route('import.user.infos')}}" method="post" enctype="multipart/form-data">
-                @csrf
-                <input type="file" name="file">
-                <x-input-error :messages="$errors->get('file')"/>
-                <x-primary-button type="submit">Import User Infos</x-primary-button>
-            </form>
-        @endcan
+
 
         <div class="relative overflow-visible shadow-md sm:rounded-lg mb-12 mt-4">
         <x-table.table>

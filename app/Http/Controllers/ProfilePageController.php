@@ -21,6 +21,7 @@ class ProfilePageController extends Controller
 {
     public function index()
     {
+        Gate::authorize('profile-page');
         $department_id = \auth()->user()->user_info->department_id;
         $userinfo = UserInfo::where('user_id',\auth()->user()->id)->value('department_id');
         if ($userinfo){
@@ -42,7 +43,7 @@ class ProfilePageController extends Controller
 
     public function updateProfileInformation(UpdateProfileInformationRequest $request)
     {
-        Gate::authorize('update-profile-page');
+        Gate::authorize('profile-page');
         $request->validated();
 
         $user = User::find(auth()->user()->id);
@@ -61,7 +62,7 @@ class ProfilePageController extends Controller
     }
     public function updateProfilePhoto(Request $request)
     {
-        Gate::authorize('update-profile-page');
+        Gate::authorize('profile-page');
         $validated = $request->validate([
             'photo' => ['nullable','mimes:jpg,png,jpeg,webp','max:1024']
         ]);
@@ -74,7 +75,7 @@ class ProfilePageController extends Controller
     }
     public function deleteProfilePhoto(Request $request)
     {
-        Gate::authorize('update-profile-page');
+        Gate::authorize('profile-page');
         $profile_path = public_path('storage/'.\auth()->user()->profile_photo_path);
         if (file_exists($profile_path)){
             unlink($profile_path);
@@ -90,9 +91,9 @@ class ProfilePageController extends Controller
      */
     public function updatePassword(UpdatePasswordRequest $request)
     {
-        Gate::authorize('update-profile-page');
+        Gate::authorize('profile-page');
         $validated = $request->validated();
-        if (!Hash::check($request->current_password,\auth()->user()->password)){
+        if (!Hash::check($request->current_password,auth()->user()->password)){
             throw ValidationException::withMessages([
                 'current_password' => 'رمز فعلی شما اشتباه است'
             ]);

@@ -21,7 +21,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/view/tasks/{meeting}', ViewTaskPage::class)
         ->name('view.task.page');
 
-    Route::get('/task/list/{meeting}', TaskList::class)->name('task.list');
+//    Route::get('/task/list/{meeting}', TaskList::class)->name('task.list');
 
 
     Route::post('tasks/{meeting}', [TaskManagementController::class, 'store'])->name('tasks.store');

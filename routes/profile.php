@@ -7,24 +7,24 @@ Route::middleware('auth')->group(function () {
 
     Route::get('profile', [ProfilePageController::class, 'index'])
         ->name('profile')
-        ->can('view-profile-page')
+        ->can('profile-page')
         ->middleware('signed');
 
     Route::post('/updateProfileInformation', [ProfilePageController::class, 'updateProfileInformation'])
         ->name('updateProfileInformation')
-        ->can('update-profile-page');
+        ->can('profile-page');
 
     Route::post('/updatePassword', [ProfilePageController::class, 'updatePassword'])
         ->name('updatePassword')
-        ->can('update-profile-page');
+        ->can('profile-page');
 
     Route::post('/updateProfilePhoto', [ProfilePageController::class, 'updateProfilePhoto'])
         ->name('updateProfilePhoto')
-        ->can('update-profile-page');
+        ->can('profile-page');
 
     Route::post('/deleteProfilePhoto', [ProfilePageController::class, 'deleteProfilePhoto'])
         ->name('deleteProfilePhoto')
-        ->can('update-profile-page');
+        ->can('profile-page');
 
 
 });

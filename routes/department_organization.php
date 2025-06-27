@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AddOrganizationController;
 use App\Http\Controllers\Admin\OrgDepManagementController;
 use App\Livewire\admin\DepartmentTable;
 use App\Livewire\admin\OrganizationTable;
+use App\Livewire\employee\EmployeesOrganization;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'adminMiddleware'])->group(function () {
@@ -42,6 +43,8 @@ Route::middleware(['auth', 'adminMiddleware'])->group(function () {
         ->name('organization.destroy');
 
 
+    Route::get('employee/organization', EmployeesOrganization::class)
+        ->name('employee.organization');
 
 
 });

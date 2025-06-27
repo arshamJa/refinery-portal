@@ -77,7 +77,11 @@ class VerificationCodeController extends Controller
             return back()->withErrors(['otp' => 'کد اشتباه است.']);
         }
 
-        $otp->update(['verified_at' => now()]);
+        // Update the verified_at field
+        DB::table('verify_codes')
+            ->where('phone', $phone)
+            ->whereNull('verified_at')
+            ->update(['verified_at' => now()]);
 
         $userInfo = UserInfo::where('phone', $phone)->first();
         if (!$userInfo) {
@@ -90,7 +94,9 @@ class VerificationCodeController extends Controller
         Auth::login($user);
         Session::forget('otp_phone');
         Session::flash('otp_verified', true);
-        $otp->delete();
+        // Delete the used OTP
+        DB::table('verify_codes')->where('phone', $phone)->delete();
+
         return redirect()->route('dashboard');
     }
 
