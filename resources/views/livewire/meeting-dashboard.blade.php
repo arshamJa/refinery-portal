@@ -186,32 +186,15 @@
                         <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
                         <x-table.cell>{{$meeting->title}}</x-table.cell>
                         <x-table.cell>{{$meeting->scriptorium}}</x-table.cell>
-                        <x-table.cell>
-                            {{$meeting->getRoleForUser(auth()->user())}}
-                        </x-table.cell>
+                        <x-table.cell>{{$meeting->getRoleForUser(auth()->user())}}</x-table.cell>
                         <x-table.cell>{{$meeting->scriptorium_department}}</x-table.cell>
                         <x-table.cell>{{$meeting->date}}</x-table.cell>
-                        <x-table.cell
-                            class="whitespace-nowrap">{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
-                        {{--                        @if( auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)--}}
-                        {{--                            <x-table.cell>--}}
-                        {{--                                <a href="{{route('presentUsers',$meeting->id)}}">--}}
-                        {{--                                    <x-secondary-button>--}}
-                        {{--                                        {{__('نمایش')}}--}}
-                        {{--                                    </x-secondary-button>--}}
-                        {{--                                </a>--}}
-                        {{--                            </x-table.cell>--}}
-                        {{--                        @else--}}
-                        {{--                            <x-table.cell>--}}
-                        {{--                                {{__('---')}}--}}
-                        {{--                            </x-table.cell>--}}
-                        {{--                        @endif--}}
+                        <x-table.cell class="whitespace-nowrap">{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
                         <x-table.cell class="whitespace-nowrap">
                             <span class="{{ $meeting->status->badgeColor() }} text-xs font-medium px-3 py-1 rounded-lg">
                                 {{ $meeting->status->label() }}
                             </span>
                         </x-table.cell>
-                        <!-- Start Meeting Button (New Column) -->
                         <x-table.cell class="whitespace-nowrap">
                             @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED &&auth()->user()->user_info->full_name === $meeting->scriptorium &&auth()->user()->user_info->position === $meeting->scriptorium_position)
                                 <button wire:click="startMeeting({{ $meeting->id }})"

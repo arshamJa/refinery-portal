@@ -135,7 +135,7 @@
                     <h2 class="text-lg font-semibold mb-3 text-gray-800">{{ __('رئیس و دبیر جلسه فعلی') }}</h2>
                     <p><span class="font-medium">{{ __('رئیس جلسه:') }}</span>
                         {{ $bossInfo->full_name ?? '—' }} -
-                        {{ $bossInfo->department->department_name ?? '—' }}
+                        {{ $bossInfo->department->department_name ?? '—' }} -
                         {{ $bossInfo->position ?? '—' }}
                     </p>
                     <p><span class="font-medium">{{ __('دبیر جلسه:') }}</span>

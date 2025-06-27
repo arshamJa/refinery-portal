@@ -19,41 +19,6 @@ use Illuminate\Validation\ValidationException;
 
 class CreateNewMeetingController extends Controller
 {
-
-    /**
-     * Display a listing of the resource.
-     */
-//    public function index(Request $request)
-//    {
-//        $query = Meeting::with('meetingUsers:id,meeting_id,user_id')
-//            ->where('scriptorium', auth()->user()->user_info->full_name)
-//            ->select(['id', 'title', 'scriptorium_department', 'scriptorium', 'location', 'date', 'time']);
-//
-//        // Get total count before filtering
-//        $originalMeetingsCount = (clone $query)->count();
-//
-//        if ($request->filled('search')) {
-//            $search = $request->input('search');
-//            $query->where(function ($q) use ($search) {
-//                $q->where('title', 'like', '%' . $search . '%')
-//                    ->orWhere('scriptorium_department', 'like', '%' . $search . '%')
-//                    ->orWhere('scriptorium', 'like', '%' . $search . '%')
-//                    ->orWhere('location', 'like', '%' . $search . '%')
-//                    ->orWhere('date', 'like', '%' . $search . '%')
-//                    ->orWhere('time', 'like', '%' . $search . '%');
-//            });
-//        }
-//        $meetings = $query->paginate(5);
-//        $filteredMeetingsCount = $meetings->total(); // Count after filtering
-//
-//
-//        return view('meeting.crud.index' , [
-//            'meetings' => $meetings,
-//            'originalMeetingsCount' => $originalMeetingsCount,
-//            'filteredMeetingsCount' => $filteredMeetingsCount
-//        ]);
-//    }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -73,7 +38,7 @@ class CreateNewMeetingController extends Controller
             return $userInfo->user_id !== auth()->id();
         })->values();
 
-        return view('meeting.crud.create' , ['users' => $users,'participants'=>$participants]);
+        return view('meeting.create' , ['users' => $users,'participants'=>$participants]);
     }
 
     /**
@@ -137,8 +102,6 @@ class CreateNewMeetingController extends Controller
 
             // Collect recipients (holders + inner guests)
             $recipients = collect();
-
-//            $guestIds = collect();
 
             // 1. Holders
             $holders = Str::of($validated['holders'])->explode(',');
@@ -265,7 +228,7 @@ class CreateNewMeetingController extends Controller
             return $userInfo->user_id !== auth()->id();
         })->values();
 
-        return view('meeting.crud.edit', [
+        return view('meeting.edit', [
             'meeting' => $meeting,
             'users' => $users,
             'userIds' => $meeting->meetingUsers->where('is_guest',false),

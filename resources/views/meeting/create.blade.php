@@ -33,9 +33,6 @@
             </span>
             </li>
         </ol>
-        {{--        <a href="{{route('meeting.table')}}">--}}
-        {{--            <x-primary-button>{{__('جدول جلسات')}}</x-primary-button>--}}
-        {{--        </a>--}}
     </nav>
 
     <form action="{{route('meeting.store')}}" method="post" class="mb-12" enctype="multipart/form-data">
