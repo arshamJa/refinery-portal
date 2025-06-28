@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\SendInvitationToReplacementController;
 use App\Http\Controllers\VerificationCodeController;
 use App\Livewire\ReceivedMessage;
 use App\Livewire\SentMessage;
@@ -25,11 +24,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
-
-    Route::post('sendInvitation/{meetingId}',
-        [SendInvitationToReplacementController::class, '__invoke'])
-        ->name('sendInvitation');
-
 
     Route::view('dashboard', 'dashboard')
         ->middleware(['auth', 'verified'])

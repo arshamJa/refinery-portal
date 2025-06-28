@@ -70,7 +70,7 @@ class ReceivedMessage extends Component
     public function userNotifications(string $type = null)
     {
         $query = Notification::where('recipient_id', auth()->id())
-            ->with(['sender.user_info', 'notifiable']);
+            ->with(['sender.user_info',  'notifiable.meetingUsers' ]);
 
         if ($type) {
             $query->where('type', $type);
@@ -103,22 +103,36 @@ class ReceivedMessage extends Component
         $this->resetPage();
     }
 
+    protected $cachedNotifications;
     #[Computed]
-    public function meetingUsers()
+    public function getNotifications()
     {
-        return MeetingUser::with([
-            'meeting:id,title,date,time,status,scriptorium',
-            'user:id',
-            'user.user_info:user_id,full_name'
-        ])
-            ->where('user_id', auth()->id())
-            ->select('id', 'meeting_id', 'user_id', 'is_present', 'reason_for_absent', 'read_by_user','replacement')
-            ->paginate(5);
+        if (! $this->cachedNotifications) {
+            $this->cachedNotifications = $this->userNotifications();
+        }
+        return $this->cachedNotifications;
     }
+    #[Computed]
+    public function hasNotificationType(string $type)
+    {
+        return $this->getNotifications()->getCollection()->contains('type', $type);
+    }
+
+//    #[Computed]
+//    public function meetingUsers()
+//    {
+//        return MeetingUser::with([
+//            'meeting:id,title,date,time,status,scriptorium',
+//            'user:id',
+//            'user.user_info:user_id,full_name'
+//        ])
+//            ->where('user_id', auth()->id())
+//            ->select('id', 'meeting_id', 'user_id', 'is_present', 'reason_for_absent', 'read_by_user','replacement')
+//            ->paginate(5);
+//    }
 
     public function openModalDeny($meetingUserId)
     {
-
         $meetingUser = MeetingUser::find($meetingUserId);
         $this->meetingUserId = $meetingUserId;
         $this->title = $meetingUser->meeting->title;
@@ -186,21 +200,6 @@ class ReceivedMessage extends Component
         return to_route('received.message')->with('status', 'شما دعوت به جلسه را پذیرفتید و دبیرجلسه مطلع شد');
     }
 
-
-    protected $cachedNotifications;
-    #[Computed]
-    public function getNotifications()
-    {
-        if (! $this->cachedNotifications) {
-            $this->cachedNotifications = $this->userNotifications();
-        }
-        return $this->cachedNotifications;
-    }
-    #[Computed]
-    public function hasNotificationType(string $type)
-    {
-        return $this->getNotifications()->getCollection()->contains('type', $type);
-    }
     /**
      * @throws ValidationException
      */

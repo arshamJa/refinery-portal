@@ -17,7 +17,6 @@ class ParticipantsTaskController extends Controller
             ->findOrFail($user_id);
 
 
-
         $meeting = Meeting::with([
             'tasks.taskUsers' => function ($q) use ($userInfo) {
                 $q->where('user_id', $userInfo->user_id)

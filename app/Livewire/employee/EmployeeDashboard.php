@@ -57,7 +57,6 @@ class EmployeeDashboard extends Component
             ->count();
     }
 
-
     public function render()
     {
         return view('livewire.employee.employee-dashboard');

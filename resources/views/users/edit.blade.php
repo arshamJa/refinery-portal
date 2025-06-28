@@ -51,11 +51,15 @@
                         <!-- Role -->
                         <div>
                             <x-input-label for="role" :value="__('نقش')"/>
-                            <select dir="ltr" name="role" id="role"
-                                    class="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                {{--                            <option selected>...</option>--}}
+                            <select dir="ltr" name="role" id="role" class="block w-full mt-1.5 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                                 @foreach($roles as $role)
-                                    <option value="{{ $role->id }}" {{ old('role') == $role->id ? 'selected' : '' }}>
+                                    <option value="{{ $role->id }}"
+                                    @if(old('role'))
+                                        {{ old('role') == $role->id ? 'selected' : '' }}
+                                        @else
+                                        {{ optional($user->roles->first())->id == $role->id ? 'selected' : '' }}
+                                        @endif
+                                    >
                                         {{ $role->name }}
                                     </option>
                                 @endforeach
@@ -136,7 +140,7 @@
 
                             <x-input-label for="department" :value="__('انتخاب دپارتمان')"/>
                             <select dir="ltr" name="department" id="role"
-                                    class="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    class="block w-full mt-1.5 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                                 <option value="">...</option>
                                 @foreach($departments as $department)
                                     <option value="{{ $department->id }}"
@@ -158,8 +162,13 @@
                         @foreach($permissions as $permission)
                             <div class="flex items-center space-x-2 space-x-reverse">
                                 <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    {{ $user->permissions->contains($permission->id) ? 'checked' : '' }}>
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    {{
+                                        ((is_array(old('permissions')) && in_array($permission->id, old('permissions'))) // old input exists
+                                            || (!old('permissions') && $user->permissions->contains($permission->id)) // no old input, load from user permissions
+                                        ) ? 'checked' : ''
+                                    }}
+                                >
                                 <label class="text-sm">{{ $permission->name }}</label>
                             </div>
                         @endforeach

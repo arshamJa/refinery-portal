@@ -66,7 +66,7 @@
                 <option value="AcceptInvitation">{{ __('تایید دعوتنامه') }}</option>
                 <option value="DenyInvitation">{{ __('رد دعوتنامه') }}</option>
                 <option value="ReplacementForMeeting">{{ __('انتخاب جانشین') }}</option>
-                <option value="AssignedNewTask">{{ __('اقدامات جدید') }}</option>
+                <option value="AssignedNewTask">{{ __('دریافت اقدام') }}</option>
                 <option value="UpdatedTaskTimeOut">{{ __('ویرایش مهلت اقدام') }}</option>
                 <option value="UpdatedTaskBody">{{ __('ویرایش بند مذاکره') }}</option>
                 <option value="DeniedTaskNotification">{{ __('رد اقدام') }}</option>
@@ -94,13 +94,131 @@
     </form>
 
 
+{{--        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>--}}
+{{--            <x-table.table>--}}
+{{--                <x-slot name="head">--}}
+{{--                    <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">--}}
+{{--                        @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده(دبیر/کاربر)', 'متن',--}}
+{{--    // 'وضعیت جلسه'--}}
+{{--     'اقدامات','وضعیت پیام'] as $th)--}}
+{{--                            <x-table.heading--}}
+{{--                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">--}}
+{{--                                {{ __($th) }}--}}
+{{--                            </x-table.heading>--}}
+{{--                        @endforeach--}}
+{{--                    </x-table.row>--}}
+{{--                </x-slot>--}}
+{{--                <x-slot name="body">--}}
+{{--                    @forelse ($this->userNotifications as $notification)--}}
+{{--                        <x-table.row--}}
+{{--                            wire:key="notification-{{$notification->id}}"--}}
+{{--                            wire:click="markAsRead({{ $notification->id }})"--}}
+{{--                            class="cursor-pointer {{ !$notification->isReadByRecipient() ? 'bg-yellow-100 font-bold' : 'bg-white' }} hover:bg-gray-50 transition-colors duration-200">--}}
+{{--                            <x-table.cell class="border-none">--}}
+{{--                                @php--}}
+{{--                                    $attrs = $notification->getTypeLabelAttributes();--}}
+{{--                                @endphp--}}
+{{--                                <span class="font-bold {{ $attrs['text'] }}">--}}
+{{--                                {{ $attrs['label'] }}--}}
+{{--                            </span>--}}
+{{--                            </x-table.cell>--}}
+{{--                            <x-table.cell--}}
+{{--                                class="whitespace-nowrap">{{ $notification->getNotificationDateTime() }}</x-table.cell>--}}
+{{--                            <x-table.cell>{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>--}}
+{{--                            <x-table.cell class="whitespace-normal break-words max-w-xs">--}}
+{{--                                {{ $notification->getNotificationMessage() }}--}}
+{{--                            </x-table.cell>--}}
+{{--                            --}}{{--                        <x-table.cell class="whitespace-nowrap">--}}
+{{--                            --}}{{--                             <span--}}
+{{--                            --}}{{--                                 class="{{$notification->notifiable->status->badgeColor() }} text-sm font-medium px-3 py-1 rounded-lg">--}}
+{{--                            --}}{{--                                {{ $notification->notifiable->status->label() }}--}}
+{{--                            --}}{{--                            </span>--}}
+{{--                            --}}{{--                        </x-table.cell>--}}
+{{--                            <x-table.cell class="whitespace-nowrap">--}}
+{{--                                @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation' || $notification->type === 'ReplacementForMeeting')--}}
+{{--                                    @php--}}
+{{--                                        $meeting = $notification->notifiable;--}}
+
+{{--                                        // Get a single MeetingUser record (not a collection)--}}
+{{--                                        $meetingUser = \App\Models\MeetingUser::where('user_id', auth()->id())--}}
+{{--                                                        ->where('meeting_id', $meeting->id)--}}
+{{--                                                        ->first();--}}
+
+{{--                                        $replacementUserFullName = null;--}}
+
+{{--                                        if ($meetingUser && $meetingUser->replacement) {--}}
+{{--                                            $replacementUser = \App\Models\User::with('user_info')->find($meetingUser->replacement);--}}
+{{--                                            $replacementUserFullName = $replacementUser?->user_info?->full_name ?? 'N/A';--}}
+{{--                                        }--}}
+{{--                                    @endphp--}}
+
+{{--                                    @if ($meetingUser)--}}
+{{--                                        @if ($meetingUser->is_present === MeetingUserStatus::PENDING->value)--}}
+{{--                                            <div class="flex gap-2 items-center justify-center mt-4 md:mt-0">--}}
+{{--                                                <x-accept-button wire:click="acceptMeeting({{ $meeting->id }})">--}}
+{{--                                                    {{ __('تایید') }}--}}
+{{--                                                </x-accept-button>--}}
+{{--                                                <x-cancel-button wire:click="openModalDeny({{ $meetingUser->id }})">--}}
+{{--                                                    {{ __('رد') }}--}}
+{{--                                                </x-cancel-button>--}}
+{{--                                            </div>--}}
+{{--                                        @elseif ($meetingUser->is_present === MeetingUserStatus::IS_PRESENT->value)--}}
+{{--                                            <span class="text-green-600 font-bold">--}}
+{{--                                                {{ __('شما دعوت به این جلسه را پذیرفتید') }}--}}
+{{--                                            </span>--}}
+{{--                                            @if ($replacementUserFullName)--}}
+{{--                                                <span class="text-green-700">--}}
+{{--                                                {{ __('و آقا/خانم') }} {{ $replacementUserFullName }} {{ __('به عنوان جانشین خود انتخاب کردید') }}--}}
+{{--                                            </span>--}}
+{{--                                            @endif--}}
+{{--                                        @elseif ($meetingUser->is_present === MeetingUserStatus::IS_NOT_PRESENT->value)--}}
+{{--                                            <span--}}
+{{--                                                class="text-red-600 font-bold">{{ __('شما دعوت به این جلسه را نپذیرفتید') }}</span>--}}
+{{--                                        @endif--}}
+{{--                                    @else--}}
+{{--                                        <span--}}
+{{--                                            class="text-gray-400 text-sm italic">{{ __('وضعیت شما در این جلسه مشخص نیست') }}</span>--}}
+{{--                                    @endif--}}
+{{--                                @endif--}}
+
+{{--                                @if ($notification->type === 'MeetingConfirmed')--}}
+{{--                                    <span class="text-green-600 font-bold">--}}
+{{--                                                                        {{ __('تایید جلسه توسط دبیر') }}--}}
+{{--                                                                    </span>--}}
+{{--                                @elseif ($notification->type === 'MeetingCancelled')--}}
+{{--                                    <span class="text-red-600 font-bold">--}}
+{{--                                                                        {{ __('لغو جلسه توسط دبیر') }}--}}
+{{--                                                                    </span>--}}
+{{--                                @elseif (($notification->isTaskRelated()))--}}
+{{--                                    <a href="{{ route('view.task.page', ['meeting' => $notification->notifiable_id]) }}">--}}
+{{--                                        <x-secondary-button>{{ __('نمایش صورتجلسه') }}</x-secondary-button>--}}
+{{--                                    </a>--}}
+{{--                                @endif--}}
+{{--                            </x-table.cell>--}}
+{{--                            <x-table.cell class="whitespace-nowrap">--}}
+{{--                                <div id="read-status-{{ $notification->id }}">--}}
+{{--                                    @if ($notification->isReadByRecipient())--}}
+{{--                                        <span class="text-gray-500">{{ __('خوانده شده') }}</span>--}}
+{{--                                    @else--}}
+{{--                                        <span class="text-red-500 font-bold">{{ __('خوانده نشده') }}</span>--}}
+{{--                                    @endif--}}
+{{--                                </div>--}}
+{{--                            </x-table.cell>--}}
+{{--                        </x-table.row>--}}
+{{--                    @empty--}}
+{{--                        <x-table.row>--}}
+{{--                            <x-table.cell colspan="7"--}}
+{{--                                          class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>--}}
+{{--                        </x-table.row>--}}
+{{--                    @endforelse--}}
+{{--                </x-slot>--}}
+{{--            </x-table.table>--}}
+{{--        </div>--}}
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده(دبیر/کاربر)', 'متن',
-// 'وضعیت جلسه'
- 'اقدامات','وضعیت پیام'] as $th)
+                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده(دبیر/کاربر)', 'متن', 'اقدامات','وضعیت پیام'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -108,12 +226,14 @@
                     @endforeach
                 </x-table.row>
             </x-slot>
+
             <x-slot name="body">
                 @forelse ($this->userNotifications as $notification)
                     <x-table.row
                         wire:key="notification-{{$notification->id}}"
                         wire:click="markAsRead({{ $notification->id }})"
-                        class="cursor-pointer {{ !$notification->isReadByRecipient() ? 'bg-yellow-100 font-bold' : 'bg-white' }} hover:bg-gray-50 transition-colors duration-200">
+                        class="cursor-pointer {{ !$notification->isReadByRecipient() ? 'bg-yellow-100 font-bold' : 'bg-white' }} hover:bg-gray-50 transition-colors duration-200"
+                    >
                         <x-table.cell class="border-none">
                             @php
                                 $attrs = $notification->getTypeLabelAttributes();
@@ -122,68 +242,51 @@
                             {{ $attrs['label'] }}
                         </span>
                         </x-table.cell>
+
                         <x-table.cell class="whitespace-nowrap">{{ $notification->getNotificationDateTime() }}</x-table.cell>
-                        <x-table.cell >{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>
+
+                        <x-table.cell>{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>
+
                         <x-table.cell class="whitespace-normal break-words max-w-xs">
                             {{ $notification->getNotificationMessage() }}
                         </x-table.cell>
-{{--                        <x-table.cell class="whitespace-nowrap">--}}
-{{--                             <span--}}
-{{--                                 class="{{$notification->notifiable->status->badgeColor() }} text-sm font-medium px-3 py-1 rounded-lg">--}}
-{{--                                {{ $notification->notifiable->status->label() }}--}}
-{{--                            </span>--}}
-{{--                        </x-table.cell>--}}
+
                         <x-table.cell class="whitespace-nowrap">
-                            @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation' || $notification->type === 'ReplacementForMeeting')
+                            @if ($notification->canShowActionButtons())
+                                <div class="flex gap-2 items-center justify-center mt-4 md:mt-0">
+                                    <x-accept-button wire:click="acceptMeeting({{ $notification->notifiable_id }})">
+                                        {{ __('تایید') }}
+                                    </x-accept-button>
+                                    <x-cancel-button wire:click="openModalDeny({{ $notification->getMeetingUserForCurrentUser()->id }})">
+                                        {{ __('رد') }}
+                                    </x-cancel-button>
+                                </div>
+                            @else
                                 @php
-                                    $meeting = $notification->notifiable;
-                                    $meetingUser = MeetingUser::where('user_id',auth()->id())->where('meeting_id',$meeting->id)->first();
-                                    $replacementUserFullName = null;
-                                    if ($meetingUser->replacement) {
-                                        $replacementUser = User::with('user_info')->find($meetingUser->replacement);
-                                        $replacementUserFullName = $replacementUser?->user_info?->full_name ?? 'N/A';
-                                        }
+                                    $statusLabel = $notification->getUserMeetingStatusLabel();
                                 @endphp
-                                @if( $meetingUser->is_present === MeetingUserStatus::PENDING->value)
-                                    <div class="flex gap-2 items-center justify-center mt-4 md:mt-0">
-                                        <x-accept-button
-                                            wire:click="acceptMeeting({{ $meeting->id }})">
-                                            {{ __('تایید') }}
-                                        </x-accept-button>
-                                        <x-cancel-button
-                                            wire:click="openModalDeny({{ $meetingUser->id }})">
-                                            {{ __('رد') }}
-                                        </x-cancel-button>
-                                    </div>
-                                @elseif ($meetingUser->is_present === MeetingUserStatus::IS_PRESENT->value)
-                                    <span class="text-green-600 font-bold">
-                                        {{ __('شما دعوت به این جلسه را پذیرفتید') }}
-                                        </span>
-                                    @if ($replacementUserFullName)
-                                        <span class="text-green-700">{{ __('و آقا/خانم') }}{{ $replacementUserFullName}}
-                                            {{ __('به عنوان جانشین خود انتخاب کردید') }}
-                                        </span>
-                                    @endif
-                                @elseif ($meetingUser->is_present === MeetingUserStatus::IS_NOT_PRESENT->value)
-                                    <span
-                                        class="text-red-600 font-bold">{{ __('شما دعوت به این جلسه را نپذیرفتید') }}</span>
+                                @if ($statusLabel)
+                                    <span class="{{ $notification->getUserMeetingStatusLabel() === __('شما دعوت به این جلسه را نپذیرفتید') ? 'text-red-600 font-bold' : 'text-green-600 font-bold' }}">
+                                    {!! $statusLabel !!}
+                                </span>
                                 @endif
                             @endif
 
                             @if ($notification->type === 'MeetingConfirmed')
                                 <span class="text-green-600 font-bold">
-                                                                    {{ __('تایید جلسه توسط دبیر') }}
-                                                                </span>
+                                {{ __('تایید جلسه توسط دبیر') }}
+                            </span>
                             @elseif ($notification->type === 'MeetingCancelled')
                                 <span class="text-red-600 font-bold">
-                                                                    {{ __('لغو جلسه توسط دبیر') }}
-                                                                </span>
-                            @elseif (($notification->isTaskRelated()))
+                                {{ __('لغو جلسه توسط دبیر') }}
+                            </span>
+                            @elseif ($notification->isTaskRelated())
                                 <a href="{{ route('view.task.page', ['meeting' => $notification->notifiable_id]) }}">
                                     <x-secondary-button>{{ __('نمایش صورتجلسه') }}</x-secondary-button>
                                 </a>
                             @endif
                         </x-table.cell>
+
                         <x-table.cell class="whitespace-nowrap">
                             <div id="read-status-{{ $notification->id }}">
                                 @if ($notification->isReadByRecipient())
@@ -196,13 +299,13 @@
                     </x-table.row>
                 @empty
                     <x-table.row>
-                        <x-table.cell colspan="7"
-                                      class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
+                        <x-table.cell colspan="7" class="text-center text-sm text-gray-600">{{ __('پیام جدیدی وجود ندارد') }}</x-table.cell>
                     </x-table.row>
                 @endforelse
             </x-slot>
         </x-table.table>
     </div>
+
     <div class="mt-2">
         {{ $this->userNotifications->links() }}
     </div>
@@ -215,7 +318,8 @@
                 {{-- Header --}}
                 <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                     <h2 class="text-2xl font-bold text-gray-800">{{ __('رد دعوت به جلسه') }}</h2>
-                    <a href="{{route('received.message')}}"  class="text-gray-400 hover:text-red-500 transition duration-150">
+                    <a href="{{route('received.message')}}"
+                       class="text-gray-400 hover:text-red-500 transition duration-150">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                              stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
@@ -235,7 +339,8 @@
                     <div class="space-y-2">
                         @foreach (['دلیل اول', 'دلیل دوم', 'دلیل سوم', 'دلیل چهارم'] as $reasonOption)
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" wire:model="reason" value="{{ $reasonOption }}" name="reason" class="text-blue-600">
+                                <input type="radio" wire:model="reason" value="{{ $reasonOption }}" name="reason"
+                                       class="text-blue-600">
                                 <span>{{ $reasonOption }}</span>
                             </label>
                         @endforeach
@@ -277,7 +382,8 @@
 
                 {{-- Footer --}}
                 <div class="flex justify-between items-center px-6 gap-x-3 py-4 bg-gray-100 border-t border-gray-200">
-                    <x-accept-button type="submit" wire:loading.attr="disabled" wire:target="deny" wire:loading.class="opacity-50">
+                    <x-accept-button type="submit" wire:loading.attr="disabled" wire:target="deny"
+                                     wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="deny">{{ __('ارسال') }}</span>
                         <span wire:loading wire:target="deny" class="ml-2">{{ __('در حال ارسال...') }}</span>
                     </x-accept-button>
@@ -292,8 +398,6 @@
             </form>
         @endif
     </x-modal>
-
-
 
 
     {{--    <x-modal name="accept-invitation" maxWidth="4xl" :closable="false">--}}

@@ -47,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super_admin') ? true : null;
         });
 
+        Gate::define('super-admin-only', function (User $user) {
+            return $user->hasRole(UserRole::SUPER_ADMIN->value);
+        });
+
 
         Gate::define('users-info', function (User $user){
             return $user->hasRole(UserRole::ADMIN->value);
@@ -57,18 +61,11 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole(UserRole::ADMIN->value);
         });
 
-//        Gate::define('scriptorium-role', function ($user) {
-//            return $user->hasRole(UserRole::SCRIPTORIUM->value);
-//        });
 
         Gate::define('admin-role',function (User $user){
            return $user->hasRole(UserRole::ADMIN->value);
         });
 
-        //  for Boss & Scriptorium
-//        Gate::define('view-denied-tasks', function (User $user) {
-//            return $user->hasAnyRoles([UserRole::SCRIPTORIUM->value, UserRole::BOSS->value]);
-//        });
 
         Gate::define('lock-task', function (User $user) {
             return $user->permissions->contains('name', UserPermission::SCRIPTORIUM_PERMISSIONS);
@@ -79,14 +76,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('refinery-report', function (User $user) {
             return $user->permissions->contains('name', UserPermission::TASK_REPORT_TABLE->value);
         });
-
-//
-//        Gate::define('has-permission', function (User $user, UserPermission $permission) {
-//            return $user->permissions->contains('name', $permission->value);
-//        });
-
-
-
 
 
         // Gate for the scriptorium to handle only his meeting
@@ -114,24 +103,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('profile-page', function (User $user) {
             return $user->id === auth()->id();
         });
-
-
-
-        //gate definition for Blog
-//        Gate::define('create-blog',[BlogPolicy::class,'create']);
-//        Gate::define('update-blog',[BlogPolicy::class,'update']);
-//        Gate::define('delete-blog',[BlogPolicy::class,'delete']);
-
-
-//        Gate::define('admin-dashboard',function (User $user){
-//           return $user->role === 'admin';
-//        });
-//        Gate::define('operator-dashboard',function (User $user){
-//            return $user->role === 'operator';
-//        });
-//        Gate::define('employee-dashboard',function (User $user){
-//            return $user->role === 'employee';
-//        });
 
     }
     /**

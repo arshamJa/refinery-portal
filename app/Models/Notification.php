@@ -76,12 +76,9 @@ class Notification extends Model
             ->exists();
     }
 
-
-
     public function getNotificationMessage(): string
     {
         $message = json_decode($this->data)->message ?? 'N/A';
-
 
         if ($this->type === 'AcceptInvitation') {
             $meeting = $this->notifiable;
@@ -171,9 +168,6 @@ class Notification extends Model
         }
         return $message;
     }
-
-
-
 
     public function getSentMessage(): string
     {
@@ -290,7 +284,6 @@ class Notification extends Model
         return $message;
     }
 
-
     public function getNotificationDateTime(): string
     {
         $datetime = $this->created_at;
@@ -364,4 +357,56 @@ class Notification extends Model
     {
         return $this->belongsTo(User::class, 'recipient_id');
     }
+
+    /**
+     * Helper functions for received-message table
+     */
+    public function getMeetingUserForCurrentUser()
+    {
+        // Fast and queryless if already eager-loaded
+        if ($this->relationLoaded('notifiable') && $this->notifiable?->relationLoaded('meetingUsers')) {
+            return $this->notifiable->meetingUsers->firstWhere('user_id', auth()->id());
+        }
+        // Fallback if not eager-loaded
+        return \App\Models\MeetingUser::where('user_id', auth()->id())
+            ->where('meeting_id', $this->notifiable_id)
+            ->first();
+    }
+    public function getReplacementUserFullName()
+    {
+        $meetingUser = $this->getMeetingUserForCurrentUser();
+        if ($meetingUser && $meetingUser->replacement) {
+            $replacementUser = \App\Models\User::with('user_info')->find($meetingUser->replacement);
+            return $replacementUser?->user_info?->full_name ?? 'N/A';
+        }
+        return null;
+    }
+    public function canShowActionButtons(): bool
+    {
+        $meetingUser = $this->getMeetingUserForCurrentUser();
+        return $meetingUser && $meetingUser->is_present === \App\Enums\MeetingUserStatus::PENDING->value;
+    }
+    public function getUserMeetingStatusLabel()
+    {
+        $meetingUser = $this->getMeetingUserForCurrentUser();
+        if (!$meetingUser) {
+            return __('وضعیت شما در این جلسه مشخص نیست');
+        }
+        switch ($meetingUser->is_present) {
+            case \App\Enums\MeetingUserStatus::PENDING->value:
+                return null; // No label, show buttons instead
+            case \App\Enums\MeetingUserStatus::IS_PRESENT->value:
+                $replacementName = $this->getReplacementUserFullName();
+                $msg = __('شما دعوت به این جلسه را پذیرفتید');
+                if ($replacementName) {
+                    $msg .= ' و آقا/خانم ' . $replacementName . ' به عنوان جانشین خود انتخاب کردید';
+                }
+                return $msg;
+            case \App\Enums\MeetingUserStatus::IS_NOT_PRESENT->value:
+                return __('شما دعوت به این جلسه را نپذیرفتید');
+            default:
+                return null;
+        }
+    }
+
 }
