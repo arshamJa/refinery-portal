@@ -48,7 +48,6 @@ class CreateNewMeetingController extends Controller
     public function store(MeetingStoreRequest $request)
     {
         $validated = $request->validated();
-
         return DB::transaction(function () use ($validated, $request) {
             $innerGuestIds = collect(explode(',', $request->input('innerGuest', '')))
                 ->filter()->unique()->values();
@@ -105,7 +104,6 @@ class CreateNewMeetingController extends Controller
             ]);
 
             $meetingUserRecords = [];
-
             $recipients = collect();
 
             // Holders
@@ -136,6 +134,9 @@ class CreateNewMeetingController extends Controller
                 }
             }
 
+            // Prepare notifications
+            $notifications = [];
+
             // Boss
             if ($boss) {
                 $meetingUserRecords[] = [
@@ -165,14 +166,12 @@ class CreateNewMeetingController extends Controller
             // Insert all meeting users at once
             MeetingUser::insert($meetingUserRecords);
 
-            // Prepare notifications
-            $notifications = [];
-
             // Notifications for holders and guests except boss (already notified)
             foreach ($recipients->unique() as $recipientId) {
                 if ($boss && (string)$boss->user_id === (string)$recipientId) {
                     continue;
                 }
+
                 $isGuest = $innerGuestIds->contains($recipientId);
                 $notifications[] = [
                     'type' => $isGuest ? 'MeetingGuestInvitation' : 'MeetingInvitation',
@@ -188,20 +187,14 @@ class CreateNewMeetingController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
-                // use this for jobs: php artisan queue:work --queue=notifications and below
-//                dispatch(new SendNotificationJob([
-//                    'type' => 'Meeting Invitation',
-//                    'data' => json_encode(['message' => $notificationMessage]),
-//                    'notifiable_type' => \App\Models\Meeting::class,
-//                    'notifiable_id' => $meeting->id,
-//                    'sender_id' => auth()->id(),
-//                    'recipient_id' => $recipientId,
-//                ]))->onQueue('notifications');
             }
+
             Notification::insert($notifications);
+
             return to_route('dashboard.meeting')->with('status', __('جلسه جدید ساخته و دعوتنامه به اعضا جلسه ارسال شد'));
         });
     }
+
 
 
     /**

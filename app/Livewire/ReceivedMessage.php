@@ -200,6 +200,16 @@ class ReceivedMessage extends Component
         return to_route('received.message')->with('status', 'شما دعوت به جلسه را پذیرفتید و دبیرجلسه مطلع شد');
     }
 
+
+
+    public function IsAlreadyRepresentative(): bool
+    {
+        return MeetingUser::where('meeting_id', $this->meetingId ?? null)
+            ->where('replacement', auth()->id())
+            ->exists();
+    }
+
+
     /**
      * @throws ValidationException
      */

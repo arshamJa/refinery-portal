@@ -143,7 +143,17 @@ class Notification extends Model
 
         if ($this->type === 'MeetingInvitation') {
             $meeting = $this->notifiable;
+
             if ($meeting) {
+                // Get recipient's full name
+                $recipientName = optional(optional($this->recipient)->user_info)->full_name;
+
+                // Check if the recipient is the boss
+                if ($recipientName && $recipientName === $meeting->boss) {
+                    return "شما به عنوان رییس به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
+                }
+
+                // Check if recipient is a guest
                 $isGuest = DB::table('meeting_users')
                     ->where('meeting_id', $meeting->id)
                     ->where('user_id', $this->recipient_id)
@@ -152,9 +162,9 @@ class Notification extends Model
 
                 if ($isGuest) {
                     return "شما به عنوان مهمان به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
-                } else {
-                    return "شما به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
                 }
+                // Default (regular invitee)
+                return "شما به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
             }
         }
 
@@ -390,7 +400,7 @@ class Notification extends Model
     {
         $meetingUser = $this->getMeetingUserForCurrentUser();
         if (!$meetingUser) {
-            return __('وضعیت شما در این جلسه مشخص نیست');
+            return __('---');
         }
         switch ($meetingUser->is_present) {
             case \App\Enums\MeetingUserStatus::PENDING->value:

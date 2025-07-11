@@ -1,16 +1,16 @@
 <header
     class="absolute top-0 right-0 md:px-12 px-4 md:mr-64 md:border-b left-0 z-50 pt-4 mb-20 flex justify-between items-center">
     <nav class="hidden md:flex items-center gap-x-10 w-full">
-        <x-link.link href="{{route('dashboard')}}" :active="request()->is('dashboard')">
+        <span class="border-b-2 border-b-blue-500 text-gray-800 px-3 py-2 text-sm font-medium">
             {{__('داشبورد ')}}{{ auth()->user()->getTranslatedRole() }}
-        </x-link.link>
+        </span>
         <x-link.link href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}" :active="request()->is('profile')">
             {{__('پروفایل')}}
         </x-link.link>
     </nav>
     <div class="md:hidden">
         <button @click="open = !open"
-                class="text-gray-800 hover:bg-gray-50 transition ease-in-out duration-300 rounded-md p-1 hover:text-gray-800 focus:outline-none">
+                class="text-gray-800 hover:bg-gray-50 transition ease-in-out duration-300 rounded-md p-1 focus:outline-none">
             <!-- Open Button -->
             <svg :class="open ? 'block' : 'hidden'" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none"
                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 block">
