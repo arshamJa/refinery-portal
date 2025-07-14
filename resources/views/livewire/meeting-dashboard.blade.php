@@ -19,16 +19,15 @@
         <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                {{__('جلسات')}}
+                {{__('جدول جلسات')}}
             </span>
         </li>
     </x-breadcrumb>
 
-
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
             <a href="{{ route('meeting.create') }}"
-               class="inline-flex items-center gap-3 px-6 py-4 rounded-lg text-white bg-gradient-to-r from-[#0A74DA] to-[#34B3F1] transition-all duration-300 ease-in-out shadow-lg hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-[#0A74DA] disabled:opacity-50">
+               class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -39,14 +38,13 @@
             </a>
         @endcan
         <a href="{{ route('my.task.table') }}"
-           class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
             <span class="text-sm font-medium">
                 {{ __('اقدامات من') }}
             </span>
         </a>
-
         <a href="{{route('received.message')}}"
-           class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="size-5">
                 <path stroke-linecap="round"
@@ -56,12 +54,12 @@
             <h3 class="text-sm font-semibold">  {{__('پیام های دریافتی')}}</h3>
             @if($this->unreadReceivedCount() > 0)
                 <span class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                {{ $this->unreadReceivedCount() > 10 ? '+10' : $this->unreadReceivedCount() }}
-            </span>
+                            {{ $this->unreadReceivedCount() > 10 ? '+10' : $this->unreadReceivedCount() }}
+                        </span>
             @endif
         </a>
         <a href="{{route('sent.message')}}"
-           class="bg-[#FCF7F8] hover:ring-2 hover:ring-[#4332BD] hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="size-5">
                 <path stroke-linecap="round"
@@ -70,7 +68,6 @@
             </svg>
             <h3 class="text-sm font-semibold">  {{__('پیام های ارسالی')}}</h3>
         </a>
-
     </div>
 
 

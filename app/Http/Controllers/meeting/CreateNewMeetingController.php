@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Computed;
 
 class CreateNewMeetingController extends Controller
 {
@@ -24,6 +25,10 @@ class CreateNewMeetingController extends Controller
      */
     public function create()
     {
+        $unreadReceivedCount =  Notification::where('recipient_id', auth()->id())
+            ->whereNull('recipient_read_at')
+            ->count();
+
         $users = Cache::remember('users_without_super_admin', 3600, function () {
             return UserInfo::with('department:id,department_name')
                 ->whereHas('user', function ($query) {
@@ -37,8 +42,11 @@ class CreateNewMeetingController extends Controller
         $participants = $users->filter(function ($userInfo) {
             return $userInfo->user_id !== auth()->id();
         })->values();
-
-        return view('meeting.create' , ['users' => $users,'participants'=>$participants]);
+        return view('meeting.create' , [
+            'users' => $users,
+            'participants'=>$participants,
+            'unreadReceivedCount' =>$unreadReceivedCount
+        ]);
     }
 
     /**
@@ -194,9 +202,6 @@ class CreateNewMeetingController extends Controller
             return to_route('dashboard.meeting')->with('status', __('جلسه جدید ساخته و دعوتنامه به اعضا جلسه ارسال شد'));
         });
     }
-
-
-
     /**
      * Show the form for editing the specified resource.
      */

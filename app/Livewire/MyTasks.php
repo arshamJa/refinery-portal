@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Meeting;
+use App\Models\Notification;
 use App\Models\Task;
 use App\Models\TaskUser;
 use Livewire\Attributes\Computed;
@@ -101,5 +102,14 @@ class MyTasks extends Component
             })
             ->select('id', 'time_out','task_id', 'user_id', 'sent_date', 'task_status', 'body_task', 'request_task')
             ->paginate(5);
+    }
+
+
+    #[Computed]
+    public function unreadReceivedCount()
+    {
+        return Notification::where('recipient_id', auth()->id())
+            ->whereNull('recipient_read_at')
+            ->count();
     }
 }

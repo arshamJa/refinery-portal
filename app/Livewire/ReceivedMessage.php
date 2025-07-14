@@ -3,21 +3,15 @@
 namespace App\Livewire;
 
 use App\Enums\MeetingUserStatus;
-use App\Jobs\SendNotificationJob;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
 use App\Models\Notification;
-use App\Models\Task;
-use App\Models\TaskUser;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Traits\MeetingsTasks;
 use App\Traits\MessageReceived;
 use App\Traits\Organizations;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -41,7 +35,6 @@ class ReceivedMessage extends Component
     public $full_name;
     public $p_code;
 
-    public $activeTab = 'sent';  // 'sent' or 'received'
     public $filter = '';
     public $message_status = '';
     public $notificationType;
@@ -60,12 +53,6 @@ class ReceivedMessage extends Component
     {
         return view('livewire.received-message');
     }
-
-    public function mount()
-    {
-        $this->activeTab = request()->routeIs('received.message') ? 'received' : 'sent';
-    }
-
     #[Computed]
     public function userNotifications(string $type = null)
     {
@@ -117,7 +104,13 @@ class ReceivedMessage extends Component
     {
         return $this->getNotifications()->getCollection()->contains('type', $type);
     }
-
+    #[Computed]
+    public function unreadReceivedCount()
+    {
+        return Notification::where('recipient_id', auth()->id())
+            ->whereNull('recipient_read_at')
+            ->count();
+    }
 //    #[Computed]
 //    public function meetingUsers()
 //    {

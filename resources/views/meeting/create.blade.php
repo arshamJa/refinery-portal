@@ -1,5 +1,7 @@
+@php use App\Enums\UserPermission;use App\Enums\UserRole; @endphp
 <x-app-layout>
-    <nav class="flex justify-between mb-4 mt-20">
+
+    <nav class="flex justify-between mb-4 mt-16 pb-4">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -19,7 +21,7 @@
             <li>
                 <a href="{{route('dashboard.meeting')}}"
                    class="inline-flex items-center gap-1 px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>{{__('جلسات')}}</span>
+                    <span>{{__('جدول جلسات')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -35,7 +37,54 @@
         </ol>
     </nav>
 
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
+            <span
+               class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white shadow-lg flex gap-3 items-center justify-start pointer-events-none p-4 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                <span class="text-sm font-medium">
+                         {{ __('ایجاد جلسه جدید') }}
+                         </span>
+            </span>
+        @endcan
+        <a href="{{ route('my.task.table') }}"
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+            <span class="text-sm font-medium">
+                {{ __('اقدامات من') }}
+            </span>
+        </a>
+        <a href="{{route('received.message')}}"
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="size-5">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+            </svg>
+            <h3 class="text-sm font-semibold">  {{__('پیام های دریافتی')}}</h3>
+            @if($unreadReceivedCount > 0)
+                <span class="ml-2 bg-[#FF7F50] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                    {{ $unreadReceivedCount > 10 ? '+10' :  $unreadReceivedCount }}
+                </span>
+            @endif
+        </a>
+        <a href="{{route('sent.message')}}"
+           class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="size-5">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+            </svg>
+            <h3 class="text-sm font-semibold">  {{__('پیام های ارسالی')}}</h3>
+        </a>
+    </div>
+
     <form action="{{route('meeting.store')}}" method="post" class="mb-12" enctype="multipart/form-data">
+
         @csrf
         <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
             {{--                        Meeting Information--}}
@@ -133,7 +182,8 @@
             {{--                        Scriptorium Information--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
 
-                <div id="boss_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                <div id="boss_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
+                     style="direction: rtl;">
                     <x-input-label for="title" class="mb-1.5" :value="__('رئیس جلسه')"/>
                     <!-- Select box -->
                     <button id="dropdown-btn" type="button"
@@ -146,10 +196,11 @@
                         </svg>
                     </button>
                     <!-- Dropdown menu -->
-                    <div id="dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                    <div id="dropdown-menu"
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
                         <div class="px-4 py-2">
                             <input id="dropdown-search" type="text" placeholder="جست و جو"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
                         <ul id="dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
                             <!-- Options will be populated here -->
@@ -161,31 +212,43 @@
                     <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
                 </div>
 
-                <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2" style="direction: rtl;">
+                @php
+                    $authUserId = auth()->id();
+                    $authUserInfo = $users->firstWhere('user_id', $authUserId);
+                @endphp
+                <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
+                     style="direction: rtl;">
                     <x-input-label for="title" class="mb-1.5" :value="__('دبیرجلسه')"/>
                     <button id="scriptorium-dropdown-btn" type="button"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
                             aria-haspopup="listbox" aria-expanded="false">
-                        <span id="scriptorium-selected-text" class="truncate">...</span>
+                            <span id="scriptorium-selected-text" class="truncate">
+                                {{ $authUserInfo->full_name ?? '...' }}
+                            </span>
                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
                              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="scriptorium-dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                    <div id="scriptorium-dropdown-menu"
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
                         <div class="px-4 py-2">
                             <input id="scriptorium-dropdown-search" type="text" placeholder="جست و جو"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
                         <ul id="scriptorium-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
-                            <!-- Options populated by JS -->
-                        </ul>
-                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
+                            <!-- JS will populate this list --></ul>
+                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500" style="display:none;">
+                            {{__('موردی یافت نشد')}}
+                        </div>
                     </div>
-                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-id" value="{{ old('scriptorium') }}">
-                    <input type="hidden" name="scriptorium_department" id="scriptorium-hidden-department" value="">
-                    <input type="hidden" name="scriptorium_position" id="scriptorium-hidden-position" value="">
-                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2" />
+                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-id"
+                           value="{{ old('scriptorium', $authUserInfo->user_id ?? '') }}">
+                    <input type="hidden" name="scriptorium_department" id="scriptorium-hidden-department"
+                           value="{{ $authUserInfo->department_id ?? '' }}">
+                    <input type="hidden" name="scriptorium_position" id="scriptorium-hidden-position"
+                           value="{{ $authUserInfo->position ?? '' }}">
+                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2"/>
                 </div>
 
                 <div>
@@ -204,8 +267,9 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
 
-                <div id="participants_dropdown" data-users='@json($participants)' class="relative w-full col-span-2" style="direction: rtl;">
-                    <x-input-label for="participants" class="mb-1.5" :value="__('شرکت‌کنندگان')" />
+                <div id="participants_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
+                     style="direction: rtl;">
+                    <x-input-label for="participants" class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
                     <button id="participants-dropdown-btn" type="button"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
                             aria-haspopup="listbox" aria-expanded="false">
@@ -215,26 +279,30 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="participants-dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                    <div id="participants-dropdown-menu"
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
                         <div class="px-4 py-2">
                             <input id="participants-dropdown-search" type="text" placeholder="جست و جو"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
                         <ul id="participants-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
                             <!-- Options populated by JS -->
                         </ul>
-                        <div id="participants-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
+                        <div id="participants-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی
+                            یافت نشد
+                        </div>
                     </div>
                     <!-- Selected participants displayed here -->
                     <div id="participants-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
                     <!-- Hidden input to hold selected IDs (comma separated) -->
-                    <input type="hidden" name="holders" id="participants-hidden-input" value="{{ old('holders') ?? '' }}">
-                    <x-input-error :messages="$errors->get('holders')" class="mt-2" />
+                    <input type="hidden" name="holders" id="participants-hidden-input"
+                           value="{{ old('holders') ?? '' }}">
+                    <x-input-error :messages="$errors->get('holders')" class="mt-2"/>
                 </div>
 
-
-                <div id="innerGuest_dropdown" data-users='@json($participants)' class="relative w-full col-span-2" style="direction: rtl;">
-                    <x-input-label for="innerGuest" class="mb-1.5" :value="__('مهمانان داخلی')" />
+                <div id="innerGuest_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
+                     style="direction: rtl;">
+                    <x-input-label for="innerGuest" class="mb-1.5" :value="__('مهمانان داخلی')"/>
                     <button id="innerGuest-dropdown-btn" type="button"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
                             aria-haspopup="listbox" aria-expanded="false">
@@ -244,19 +312,23 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="innerGuest-dropdown-menu" class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                    <div id="innerGuest-dropdown-menu"
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
                         <div class="px-4 py-2">
                             <input id="innerGuest-dropdown-search" type="text" placeholder="جست و جو"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
                         <ul id="innerGuest-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
                             <!-- Options populated by JS -->
                         </ul>
-                        <div id="innerGuest-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
+                        <div id="innerGuest-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت
+                            نشد
+                        </div>
                     </div>
                     <div id="innerGuest-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
-                    <input type="hidden" name="innerGuest" id="innerGuest-hidden-input" value="{{ old('innerGuest') ?? '' }}">
-                    <x-input-error :messages="$errors->get('innerGuest')" class="mt-2" />
+                    <input type="hidden" name="innerGuest" id="innerGuest-hidden-input"
+                           value="{{ old('innerGuest') ?? '' }}">
+                    <x-input-error :messages="$errors->get('innerGuest')" class="mt-2"/>
                 </div>
 
                 {{--  Guests --}}
@@ -266,8 +338,10 @@
                     </h3>
                     {{-- Hidden data element for JS --}}
                     <div id="guests-data" data-outer-guests="{{ json_encode(old('guests.outer', [])) }}"></div>
-                    <div id="outer-organization-table" class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
-                        <table id="guests-outer-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                    <div id="outer-organization-table"
+                         class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
+                        <table id="guests-outer-table"
+                               class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
                             <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-2 text-right">#</th>

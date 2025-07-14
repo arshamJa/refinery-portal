@@ -74,6 +74,5 @@
 <script src="{{ asset('js/outerGuest.js') }}"></script>
 <script src="{{ asset('js/multiSelectUsers.js') }}"></script>
 <script src="{{ asset('js/holders-dropdown.js') }}"></script>
-
 </body>
 </html>

@@ -3,12 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Notification;
-use App\Models\User;
 use App\Traits\MeetingsTasks;
-use App\Traits\MessageReceived;
 use App\Traits\Organizations;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
@@ -25,8 +21,6 @@ class SentMessage extends Component
     public bool $checkBox = false;
     public $full_name;
     public $p_code;
-
-    public $activeTab = 'sent';  // 'sent' or 'received'
     public $filter = '';
 
 
@@ -54,10 +48,6 @@ class SentMessage extends Component
             'notifiable'
         ]);
 
-        if ($this->activeTab === 'sent') {
-            $query->where('sender_id', auth()->id());
-        }
-
         if ($type) {
             $query->where('type', $type);
         }
@@ -74,5 +64,14 @@ class SentMessage extends Component
         $notification->save();
         $this->dispatch('notificationRead');
         $this->resetPage();
+    }
+
+
+    #[Computed]
+    public function unreadReceivedCount()
+    {
+        return Notification::where('recipient_id', auth()->id())
+            ->whereNull('recipient_read_at')
+            ->count();
     }
 }

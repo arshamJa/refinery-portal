@@ -15,39 +15,42 @@ class Time implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        // Normalize
+        // Normalize time if needed
         if (!str_contains($value, ':')) {
-            $hour = intval($value); // ensure it's a number
+            $hour = intval($value);
             $value = sprintf('%02d:00', $hour);
         }
-
-        // Step 1: Validate time format (HH:MM)
+        // Validate time format (HH:MM)
         if (!preg_match('/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', $value)) {
             $fail('فرمت زمان معتبر نیست. فرمت درست: HH:MM');
             return;
         }
+        $year = request()->input('year');
+        $month = request()->input('month');
+        $day = request()->input('day');
 
-        // Step 2: Extract hour and minute
-        list($hour, $minute) = explode(':', $value);
-        $hour = intval($hour);
-        $minute = intval($minute);
+        if (!$year || !$month || !$day) {
+            return;
+        }
 
-        // Current Jalali time
-        $j_hour = jgetdate()['hours'];
-        $j_minute = jgetdate()['minutes'];
-
-        // Jalali today date
+        // Let's get the current Jalali date (assuming gregorian_to_jalali() exists)
         [$jaYear, $jaMonth, $jaDay] = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
 
-        // Request date
-        $requestYear = intval(substr(request('date'), 0, 4));
-        $requestMonth = intval(substr(request('date'), 5, 2));
-        $requestDay = intval(substr(request('date'), 8));
+        // Check if input date is today
+        if ((int)$year === (int)$jaYear && (int)$month === (int)$jaMonth && (int)$day === (int)$jaDay) {
 
-        // If selected date is today, ensure time is in the future
-        $isToday = ($requestYear == $jaYear && $requestMonth == $jaMonth && $requestDay == $jaDay);
-        if ($isToday && ($hour < $j_hour || ($hour == $j_hour && $minute <= $j_minute))) {
-            $fail('ساعت باید بعد از زمان فعلی باشد');
+            [$inputHour, $inputMinute] = explode(':', $value);
+            $inputHour = (int) $inputHour;
+            $inputMinute = (int) $inputMinute;
+
+            $nowHour = (int) now()->format('H');
+            $nowMinute = (int) now()->format('i');
+
+            if ($inputHour < $nowHour || ($inputHour === $nowHour && $inputMinute <= $nowMinute)) {
+                $fail('ساعت باید بعد از زمان فعلی باشد');
+                return;
+            }
         }
     }
+
 }
