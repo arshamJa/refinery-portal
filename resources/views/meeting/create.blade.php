@@ -40,7 +40,7 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
             <span
-               class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white shadow-lg flex gap-3 items-center justify-start pointer-events-none p-4 rounded-lg">
+                class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white shadow-lg flex gap-3 items-center justify-start pointer-events-none p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -84,7 +84,6 @@
     </div>
 
     <form action="{{route('meeting.store')}}" method="post" class="mb-12" enctype="multipart/form-data">
-
         @csrf
         <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
             {{--                        Meeting Information--}}
@@ -92,7 +91,6 @@
                 {{ __('بخش اطلاعات جلسه') }}
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-
                 {{--                                Meeting Title--}}
                 <div>
                     <x-input-label for="title" :value="__('موضوع جلسه')"/>
@@ -123,7 +121,6 @@
                     <x-input-error :messages="$errors->get('treat')"/>
                 </div>
             </div>
-
             {{--                        Time & Date--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 ">
                 <div>
@@ -174,156 +171,134 @@
                     <x-input-error :messages="$errors->get('time')"/>
                 </div>
             </div>
-
-
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 border-b pb-2">
                 {{ __('بخش دبیرجلسه') }}
             </h2>
-            {{--                        Scriptorium Information--}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-
+                {{-- Boss Dropdown --}}
                 <div id="boss_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
                      style="direction: rtl;">
-                    <x-input-label for="title" class="mb-1.5" :value="__('رئیس جلسه')"/>
-                    <!-- Select box -->
-                    <button id="dropdown-btn" type="button"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
-                            aria-haspopup="listbox" aria-expanded="false">
-                        <span id="selected-text" class="truncate">...</span>
+                    <x-input-label class="mb-1.5" :value="__('رئیس جلسه')"/>
+                    <button id="boss-dropdown-btn" type="button"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+                        <span id="boss-selected-text" class="truncate">...</span>
                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <!-- Dropdown menu -->
-                    <div id="dropdown-menu"
-                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                    <div id="boss-dropdown-menu"
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                         <div class="px-4 py-2">
-                            <input id="dropdown-search" type="text" placeholder="جست و جو"
+                            <input id="boss-dropdown-search" type="text" placeholder="جست و جو"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
-                        <ul id="dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
-                            <!-- Options will be populated here -->
-                        </ul>
-                        <div id="no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت نشد</div>
+                        <ul id="boss-dropdown-list" class="max-h-48 overflow-auto"></ul>
+                        <div id="boss-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>
                     </div>
-                    <input type="hidden" name="boss" id="hidden-input" value="{{ old('boss') }}">
-                    <div id="error-msg" class="mt-2 text-red-600 text-sm"></div>
+                    <input type="hidden" name="boss" id="boss-hidden-input" value="{{ old('boss') }}">
                     <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
                 </div>
-
+                {{-- Scriptorium Dropdown --}}
                 @php
                     $authUserId = auth()->id();
                     $authUserInfo = $users->firstWhere('user_id', $authUserId);
                 @endphp
                 <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
                      style="direction: rtl;">
-                    <x-input-label for="title" class="mb-1.5" :value="__('دبیرجلسه')"/>
+                    <x-input-label class="mb-1.5" :value="__('دبیر جلسه')"/>
                     <button id="scriptorium-dropdown-btn" type="button"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
-                            aria-haspopup="listbox" aria-expanded="false">
-                            <span id="scriptorium-selected-text" class="truncate">
-                                {{ $authUserInfo->full_name ?? '...' }}
-                            </span>
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+                    <span id="scriptorium-selected-text" class="truncate">
+                        @if ($authUserInfo)
+                            <div>
+                                <div><strong>{{ $authUserInfo['full_name'] }}</strong></div>
+                                <div class="text-xs text-gray-500">
+                                    {{ $authUserInfo['department_name'] ?? '' }} - {{ $authUserInfo['position'] ?? '' }}
+                                </div>
+                            </div>
+                        @else
+                            انتخاب کنید
+                        @endif
+                    </span>
                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
                     <div id="scriptorium-dropdown-menu"
-                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                         <div class="px-4 py-2">
                             <input id="scriptorium-dropdown-search" type="text" placeholder="جست و جو"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
-                        <ul id="scriptorium-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
-                            <!-- JS will populate this list --></ul>
-                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500" style="display:none;">
-                            {{__('موردی یافت نشد')}}
-                        </div>
+                        <ul id="scriptorium-dropdown-list" class="max-h-48 overflow-auto"></ul>
+                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>
                     </div>
-                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-id"
-                           value="{{ old('scriptorium', $authUserInfo->user_id ?? '') }}">
-                    <input type="hidden" name="scriptorium_department" id="scriptorium-hidden-department"
-                           value="{{ $authUserInfo->department_id ?? '' }}">
-                    <input type="hidden" name="scriptorium_position" id="scriptorium-hidden-position"
-                           value="{{ $authUserInfo->position ?? '' }}">
+                    {{-- Hidden Inputs --}}
+                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-input"
+                           value="{{ old('scriptorium', $authUserInfo['user_id'] ?? '') }}">
                     <x-input-error :messages="$errors->get('scriptorium')" class="mt-2"/>
                 </div>
-
                 <div>
                     <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
                     <x-text-input name="unit_held" id="unit_held" value="{{old('unit_held')}}"
                                   class="block" type="text" autofocus/>
                     <x-input-error :messages="$errors->get('unit_held')"/>
                 </div>
-
-
             </div>
-
-
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 border-b pb-2">
                 {{ __('بخش اعضا و مهمان') }}
             </h2>
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
 
+                {{-- Participants Dropdown (multi-select) --}}
                 <div id="participants_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
                      style="direction: rtl;">
-                    <x-input-label for="participants" class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
+                    <x-input-label class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
                     <button id="participants-dropdown-btn" type="button"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
-                            aria-haspopup="listbox" aria-expanded="false">
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
                         <span id="participants-selected-text" class="truncate">انتخاب شرکت‌کنندگان</span>
                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
                     <div id="participants-dropdown-menu"
-                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                         <div class="px-4 py-2">
                             <input id="participants-dropdown-search" type="text" placeholder="جست و جو"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
-                        <ul id="participants-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
-                            <!-- Options populated by JS -->
-                        </ul>
-                        <div id="participants-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی
-                            یافت نشد
-                        </div>
+                        <ul id="participants-dropdown-list" class="max-h-48 overflow-auto"></ul>
+                        <div id="participants-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>
                     </div>
-                    <!-- Selected participants displayed here -->
                     <div id="participants-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
-                    <!-- Hidden input to hold selected IDs (comma separated) -->
                     <input type="hidden" name="holders" id="participants-hidden-input"
                            value="{{ old('holders') ?? '' }}">
                     <x-input-error :messages="$errors->get('holders')" class="mt-2"/>
                 </div>
-
+                {{-- Inner Guests Dropdown (multi-select) --}}
                 <div id="innerGuest_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
                      style="direction: rtl;">
-                    <x-input-label for="innerGuest" class="mb-1.5" :value="__('مهمانان داخلی')"/>
+                    <x-input-label class="mb-1.5" :value="__('مهمانان داخلی')"/>
                     <button id="innerGuest-dropdown-btn" type="button"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center"
-                            aria-haspopup="listbox" aria-expanded="false">
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
                         <span id="innerGuest-selected-text" class="truncate">انتخاب مهمانان داخلی</span>
                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
                     <div id="innerGuest-dropdown-menu"
-                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-y-auto z-10">
+                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                         <div class="px-4 py-2">
                             <input id="innerGuest-dropdown-search" type="text" placeholder="جست و جو"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         </div>
-                        <ul id="innerGuest-dropdown-list" role="listbox" tabindex="-1" class="max-h-48 overflow-auto">
-                            <!-- Options populated by JS -->
-                        </ul>
-                        <div id="innerGuest-no-result" class="px-4 py-2 text-gray-500" style="display:none;">موردی یافت
-                            نشد
-                        </div>
+                        <ul id="innerGuest-dropdown-list" class="max-h-48 overflow-auto"></ul>
+                        <div id="innerGuest-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>
                     </div>
                     <div id="innerGuest-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
                     <input type="hidden" name="innerGuest" id="innerGuest-hidden-input"
@@ -331,12 +306,12 @@
                     <x-input-error :messages="$errors->get('innerGuest')" class="mt-2"/>
                 </div>
 
-                {{--  Guests --}}
+                {{--                              Guests --}}
                 <div class="col-span-2">
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 pb-2">
                         {{ __('لیست مهمانان برون سازمانی') }}
                     </h3>
-                    {{-- Hidden data element for JS --}}
+                    {{--                                 Hidden data element for JS --}}
                     <div id="guests-data" data-outer-guests="{{ json_encode(old('guests.outer', [])) }}"></div>
                     <div id="outer-organization-table"
                          class="overflow-x-auto rounded-lg border border-gray-300 shadow mb-4">
@@ -379,5 +354,171 @@
             </div>
         </div>
     </form>
+
+
+    {{--    <script>--}}
+    {{--        document.addEventListener("DOMContentLoaded", () => {--}}
+    {{--            const dropdowns = [--}}
+    {{--                { id: "boss", type: "single" },--}}
+    {{--                { id: "scriptorium", type: "single" },--}}
+    {{--                { id: "participants", type: "multi" },--}}
+    {{--                { id: "innerGuest", type: "multi" }--}}
+    {{--            ];--}}
+    {{--            const selectedUserIds = new Set();--}}
+    {{--            dropdowns.forEach(({ id, type }) => {--}}
+    {{--                const container = document.getElementById(`${id}_dropdown`);--}}
+    {{--                const users = JSON.parse(container.dataset.users || "[]");--}}
+
+    {{--                const button = document.getElementById(`${id}-dropdown-btn`);--}}
+    {{--                const menu = document.getElementById(`${id}-dropdown-menu`);--}}
+    {{--                const list = document.getElementById(`${id}-dropdown-list`);--}}
+    {{--                const searchInput = document.getElementById(`${id}-dropdown-search`);--}}
+    {{--                const hiddenInput = document.getElementById(`${id}-hidden-input`);--}}
+    {{--                const selectedText = document.getElementById(`${id}-selected-text`);--}}
+    {{--                const noResult = document.getElementById(`${id}-no-result`);--}}
+    {{--                const selectedContainer = document.getElementById(`${id}-selected-container`);--}}
+
+    {{--                // For scriptorium, also get extra hidden inputs for dept and position--}}
+    {{--                const hiddenDepartment = document.getElementById(`${id}-hidden-department`);--}}
+    {{--                const hiddenPosition = document.getElementById(`${id}-hidden-position`);--}}
+
+    {{--                let currentSelected = type === "multi" ? [] : null;--}}
+
+    {{--                button.addEventListener("click", (e) => {--}}
+    {{--                    e.stopPropagation();--}}
+    {{--                    menu.classList.toggle("hidden");--}}
+    {{--                    renderList();--}}
+    {{--                    searchInput.focus();--}}
+    {{--                });--}}
+
+    {{--                searchInput.addEventListener("input", renderList);--}}
+
+    {{--                function renderList() {--}}
+    {{--                    const search = searchInput.value.toLowerCase();--}}
+    {{--                    list.innerHTML = "";--}}
+
+    {{--                    const filtered = users.filter(user => {--}}
+    {{--                        return !selectedUserIds.has(user.user_id.toString()) &&--}}
+    {{--                            user.full_name.toLowerCase().includes(search);--}}
+    {{--                    });--}}
+
+    {{--                    if (filtered.length === 0) {--}}
+    {{--                        noResult.classList.remove("hidden");--}}
+    {{--                    } else {--}}
+    {{--                        noResult.classList.add("hidden");--}}
+    {{--                        filtered.forEach(user => {--}}
+    {{--                            const li = document.createElement("li");--}}
+    {{--                            li.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer text-right";--}}
+
+    {{--                            li.innerHTML = `--}}
+    {{--                <div>--}}
+    {{--                    <div>${user.full_name}</div>--}}
+    {{--                    <div class="text-xs text-gray-500">${user.department_name || ''} - ${user.position || ''}</div>--}}
+    {{--                </div>--}}
+    {{--            `;--}}
+
+    {{--                            li.addEventListener("click", () => handleSelect(user));--}}
+    {{--                            list.appendChild(li);--}}
+    {{--                        });--}}
+    {{--                    }--}}
+    {{--                }--}}
+
+    {{--                function handleSelect(user) {--}}
+    {{--                    const userIdStr = user.user_id.toString();--}}
+
+    {{--                    if (type === "single") {--}}
+    {{--                        if (currentSelected) {--}}
+    {{--                            selectedUserIds.delete(currentSelected.user_id.toString());--}}
+    {{--                        }--}}
+    {{--                        currentSelected = user;--}}
+    {{--                        selectedUserIds.add(userIdStr);--}}
+
+    {{--                        // Update hidden input user id--}}
+    {{--                        hiddenInput.value = user.user_id;--}}
+
+    {{--                        // If scriptorium, update dept and position hidden inputs too--}}
+    {{--                        if (id === "scriptorium") {--}}
+    {{--                            if (hiddenDepartment) hiddenDepartment.value = user.department_id || '';--}}
+    {{--                            if (hiddenPosition) hiddenPosition.value = user.position || '';--}}
+    {{--                        }--}}
+
+    {{--                        // Update displayed selected text--}}
+    {{--                        selectedText.innerHTML = `--}}
+    {{--          <div>--}}
+    {{--            <div><strong>${user.full_name}</strong></div>--}}
+    {{--            <div class="text-xs text-gray-500">${user.department_name || ''} - ${user.position || ''}</div>--}}
+    {{--          </div>--}}
+    {{--        `;--}}
+
+    {{--                        menu.classList.add("hidden");--}}
+    {{--                    } else {--}}
+    {{--                        if (!currentSelected.find(u => u.user_id === user.user_id)) {--}}
+    {{--                            currentSelected.push(user);--}}
+    {{--                            selectedUserIds.add(userIdStr);--}}
+    {{--                        }--}}
+    {{--                        updateMultiDisplay();--}}
+    {{--                        menu.classList.add("hidden");--}}
+    {{--                    }--}}
+
+    {{--                    dropdowns.forEach(d => {--}}
+    {{--                        if (d.id !== id) {--}}
+    {{--                            const searchInput = document.getElementById(`${d.id}-dropdown-search`);--}}
+    {{--                            if (searchInput) searchInput.dispatchEvent(new Event("input"));--}}
+    {{--                        }--}}
+    {{--                    });--}}
+    {{--                }--}}
+
+    {{--                function updateMultiDisplay() {--}}
+    {{--                    if (!selectedContainer) return;--}}
+    {{--                    selectedContainer.innerHTML = "";--}}
+
+    {{--                    currentSelected.forEach(user => {--}}
+    {{--                        const tag = document.createElement("span");--}}
+    {{--                        tag.className = "bg-blue-100 text-blue-800 px-2 py-1 rounded-lg text-sm flex items-center gap-1";--}}
+
+    {{--                        const close = document.createElement("span");--}}
+    {{--                        close.textContent = "×";--}}
+    {{--                        close.className = "ml-1 cursor-pointer";--}}
+    {{--                        close.addEventListener("click", () => {--}}
+    {{--                            currentSelected = currentSelected.filter(u => u.user_id !== user.user_id);--}}
+    {{--                            selectedUserIds.delete(user.user_id.toString());--}}
+    {{--                            updateMultiDisplay();--}}
+    {{--                            renderList();--}}
+    {{--                            dropdowns.forEach(d => {--}}
+    {{--                                if (d.id !== id) {--}}
+    {{--                                    const searchInput = document.getElementById(`${d.id}-dropdown-search`);--}}
+    {{--                                    if (searchInput) searchInput.dispatchEvent(new Event("input"));--}}
+    {{--                                }--}}
+    {{--                            });--}}
+    {{--                        });--}}
+
+    {{--                        tag.innerHTML = `--}}
+    {{--          <div>--}}
+    {{--            <div><strong>${user.full_name}</strong></div>--}}
+    {{--            <div class="text-xs text-gray-500">${user.department_name || ''} - ${user.position || ''}</div>--}}
+    {{--          </div>--}}
+    {{--        `;--}}
+    {{--                        tag.appendChild(close);--}}
+    {{--                        selectedContainer.appendChild(tag);--}}
+    {{--                    });--}}
+
+    {{--                    const ids = currentSelected.map(u => u.user_id);--}}
+    {{--                    hiddenInput.value = JSON.stringify(ids);--}}
+    {{--                    selectedText.textContent = currentSelected.length > 0 ? `${currentSelected.length} انتخاب شده` : "انتخاب کنید";--}}
+    {{--                }--}}
+
+    {{--                renderList();--}}
+    {{--            });--}}
+    {{--            // Close dropdowns on clicking outside--}}
+    {{--            document.addEventListener("click", () => {--}}
+    {{--                dropdowns.forEach(({ id }) => {--}}
+    {{--                    const menu = document.getElementById(`${id}-dropdown-menu`);--}}
+    {{--                    if (menu) menu.classList.add("hidden");--}}
+    {{--                });--}}
+    {{--            });--}}
+    {{--        });--}}
+    {{--    </script>--}}
+
+
 </x-app-layout>
 

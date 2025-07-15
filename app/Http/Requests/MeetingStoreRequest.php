@@ -25,9 +25,7 @@ class MeetingStoreRequest extends FormRequest
     {
         return [
             'title' => ['required','string','max:255'],
-            'scriptorium' => ['required','string','max:255'],
-            'scriptorium_department' => ['required','string','min:5','max:255'],
-            'scriptorium_position' => ['required','string','max:255'],
+            'scriptorium' => ['required'],
             'boss' => ['required'],
             'location' => ['required','string','max:255'],
             'year' => ['required'],
@@ -35,8 +33,8 @@ class MeetingStoreRequest extends FormRequest
             'day' => ['required'],
             'time' => ['required', new Time()],
             'unit_held' => ['required','string','max:255'],
-            'treat' => ['required'],
-            'guest' => ['nullable','string'],
+            'treat' => ['required','boolean'],
+            'guest' => ['nullable'],
             'holders' => ['required']
         ];
     }

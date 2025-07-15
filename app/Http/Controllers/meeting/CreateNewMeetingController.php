@@ -14,6 +14,7 @@ use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
@@ -25,7 +26,7 @@ class CreateNewMeetingController extends Controller
      */
     public function create()
     {
-        $unreadReceivedCount =  Notification::where('recipient_id', auth()->id())
+        $unreadReceivedCount = Notification::where('recipient_id', auth()->id())
             ->whereNull('recipient_read_at')
             ->count();
 
@@ -39,16 +40,28 @@ class CreateNewMeetingController extends Controller
                 ->select('id', 'user_id', 'full_name', 'department_id', 'position')
                 ->get();
         });
-        $participants = $users->filter(function ($userInfo) {
-            return $userInfo->user_id !== auth()->id();
+
+        // Map to include department_name directly for frontend JSON
+        $usersForJson = $users->map(function ($user) {
+            return [
+                'user_id' => $user->user_id,
+                'full_name' => $user->full_name,
+                'position' => $user->position,
+                'department_id' => $user->department_id,
+                'department_name' => $user->department ? $user->department->department_name : '',
+            ];
+        });
+
+        $participants = $usersForJson->filter(function ($user) {
+            return $user['user_id'] !== auth()->id();
         })->values();
-        return view('meeting.create' , [
-            'users' => $users,
-            'participants'=>$participants,
-            'unreadReceivedCount' =>$unreadReceivedCount
+
+        return view('meeting.create', [
+            'users' => $usersForJson,
+            'participants' => $participants,
+            'unreadReceivedCount' => $unreadReceivedCount,
         ]);
     }
-
     /**
      * Store a newly created resource in storage.
      * @throws ValidationException
@@ -56,12 +69,18 @@ class CreateNewMeetingController extends Controller
     public function store(MeetingStoreRequest $request)
     {
         $validated = $request->validated();
+
         return DB::transaction(function () use ($validated, $request) {
+            // Parse comma-separated inner guest IDs
             $innerGuestIds = collect(explode(',', $request->input('innerGuest', '')))
-                ->filter()->unique()->values();
+                ->map(fn($id) => (int) trim($id))
+                ->filter()
+                ->unique()
+                ->values();
 
             $innerGuests = UserInfo::whereIn('user_id', $innerGuestIds)->get();
 
+            // Clean up outer guests
             $outerGuests = collect($request->input('guests.outer', []))
                 ->map(function ($guest) {
                     $name = preg_replace('/\s+/', ' ', trim($guest['name'] ?? ''));
@@ -74,50 +93,50 @@ class CreateNewMeetingController extends Controller
                 ->filter(fn($guest) => $guest['name'] !== null || $guest['companyName'] !== null)
                 ->values();
 
-            // Convert current Gregorian date to Jalali
             $newDate = $this->getCurrentDate($validated['year'], $validated['month'], $validated['day']);
 
-            // Get boss and scriptorium together
+            // Load boss and scriptorium user info
             $userIdsToFetch = array_filter([$validated['boss'], $validated['scriptorium']]);
             $userInfos = UserInfo::whereIn('user_id', $userIdsToFetch)->get()->keyBy('user_id');
 
             $boss = $userInfos->get($validated['boss']);
-            $bossName = $boss ? $boss->full_name : 'Unknown';
+            $scriptorium = $userInfos->get($validated['scriptorium']);
 
-            $scriptorium = $userInfos->firstWhere('position', $validated['scriptorium_position']);
-            $scriptoriumName = $scriptorium ? $scriptorium->full_name : 'Unknown';
-
+            // Normalize time format (e.g., "8" to "08:00")
             $validated['time'] = str_contains($validated['time'], ':')
                 ? $validated['time']
                 : sprintf('%02d:00', intval($validated['time']));
 
+            // Check for time conflict
             if (Meeting::where('date', $newDate)->where('time', $validated['time'])->exists()) {
                 throw ValidationException::withMessages([
                     'time' => 'در این زمان جلسه ثبت شده است',
                 ]);
             }
 
+            // Create meeting with foreign keys and proper field casting
             $meeting = Meeting::create([
                 'title' => $validated['title'],
-                'scriptorium' => $scriptoriumName,
-                'scriptorium_department' => $validated['scriptorium_department'],
-                'scriptorium_position' => $validated['scriptorium_position'],
-                'boss' => $bossName,
+                'scriptorium_id' => $validated['scriptorium'],  // foreign key matches your migration
+                'boss_id' => $validated['boss'],                // foreign key matches your migration
                 'location' => $validated['location'],
                 'date' => $newDate,
                 'time' => $validated['time'],
                 'unit_held' => $validated['unit_held'],
-                'treat' => $validated['treat'],
-                'guest' => $outerGuests->isNotEmpty() ? $outerGuests : null,
+                'treat' => (bool) $validated['treat'],          // cast boolean properly
+                'guest' => $outerGuests->isNotEmpty() ? $outerGuests->toArray() : null, // convert collection to array for JSON
             ]);
 
             $meetingUserRecords = [];
             $recipients = collect();
 
-            // Holders
-            $holders = Str::of($validated['holders'])->explode(',');
-            foreach ($holders as $holder) {
-                $holderId = trim($holder);
+            // Add holders
+            $holders = collect(explode(',', $validated['holders'] ?? ''))
+                ->map(fn($id) => (int) trim($id))
+                ->filter()
+                ->unique();
+
+            foreach ($holders as $holderId) {
                 $meetingUserRecords[] = [
                     'user_id' => $holderId,
                     'meeting_id' => $meeting->id,
@@ -128,7 +147,7 @@ class CreateNewMeetingController extends Controller
                 $recipients->push($holderId);
             }
 
-            // Inner guests
+            // Add inner guests
             foreach ($innerGuests as $guest) {
                 if ($guest->user_id) {
                     $meetingUserRecords[] = [
@@ -142,10 +161,10 @@ class CreateNewMeetingController extends Controller
                 }
             }
 
-            // Prepare notifications
+            // Notifications
             $notifications = [];
 
-            // Boss
+            // Notify boss
             if ($boss) {
                 $meetingUserRecords[] = [
                     'user_id' => $boss->user_id,
@@ -171,16 +190,17 @@ class CreateNewMeetingController extends Controller
                 ];
             }
 
-            // Insert all meeting users at once
+            // Insert all meeting-user relationships
             MeetingUser::insert($meetingUserRecords);
 
-            // Notifications for holders and guests except boss (already notified)
+            // Notify other recipients
             foreach ($recipients->unique() as $recipientId) {
                 if ($boss && (string)$boss->user_id === (string)$recipientId) {
-                    continue;
+                    continue; // Boss already notified
                 }
 
-                $isGuest = $innerGuestIds->contains($recipientId);
+                $isGuest = $innerGuestIds->contains((int)$recipientId);
+
                 $notifications[] = [
                     'type' => $isGuest ? 'MeetingGuestInvitation' : 'MeetingInvitation',
                     'data' => json_encode([
@@ -207,12 +227,14 @@ class CreateNewMeetingController extends Controller
      */
     public function edit(string $id)
     {
+        // Load meeting with meetingUsers and nested relations
         $meeting = Meeting::with([
             'meetingUsers.user.user_info.department',
+            'boss.user_info.department',
+            'scriptorium.user_info.department',
         ])
-            ->select('id','title', 'scriptorium_department',
-                'scriptorium', 'boss', 'location', 'date', 'time',
-                'unit_held', 'treat', 'guest', 'scriptorium_position')
+            ->select('id','title', 'scriptorium_id', 'boss_id',
+                'location', 'date', 'time', 'unit_held', 'treat', 'guest')
             ->findOrFail($id);
 
         // Date processing
@@ -223,26 +245,15 @@ class CreateNewMeetingController extends Controller
             $year = $month = $day = null;
         }
 
-        // Fetching the boss with department and position
-        $bossInfo = null;
-        if ($meeting->boss) {
-            $bossInfo = UserInfo::with(['department:id,department_name'])
-                ->where('full_name', $meeting->boss)
-                ->first();
-        }
-
         // Map inner guests with department names
-        $innerGuests = $meeting->meetingUsers->filter(function ($meetingUser) {
-            return $meetingUser->is_guest;  // Only filter inner guests
-        })->map(function ($meetingUser) {
+        $innerGuests = $meeting->meetingUsers->filter(fn($mu) => $mu->is_guest)->map(function ($meetingUser) {
             if ($meetingUser->user && $meetingUser->user->user_info) {
                 $meetingUser->department_name = $meetingUser->user->user_info->department->department_name ?? 'Unknown Department';
             }
             return $meetingUser;
         });
 
-
-        // Get users (non-guests) excluding current user and super admins
+        // Get users (non-guests), excluding current user and super admins
         $users = UserInfo::with('department:id,department_name')
             ->whereHas('user', function ($query) {
                 $query->whereDoesntHave('roles', function ($roleQuery) {
@@ -252,21 +263,21 @@ class CreateNewMeetingController extends Controller
             ->select('id', 'user_id', 'full_name', 'department_id', 'position')
             ->get();
 
+        // Filter participants excluding current logged-in user
+        $participants = $users->filter(fn($userInfo) => $userInfo->user_id !== auth()->id())->values();
 
-        $participants = $users->filter(function ($userInfo) {
-            return $userInfo->user_id !== auth()->id();
-        })->values();
+        // Pass meetingUsers who are not guests
+        $userIds = $meeting->meetingUsers->where('is_guest', false);
 
         return view('meeting.edit', [
             'meeting' => $meeting,
             'users' => $users,
-            'userIds' => $meeting->meetingUsers->where('is_guest',false),
+            'userIds' => $userIds,
             'innerGuests' => $innerGuests,
             'year' => $year,
             'month' => $month,
             'day' => $day,
-            'bossInfo' => $bossInfo,
-            'participants' => $participants
+            'participants' => $participants,
         ]);
     }
 
@@ -275,7 +286,6 @@ class CreateNewMeetingController extends Controller
      */
     public function update(MeetingUpdateRequest $request, string $id)
     {
-
         $validated = $request->validated();
 
         $validated['time'] = str_contains($validated['time'], ':')
@@ -284,47 +294,29 @@ class CreateNewMeetingController extends Controller
 
         $newDate = $this->getCurrentDate($validated['year'], $validated['month'], $validated['day']);
 
-        // Retrieve meeting with related users
         $meeting = Meeting::with('meetingUsers')->findOrFail($id);
 
-        // Store original boss user ID for notification comparison
-        $originalBossUserId = UserInfo::where('full_name', $meeting->boss)->value('user_id');
+        // Original and new boss IDs
+        $originalBossId = $meeting->boss_id;
+        $newBossId = $validated['boss_id'] ?? $meeting->boss_id;
 
-        // Get Boss Name from UserInfo if boss id provided, else keep current
-        $bossName = $meeting->boss;
-        if (!empty($validated['boss'])) {
-            $bossName = UserInfo::where('user_id', $validated['boss'])->value('full_name') ?? $meeting->boss;
-        }
+        $scriptoriumId = $validated['scriptorium_id'] ?? $meeting->scriptorium_id;
+        $scriptoriumPosition = $validated['scriptorium_position'] ?? $meeting->scriptorium_position;
 
-        // Initialize with existing meeting values
-        $scriptoriumName = $meeting->scriptorium;
-        $scriptoriumDepartment = $meeting->scriptorium_department;
-        $scriptoriumPosition = $meeting->scriptorium_position;
-
-        // Override if valid scriptorium user ID and position provided
-        if (!empty($validated['scriptorium'])) {
-            $scriptorium = UserInfo::where('user_id', $validated['scriptorium'])
-                ->where('position', $validated['scriptorium_position'])
-                ->first();
-
-            if ($scriptorium) {
-                $scriptoriumName = $scriptorium->full_name;
-
-                // Fetch department name using department_id from Department model
-                $department = Department::find($scriptorium->department_id);
+        $scriptoriumDepartment = null;
+        if ($scriptoriumId) {
+            $scriptoriumUserInfo = UserInfo::where('user_id', $scriptoriumId)->first();
+            if ($scriptoriumUserInfo) {
+                $department = Department::find($scriptoriumUserInfo->department_id);
                 $scriptoriumDepartment = $department ? $department->department_name : null;
-
-                $scriptoriumPosition = $scriptorium->position;
             }
         }
 
-        // Process inner guests: parse from comma-separated IDs like in store()
+        // Process inner guests
         $innerGuestIds = collect(explode(',', $request->input('innerGuest', '')))
             ->filter()->unique()->values();
 
-        $innerGuests = UserInfo::whereIn('user_id', $innerGuestIds)->get();
-
-        // Process outer guests like store()
+        // Process outer guests
         $newOuterGuests = collect($request->input('guests.outer', []))
             ->map(function ($guest) {
                 $name = preg_replace('/\s+/', ' ', trim($guest['name'] ?? ''));
@@ -337,20 +329,19 @@ class CreateNewMeetingController extends Controller
             ->filter(fn($guest) => $guest['name'] !== null || $guest['companyName'] !== null)
             ->values();
 
-        // Merge with existing outer guests without duplicates based on name + companyName
         $existingOuterGuests = collect($meeting->guest ?? []);
         $mergedOuterGuests = $existingOuterGuests->merge($newOuterGuests)
             ->unique(fn($guest) => $guest['name'].'-'.$guest['companyName'])
             ->values()
             ->toArray();
 
-        // Update meeting details (including merged guests)
+        // Update meeting
         $meeting->update([
             'title' => $validated['title'],
-            'scriptorium' => $scriptoriumName,
+            'scriptorium_id' => $scriptoriumId,
             'scriptorium_department' => $scriptoriumDepartment,
             'scriptorium_position' => $scriptoriumPosition,
-            'boss' => $bossName,
+            'boss_id' => $newBossId,
             'location' => $validated['location'],
             'date' => $newDate,
             'time' => $validated['time'],
@@ -359,12 +350,8 @@ class CreateNewMeetingController extends Controller
             'guest' => $mergedOuterGuests,
         ]);
 
-
-        // Add new inner guests that don't exist yet
-        $existingGuestUserIds = $meeting->meetingUsers()
-            ->where('is_guest', true)
-            ->pluck('user_id');
-
+        // Add new inner guests
+        $existingGuestUserIds = $meeting->meetingUsers()->where('is_guest', true)->pluck('user_id');
         $newGuestUserIds = $innerGuestIds->diff($existingGuestUserIds);
 
         foreach ($newGuestUserIds as $userId) {
@@ -376,16 +363,13 @@ class CreateNewMeetingController extends Controller
             ]);
         }
 
-        // Manage Holders (Keep old, add new)
+        // Manage Holders
         $holders = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
             ->filter(fn($id) => is_numeric($id))
             ->unique()
             ->map(fn($id) => (int) $id);
 
-        $existingHolders = $meeting->meetingUsers()
-            ->where('is_guest', false)
-            ->pluck('user_id');
-
+        $existingHolders = $meeting->meetingUsers()->where('is_guest', false)->pluck('user_id');
         $newHolders = $holders->diff($existingHolders);
         $newHolders->each(fn($id) => $meeting->meetingUsers()->create([
             'user_id' => $id,
@@ -397,24 +381,30 @@ class CreateNewMeetingController extends Controller
             'updated_at' => now(),
         ]));
 
-        // Manage Inner Guests & Participants for notifications
-        $participants = $holders;
-        $allUserIds = $innerGuestIds
-            ->merge($participants)
-            ->push((int) $validated['boss'])
-            ->unique()
-            ->filter(fn($id) => is_numeric($id));
+        // Manage Notifications
 
         // If boss changed, delete old boss notification
-        if ($originalBossUserId && $originalBossUserId != (int) $validated['boss']) {
+        if ($originalBossId && $originalBossId != (int) $newBossId) {
             Notification::where('notifiable_type', Meeting::class)
                 ->where('notifiable_id', $meeting->id)
-                ->where('recipient_id', $originalBossUserId)
+                ->where('recipient_id', $originalBossId)
                 ->delete();
         }
 
-        $notificationsData = [];
+        // Prepare notification recipients
+        $participants = $holders;
 
+        $notificationRecipients = $innerGuestIds->merge($participants);
+
+        // Only add boss to notification list **if the boss has changed**
+        if ((int) $newBossId !== (int) $originalBossId) {
+            $notificationRecipients->push((int) $newBossId);
+        }
+
+        $allUserIds = $notificationRecipients->unique()->filter(fn($id) => is_numeric($id));
+
+        // Create notifications
+        $notificationsData = [];
         foreach ($allUserIds as $userId) {
             $isGuest = $innerGuestIds->contains($userId);
             $notificationType = $isGuest ? 'MeetingGuestInvitation' : 'MeetingInvitation';
@@ -437,13 +427,12 @@ class CreateNewMeetingController extends Controller
 
         Notification::upsert(
             $notificationsData,
-            ['notifiable_type', 'notifiable_id', 'recipient_id'], // unique keys
-            ['data', 'sender_id', 'updated_at'] // fields to update if exists
+            ['notifiable_type', 'notifiable_id', 'recipient_id'],
+            ['data', 'sender_id', 'updated_at']
         );
 
         return to_route('dashboard.meeting')->with('status', __('جلسه با موفقیت بروز شد'));
     }
-
 
     public function deleteUser(Request $request, $meetingId, $userId)
     {

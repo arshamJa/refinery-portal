@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use App\Enums\MeetingStatus;
-use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,10 +18,8 @@ class Meeting extends Model
 
     protected $fillable = [
         'title',
-        'scriptorium',
-        'scriptorium_department',
-        'scriptorium_position',
-        'boss',
+        'scriptorium_id',
+        'boss_id',
         'location',
         'date',
         'time',
@@ -80,21 +76,29 @@ class Meeting extends Model
     {
         return $this->morphMany(Notification::class, 'notifiable');
     }
+    public function boss()
+    {
+        return $this->belongsTo(User::class, 'boss_id');
+    }
+    public function scriptorium()
+    {
+        return $this->belongsTo(User::class, 'scriptorium_id');
+    }
 
 
     public function getRoleForUser(User $user): string
     {
-        if ($user->user_info->full_name === $this->scriptorium) {
+        if ($user->id === $this->scriptorium_id) {
             return 'دبیرجلسه';
         }
 
-        if ($user->user_info->full_name === $this->boss) {
+        if ($user->id === $this->boss_id) {
             return 'رئیس جلسه';
         }
 
         $meetingUser = $this->meetingUsers->firstWhere('user_id', $user->id);
         if ($meetingUser) {
-            return $meetingUser->is_guest ? 'مهمان' : 'عضوجلسه';
+            return $meetingUser->is_guest ? 'مهمان' : 'عضو جلسه';
         }
 
         return 'none'; // user not associated with meeting

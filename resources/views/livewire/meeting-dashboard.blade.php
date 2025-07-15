@@ -182,11 +182,12 @@
                                  class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
                         <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
                         <x-table.cell>{{$meeting->title}}</x-table.cell>
-                        <x-table.cell>{{$meeting->scriptorium}}</x-table.cell>
+                        <x-table.cell>{{ $meeting->scriptorium->user_info->full_name ?? '—' }}</x-table.cell>
                         <x-table.cell>{{$meeting->getRoleForUser(auth()->user())}}</x-table.cell>
-                        <x-table.cell>{{$meeting->scriptorium_department}}</x-table.cell>
+                        <x-table.cell>{{ $meeting->scriptorium->user_info->department->department_name ?? '—' }}</x-table.cell>
                         <x-table.cell>{{$meeting->date}}</x-table.cell>
-                        <x-table.cell class="whitespace-nowrap">{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
+                        <x-table.cell
+                            class="whitespace-nowrap">{{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}</x-table.cell>
                         <x-table.cell class="whitespace-nowrap">
                             <span class="{{ $meeting->status->badgeColor() }} text-xs font-medium px-3 py-1 rounded-lg">
                                 {{ $meeting->status->label() }}
@@ -223,13 +224,14 @@
                                     <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                         {{ __('نمایش') }}
                                     </x-dropdown-link>
-                                    @if( $meeting->status === MeetingStatus::PENDING && auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)
-                                        <x-dropdown-link href="{{route('meeting.edit',$meeting->id)}}">
+                                    @if($meeting->status === \App\Enums\MeetingStatus::PENDING &&
+                                            auth()->id() === $meeting->scriptorium_id)
+                                        <x-dropdown-link href="{{ route('meeting.edit', $meeting->id) }}">
                                             {{ __('ویرایش') }}
                                         </x-dropdown-link>
                                     @endif
-                                    @if(( $meeting->status == MeetingStatus::PENDING || $meeting->status == MeetingStatus::IS_CANCELLED ) &&
-                                        auth()->user()->user_info->full_name === $meeting->scriptorium && auth()->user()->user_info->position === $meeting->scriptorium_position)
+                                    @if(($meeting->status === \App\Enums\MeetingStatus::PENDING || $meeting->status === \App\Enums\MeetingStatus::IS_CANCELLED) &&
+                                        auth()->id() === $meeting->scriptorium_id)
                                         <x-dropdown-link wire:click.prevent="deleteMeeting({{ $meeting->id }})"
                                                          class="text-red-600">
                                             {{ __('حذف') }}
@@ -261,12 +263,13 @@
                     : (is_array($selectedMeeting->guest) ? $selectedMeeting->guest : []);
 
                 $innerGuests = $selectedMeeting->meetingUsers->where('is_guest', true);
-                $participants = $selectedMeeting->meetingUsers->where('is_guest', false);
+                $participants = $selectedMeeting->meetingUsers->where('is_guest', false)
+                ->filter(fn($mu) => $mu->user_id !== $selectedMeeting->boss_id);
             @endphp
 
             <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-10">
 
-                {{-- Meeting Title --}}
+{{--                 Meeting Title--}}
                 <div class="flex items-center justify-between border-b pb-4">
                     <div>
                         <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $selectedMeeting->title }}</h2>
@@ -279,21 +282,17 @@
                         </svg>
                     </a>
                 </div>
-                {{-- Meeting Info --}}
+{{--                 Meeting Info--}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[15px]">
-                    <div
-                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
-                        <div><strong>{{ __('رئیس جلسه:') }}</strong>{{ $selectedMeeting->boss }}</div>
-                        <div>
-                            <strong>{{ __('واحد رئیس:') }}</strong>{{ $bossInfo->department->department_name ?? '---' }}
-                        </div>
-                        <div><strong>{{ __('سمت رئیس:') }}</strong>{{ $bossInfo->position ?? '---' }}</div>
+                    <div class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div><strong>{{ __('رئیس جلسه:') }}</strong>{{ $selectedMeeting->boss->user_info->full_name ?? '---' }}</div>
+                        <div><strong>{{ __('واحد رئیس:') }}</strong>{{ $selectedMeeting->boss->user_info->department->department_name ?? '---' }}</div>
+                        <div><strong>{{ __('سمت رئیس:') }}</strong>{{ $selectedMeeting->boss->user_info->position ?? '---' }}</div>
                     </div>
-                    <div
-                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
-                        <div><strong>{{ __('دبیر جلسه:') }}</strong>{{ $selectedMeeting->scriptorium }}</div>
-                        <div><strong>{{ __('واحد دبیر:') }}</strong>{{$selectedMeeting->scriptorium_department}}</div>
-                        <div><strong>{{ __('سمت دبیر:') }}</strong>{{$selectedMeeting->scriptorium_position}}</div>
+                    <div class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div><strong>{{ __('دبیر جلسه:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->full_name ?? '---' }}</div>
+                        <div><strong>{{ __('واحد دبیر:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->department->department_name ?? '---' }}</div>
+                        <div><strong>{{ __('سمت دبیر:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->position ?? '---' }}</div>
                     </div>
                     <div
                         class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
@@ -309,7 +308,7 @@
                         </div>
                     </div>
                 </div>
-                {{-- Participants --}}
+{{--                 Participants--}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('اعضای جلسه') }}</h3>
                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -335,7 +334,7 @@
                         @endforeach
                     </div>
                 </div>
-                {{-- Inner Guests --}}
+{{--                 Inner Guests--}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('مهمانان درون سازمانی') }}</h3>
                     @if ($innerGuests->isNotEmpty())
@@ -365,7 +364,7 @@
                         <p class="text-gray-500">{{ __('مهمان درون سازمانی وجود ندارد') }}</p>
                     @endif
                 </div>
-                {{-- Outer Guests --}}
+{{--                 Outer Guests--}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('مهمانان برون سازمانی') }}</h3>
                     @if (!empty($guests))
@@ -385,26 +384,34 @@
                         <p class="text-gray-500">{{ __('مهمان برون سازمانی وجود ندارد') }}</p>
                     @endif
                 </div>
-                {{-- Buttons --}}
+{{--                 Buttons--}}
                 @if($selectedMeeting->status === MeetingStatus::PENDING)
-                    @can('handle-own-meeting',$meeting)
-                        <div class="flex justify-end gap-4 pt-6">
-                            <x-primary-button wire:click="acceptMeeting({{$selectedMeeting->id}})">
-                                {{ __('تایید جلسه') }}
-                            </x-primary-button>
-                            <x-danger-button wire:click="denyMeeting({{$selectedMeeting->id}})">
-                                {{ __('لغو جلسه') }}
-                            </x-danger-button>
+                    <div class="flex justify-between gap-4 pt-6">
+                        @can('handle-own-meeting',$meeting)
+                            <div>
+                                <x-primary-button wire:click="acceptMeeting({{$selectedMeeting->id}})" class="ml-2">
+                                    {{ __('تایید جلسه') }}
+                                </x-primary-button>
+                                <x-danger-button wire:click="denyMeeting({{$selectedMeeting->id}})">
+                                    {{ __('لغو جلسه') }}
+                                </x-danger-button>
+                            </div>
+                        @endcan
+                        <div>
+                            <a href="{{route('dashboard.meeting')}}">
+                                <x-secondary-button>
+                                    {{ __('بستن') }}
+                                </x-secondary-button>
+                            </a>
                         </div>
-                    @endcan
+                    </div>
                 @endif
             </div>
         @endif
     </x-modal>
-
     <x-modal name="delete-meeting-modal" maxWidth="4xl" :closable="false">
         @if ($selectedMeeting)
-            @if(auth()->user()->user_info->full_name === $selectedMeeting->scriptorium && auth()->user()->user_info->position === $selectedMeeting->scriptorium_position)
+            @if(auth()->id() === $selectedMeeting->scriptorium_id)
                 <form method="POST" action="{{ route('meeting.destroy', $selectedMeeting->id) }}">
                     @csrf
                     @method('DELETE')
@@ -415,7 +422,7 @@
                     </div>
                     <div class="px-6 py-4" dir="rtl">
                         <div class="mt-4 text-sm text-gray-600">
-                            {{--                         Show a bit of meeting info for confirmation--}}
+{{--                                                     Show a bit of meeting info for confirmation--}}
                             <ul class="list-disc list-inside text-sm space-y-2">
                                 <li><strong>{{ __('عنوان جلسه:') }}</strong> {{ $selectedMeeting->title }}</li>
                                 <li><strong>{{ __('تاریخ:') }}</strong> {{ $selectedMeeting->date }}</li>

@@ -24,10 +24,8 @@ class MeetingUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required','string'],
-            'scriptorium' => ['nullable','string','max:255'],
-            'scriptorium_department' => ['nullable','string','min:5','max:255'],
-            'scriptorium_position' => ['nullable','string','max:255'],
+            'title' => ['required','string','max:255'],
+            'scriptorium' => ['nullable'],
             'boss' => ['nullable'],
             'location' => ['required','string','min:5','max:30'],
             'year' => ['required'],

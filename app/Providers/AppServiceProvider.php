@@ -81,9 +81,7 @@ class AppServiceProvider extends ServiceProvider
         // Gate for the scriptorium to handle only his meeting
         Gate::define('handle-own-meeting', function (User $user, Meeting $meeting) {
             $userInfo = $user->user_info;
-            return $userInfo
-                && $userInfo->full_name === $meeting->scriptorium
-                && $userInfo->position === $meeting->scriptorium_position;
+            return $user->id === $meeting->scriptorium_id && $userInfo;
         });
 
         Gate::define('has-permission-and-role', function ($user, UserPermission|string $permission, UserRole|string $role = null) {

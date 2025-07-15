@@ -19,45 +19,45 @@ class MeetingsExport implements FromCollection, WithHeadings
     public function collection()
     {
         return $this->meetings->values()->map(function ($meeting, $index) {
+            // Safely retrieve scriptorium info
+            $scriptoriumUserInfo = optional($meeting->scriptorium)->user_info;
+            $scriptoriumName = optional($scriptoriumUserInfo)->full_name ?? '—';
+            $scriptoriumDepartment = optional($scriptoriumUserInfo->department)->department_name ?? '—';
+            $scriptoriumPosition = optional($scriptoriumUserInfo)->position ?? '—';
 
-            // Get full names of participants (including all meeting user info)
+            // Safely retrieve boss info
+            $bossUserInfo = optional($meeting->boss)->user_info;
+            $bossName = optional($bossUserInfo)->full_name ?? '—';
+
+            // Participants: exclude guests and boss
             $participants = $meeting->meetingUsers
-                ->filter(fn($mu) => !$mu->is_guest) // Only include non-guests
-                ->map(function ($mu) {
-                    return optional($mu->user)->user_info
-                        ? optional($mu->user->user_info)->full_name
-                        : null;
-                })
+                ->filter(fn($mu) => !$mu->is_guest && $mu->user_id !== $meeting->boss_id)
+                ->map(fn($mu) => optional($mu->user->user_info)->full_name)
                 ->filter()
                 ->join(', ');
 
-
-
-            // Inner guests (from meeting_users with is_guest = true)
+            // Inner Guests (users marked as guests)
             $innerGuests = $meeting->meetingUsers
                 ->filter(fn($mu) => $mu->is_guest)
-                ->map(function ($mu) {
-                    return optional($mu->user)->user_info ? optional($mu->user->user_info)->full_name : null;
-                })
+                ->map(fn($mu) => optional($mu->user->user_info)->full_name)
                 ->filter()
                 ->join(', ');
 
-            // Outer guests (from guest JSON field)
+            // Outer Guests (from guest JSON)
             $outerGuests = collect(is_array($meeting->guest) ? $meeting->guest : json_decode($meeting->guest, true))
                 ->filter()
                 ->join(', ');
 
-
             return [
                 'ردیف' => $index + 1,
-                'نام دبیر' => $meeting->scriptorium,
-                'نام رئیس جلسه' => $meeting->boss,
-                'واحد سازمانی' => $meeting->scriptorium_department,
+                'نام دبیر' => $scriptoriumName,
+                'نام رئیس جلسه' => $bossName,
+                'واحد متولی جلسه' => $scriptoriumDepartment,
                 'موضوع جلسه' => $meeting->title,
                 'تاریخ برگزاری' => $meeting->date,
                 'مکان' => $meeting->location,
                 'زمان' => $meeting->time,
-                'سمت سازمانی' => $meeting->scriptorium_position,
+                'سمت سازمانی' => $scriptoriumPosition,
                 'واحد برگزار کننده' => $meeting->unit_held,
                 'اعضای جلسه' => $participants,
                 'مهمان داخلی' => $innerGuests,
@@ -65,11 +65,12 @@ class MeetingsExport implements FromCollection, WithHeadings
             ];
         });
     }
+
     public function headings(): array
     {
         return [
-            'ردیف', 'نام دبیر','نام رئیس جلسه' , 'واحد سازمانی', 'موضوع جلسه', 'تاریخ برگزاری', 'مکان','زمان',
-            'سمت سازمانی', 'واحد برگزار کننده', 'اعضای جلسه','مهمان داخلی', 'مهمان خارجی',
+            'ردیف', 'نام دبیر', 'نام رئیس جلسه', 'واحد متولی جلسه', 'موضوع جلسه', 'تاریخ برگزاری', 'مکان', 'زمان',
+            'سمت سازمانی', 'واحد برگزار کننده', 'اعضای جلسه', 'مهمان داخلی', 'مهمان خارجی',
         ];
     }
 }

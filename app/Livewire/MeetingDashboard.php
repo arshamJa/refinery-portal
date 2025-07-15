@@ -126,40 +126,35 @@ class MeetingDashboard extends Component
     #[Computed]
     public function meetings()
     {
-        // Get the filters passed via request or Livewire properties
         $filters = [
             'search' => $this->search,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'statusFilter' => $this->statusFilter,
-            'scriptoriumFilter' => $this->scriptoriumFilter
+            'scriptoriumFilter' => $this->scriptoriumFilter,
         ];
         return $this->baseFilteredMeetingQuery($filters)->paginate(5);
     }
-
     public function baseFilteredMeetingQuery($filters)
     {
-        // Extract filters with trimming applied
-        $search = trim($filters['search'] ?? '');  // Get the search value
-        $startDate = trim($filters['start_date'] ?? '');  // Get the start date value
-        $endDate = trim($filters['end_date'] ?? '');  // Get the end date value
-        $statusFilter = $filters['statusFilter'] ?? '';  // Get the status filter value
+        $search = trim($filters['search'] ?? '');
+        $startDate = trim($filters['start_date'] ?? '');
+        $endDate = trim($filters['end_date'] ?? '');
+        $statusFilter = $filters['statusFilter'] ?? '';
         $scriptoriumFilter = $filters['scriptoriumFilter'] ?? 'all';
         $userId = auth()->id();
-        $userFullName = auth()->user()->user_info->full_name;
 
         return Meeting::with([
-            'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,replacement',
-            'meetingUsers.user:id',
-            'meetingUsers.user.user_info:id,user_id,full_name',
-            'meetingUsers.user.user_info.department:id,department_name',
+            'scriptorium.user_info.department',
+            'boss.user_info.department',
+            'meetingUsers.user.user_info.department',
         ])
             ->select([
-                'id', 'title', 'scriptorium_department', 'scriptorium', 'boss', 'location',
-                'date', 'time','end_time','status', 'scriptorium_position', 'unit_held'
+                'id', 'title', 'scriptorium_id', 'boss_id', 'location',
+                'date', 'time', 'end_time', 'status', 'unit_held', 'treat', 'guest'
             ])
-            ->where(function ($query) use ($userId, $userFullName) {
-                $query->where('scriptorium', $userFullName)
+            ->where(function ($query) use ($userId) {
+                $query->where('scriptorium_id', $userId)
                     ->orWhereHas('meetingUsers', function ($q) use ($userId) {
                         $q->where('user_id', $userId);
                     });
@@ -167,26 +162,29 @@ class MeetingDashboard extends Component
             ->when(!empty($search), function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('scriptorium_department', 'like', "%{$search}%")
-                        ->orWhere('scriptorium', 'like', "%{$search}%")
                         ->orWhere('location', 'like', "%{$search}%")
                         ->orWhere('date', 'like', "%{$search}%")
-                        ->orWhere('time', 'like', "%{$search}%");
+                        ->orWhere('time', 'like', "%{$search}%")
+                        ->orWhereHas('scriptorium.user_info', function ($sub) use ($search) {
+                            $sub->where('full_name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('scriptorium.user_info.department', function ($sub) use ($search) {
+                            $sub->where('department_name', 'like', "%{$search}%");
+                        });
                 });
             })
-            ->when($statusFilter !== '', fn($query) => $query->where('status', $statusFilter))
-            ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
-                $query->dateRange($startDate, $endDate);  // Assuming dateRange is a scope or method for filtering dates
+            ->when($statusFilter !== '', function ($query) use ($statusFilter) {
+                $query->where('status', $statusFilter);
             })
-//            this mine comes from the select value
-            ->when($scriptoriumFilter === 'mine', function ($query) {
-                $query->where('scriptorium', auth()->user()->user_info->full_name); // Assuming the scriptorium is the authenticated user's name
+            ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('date', [$startDate, $endDate]);
+            })
+            ->when($scriptoriumFilter === 'mine', function ($query) use ($userId) {
+                $query->where('scriptorium_id', $userId);
             });
     }
-
     public function exportExcel()
     {
-        // Get the filters from the request
         $filters = [
             'search' => $this->search,
             'start_date' => $this->start_date,
@@ -194,19 +192,16 @@ class MeetingDashboard extends Component
             'statusFilter' => $this->statusFilter,
             'scriptoriumFilter' => $this->scriptoriumFilter
         ];
-
-        // Get the filtered meetings based on the provided filters
         $meetings = $this->baseFilteredMeetingQuery($filters)
             ->with([
-                'meetingUsers:id,meeting_id,user_id,is_guest,is_present,reason_for_absent,replacement',
-                'meetingUsers.user:id',
-                'meetingUsers.user.user_info:id,user_id,full_name,department_id',
-                'meetingUsers.user.user_info.department:id,department_name',
+                'scriptorium.user_info.department',
+                'boss.user_info.department',
+                'meetingUsers.user.user_info.department',
             ])
-            ->get();// Get all relevant data including meeting users and their associated info
-        // Export the filtered meetings to Excel
+            ->get();
         return Excel::download(new MeetingsExport($meetings), 'meetings.xlsx');
     }
+
 
     public $selectedMeeting;
 
@@ -216,22 +211,18 @@ class MeetingDashboard extends Component
             'meetingUsers' => function ($query) {
                 $query->select(
                     'id', 'meeting_id', 'user_id', 'is_guest', 'is_present', 'reason_for_absent', 'replacement'
-                )
-                    ->with([
-                        'user.user_info.department'
-                    ]);
-            }
+                )->with([
+                    'user.user_info.department'
+                ]);
+            },
+            'scriptorium.user_info.department',
+            'boss.user_info.department'
         ])
             ->select(
-                'id', 'title', 'scriptorium_department', 'scriptorium', 'location', 'date', 'time',
-                'unit_held', 'treat', 'scriptorium_position', 'guest', 'boss','status'
+                'id', 'title', 'scriptorium_id', 'location', 'date', 'time',
+                'unit_held', 'treat', 'guest', 'boss_id', 'status'
             )
             ->findOrFail($id);
-
-        $this->bossInfo = \App\Models\UserInfo::with('department')
-            ->where('full_name', $this->selectedMeeting->boss)
-            ->first();
-
 
         $this->dispatch('crud-modal', name: 'view-meeting-modal');
     }
@@ -239,7 +230,7 @@ class MeetingDashboard extends Component
 
     public function deleteMeeting($id)
     {
-        $this->selectedMeeting = Meeting::select('id', 'title', 'date', 'time','scriptorium','scriptorium_position')
+        $this->selectedMeeting = Meeting::select('id', 'title', 'date', 'time','scriptorium_id')
             ->findOrFail($id);
         $this->dispatch('crud-modal', name: 'delete-meeting-modal');
     }
