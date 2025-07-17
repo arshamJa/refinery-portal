@@ -27,7 +27,7 @@
         <ul class="w-full mt-2">
             <li class="mb-2">
                 <x-link.responsive-link wire:navigate href="{{route('dashboard')}}"
-                                        :active="request()->is('dashboard')" class="flex items-center gap-2 pr-4">
+                                        :active="request()->is('dashboard')" class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -38,7 +38,7 @@
             </li>
             <li class="mb-2">
                 <x-link.responsive-link wire:navigate href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
-                                        :active="request()->is('profile')" class="flex items-center gap-2 pr-4">
+                                        :active="request()->is('profile')" class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -50,8 +50,8 @@
             <li class="mb-2">
                 <div x-data="{ openMeeting: false }" class="w-full">
                     <button @click="openMeeting = !openMeeting"
-                            class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
-                        <div class="flex items-center gap-2">
+                            class="w-full flex items-center justify-between pl-2 pr-3 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
+                        <div class="flex items-center gap-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="size-5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -118,7 +118,7 @@
                 <li class="mb-2">
                     <div x-data="{ openReport: false }" class="w-full">
                         <button @click="openReport = !openReport"
-                                class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
+                                class="w-full flex items-center justify-between pl-2 pr-3 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
                             <div class="flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5"
@@ -178,7 +178,7 @@
             <li class="mb-2">
                 <div x-data="{ openMessage: false }" class="w-full" wire:poll.visible.60s>
                     <button @click="openMessage = !openMessage"
-                            class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
+                            class="w-full flex items-center justify-between pl-2 pr-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition ease-in-out duration-300 rounded-md relative">
                         <div class="flex items-center gap-2">
                             @if($this->messagesNotification > 0)
                                 <div class="relative flex items-center">
@@ -269,7 +269,7 @@
                 @can('admin-role')
                     <div x-data="{ openSetting: false }" class="w-full mb-4">
                         <button @click="openSetting = !openSetting"
-                                class="w-full flex items-center justify-between px-4 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition">
+                                class="w-full flex items-center justify-between pl-2 pr-3 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition">
                             <div class="flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                      viewBox="0 0 24 24"

@@ -194,7 +194,7 @@
                             </span>
                         </x-table.cell>
                         <x-table.cell class="whitespace-nowrap">
-                            @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED &&auth()->user()->user_info->full_name === $meeting->scriptorium &&auth()->user()->user_info->position === $meeting->scriptorium_position)
+                            @if($meeting->status == MeetingStatus::IS_NOT_CANCELLED && auth()->id() === $meeting->scriptorium_id)
                                 <button wire:click="startMeeting({{ $meeting->id }})"
                                         class="w-full px-4 py-2 rounded-lg text-xs font-semibold transition duration-300 ease-in-out bg-pink-500 text-white hover:bg-pink-600 hover:outline-none hover:ring-2 hover:ring-pink-500 hover:ring-offset-2">
                                     {{ __('شروع جلسه') }}
@@ -224,13 +224,13 @@
                                     <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                         {{ __('نمایش') }}
                                     </x-dropdown-link>
-                                    @if($meeting->status === \App\Enums\MeetingStatus::PENDING &&
+                                    @if($meeting->status === MeetingStatus::PENDING &&
                                             auth()->id() === $meeting->scriptorium_id)
                                         <x-dropdown-link href="{{ route('meeting.edit', $meeting->id) }}">
                                             {{ __('ویرایش') }}
                                         </x-dropdown-link>
                                     @endif
-                                    @if(($meeting->status === \App\Enums\MeetingStatus::PENDING || $meeting->status === \App\Enums\MeetingStatus::IS_CANCELLED) &&
+                                    @if(($meeting->status === MeetingStatus::PENDING || $meeting->status === MeetingStatus::IS_CANCELLED) &&
                                         auth()->id() === $meeting->scriptorium_id)
                                         <x-dropdown-link wire:click.prevent="deleteMeeting({{ $meeting->id }})"
                                                          class="text-red-600">
@@ -269,7 +269,7 @@
 
             <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-10">
 
-{{--                 Meeting Title--}}
+                {{--                 Meeting Title--}}
                 <div class="flex items-center justify-between border-b pb-4">
                     <div>
                         <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $selectedMeeting->title }}</h2>
@@ -282,17 +282,31 @@
                         </svg>
                     </a>
                 </div>
-{{--                 Meeting Info--}}
+                {{--                 Meeting Info--}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[15px]">
-                    <div class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
-                        <div><strong>{{ __('رئیس جلسه:') }}</strong>{{ $selectedMeeting->boss->user_info->full_name ?? '---' }}</div>
-                        <div><strong>{{ __('واحد رئیس:') }}</strong>{{ $selectedMeeting->boss->user_info->department->department_name ?? '---' }}</div>
-                        <div><strong>{{ __('سمت رئیس:') }}</strong>{{ $selectedMeeting->boss->user_info->position ?? '---' }}</div>
+                    <div
+                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div>
+                            <strong>{{ __('رئیس جلسه:') }}</strong>{{ $selectedMeeting->boss->user_info->full_name ?? '---' }}
+                        </div>
+                        <div>
+                            <strong>{{ __('واحد رئیس:') }}</strong>{{ $selectedMeeting->boss->user_info->department->department_name ?? '---' }}
+                        </div>
+                        <div>
+                            <strong>{{ __('سمت رئیس:') }}</strong>{{ $selectedMeeting->boss->user_info->position ?? '---' }}
+                        </div>
                     </div>
-                    <div class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
-                        <div><strong>{{ __('دبیر جلسه:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->full_name ?? '---' }}</div>
-                        <div><strong>{{ __('واحد دبیر:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->department->department_name ?? '---' }}</div>
-                        <div><strong>{{ __('سمت دبیر:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->position ?? '---' }}</div>
+                    <div
+                        class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+                        <div>
+                            <strong>{{ __('دبیر جلسه:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->full_name ?? '---' }}
+                        </div>
+                        <div>
+                            <strong>{{ __('واحد دبیر:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->department->department_name ?? '---' }}
+                        </div>
+                        <div>
+                            <strong>{{ __('سمت دبیر:') }}</strong>{{ $selectedMeeting->scriptorium->user_info->position ?? '---' }}
+                        </div>
                     </div>
                     <div
                         class="p-4 rounded-xl shadow-md space-y-2 text-sm border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
@@ -308,7 +322,7 @@
                         </div>
                     </div>
                 </div>
-{{--                 Participants--}}
+                {{--                 Participants--}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('اعضای جلسه') }}</h3>
                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -334,7 +348,7 @@
                         @endforeach
                     </div>
                 </div>
-{{--                 Inner Guests--}}
+                {{--                 Inner Guests--}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('مهمانان درون سازمانی') }}</h3>
                     @if ($innerGuests->isNotEmpty())
@@ -364,7 +378,7 @@
                         <p class="text-gray-500">{{ __('مهمان درون سازمانی وجود ندارد') }}</p>
                     @endif
                 </div>
-{{--                 Outer Guests--}}
+                {{--                 Outer Guests--}}
                 <div>
                     <h3 class="text-xl font-bold border-b pb-2 mb-4">{{ __('مهمانان برون سازمانی') }}</h3>
                     @if (!empty($guests))
@@ -384,9 +398,9 @@
                         <p class="text-gray-500">{{ __('مهمان برون سازمانی وجود ندارد') }}</p>
                     @endif
                 </div>
-{{--                 Buttons--}}
-                @if($selectedMeeting->status === MeetingStatus::PENDING)
-                    <div class="flex justify-between gap-4 pt-6">
+                {{--                 Buttons--}}
+                <div class="flex justify-between gap-4 pt-6">
+                    @if($selectedMeeting->status === MeetingStatus::PENDING)
                         @can('handle-own-meeting',$meeting)
                             <div>
                                 <x-primary-button wire:click="acceptMeeting({{$selectedMeeting->id}})" class="ml-2">
@@ -397,15 +411,16 @@
                                 </x-danger-button>
                             </div>
                         @endcan
-                        <div>
-                            <a href="{{route('dashboard.meeting')}}">
-                                <x-secondary-button>
-                                    {{ __('بستن') }}
-                                </x-secondary-button>
-                            </a>
-                        </div>
+                    @endif
+                    <div>
+                        <a href="{{route('dashboard.meeting')}}">
+                            <x-secondary-button>
+                                {{ __('بستن') }}
+                            </x-secondary-button>
+                        </a>
                     </div>
-                @endif
+                </div>
+
             </div>
         @endif
     </x-modal>
@@ -422,7 +437,7 @@
                     </div>
                     <div class="px-6 py-4" dir="rtl">
                         <div class="mt-4 text-sm text-gray-600">
-{{--                                                     Show a bit of meeting info for confirmation--}}
+                            {{--                                                     Show a bit of meeting info for confirmation--}}
                             <ul class="list-disc list-inside text-sm space-y-2">
                                 <li><strong>{{ __('عنوان جلسه:') }}</strong> {{ $selectedMeeting->title }}</li>
                                 <li><strong>{{ __('تاریخ:') }}</strong> {{ $selectedMeeting->date }}</li>

@@ -16,10 +16,13 @@ class SanitizeInputMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $input = $request->all();
-        array_walk_recursive($input, function (&$item) { // Changed $input to $item for clarity
-            $item = strip_tags($item); // Directly modify the $item (passed by reference)
+        array_walk_recursive($input, function (&$item) {
+            // Strip HTML tags
+            $item = strip_tags($item);
+            // Replace multiple whitespace with single space and trim
+            $item = preg_replace('/\s+/', ' ', trim($item));
         });
-        $request->merge($input); // Now this will merge the sanitized input
+        $request->merge($input);
         return $next($request);
     }
 }

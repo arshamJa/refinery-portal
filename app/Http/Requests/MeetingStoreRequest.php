@@ -25,7 +25,7 @@ class MeetingStoreRequest extends FormRequest
     {
         return [
             'title' => ['required','string','max:255'],
-            'scriptorium' => ['required'],
+//            'scriptorium' => ['required'],
             'boss' => ['required'],
             'location' => ['required','string','max:255'],
             'year' => ['required'],
@@ -33,7 +33,7 @@ class MeetingStoreRequest extends FormRequest
             'day' => ['required'],
             'time' => ['required', new Time()],
             'unit_held' => ['required','string','max:255'],
-            'treat' => ['required','boolean'],
+            'treat' => ['required'],
             'guest' => ['nullable'],
             'holders' => ['required']
         ];

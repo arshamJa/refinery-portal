@@ -141,32 +141,32 @@ class Notification extends Model
             }
         }
 
-        if ($this->type === 'MeetingInvitation') {
-            $meeting = $this->notifiable;
-
-            if ($meeting) {
-                // Get recipient's full name
-                $recipientName = optional(optional($this->recipient)->user_info)->full_name;
-
-                // Check if the recipient is the boss
-                if ($recipientName && $recipientName === $meeting->boss) {
-                    return "شما به عنوان رییس به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
-                }
-
-                // Check if recipient is a guest
-                $isGuest = DB::table('meeting_users')
-                    ->where('meeting_id', $meeting->id)
-                    ->where('user_id', $this->recipient_id)
-                    ->where('is_guest', true)
-                    ->exists();
-
-                if ($isGuest) {
-                    return "شما به عنوان مهمان به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
-                }
-                // Default (regular invitee)
-                return "شما به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
-            }
-        }
+//        if ($this->type === 'MeetingInvitation') {
+//            $meeting = $this->notifiable;
+//            if ($meeting) {
+//                // Get recipient's user ID as int (assuming recipient has user_id property)
+//                $recipientUserId = (int) optional($this->recipient)->user_id;
+//
+//                // Compare with meeting boss_id as int
+//                if ($recipientUserId && $recipientUserId === (int) $meeting->boss_id) {
+//                    return "شما به عنوان رئیس به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
+//                }
+//
+//                // Check if recipient is a guest
+//                $isGuest = DB::table('meeting_users')
+//                    ->where('meeting_id', $meeting->id)
+//                    ->where('user_id', $recipientUserId)
+//                    ->where('is_guest', true)
+//                    ->exists();
+//
+//                if ($isGuest) {
+//                    return "شما به عنوان مهمان به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
+//                }
+//
+//                // Default (regular invitee)
+//                return "شما به جلسه‌ای با عنوان \"{$meeting->title}\" در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌اید.";
+//            }
+//        }
 
         if (auth()->id() === $this->sender_id) {
             $meeting = $this->notifiable;
@@ -212,15 +212,24 @@ class Notification extends Model
         if ($this->type === 'ReplacementForMeeting') {
             $meeting = $this->notifiable;
             if ($meeting) {
-                $recipient = \App\Models\User::find($this->recipient_id);
-                $fullName = $recipient?->user_info?->full_name ?? 'نامشخص';
-                return 'شما این جلسه را نپذیرفته‌اید و این فرد جانشین شماست: ' . $fullName;
+                // Only show to the user who rejected (sender)
+                if (auth()->id() === $this->sender_id) {
+                    $recipientUser = \App\Models\User::find($this->recipient_id);
+                    $replacementName = $recipientUser?->user_info?->full_name ?? 'نامشخص';
+                    return "شما دعوت به جلسه «{$meeting->title}» برای تاریخ {$meeting->date} و ساعت {$meeting->time} را رد کردید. جانشین شما: {$replacementName}.";
+                }
             }
         }
 
-        if (in_array($this->type, ['MeetingGuestInvitation', 'MeetingInvitation'])) {
+        if (in_array($this->type, ['MeetingGuestInvitation', 'MeetingInvitation', 'MeetingBossInvitation'])) {
             $meeting = $this->notifiable;
-            $roleText = $this->type === 'MeetingGuestInvitation' ? 'به عنوان مهمان ' : '';
+            if ($this->type === 'MeetingBossInvitation') {
+                $roleText = 'به عنوان رئیس ';
+            } elseif ($this->type === 'MeetingGuestInvitation') {
+                $roleText = 'به عنوان مهمان ';
+            } else {
+                $roleText = '';
+            }
             return "این شخص {$roleText}در جلسه \"{$meeting->title}\" و در تاریخ {$meeting->date} و ساعت {$meeting->time} دعوت شده‌است.";
         }
 
@@ -310,11 +319,48 @@ class Notification extends Model
         return $newDate . ' - ' . $hour . ':' . $minute;
     }
 
+
+    public function getSenderRoleLabel(): string
+    {
+        $meeting = $this->notifiable;
+        $userId = $this->sender_id;
+
+        if (! $meeting || ! $userId) {
+            return 'نقش نامشخص';
+        }
+        // Check if sender is the boss
+        if ($meeting->boss_id === $userId) {
+            return 'رئیس';
+        }
+        // Check if sender is the scriptorium
+        if ($meeting->scriptorium_id === $userId) {
+            return 'دبیر';  // or whatever label you want for scriptorium
+        }
+        // Get all meeting users
+        $meetingUsers = $meeting->meetingUsers;
+
+        // Exclude users who are acting as replacements
+        $isReplacement = $meetingUsers->contains(fn ($mu) => $mu->replacement === $userId);
+        if ($isReplacement) {
+            return 'جانشین';
+        }
+        // Get the user's record (non-replacement only)
+        $meetingUser = $meetingUsers->firstWhere('user_id', $userId);
+        if ($meetingUser) {
+            if ((bool) $meetingUser->is_guest) {
+                return 'مهمان';
+            }
+            return 'عضو جلسه';
+        }
+        return 'نقش نامشخص';
+    }
+
     public function getTypeLabelAttributes(): array
     {
         return match ($this->type) {
             'MeetingInvitation' => ['label' => __('دعوتنامه'), 'text' => 'text-blue-600'],
             'MeetingGuestInvitation' => ['label' => __('دعوتنامه مهمان'), 'text' => 'text-teal-600'],
+            'MeetingBossInvitation' => ['label' => __('دعوتنامه رییس'), 'text' => 'text-cyan-600'],
             'ReplacementForMeeting' => ['label' => __('دعوتنامه جانشین'), 'text' => 'text-indigo-600'],
             'AcceptInvitation' => ['label' => __('تایید دعوتنامه'), 'text' => 'text-green-600'],
             'DenyInvitation' => ['label' => __('رد دعوتنامه'), 'text' => 'text-red-600'],
@@ -391,32 +437,32 @@ class Notification extends Model
         }
         return null;
     }
-    public function canShowActionButtons(): bool
-    {
-        $meetingUser = $this->getMeetingUserForCurrentUser();
-        return $meetingUser && $meetingUser->is_present === \App\Enums\MeetingUserStatus::PENDING->value;
-    }
-    public function getUserMeetingStatusLabel()
-    {
-        $meetingUser = $this->getMeetingUserForCurrentUser();
-        if (!$meetingUser) {
-            return __('---');
-        }
-        switch ($meetingUser->is_present) {
-            case \App\Enums\MeetingUserStatus::PENDING->value:
-                return null; // No label, show buttons instead
-            case \App\Enums\MeetingUserStatus::IS_PRESENT->value:
-                $replacementName = $this->getReplacementUserFullName();
-                $msg = __('شما دعوت به این جلسه را پذیرفتید');
-                if ($replacementName) {
-                    $msg .= ' و آقا/خانم ' . $replacementName . ' به عنوان جانشین خود انتخاب کردید';
-                }
-                return $msg;
-            case \App\Enums\MeetingUserStatus::IS_NOT_PRESENT->value:
-                return __('شما دعوت به این جلسه را نپذیرفتید');
-            default:
-                return null;
-        }
-    }
+//    public function canShowActionButtons(): bool
+//    {
+//        $meetingUser = $this->getMeetingUserForCurrentUser();
+//        return $meetingUser && $meetingUser->is_present === \App\Enums\MeetingUserStatus::PENDING->value;
+//    }
+//    public function getUserMeetingStatusLabel()
+//    {
+//        $meetingUser = $this->getMeetingUserForCurrentUser();
+//        if (!$meetingUser) {
+//            return __('---');
+//        }
+//        switch ($meetingUser->is_present) {
+//            case \App\Enums\MeetingUserStatus::PENDING->value:
+//                return null; // No label, show buttons instead
+//            case \App\Enums\MeetingUserStatus::IS_PRESENT->value:
+//                $replacementName = $this->getReplacementUserFullName();
+//                $msg = __('شما دعوت به این جلسه را پذیرفتید');
+//                if ($replacementName) {
+//                    $msg .= ' و آقا/خانم ' . $replacementName . ' به عنوان جانشین خود انتخاب کردید';
+//                }
+//                return $msg;
+//            case \App\Enums\MeetingUserStatus::IS_NOT_PRESENT->value:
+//                return __('شما دعوت به این جلسه را نپذیرفتید');
+//            default:
+//                return null;
+//        }
+//    }
 
 }

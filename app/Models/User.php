@@ -127,33 +127,44 @@ class User extends Authenticatable
         }
         return $this->roles->pluck('name')->intersect($roles)->isNotEmpty();
     }
+//    public function hasPermissionTo($permission): bool
+//    {
+//        // If permission is passed as a string, get Permission model
+//        if (is_string($permission)) {
+//            $permission = Permission::where('name', $permission)->first();
+//            if ($permission === null) {
+//                return false;
+//            }
+//        }
+//        // Check direct permissions assigned to user
+//        if ($this->permissions->contains('id', $permission->id)) {
+//            return true;
+//        }
+//        // Eager load roles and their permissions if not already loaded
+//        if (!$this->relationLoaded('roles')) {
+//            $this->load('roles.permissions');
+//        }
+//        // Check permissions assigned via roles
+//        foreach ($this->roles as $role) {
+//            if ($role->hasPermissionTo($permission)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
     public function hasPermissionTo($permission): bool
     {
-        // If permission is passed as a string, get Permission model
         if (is_string($permission)) {
             $permission = Permission::where('name', $permission)->first();
             if ($permission === null) {
                 return false;
             }
         }
-        // Check direct permissions assigned to user
-        if ($this->permissions->contains('id', $permission->id)) {
-            return true;
+        if (! $this->relationLoaded('permissions')) {
+            $this->load('permissions');
         }
-        // Eager load roles and their permissions if not already loaded
-        if (!$this->relationLoaded('roles')) {
-            $this->load('roles.permissions');
-        }
-        // Check permissions assigned via roles
-        foreach ($this->roles as $role) {
-            if ($role->hasPermissionTo($permission)) {
-                return true;
-            }
-        }
-        return false;
+        return $this->permissions->contains('id', $permission->id);
     }
-
-
     // use this for checking which user has a specific permission
     function userHasPermission($permission): bool
     {
@@ -169,9 +180,13 @@ class User extends Authenticatable
     {
         $this->permissions()->detach($permission);
     }
+//    public function getAllPermissions(): BelongsToMany
+//    {
+//        return $this->permissions()->with('roles.permissions');
+//    }
     public function getAllPermissions(): BelongsToMany
     {
-        return $this->permissions()->with('roles.permissions');
+        return $this->permissions();
     }
 
 

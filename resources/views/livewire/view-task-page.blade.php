@@ -58,27 +58,22 @@
         <div id="meeting-info"
              class="grid grid-cols-2 gap-x-6 gap-y-2 bg-gray-50 border border-gray-300 rounded-md p-4 text-gray-700 text-sm print:text-[16px] print:leading-[1.4] print:grid print:grid-cols-2 print:gap-2 print:border print:border-gray-400">
             <div><strong>{{ __('واحد/کمیته: ') }}</strong><span>{{ $this->meetings->unit_held }}</span></div>
-            <div><strong>{{ __('تهیه کننده(دبیرجلسه): ') }}</strong><span>{{ $this->meetings->scriptorium }}</span>
-            </div>
-            <div><strong>{{ __('رئیس جلسه: ') }}</strong><span>{{ $this->meetings->boss }}</span></div>
-            <div>
-                <strong>{{ __('پیوست: ') }}</strong><span>{{ $this->meetings->tasks->flatMap->taskUsers->flatMap->taskUserFiles->count() > 0 ? 'دارد' : 'ندارد' }}</span>
-            </div>
+            <div><strong>{{ __('تهیه کننده(دبیرجلسه): ') }}</strong><span>{{ $this->meetings->scriptorium?->user_info?->full_name }}</span></div>
+            <div><strong>{{ __('رئیس جلسه: ') }}</strong><span>{{  $this->meetings->boss?->user_info?->full_name }}</span></div>
+            <div><strong>{{ __('پیوست: ') }}</strong><span>{{ $this->meetings->tasks->flatMap->taskUsers->flatMap->taskUserFiles->count() > 0 ? 'دارد' : 'ندارد' }}</span></div>
             <div><strong>{{ __('تاریخ جلسه: ') }}</strong><span>{{ $this->meetings->date }}</span></div>
-            <div><strong>{{ __('زمان جلسه: ') }}</strong><span>{{ $this->meetings->time }}@if($this->meetings->end_time)
-                        - {{ $this->meetings->end_time }}
-                    @endif</span></div>
+            <div><strong>{{ __('زمان جلسه: ') }}</strong><span>{{ $this->meetings->time }}@if($this->meetings->end_time)- {{ $this->meetings->end_time }}@endif</span></div>
             <div><strong>{{ __('مکان جلسه: ') }}</strong><span>{{ $this->meetings->location }}</span></div>
             <div><strong>{{ __('موضوع جلسه: ') }}</strong><span>{{ $this->meetings->title }}</span></div>
             <div class="col-span-2 print:col-span-2"><strong>{{ __('حاضرین: ') }}</strong>
                 <span>
-                    @foreach ($this->employees as $employee)
-                        {{ $employee->user->user_info->full_name }}{{ !$loop->last ? ' -' : '' }}
+                    @foreach ($this->participants as $participant)
+                        {{ $participant['full_name'] }}{{ !$loop->last ? ' -' : '' }}
                     @endforeach
                 </span>
             </div>
         </div>
-        @if(auth()->user()->user_info->full_name === $this->meetings->scriptorium && auth()->user()->user_info->position === $this->meetings->scriptorium_position)
+        @if(auth()->id() === $this->meetings->scriptorium_id)
             <div class="flex justify-end items-center gap-4">
                 @if( $this->meetings->status == MeetingStatus::IS_IN_PROGRESS)
                     @if (!$this->allTasksLocked)
@@ -101,8 +96,7 @@
             </div>
             @if (!$this->allTasksLocked)
                 <form action="{{route('tasks.store', $this->meetings->id)}}" method="post"
-                      class="border-t border-b py-3"
-                      enctype="multipart/form-data">
+                      class="border-t border-b py-3" enctype="multipart/form-data">
                     @csrf
                     <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 mt-4 pb-2">
                         {{__('درج بند جدید')}}
@@ -110,43 +104,87 @@
                     <div class=" space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <x-input-label for="holders" class="mb-2"
-                                               :value="__('اقدام کننده')"/>
-                                <div class="custom-select">
-                                    <div class="select-box">
-                                        <input type="text" class="tags_input" multiple name="holders" hidden>
-                                        <div class="selected-options"></div>
-                                        <div class="arrow">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                 stroke-width="1.5"
-                                                 stroke="currentColor" class="size-4">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                                            </svg>
+                                {{--                                <x-input-label for="holders" class="mb-2"--}}
+                                {{--                                               :value="__('اقدام کننده')"/>--}}
+                                {{--                                <div class="custom-select">--}}
+                                {{--                                    <div class="select-box">--}}
+                                {{--                                        <input type="text" class="tags_input" multiple name="holders" hidden>--}}
+                                {{--                                        <div class="selected-options"></div>--}}
+                                {{--                                        <div class="arrow">--}}
+                                {{--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
+                                {{--                                                 stroke-width="1.5"--}}
+                                {{--                                                 stroke="currentColor" class="size-4">--}}
+                                {{--                                                <path stroke-linecap="round" stroke-linejoin="round"--}}
+                                {{--                                                      d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>--}}
+                                {{--                                            </svg>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                    <div class="options">--}}
+                                {{--                                        <div class="option-search-tags">--}}
+                                {{--                                            <input type="text" class="search-tags" placeholder="جست و جو ...">--}}
+                                {{--                                            <button type="button" class="clear">--}}
+                                {{--                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
+                                {{--                                                     stroke-width="1.5"--}}
+                                {{--                                                     stroke="currentColor" class="size-4">--}}
+                                {{--                                                    <path stroke-linecap="round" stroke-linejoin="round"--}}
+                                {{--                                                          d="M6 18 18 6M6 6l12 12"/>--}}
+                                {{--                                                </svg>--}}
+                                {{--                                            </button>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>--}}
+                                {{--                                        @foreach($this->employees as $employee)--}}
+                                {{--                                            <div class="option" data-value="{{$employee->user_id}}">--}}
+                                {{--                                                {{ $employee->user->user_info->full_name }}--}}
+                                {{--                                            </div>--}}
+                                {{--                                        @endforeach--}}
+                                {{--                                        <div class="no-result-message" style="display:none;">No result match</div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                </div>--}}
+                                {{--                                <x-input-error :messages="$errors->get('holders')" class="my-2"/>--}}
+                                <div id="participants_dropdown" data-users='@json($this->participants)'
+                                     class="relative w-full col-span-2"
+                                     style="direction: rtl;">
+                                    <x-input-label class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
+                                    <button id="participants-dropdown-btn" type="button"
+                                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+                                        <span id="participants-selected-text"
+                                              class="truncate">انتخاب شرکت‌کنندگان</span>
+                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+                                             stroke-width="2"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                    <div id="participants-dropdown-menu"
+                                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                                        <div class="px-4 py-2">
+                                            <input id="participants-dropdown-search" type="text" placeholder="جست و جو"
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                                        </div>
+                                        <ul id="participants-dropdown-list" class="max-h-48 overflow-auto">
+                                            @foreach ($this->participants as $participant)
+                                                <li class="option px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                                    data-value="{{ $participant['user_id'] }}">
+                                                    <div>
+                                                        <strong>{{ $participant['full_name'] }}</strong>
+                                                        <div class="text-xs text-gray-500">
+                                                            {{ $participant['position'] }}
+                                                            - {{ $participant['department_name'] }}
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                        <div id="participants-no-result" class="px-4 py-2 text-gray-500 hidden">موردی
+                                            یافت نشد
                                         </div>
                                     </div>
-                                    <div class="options">
-                                        <div class="option-search-tags">
-                                            <input type="text" class="search-tags" placeholder="جست و جو ...">
-                                            <button type="button" class="clear">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                     stroke-width="1.5"
-                                                     stroke="currentColor" class="size-4">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          d="M6 18 18 6M6 6l12 12"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>
-                                        @foreach($this->employees as $employee)
-                                            <div class="option" data-value="{{$employee->user_id}}">
-                                                {{ $employee->user->user_info->full_name }}
-                                            </div>
-                                        @endforeach
-                                        <div class="no-result-message" style="display:none;">No result match</div>
-                                    </div>
+                                    <div id="participants-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
+                                    <input type="hidden" name="holders" id="participants-hidden-input"
+                                           value='{{ json_encode(explode(",", old("holders", ""))) }}'/>
+                                    <x-input-error :messages="$errors->get('holders')" class="mt-2"/>
                                 </div>
-                                <x-input-error :messages="$errors->get('holders')" class="my-2"/>
+
                             </div>
                             <div>
                                 <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
@@ -199,7 +237,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div>
                             <x-input-label for="body" :value="__('تصمیم اتخاذ شده')" class="mb-2"/>
                             <textarea type="text" name="body" rows="4"
@@ -270,9 +307,16 @@
                                         <x-input-label :value="__('اقدام‌کننده')" class="mb-2"/>
                                         <x-select-input wire:model.defer="employee_id">
                                             <option value="">{{ __('انتخاب کنید') }}</option>
-                                            @foreach($this->employees as $employee)
+                                            {{--                                            @foreach($this->employees as $employee)--}}
+                                            {{--                                                <option--}}
+                                            {{--                                                    value="{{ $employee->user_id }}">{{ $employee->user->user_info->full_name }}</option>--}}
+                                            {{--                                            @endforeach--}}
+                                            @foreach ($this->participants as $participant)
                                                 <option
-                                                    value="{{ $employee->user_id }}">{{ $employee->user->user_info->full_name }}</option>
+                                                    value="{{ $participant['user_id'] }}">
+                                                    {{ $participant['full_name'] }} - {{ $participant['position'] }}
+                                                    - {{ $participant['department_name'] }}
+                                                </option>
                                             @endforeach
                                         </x-select-input>
                                         <x-input-error :messages="$errors->get('employee_id')" class="mt-2"/>
@@ -464,7 +508,7 @@
                                     {{-- Task Body --}}
                                     <td class="px-4 py-2 border-r border-gray-300 relative" rowspan="{{ $rowspan }}">
                                         <span class="block text-gray-700">{{ $task->body }}</span>
-                                        @if(auth()->user()->user_info->full_name === $task->meeting->scriptorium && auth()->user()->user_info->position === $task->meeting->scriptorium_position)
+                                        @if(auth()->id() === $task->meeting->scriptorium_id)
                                             @if (!$this->allTasksLocked)
                                                 <x-secondary-button class="absolute bottom-2 left-2"
                                                                     wire:click="openEditTaskModal({{ $task->id }})">
@@ -544,7 +588,6 @@
                                                 {{__('اقدام تکمیل شد')}}
                                         </span>
                                     @else
-
                                         @can('participantTask',$taskUser)
                                             @if($taskUser->task_status === TaskStatus::PENDING)
                                                 <x-accept-button class="inline-flex justify-center w-full mb-2"
@@ -556,7 +599,8 @@
                                                     {{ __('رد') }}
                                                 </x-cancel-button>
                                             @elseif($taskUser->task_status === TaskStatus::ACCEPTED)
-                                                <x-secondary-button class="whitespace-nowrap" wire:click="showTaskForm({{ $taskUser->id }})">
+                                                <x-secondary-button class="whitespace-nowrap"
+                                                                    wire:click="showTaskForm({{ $taskUser->id }})">
                                                     {{ __('انجام اقدام') }}
                                                 </x-secondary-button>
                                             @elseif($taskUser->task_status === TaskStatus::IS_COMPLETED)
@@ -882,7 +926,6 @@
             @endcan
         @endif
     </x-modal>
-
 
     @if (!$this->allTasksLocked)
         {{--          Modal for scriptorium to finish the meeting --}}

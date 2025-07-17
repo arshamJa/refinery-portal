@@ -56,7 +56,7 @@
             </span>
         </a>
         <span
-           class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white shadow-lg flex gap-3 items-center justify-start pointer-events-none p-4 rounded-lg">
+            class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white shadow-lg flex gap-3 items-center justify-start pointer-events-none p-4 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="size-5">
                 <path stroke-linecap="round"
@@ -128,7 +128,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده(دبیر/کاربر)', 'متن',
+                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده', 'متن',
 // 'وضعیت جلسه'
  'اقدامات','وضعیت پیام'] as $th)
                         <x-table.heading
@@ -154,7 +154,9 @@
                         </x-table.cell>
                         <x-table.cell
                             class="whitespace-nowrap">{{ $notification->getNotificationDateTime() }}</x-table.cell>
-                        <x-table.cell>{{ $notification->sender->user_info->full_name ?? 'N/A' }}</x-table.cell>
+                        <x-table.cell>{{ $notification->sender->user_info->full_name ?? 'N/A' }}
+                            <span class="text-sm text-gray-500">({{ $notification->getSenderRoleLabel() }})</span>
+                        </x-table.cell>
                         <x-table.cell class="whitespace-normal break-words max-w-xs">
                             {{ $notification->getNotificationMessage() }}
                         </x-table.cell>
@@ -165,11 +167,10 @@
                         {{--                                                        </span>--}}
                         {{--                                                    </x-table.cell>--}}
                         <x-table.cell class="whitespace-nowrap">
-                            @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation' || $notification->type === 'ReplacementForMeeting')
+                            @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation' || $notification->type === 'MeetingBossInvitation' || $notification->type === 'ReplacementForMeeting')
+                                {{-- Handle meeting invitation responses --}}
                                 @php
                                     $meeting = $notification->notifiable;
-
-                                    // Get a single MeetingUser record (not a collection)
                                     $meetingUser = MeetingUser::where('user_id', auth()->id())
                                                     ->where('meeting_id', $meeting->id)
                                                     ->first();
@@ -193,37 +194,29 @@
                                             </x-cancel-button>
                                         </div>
                                     @elseif ($meetingUser->is_present === MeetingUserStatus::IS_PRESENT->value)
-                                        <span class="text-green-600 font-bold">
-                                                {{ __('شما دعوت به این جلسه را پذیرفتید') }}
-                                            </span>
+                                        <span
+                                            class="text-green-600 font-bold">{{ __('شما دعوت به این جلسه را پذیرفتید') }}</span>
                                         @if ($replacementUserFullName)
-                                            <span class="text-green-700">
-                                                {{ __('و آقا/خانم') }} {{ $replacementUserFullName }} {{ __('به عنوان جانشین خود انتخاب کردید') }}
-                                            </span>
+                                            <span
+                                                class="text-green-700">{{ __('و آقا/خانم') }} {{ $replacementUserFullName }} {{ __('به عنوان جانشین خود انتخاب کردید') }}</span>
                                         @endif
                                     @elseif ($meetingUser->is_present === MeetingUserStatus::IS_NOT_PRESENT->value)
                                         <span
                                             class="text-red-600 font-bold">{{ __('شما دعوت به این جلسه را نپذیرفتید') }}</span>
                                     @endif
-                                @else
-                                    <span
-                                        class="text-gray-400 text-sm italic">{{ __('وضعیت شما در این جلسه مشخص نیست') }}</span>
                                 @endif
-                            @endif
-
-                            @if ($notification->type === 'MeetingConfirmed')
-                                <span class="text-green-600 font-bold">
-                                                                        {{ __('تایید جلسه توسط دبیر') }}
-                                                                    </span>
+                            @elseif ($notification->type === 'MeetingConfirmed')
+                                <span class="text-green-500 font-bold">{{ __('تایید جلسه توسط دبیر') }}</span>
                             @elseif ($notification->type === 'MeetingCancelled')
-                                <span class="text-red-600 font-bold">
-                                                                        {{ __('لغو جلسه توسط دبیر') }}
-                                                                    </span>
-                            @elseif (($notification->isTaskRelated()))
+                                <span class="text-red-600 font-bold">{{ __('لغو جلسه توسط دبیر') }}</span>
+                            @elseif ($notification->isTaskRelated())
                                 <a href="{{ route('view.task.page', ['meeting' => $notification->notifiable_id]) }}">
                                     <x-secondary-button>{{ __('نمایش صورتجلسه') }}</x-secondary-button>
                                 </a>
+                            @else
+                                <span class="text-gray-400 text-sm italic">---</span>
                             @endif
+
                         </x-table.cell>
                         <x-table.cell class="whitespace-nowrap">
                             <div id="read-status-{{ $notification->id }}">

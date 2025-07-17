@@ -2,10 +2,8 @@
 
 namespace App\Policies;
 
-use App\Enums\TaskStatus;
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
-use App\Models\Meeting;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\User;
@@ -34,27 +32,14 @@ class TaskUserPolicy
 
     public function scriptoriumTask(User $user, TaskUser $taskUser): bool
     {
-//        $todayDate = $this->getTodayDate();
-
-        // Check if user has the "scriptorium" role
-//        $isScriptorium = $user->hasRole(UserRole::SCRIPTORIUM->value);
-
-        // Normalize both sides (trim and strtolower to avoid casing and whitespace issues)
-        $userFullName = trim(strtolower($user->user_info->full_name));
-        $userPosition = trim(strtolower($user->user_info->position));
-        $meetingFullName = trim(strtolower($taskUser->task->meeting->scriptorium));
-        $meetingPosition = trim(strtolower($taskUser->task->meeting->scriptorium_position));
-        $isAssignedScriptorium = $userFullName === $meetingFullName && $userPosition === $meetingPosition;
-
-        // Check if task has not been filled by scriptorium yet
+        $meeting = $taskUser->task->meeting;
+        // Check if the user has the SCRIPTORIUM role
+        $isScriptorium = $user->hasPermissionTo(UserPermission::SCRIPTORIUM_PERMISSIONS->value);
+        // Check if the user is the assigned scriptorium based on meeting.scriptorium_id
+        $isAssignedScriptorium = $user->id === $meeting->scriptorium_id;
+        // Check if the task has not been filled in yet
         $isTaskEmpty = trim($taskUser->task->body_task) === '';
-
-        // Check if the task's time_out has passed
-//        $isAfterTimeOut = $todayDate >= $task->time_out;
-
-        return
-//            $isScriptorium &&
-            $isAssignedScriptorium && $isTaskEmpty;
+        return $isScriptorium && $isAssignedScriptorium && $isTaskEmpty;
     }
 
     public function participantTask(User $user, TaskUser $taskUser): bool

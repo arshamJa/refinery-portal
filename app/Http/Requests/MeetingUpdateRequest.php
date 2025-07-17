@@ -25,7 +25,7 @@ class MeetingUpdateRequest extends FormRequest
     {
         return [
             'title' => ['required','string','max:255'],
-            'scriptorium' => ['nullable'],
+//            'scriptorium' => ['nullable'],
             'boss' => ['nullable'],
             'location' => ['required','string','min:5','max:30'],
             'year' => ['required'],

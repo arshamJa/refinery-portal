@@ -45,8 +45,9 @@ class ViewTaskPage extends Component
 
 
     protected $loadedMeeting;
-    protected $loadedEmployees;
+//    protected $loadedEmployees;
     protected $loadedTasks;
+//    protected $loadedParticipants;
 
     public $selectedTaskFiles = [];
 
@@ -135,25 +136,14 @@ class ViewTaskPage extends Component
     public function editForm()
     {
         $validated = Validator::make(
-            [
-                'taskBody' => $this->taskBody,
-                'year' => $this->year,
-                'month' => $this->month,
-                'day' => $this->day,
+            ['taskBody' => $this->taskBody, 'year' => $this->year, 'month' => $this->month, 'day' => $this->day,
             ],
-            [
-                'taskBody' => 'nullable|string|min:5',
-                'year' => 'nullable|integer|between:1404,1430',
-                'month' => 'nullable|integer|between:1,12',
-                'day' => 'nullable|integer|between:1,31',
+            ['taskBody' => 'nullable|string|min:5', 'year' => 'nullable|integer|between:1404,1430',
+                'month' => 'nullable|integer|between:1,12', 'day' => 'nullable|integer|between:1,31',
             ],
-            [
-                'taskBody.min' => 'خلاصه مذاکره باید حداقل ۵ کاراکتر باشد.',
-                'year.integer' => 'مقدار سال نامعتبر است.',
-                'year.between' => 'سال باید بین ۱۴۰۴ تا ۱۴۳۰ باشد.',
-                'month.integer' => 'مقدار ماه نامعتبر است.',
-                'month.between' => 'ماه باید بین ۱ تا ۱۲ باشد.',
-                'day.integer' => 'مقدار روز نامعتبر است.',
+            ['taskBody.min' => 'خلاصه مذاکره باید حداقل ۵ کاراکتر باشد.', 'year.integer' => 'مقدار سال نامعتبر است.',
+                'year.between' => 'سال باید بین ۱۴۰۴ تا ۱۴۳۰ باشد.', 'month.integer' => 'مقدار ماه نامعتبر است.',
+                'month.between' => 'ماه باید بین ۱ تا ۱۲ باشد.', 'day.integer' => 'مقدار روز نامعتبر است.',
                 'day.between' => 'روز باید بین ۱ تا ۳۱ باشد.',
             ]
         )->validate();
@@ -341,23 +331,42 @@ class ViewTaskPage extends Component
         // Load once and cache inside the object
         if (!$this->loadedMeeting) {
             $this->loadedMeeting = Meeting::with([
-                'meetingUsers.user.user_info:id,user_id,full_name',
-                'tasks.user.user_info:id,user_id,full_name',
+                'scriptorium.user_info:id,user_id,full_name,position,department_id',
+                'boss.user_info:id,user_id,full_name,position,department_id',
+                'meetingUsers.user.user_info.department:id,department_name',
+                'tasks.user.user_info:id,user_id,full_name,position,department_id',
                 'tasks.taskUsers.taskUserFiles',
             ])
                 ->findOrFail($this->meeting);
         }
         return $this->loadedMeeting;
     }
+//    #[Computed]
+//    public function employees()
+//    {
+//        if (!$this->loadedEmployees) {
+//            $this->loadedEmployees = $this->meetings()->meetingUsers->where('is_guest',false);
+//        }
+//        return $this->loadedEmployees;
+//    }
     #[Computed]
-    public function employees()
+    public function participants()
     {
-        if (!$this->loadedEmployees) {
-            $this->loadedEmployees = $this->meetings()->meetingUsers->where('is_guest',false);
-        }
-        return $this->loadedEmployees;
-    }
+        $meeting = $this->meetings();
+        $bossId = $meeting->boss_id;
+        $meetingUsers = $meeting->meetingUsers
+            ->filter(fn($mu) => !$mu->is_guest && $mu->user->user_info->user_id != $bossId);
 
+        return $meetingUsers->map(function ($meetingUser) {
+            $userInfo = $meetingUser->user->user_info;
+            return [
+                'user_id' => $userInfo->user_id,
+                'full_name' => $userInfo->full_name,
+                'position' => $userInfo->position ?? '',
+                'department_name' => $userInfo->department ? $userInfo->department->department_name : '',
+            ];
+        })->values();
+    }
     #[Computed]
     public function tasks()
     {
@@ -369,12 +378,27 @@ class ViewTaskPage extends Component
     #[Computed]
     public function presentUsers()
     {
-        return $this->employees->filter(function ($employee) {
-            return $employee->is_present; // Adjust this to match your actual logic
-        })->map(function ($employee) {
-            return $employee->user;
-        });
+        $meeting = $this->meetings();
+        $bossId = $meeting->boss_id;
+        $presentUsers = $meeting->meetingUsers
+            ->filter(function ($mu) use ($bossId) {
+                return !$mu->is_guest
+                    && $mu->is_present
+                    && $mu->user->user_info->user_id != $bossId;
+            });
+        return $presentUsers->map(function ($meetingUser) {
+            return $meetingUser->user;
+        })->values();
     }
+//    #[Computed]
+//    public function presentUsers()
+//    {
+//        return $this->employees->filter(function ($employee) {
+//            return $employee->is_present; // Adjust this to match your actual logic
+//        })->map(function ($employee) {
+//            return $employee->user;
+//        });
+//    }
     #[Computed]
     public function taskUsers()
     {

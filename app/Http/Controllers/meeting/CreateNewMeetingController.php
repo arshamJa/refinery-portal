@@ -96,11 +96,12 @@ class CreateNewMeetingController extends Controller
             $newDate = $this->getCurrentDate($validated['year'], $validated['month'], $validated['day']);
 
             // Load boss and scriptorium user info
-            $userIdsToFetch = array_filter([$validated['boss'], $validated['scriptorium']]);
+//            $userIdsToFetch = array_filter([$validated['boss'], $validated['scriptorium']]);
+            $userIdsToFetch = array_filter([$validated['boss']]);
             $userInfos = UserInfo::whereIn('user_id', $userIdsToFetch)->get()->keyBy('user_id');
 
             $boss = $userInfos->get($validated['boss']);
-            $scriptorium = $userInfos->get($validated['scriptorium']);
+//            $scriptorium = $userInfos->get($validated['scriptorium']);
 
             // Normalize time format (e.g., "8" to "08:00")
             $validated['time'] = str_contains($validated['time'], ':')
@@ -114,17 +115,18 @@ class CreateNewMeetingController extends Controller
                 ]);
             }
 
-            // Create meeting with foreign keys and proper field casting
+            // Create meeting
             $meeting = Meeting::create([
                 'title' => $validated['title'],
-                'scriptorium_id' => $validated['scriptorium'],  // foreign key matches your migration
-                'boss_id' => $validated['boss'],                // foreign key matches your migration
+//                'scriptorium_id' => $validated['scriptorium'],
+                'scriptorium_id' => auth()->id(),
+                'boss_id' => $validated['boss'],
                 'location' => $validated['location'],
                 'date' => $newDate,
                 'time' => $validated['time'],
                 'unit_held' => $validated['unit_held'],
-                'treat' => (bool) $validated['treat'],          // cast boolean properly
-                'guest' => $outerGuests->isNotEmpty() ? $outerGuests->toArray() : null, // convert collection to array for JSON
+                'treat' => (bool) $validated['treat'],
+                'guest' => $outerGuests->isNotEmpty() ? $outerGuests->toArray() : null,
             ]);
 
             $meetingUserRecords = [];
@@ -161,10 +163,7 @@ class CreateNewMeetingController extends Controller
                 }
             }
 
-            // Notifications
-            $notifications = [];
-
-            // Notify boss
+            // Add boss
             if ($boss) {
                 $meetingUserRecords[] = [
                     'user_id' => $boss->user_id,
@@ -174,44 +173,37 @@ class CreateNewMeetingController extends Controller
                     'updated_at' => now(),
                 ];
                 $recipients->push((string)$boss->user_id);
-
-                $notifications[] = [
-                    'type' => 'MeetingInvitation',
-                    'data' => json_encode([
-                        'message' => 'شما به عنوان رئیس برای جلسه "' . $meeting->title .
-                            '" در تاریخ ' . $newDate . ' و ساعت ' . $validated['time'] . ' دعوت شده‌اید.',
-                    ]),
-                    'notifiable_type' => Meeting::class,
-                    'notifiable_id' => $meeting->id,
-                    'sender_id' => auth()->id(),
-                    'recipient_id' => $boss->user_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
             }
 
-            // Insert all meeting-user relationships
             MeetingUser::insert($meetingUserRecords);
 
-            // Notify other recipients
+            // Create notifications with different types
+            $notifications = [];
+
             foreach ($recipients->unique() as $recipientId) {
-                if ($boss && (string)$boss->user_id === (string)$recipientId) {
-                    continue; // Boss already notified
+                $recipientIdInt = (int)$recipientId;
+
+                if ($boss && $recipientIdInt === (int)$boss->user_id) {
+                    $type = 'MeetingBossInvitation';
+                    $message = 'شما به عنوان رئیس در جلسه: "' . $meeting->title .
+                        '" در تاریخ ' . $newDate . ' و ساعت ' . $validated['time'] . ' دعوت شده‌اید.';
+                } elseif ($innerGuestIds->contains($recipientIdInt)) {
+                    $type = 'MeetingGuestInvitation';
+                    $message = 'شما به عنوان مهمان در جلسه: ' . $meeting->title .
+                        ' در تاریخ ' . $newDate . ' و در ساعت ' . $validated['time'] . ' دعوت شده‌اید.';
+                } else {
+                    $type = 'MeetingInvitation';
+                    $message = 'شما در جلسه: ' . $meeting->title .
+                        ' در تاریخ ' . $newDate . ' و در ساعت ' . $validated['time'] . ' دعوت شده‌اید.';
                 }
 
-                $isGuest = $innerGuestIds->contains((int)$recipientId);
-
                 $notifications[] = [
-                    'type' => $isGuest ? 'MeetingGuestInvitation' : 'MeetingInvitation',
-                    'data' => json_encode([
-                        'message' => $isGuest
-                            ? 'شما به عنوان مهمان در جلسه: ' . $meeting->title . ' در تاریخ ' . $newDate . ' و در ساعت ' . $validated['time'] . ' دعوت شده‌اید'
-                            : 'شما در جلسه: ' . $meeting->title . ' در تاریخ ' . $newDate . ' و در ساعت ' . $validated['time'] . ' دعوت شده‌اید',
-                    ]),
+                    'type' => $type,
+                    'data' => json_encode(['message' => $message]),
                     'notifiable_type' => Meeting::class,
                     'notifiable_id' => $meeting->id,
                     'sender_id' => auth()->id(),
-                    'recipient_id' => $recipientId,
+                    'recipient_id' => $recipientIdInt,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -300,17 +292,17 @@ class CreateNewMeetingController extends Controller
         $originalBossId = $meeting->boss_id;
         $newBossId = $validated['boss_id'] ?? $meeting->boss_id;
 
-        $scriptoriumId = $validated['scriptorium_id'] ?? $meeting->scriptorium_id;
-        $scriptoriumPosition = $validated['scriptorium_position'] ?? $meeting->scriptorium_position;
-
-        $scriptoriumDepartment = null;
-        if ($scriptoriumId) {
-            $scriptoriumUserInfo = UserInfo::where('user_id', $scriptoriumId)->first();
-            if ($scriptoriumUserInfo) {
-                $department = Department::find($scriptoriumUserInfo->department_id);
-                $scriptoriumDepartment = $department ? $department->department_name : null;
-            }
-        }
+//        $scriptoriumId = $validated['scriptorium_id'] ?? $meeting->scriptorium_id;
+//        $scriptoriumPosition = $validated['scriptorium_position'] ?? $meeting->scriptorium_position;
+//
+//        $scriptoriumDepartment = null;
+//        if ($scriptoriumId) {
+//            $scriptoriumUserInfo = UserInfo::where('user_id', $scriptoriumId)->first();
+//            if ($scriptoriumUserInfo) {
+//                $department = Department::find($scriptoriumUserInfo->department_id);
+//                $scriptoriumDepartment = $department ? $department->department_name : null;
+//            }
+//        }
 
         // Process inner guests
         $innerGuestIds = collect(explode(',', $request->input('innerGuest', '')))
@@ -338,9 +330,8 @@ class CreateNewMeetingController extends Controller
         // Update meeting
         $meeting->update([
             'title' => $validated['title'],
-            'scriptorium_id' => $scriptoriumId,
-            'scriptorium_department' => $scriptoriumDepartment,
-            'scriptorium_position' => $scriptoriumPosition,
+//            'scriptorium_id' => $scriptoriumId,
+            'scriptorium_id' => auth()->id(),
             'boss_id' => $newBossId,
             'location' => $validated['location'],
             'date' => $newDate,
@@ -450,7 +441,6 @@ class CreateNewMeetingController extends Controller
 
         return response()->json(['status' => 'این شخص از جلسه حذف شد']);
     }
-
     public function deleteGuest(Request $request, $guestId)
     {
         // Get meeting_id and guest_id from the request

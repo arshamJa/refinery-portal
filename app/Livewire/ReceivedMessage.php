@@ -138,11 +138,14 @@ class ReceivedMessage extends Component
      */
     public function acceptMeeting($meetingId)
     {
-
         $userId = auth()->id();
 
-        $meeting = Meeting::select('id', 'title', 'date', 'time', 'scriptorium')->findOrFail($meetingId);
-        $scriptoriumUserId = UserInfo::where('full_name', $meeting->scriptorium)->value('user_id');
+        // Load meeting with scriptorium user info
+        $meeting = Meeting::with('scriptorium.user_info')
+            ->select('id', 'title', 'date', 'time', 'scriptorium_id')
+            ->findOrFail($meetingId);
+
+        $scriptoriumUserId = $meeting->scriptorium_id;
 
         // Check if user is invited
         $isInvited = DB::table('meeting_users')
@@ -165,13 +168,14 @@ class ReceivedMessage extends Component
             abort(400, 'شما قبلاً به این دعوت پاسخ داده‌اید.');
         }
 
-        DB::transaction(function () use ($meetingId, $userId, $meeting, $scriptoriumUserId) {
+        DB::transaction(function () use ($meetingId, $userId, $scriptoriumUserId) {
             DB::table('meeting_users')
                 ->where('meeting_id', $meetingId)
                 ->where('user_id', $userId)
                 ->update(['is_present' => MeetingUserStatus::IS_PRESENT->value]);
 
             $notificationMessage = 'شما دعوت به جلسه را قبول کردید.';
+
             Notification::create([
                 'type' => 'AcceptInvitation',
                 'data' => json_encode(['message' => $notificationMessage]),
@@ -180,14 +184,6 @@ class ReceivedMessage extends Component
                 'sender_id' => $userId,
                 'recipient_id' => $scriptoriumUserId,
             ]);
-//            SendNotificationJob::dispatch([
-//                'type' => 'AcceptInvitation',
-//                'data' => json_encode(['message' => 'شما دعوت به جلسه را قبول کردید.']),
-//                'notifiable_type' => Meeting::class,
-//                'notifiable_id' => $meetingId,
-//                'sender_id' => $userId,
-//                'recipient_id' => $scriptoriumUserId,
-//            ]);
         });
 
         return to_route('received.message')->with('status', 'شما دعوت به جلسه را پذیرفتید و دبیرجلسه مطلع شد');
@@ -201,14 +197,13 @@ class ReceivedMessage extends Component
             ->where('replacement', auth()->id())
             ->exists();
     }
-
-
     /**
      * @throws ValidationException
      */
     public function deny()
     {
         $allowedReasons = ['دلیل اول', 'دلیل دوم', 'دلیل سوم', 'دلیل چهارم'];
+
         $validatedReason = Validator::make(
             ['reason' => $this->reason],
             ['reason' => ['required', 'string', 'in:' . implode(',', $allowedReasons)]],
@@ -218,16 +213,15 @@ class ReceivedMessage extends Component
             ]
         )->validate();
 
-        // Block users who are already a replacement for this meeting
         if ($this->IsAlreadyRepresentative()) {
             $this->addError('checkBox', 'شما قبلاً به عنوان جانشین انتخاب شده‌اید و نمی‌توانید جانشین دیگری معرفی کنید.');
             return;
         }
 
+        // ✅ If checkbox is checked, both inputs must be validated BEFORE entering transaction
         if ($this->checkBox) {
-
             $validated = Validator::make(
-                ['full_name' => $this->full_name, 'p_code' => $this->p_code, 'checkBox' => $this->checkBox],
+                ['full_name' => $this->full_name, 'p_code' => $this->p_code],
                 [
                     'full_name' => 'required|string|max:255',
                     'p_code' => 'required|numeric|digits:6',
@@ -240,108 +234,115 @@ class ReceivedMessage extends Component
                 ]
             )->validate();
 
-            $full_name = Str::deduplicate(trim($validated['full_name']));
-
-            $userInfo = UserInfo::where('full_name', $full_name)->first();
-
-            if (!$userInfo) {
-                $this->addError('full_name', 'نام و نام خانوادگی یافت نشد');
-                return;
-            }
-
-            $userPCode = User::where('id', $userInfo->user_id)->pluck('p_code')->first();
-            if ($userPCode != $this->p_code) {
-                $this->addError('p_code', 'کد پرسنلی با نام مطابقت ندارد');
-                return;
-            }
-
-            $existingReplacement = MeetingUser::where('id', $this->meetingUserId)
-                ->where('replacement', $userInfo->user_id)
-                ->exists();
-
-            if ($existingReplacement) {
-                $this->addError('full_name', 'شخص جانشین قبلا برای این جلسه توسط کاربر دیگری انتخاب شده است');
-                return;
-            }
-            $meetingUser = MeetingUser::with('meeting:id,title,date,time,scriptorium')->findOrFail($this->meetingUserId);
-            $scriptoriumUserId = UserInfo::where('full_name', $meetingUser->meeting->scriptorium)->value('user_id');
-
-            DB::table('meeting_users')
-                ->where('id', $this->meetingUserId)
-                ->where('user_id', auth()->id())
-                ->update([
-                    'is_present' => MeetingUserStatus::IS_NOT_PRESENT->value,
-                    'replacement' => $userInfo->user_id,
-                    'reason_for_absent' => $validatedReason['reason'],
-                    'updated_at' => now(),
-                ]);
-
-            DB::table('meeting_users')->insert([
-                'meeting_id' => $meetingUser->meeting->id,
-                'user_id' => $userInfo->user_id,
-                'is_present' => MeetingUserStatus::PENDING->value,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            $notificationMessage = 'شما در این جلسه در تاریخ ' . $meetingUser->meeting->date .
-                ' و ساعت ' . $meetingUser->meeting->time . ' به عنوان جانشین از طرف ' .
-                auth()->user()->user_info->full_name . ' دعوت شده‌اید.';
-
-            Notification::create([
-                'type' => 'ReplacementForMeeting',
-                'data' => json_encode(['message' => $notificationMessage]),
-                'notifiable_type' => Meeting::class,
-                'notifiable_id' => $meetingUser->meeting->id,
-                'sender_id' => auth()->id(),
-                'recipient_id' => $userInfo->user_id,
-            ]);
-
-            $scriptoriumAcceptMessage = 'شما این دعوت را رد کردید و آقای/خانم ' .
-                $userInfo->full_name . ' به جای شما در جلسه شرکت خواهد کرد.';
-
-            Notification::create([
-                'type' => 'DenyInvitation',
-                'data' => json_encode(['message' => $scriptoriumAcceptMessage]),
-                'notifiable_type' => Meeting::class,
-                'notifiable_id' => $meetingUser->meeting->id,
-                'sender_id' => auth()->id(),
-                'recipient_id' => $scriptoriumUserId,
-            ]);
-
-        } else {
-            // Deny without selecting replacement
-            DB::table('meeting_users')
-                ->where('id', $this->meetingUserId)
-                ->where('user_id', auth()->id())
-                ->update([
-                    'is_present' => MeetingUserStatus::IS_NOT_PRESENT->value,
-                    'reason_for_absent' => $validatedReason['reason'],
-                    'updated_at' => now(),
-                ]);
-
-            $meetingUser = MeetingUser::with('meeting:id,title,date,time,scriptorium')->findOrFail($this->meetingUserId);
-            $scriptoriumUserId = UserInfo::where('full_name', $meetingUser->meeting->scriptorium)->value('user_id');
-
-            $notificationMessage = 'شما دعوت به جلسه را رد کردید.';
-
-            DB::table('notifications')->insert([
-                'type' => 'DenyInvitation',
-                'data' => json_encode(['message' => $notificationMessage]),
-                'notifiable_type' => Meeting::class,
-                'notifiable_id' => $meetingUser->meeting->id,
-                'sender_id' => auth()->id(),
-                'recipient_id' => $scriptoriumUserId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $this->full_name = Str::deduplicate(trim($validated['full_name']));
         }
 
+        if ($this->checkBox) {
+                $userInfo = UserInfo::where('full_name', $this->full_name)->first();
+
+                if (!$userInfo) {
+                    $this->addError('full_name', 'نام و نام خانوادگی یافت نشد');
+                    return;
+                }
+
+                $userPCode = User::where('id', $userInfo->user_id)->value('p_code');
+                if ($userPCode != $this->p_code) {
+                    $this->addError('p_code', 'کد پرسنلی با نام مطابقت ندارد');
+                    return;
+                }
+
+                $meetingId = $this->meetingId ?? optional(MeetingUser::find($this->meetingUserId))->meeting_id;
+
+                $existingReplacement = MeetingUser::where('meeting_id', $meetingId)
+                    ->where('replacement', $userInfo->user_id)
+                    ->exists();
+
+                if ($existingReplacement) {
+                    $this->addError('checkBox', 'شخص جانشین قبلاً برای این جلسه توسط کاربر دیگری انتخاب شده است.');
+                    return;
+                }
+
+                $meetingUser = MeetingUser::with('meeting')->findOrFail($this->meetingUserId);
+                $scriptoriumUserId = $meetingUser->meeting->scriptorium_id;
+
+                if (!$scriptoriumUserId) {
+                    $this->addError('checkBox', 'دبیر جلسه تعیین نشده است و نمی‌توان اطلاع‌رسانی کرد.');
+                    return;
+                }
+
+                DB::table('meeting_users')
+                    ->where('id', $this->meetingUserId)
+                    ->where('user_id', auth()->id())
+                    ->update([
+                        'is_present' => MeetingUserStatus::IS_NOT_PRESENT->value,
+                        'replacement' => $userInfo->user_id,
+                        'reason_for_absent' => $validatedReason['reason'],
+                        'updated_at' => now(),
+                    ]);
+
+                DB::table('meeting_users')->insert([
+                    'meeting_id' => $meetingUser->meeting->id,
+                    'user_id' => $userInfo->user_id,
+                    'is_present' => MeetingUserStatus::PENDING->value,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                Notification::create([
+                    'type' => 'ReplacementForMeeting',
+                    'data' => json_encode(['message' => 'شما در این جلسه در تاریخ ' .
+                        $meetingUser->meeting->date . ' و ساعت ' . $meetingUser->meeting->time .
+                        ' به عنوان جانشین از طرف ' . auth()->user()->user_info->full_name . ' دعوت شده‌اید.']),
+                    'notifiable_type' => Meeting::class,
+                    'notifiable_id' => $meetingUser->meeting->id,
+                    'sender_id' => auth()->id(),
+                    'recipient_id' => $userInfo->user_id,
+                ]);
+
+                Notification::create([
+                    'type' => 'DenyInvitation',
+                    'data' => json_encode(['message' => 'شما این دعوت را رد کردید و آقای/خانم ' .
+                        $userInfo->full_name . ' به جای شما در جلسه شرکت خواهد کرد.']),
+                    'notifiable_type' => Meeting::class,
+                    'notifiable_id' => $meetingUser->meeting->id,
+                    'sender_id' => auth()->id(),
+                    'recipient_id' => $scriptoriumUserId,
+                ]);
+
+            } else {
+            $meetingUser = MeetingUser::with('meeting')->findOrFail($this->meetingUserId);
+            $scriptoriumUserId = $meetingUser->meeting->scriptorium_id;
+
+            if (!$scriptoriumUserId) {
+                    $this->addError('checkBox', 'دبیر جلسه تعیین نشده است و نمی‌توان اطلاع‌رسانی کرد.');
+                    return;
+                }
+
+            DB::table('meeting_users')
+                ->where('id', $this->meetingUserId)
+                ->where('user_id', auth()->id())
+                ->update([
+                        'is_present' => MeetingUserStatus::IS_NOT_PRESENT->value,
+                        'reason_for_absent' => $validatedReason['reason'],
+                        'updated_at' => now(),
+                    ]);
+
+            Notification::create([
+                    'type' => 'DenyInvitation',
+                    'data' => json_encode(['message' => 'شما دعوت به جلسه را رد کردید.']),
+                    'notifiable_type' => Meeting::class,
+                    'notifiable_id' => $meetingUser->meeting->id,
+                    'sender_id' => auth()->id(),
+                    'recipient_id' => $scriptoriumUserId,
+                ]);
+        }
         return to_route('received.message')->with('status', 'شما دعوت به جلسه را نپذیرفتید و دبیرجلسه مطلع شد');
     }
 
+
     protected function normalizeText($text)
     {
+        $text = strip_tags($text); // Remove HTML tags
         $text = preg_replace('/\s+/', ' ', trim($text));
         $words = explode(' ', $text);
         return implode(' ', $words);

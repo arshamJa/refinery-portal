@@ -199,47 +199,70 @@
                     <input type="hidden" name="boss" id="boss-hidden-input" value="{{ old('boss') }}">
                     <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
                 </div>
-                {{-- Scriptorium Dropdown --}}
+                {{--                --}}{{-- Scriptorium Dropdown --}}
+                {{--                @php--}}
+                {{--                    $authUserId = auth()->id();--}}
+                {{--                    $authUserInfo = $users->firstWhere('user_id', $authUserId);--}}
+                {{--                @endphp--}}
+                {{--                <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2"--}}
+                {{--                     style="direction: rtl;">--}}
+                {{--                    <x-input-label class="mb-1.5" :value="__('دبیر جلسه')"/>--}}
+                {{--                    <button id="scriptorium-dropdown-btn" type="button"--}}
+                {{--                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">--}}
+                {{--                    <span id="scriptorium-selected-text" class="truncate">--}}
+                {{--                        @if ($authUserInfo)--}}
+                {{--                            <div>--}}
+                {{--                                <div><strong>{{ $authUserInfo['full_name'] }}</strong></div>--}}
+                {{--                                <div class="text-xs text-gray-500">--}}
+                {{--                                    {{ $authUserInfo['department_name'] ?? '' }} - {{ $authUserInfo['position'] ?? '' }}--}}
+                {{--                                </div>--}}
+                {{--                            </div>--}}
+                {{--                        @else--}}
+                {{--                            انتخاب کنید--}}
+                {{--                        @endif--}}
+                {{--                    </span>--}}
+                {{--                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"--}}
+                {{--                             viewBox="0 0 24 24">--}}
+                {{--                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>--}}
+                {{--                        </svg>--}}
+                {{--                    </button>--}}
+                {{--                    <div id="scriptorium-dropdown-menu"--}}
+                {{--                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">--}}
+                {{--                        <div class="px-4 py-2">--}}
+                {{--                            <input id="scriptorium-dropdown-search" type="text" placeholder="جست و جو"--}}
+                {{--                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>--}}
+                {{--                        </div>--}}
+                {{--                        <ul id="scriptorium-dropdown-list" class="max-h-48 overflow-auto"></ul>--}}
+                {{--                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>--}}
+                {{--                    </div>--}}
+                {{--                    --}}{{-- Hidden Inputs --}}
+                {{--                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-input"--}}
+                {{--                           value="{{ old('scriptorium', $authUserInfo['user_id'] ?? '') }}">--}}
+                {{--                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2"/>--}}
+                {{--                </div>--}}
                 @php
                     $authUserId = auth()->id();
                     $authUserInfo = $users->firstWhere('user_id', $authUserId);
                 @endphp
-                <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
-                     style="direction: rtl;">
+
+                <div id="scriptorium_display" class="relative w-full col-span-2" style="direction: rtl;">
                     <x-input-label class="mb-1.5" :value="__('دبیر جلسه')"/>
-                    <button id="scriptorium-dropdown-btn" type="button"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
-                    <span id="scriptorium-selected-text" class="truncate">
-                        @if ($authUserInfo)
-                            <div>
-                                <div><strong>{{ $authUserInfo['full_name'] }}</strong></div>
-                                <div class="text-xs text-gray-500">
-                                    {{ $authUserInfo['department_name'] ?? '' }} - {{ $authUserInfo['position'] ?? '' }}
+                    <div class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 bg-gray-50 flex justify-between items-center cursor-default">
+                        <span id="scriptorium-selected-text" class="truncate w-full">
+                            @if ($authUserInfo)
+                                <div>
+                                    <div><strong>{{ $authUserInfo['full_name'] }}</strong></div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $authUserInfo['department_name'] ?? '' }} - {{ $authUserInfo['position'] ?? '' }}
+                                    </div>
                                 </div>
-                            </div>
-                        @else
-                            انتخاب کنید
-                        @endif
-                    </span>
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-                    <div id="scriptorium-dropdown-menu"
-                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                        <div class="px-4 py-2">
-                            <input id="scriptorium-dropdown-search" type="text" placeholder="جست و جو"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                        </div>
-                        <ul id="scriptorium-dropdown-list" class="max-h-48 overflow-auto"></ul>
-                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>
+                            @else
+                                <div class="text-gray-500">نامشخص</div>
+                            @endif
+                        </span>
                     </div>
-                    {{-- Hidden Inputs --}}
-                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-input"
-                           value="{{ old('scriptorium', $authUserInfo['user_id'] ?? '') }}">
-                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2"/>
                 </div>
+
                 <div>
                     <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
                     <x-text-input name="unit_held" id="unit_held" value="{{old('unit_held')}}"
@@ -254,6 +277,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
 
                 {{-- Participants Dropdown (multi-select) --}}
+
                 <div id="participants_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
                      style="direction: rtl;">
                     <x-input-label class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
@@ -276,7 +300,7 @@
                     </div>
                     <div id="participants-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
                     <input type="hidden" name="holders" id="participants-hidden-input"
-                           value="{{ old('holders') ?? '' }}">
+                           value='{{ json_encode(explode(",", old("holders", ""))) }}'>
                     <x-input-error :messages="$errors->get('holders')" class="mt-2"/>
                 </div>
                 {{-- Inner Guests Dropdown (multi-select) --}}
@@ -302,7 +326,7 @@
                     </div>
                     <div id="innerGuest-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
                     <input type="hidden" name="innerGuest" id="innerGuest-hidden-input"
-                           value="{{ old('innerGuest') ?? '' }}">
+                           value='{{ json_encode(explode(",", old("innerGuest", ""))) }}'>
                     <x-input-error :messages="$errors->get('innerGuest')" class="mt-2"/>
                 </div>
 

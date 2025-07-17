@@ -19,7 +19,7 @@
         <li>
             <a href="{{route('dashboard.meeting')}}"
                class="inline-flex items-center px-2 gap-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                <span>{{__('جلسات')}}</span>
+                <span>{{__('جدول جلسات')}}</span>
             </a>
         </li>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -189,46 +189,67 @@
                     <x-input-error :messages="$errors->get('boss')" class="mt-2"/>
                 </div>
                 {{-- Scriptorium Dropdown --}}
+{{--                @php--}}
+{{--                    $authUserId = auth()->id();--}}
+{{--                    $authUserInfo = $users->firstWhere('user_id', $authUserId);--}}
+{{--                @endphp--}}
+{{--                <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2"--}}
+{{--                     style="direction: rtl;">--}}
+{{--                    <x-input-label class="mb-1.5" :value="__('دبیر جلسه')"/>--}}
+{{--                    <button id="scriptorium-dropdown-btn" type="button"--}}
+{{--                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">--}}
+{{--                    <span id="scriptorium-selected-text" class="truncate">--}}
+{{--                        @if ($authUserInfo)--}}
+{{--                            <div>--}}
+{{--                                <div><strong>{{ $authUserInfo['full_name'] }}</strong></div>--}}
+{{--                                <div class="text-xs text-gray-500">--}}
+{{--                                    {{ $authUserInfo['department_name'] ?? '' }} - {{ $authUserInfo['position'] ?? '' }}--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        @else--}}
+{{--                            انتخاب کنید--}}
+{{--                        @endif--}}
+{{--                    </span>--}}
+{{--                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"--}}
+{{--                             viewBox="0 0 24 24">--}}
+{{--                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>--}}
+{{--                        </svg>--}}
+{{--                    </button>--}}
+{{--                    <div id="scriptorium-dropdown-menu"--}}
+{{--                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">--}}
+{{--                        <div class="px-4 py-2">--}}
+{{--                            <input id="scriptorium-dropdown-search" type="text" placeholder="جست و جو"--}}
+{{--                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>--}}
+{{--                        </div>--}}
+{{--                        <ul id="scriptorium-dropdown-list" class="max-h-48 overflow-auto"></ul>--}}
+{{--                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>--}}
+{{--                    </div>--}}
+{{--                    --}}{{-- Hidden Inputs --}}
+{{--                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-input"--}}
+{{--                           value="{{ old('scriptorium', $authUserInfo['user_id'] ?? '') }}">--}}
+{{--                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2"/>--}}
+{{--                </div>--}}
                 @php
                     $authUserId = auth()->id();
                     $authUserInfo = $users->firstWhere('user_id', $authUserId);
                 @endphp
-                <div id="scriptorium_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
-                     style="direction: rtl;">
-                    <x-input-label class="mb-1.5" :value="__('دبیر جلسه')"/>
-                    <button id="scriptorium-dropdown-btn" type="button"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
-                    <span id="scriptorium-selected-text" class="truncate">
+                <div id="scriptorium_display" class="relative w-full col-span-2" style="direction: rtl;">
+                    <x-input-label class="mb-1.5" :value="__('دبیر جلسه')" />
+                    <div class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 bg-gray-50 flex flex-col cursor-default">
                         @if ($authUserInfo)
                             <div>
-                                <div><strong>{{ $authUserInfo['full_name'] }}</strong></div>
+                                <div><strong>{{ $authUserInfo->full_name }}</strong></div>
                                 <div class="text-xs text-gray-500">
-                                    {{ $authUserInfo['department_name'] ?? '' }} - {{ $authUserInfo['position'] ?? '' }}
+                                    {{-- Access department relation --}}
+                                    {{ $authUserInfo->department->department_name ?? 'نامشخص' }} - {{ $authUserInfo->position ?? '' }}
                                 </div>
                             </div>
                         @else
-                            انتخاب کنید
+                            <div class="text-gray-500">نامشخص</div>
                         @endif
-                    </span>
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-                    <div id="scriptorium-dropdown-menu"
-                         class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                        <div class="px-4 py-2">
-                            <input id="scriptorium-dropdown-search" type="text" placeholder="جست و جو"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                        </div>
-                        <ul id="scriptorium-dropdown-list" class="max-h-48 overflow-auto"></ul>
-                        <div id="scriptorium-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>
                     </div>
-                    {{-- Hidden Inputs --}}
-                    <input type="hidden" name="scriptorium" id="scriptorium-hidden-input"
-                           value="{{ old('scriptorium', $authUserInfo['user_id'] ?? '') }}">
-                    <x-input-error :messages="$errors->get('scriptorium')" class="mt-2"/>
                 </div>
+
 
                 <div>
                     <x-input-label for="unit_held" :value="__('کمیته یا واحد برگزار کننده جلسه')"/>
@@ -249,19 +270,21 @@
                     <div class="mb-2">{{ __('اعضای جلسه فعلی') }}:</div>
                     <div class="flex flex-wrap gap-2">
                         @foreach($userIds as $meetingUser)
-                            <div id="user-{{ $meetingUser->user_id }}"
-                                 class="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm">
-                                <span>{{ $meetingUser->user->user_info->full_name }}</span>
-                                <button type="button"
-                                        class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-300 rounded-full p-1.5"
-                                        onclick="deleteUser(event, {{ $meeting->id }}, {{ $meetingUser->user_id }})"
-                                        title="حذف">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
+                            @if($meetingUser->user_id !== $meeting->boss_id)
+                                <div id="user-{{ $meetingUser->user_id }}"
+                                     class="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm">
+                                    <span>{{ $meetingUser->user->user_info->full_name }}</span>
+                                    <button type="button"
+                                            class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-300 rounded-full p-1.5"
+                                            onclick="deleteUser(event, {{ $meeting->id }}, {{ $meetingUser->user_id }})"
+                                            title="حذف">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endif
                         @endforeach
 
                         <script>
