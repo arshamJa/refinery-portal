@@ -1,6 +1,28 @@
 @php use App\Enums\UserPermission;use App\Enums\UserRole;use App\Models\MeetingUser; @endphp
 @php use App\Enums\MeetingUserStatus;use App\Models\User; @endphp
 <div>
+    @if (session()->has('status'))
+        <div
+            x-data="{ showMessage: true }" x-show="showMessage" x-transition x-cloak
+            x-init="setTimeout(() => showMessage = false, 4000)"
+            dir="rtl"
+            class="fixed top-5 right-5 z-[99] max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
+            <div class="flex p-4">
+                <div class="shrink-0">
+                    <svg class="shrink-0 size-4 text-teal-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16"
+                         height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"></path>
+                    </svg>
+                </div>
+                <div class="ms-3">
+                    <p class="text-sm text-gray-700 dark:text-neutral-400">
+                        {{ session('status') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
     <x-breadcrumb>
         <li class="flex items-center h-full">
             <a href="{{route('dashboard')}}"
@@ -110,6 +132,7 @@
                 <option value="">{{ __('همه وضعیت‌ها') }}</option>
                 <option value="unread">{{ __('خوانده نشده') }}</option>
                 <option value="read">{{ __('خوانده شده') }}</option>
+                <option value="archived">{{ __('بایگانی شده') }}</option>
             </x-select-input>
         </div>
 
@@ -123,14 +146,13 @@
         </div>
     </form>
 
-
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
                     @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده', 'متن',
 // 'وضعیت جلسه'
- 'اقدامات','وضعیت پیام'] as $th)
+ 'اقدامات','وضعیت بایگانی'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -219,11 +241,21 @@
 
                         </x-table.cell>
                         <x-table.cell class="whitespace-nowrap">
-                            <div id="read-status-{{ $notification->id }}">
-                                @if ($notification->isReadByRecipient())
-                                    <span class="text-gray-500">{{ __('خوانده شده') }}</span>
+                            <div>
+{{--                                @if ($notification->isReadByRecipient())--}}
+{{--                                    <span class="text-gray-500">{{ __('خوانده شده') }}</span>--}}
+{{--                                @else--}}
+{{--                                    <span class="text-red-500 font-bold">{{ __('خوانده نشده') }}</span>--}}
+{{--                                @endif--}}
+                                @if (! $notification->trashed())
+                                    <form method="POST" action="{{ route('notifications.archive', $notification->id) }}">
+                                        @csrf
+                                        <x-secondary-button type="submit">
+                                            {{ __('بایگانی') }}
+                                        </x-secondary-button>
+                                    </form>
                                 @else
-                                    <span class="text-red-500 font-bold">{{ __('خوانده نشده') }}</span>
+                                    <span class="text-gray-500 text-sm">{{ __('بایگانی شده') }}</span>
                                 @endif
                             </div>
                         </x-table.cell>

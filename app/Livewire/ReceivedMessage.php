@@ -8,9 +8,6 @@ use App\Models\MeetingUser;
 use App\Models\Notification;
 use App\Models\User;
 use App\Models\UserInfo;
-use App\Traits\MeetingsTasks;
-use App\Traits\MessageReceived;
-use App\Traits\Organizations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -22,22 +19,19 @@ use Livewire\WithPagination;
 
 class ReceivedMessage extends Component
 {
-    use MessageReceived,WithPagination, WithoutUrlPagination, Organizations, MeetingsTasks;
+    use WithPagination, WithoutUrlPagination;
 
     public ?string $search='';
     public $meeting;
     public $title;
     public $meetingId;
     public $meetingUserId;
-//    public $body;
     public $reason;
     public bool $checkBox = false;
     public $full_name;
     public $p_code;
-
     public $filter = '';
     public $message_status = '';
-    public $notificationType;
 
     public function filterMessage()
     {
@@ -53,30 +47,34 @@ class ReceivedMessage extends Component
     {
         return view('livewire.received-message');
     }
+
     #[Computed]
     public function userNotifications(string $type = null)
     {
-        $query = Notification::where('recipient_id', auth()->id())
-            ->with(['sender.user_info',  'notifiable.meetingUsers' ]);
+        $query = Notification::with(['sender.user_info', 'notifiable.meetingUsers'])
+            ->where('recipient_id', auth()->id());
 
+        // Filter by message_status including archived
+        if ($this->message_status) {
+            if ($this->message_status === 'archived') {
+                $query->onlyTrashed();
+            } elseif ($this->message_status === 'unread') {
+                $query->whereNull('recipient_read_at')
+                    ->whereNull('deleted_at');  // Only non-archived unread
+            } elseif ($this->message_status === 'read') {
+                $query->whereNotNull('recipient_read_at')
+                    ->whereNull('deleted_at');  // Only non-archived read
+            }
+        } else {
+            // When no filter, exclude archived by default or show all depending on your logic
+            $query->whereNull('deleted_at');
+        }
+        // Optional type filter
         if ($type) {
             $query->where('type', $type);
         }
-        // Filter by message status
-        if ($this->message_status) {
-            switch ($this->message_status) {
-                case 'unread':
-                    // Assuming unread means sender_read_at IS NULL
-                    $query->whereNull('sender_read_at');
-                    break;
 
-                case 'read':
-                    // Read means sender_read_at IS NOT NULL
-                    $query->whereNotNull('sender_read_at');
-                    break;
-            }
-        }
-        return $query->latest()->paginate(5);
+        return $query->latest()->paginate(10);
     }
     /**
      * Mark a notification as read.
@@ -89,21 +87,6 @@ class ReceivedMessage extends Component
         $this->dispatch('notificationRead');
         $this->resetPage();
     }
-
-    protected $cachedNotifications;
-    #[Computed]
-    public function getNotifications()
-    {
-        if (! $this->cachedNotifications) {
-            $this->cachedNotifications = $this->userNotifications();
-        }
-        return $this->cachedNotifications;
-    }
-    #[Computed]
-    public function hasNotificationType(string $type)
-    {
-        return $this->getNotifications()->getCollection()->contains('type', $type);
-    }
     #[Computed]
     public function unreadReceivedCount()
     {
@@ -111,19 +94,6 @@ class ReceivedMessage extends Component
             ->whereNull('recipient_read_at')
             ->count();
     }
-//    #[Computed]
-//    public function meetingUsers()
-//    {
-//        return MeetingUser::with([
-//            'meeting:id,title,date,time,status,scriptorium',
-//            'user:id',
-//            'user.user_info:user_id,full_name'
-//        ])
-//            ->where('user_id', auth()->id())
-//            ->select('id', 'meeting_id', 'user_id', 'is_present', 'reason_for_absent', 'read_by_user','replacement')
-//            ->paginate(5);
-//    }
-
     public function openModalDeny($meetingUserId)
     {
         $meetingUser = MeetingUser::find($meetingUserId);
@@ -131,8 +101,6 @@ class ReceivedMessage extends Component
         $this->title = $meetingUser->meeting->title;
         $this->dispatch('crud-modal', name: 'deny-invitation');
     }
-
-
     /**
      * @throws ValidationException
      */
@@ -188,9 +156,6 @@ class ReceivedMessage extends Component
 
         return to_route('received.message')->with('status', 'شما دعوت به جلسه را پذیرفتید و دبیرجلسه مطلع شد');
     }
-
-
-
     public function IsAlreadyRepresentative(): bool
     {
         return MeetingUser::where('meeting_id', $this->meetingId ?? null)
@@ -338,8 +303,6 @@ class ReceivedMessage extends Component
         }
         return to_route('received.message')->with('status', 'شما دعوت به جلسه را نپذیرفتید و دبیرجلسه مطلع شد');
     }
-
-
     protected function normalizeText($text)
     {
         $text = strip_tags($text); // Remove HTML tags

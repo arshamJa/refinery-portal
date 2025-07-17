@@ -669,8 +669,6 @@
             </div>
             {{--            @endcan--}}
         @endif
-
-
         {{--  this is for showing the signatures --}}
         @if($this->presentUsers->isNotEmpty())
             <div id="signature-section">

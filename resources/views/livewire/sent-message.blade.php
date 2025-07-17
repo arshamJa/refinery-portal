@@ -117,7 +117,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['نوع پیام','تاریخ ارسال پیام', 'گیرنده(دبیر/کاربر)', 'متن'] as $th)
+                    @foreach (['نوع پیام','تاریخ ارسال پیام', 'گیرنده', 'متن'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -137,7 +137,9 @@
                             {{ $attrs['label'] }}
                         </x-table.cell>
                         <x-table.cell class="whitespace-nowrap">{{ $notification->getNotificationDateTime() }}</x-table.cell>
-                        <x-table.cell>{{ $notification->recipient->user_info->full_name ?? 'N/A' }}</x-table.cell>
+                        <x-table.cell>{{ $notification->recipient->user_info->full_name ?? 'N/A' }}
+                            <span class="text-sm text-gray-500">({{ $notification->getReceiverRoleLabel() }})</span>
+                        </x-table.cell>
                         <x-table.cell>{{ $notification->getSentMessage() }}</x-table.cell>
                     </x-table.row>
                 @empty

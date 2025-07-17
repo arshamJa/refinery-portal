@@ -39,23 +39,20 @@ class SentMessage extends Component
     {
         return view('livewire.sent-message');
     }
-
     #[Computed]
-    public function userNotifications(string $type = null, bool $isSender = false)
+    public function userNotifications(string $type = null)
     {
         $query = Notification::with([
             'sender.user_info',
             'notifiable'
-        ]);
-
+        ])->where('sender_id', auth()->id()); // Always filter by sender
         if ($type) {
             $query->where('type', $type);
         }
-
         if ($this->filter) {
             $query->where('type', $this->filter);
         }
-        return $query->latest()->paginate(5);
+        return $query->latest()->paginate(10);
     }
     public function markAsRead($notificationId)
     {

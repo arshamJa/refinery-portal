@@ -5,21 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 
 class Notification extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'type', 'data', 'notifiable_type', 'notifiable_id', 'sender_id', 'recipient_id', 'status',
         'sender_read_at','recipient_read_at'
     ];
 
     // Mark as read for sender
-    public function markAsReadBySender()
-    {
-        $this->update(['sender_read_at' => now()]);
-    }
+//    public function markAsReadBySender()
+//    {
+//        $this->update(['sender_read_at' => now()]);
+//    }
 
     // Mark as read for recipient
     public function markAsReadByRecipient()
@@ -28,10 +31,10 @@ class Notification extends Model
     }
 
     // Check if the notification is read for sender
-    public function isReadBySender()
-    {
-        return !is_null($this->sender_read_at);
-    }
+//    public function isReadBySender()
+//    {
+//        return !is_null($this->sender_read_at);
+//    }
 
     // Check if the notification is read for recipient
     public function isReadByRecipient()
@@ -352,6 +355,45 @@ class Notification extends Model
             }
             return 'عضو جلسه';
         }
+        return 'نقش نامشخص';
+    }
+    public function getReceiverRoleLabel(): string
+    {
+        $meeting = $this->notifiable;
+        $userId = $this->recipient_id;
+
+        if (! $meeting || ! $userId) {
+            return 'نقش نامشخص';
+        }
+
+        // Check if receiver is the boss
+        if ($meeting->boss_id === $userId) {
+            return 'رئیس';
+        }
+
+        // Check if receiver is the scriptorium
+        if ($meeting->scriptorium_id === $userId) {
+            return 'دبیر';
+        }
+
+        // Get all meeting users
+        $meetingUsers = $meeting->meetingUsers;
+
+        // Exclude users who are acting as replacements
+        $isReplacement = $meetingUsers->contains(fn ($mu) => $mu->replacement === $userId);
+        if ($isReplacement) {
+            return 'جانشین';
+        }
+
+        // Get the user's record (non-replacement only)
+        $meetingUser = $meetingUsers->firstWhere('user_id', $userId);
+        if ($meetingUser) {
+            if ((bool) $meetingUser->is_guest) {
+                return 'مهمان';
+            }
+            return 'عضو جلسه';
+        }
+
         return 'نقش نامشخص';
     }
 
