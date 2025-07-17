@@ -66,14 +66,22 @@ class ReceivedMessage extends Component
                     ->whereNull('deleted_at');  // Only non-archived read
             }
         } else {
-            // When no filter, exclude archived by default or show all depending on your logic
+            // Exclude archived by default
             $query->whereNull('deleted_at');
         }
-        // Optional type filter
-        if ($type) {
-            $query->where('type', $type);
+        if ($this->filter === 'invitation') {
+            $query->whereIn('type', ['MeetingInvitation', 'MeetingGuestInvitation', 'MeetingBossInvitation']);
+        } elseif ($this->filter === 'meeting_status') {
+            $query->whereIn('type', ['MeetingConfirmed', 'MeetingCancelled']);
+        } elseif ($this->filter === 'invitation_response') {
+            $query->whereIn('type', ['AcceptInvitation', 'DenyInvitation']);
+        } elseif ($this->filter === 'updated_task') {
+            $query->whereIn('type', ['UpdatedTaskTimeOut', 'UpdatedTaskBody']);
+        } elseif (in_array($this->filter, ['ReplacementForMeeting', 'AssignedNewTask', 'DeniedTaskNotification'])) {
+            $query->where('type', $this->filter);
+        } elseif ($this->filter) {
+            $query->where('type', $this->filter);
         }
-
         return $query->latest()->paginate(10);
     }
     /**

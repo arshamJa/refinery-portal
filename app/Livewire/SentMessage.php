@@ -42,15 +42,24 @@ class SentMessage extends Component
     #[Computed]
     public function userNotifications(string $type = null)
     {
-        $query = Notification::with([
-            'sender.user_info',
-            'notifiable'
+        $query = Notification::with(['sender.user_info', 'notifiable'
         ])->where('sender_id', auth()->id()); // Always filter by sender
         if ($type) {
             $query->where('type', $type);
         }
         if ($this->filter) {
-            $query->where('type', $this->filter);
+            if ($this->filter === 'invitation') {
+                $query->whereIn('type', ['MeetingInvitation', 'MeetingGuestInvitation', 'MeetingBossInvitation']);
+            } elseif ($this->filter === 'invitation_response') {
+                $query->whereIn('type', ['AcceptInvitation', 'DenyInvitation']);
+            } elseif ($this->filter === 'meeting_status') {
+                $query->whereIn('type', ['MeetingConfirmed', 'MeetingCancelled']);
+            } elseif ($this->filter === 'updated_task') {
+                $query->whereIn('type', ['UpdatedTaskTimeOut', 'UpdatedTaskBody']);
+            } else {
+                // For single-type filters like 'ReplacementForMeeting', 'AssignedNewTask', 'DeniedTaskNotification'
+                $query->where('type', $this->filter);
+            }
         }
         return $query->latest()->paginate(10);
     }

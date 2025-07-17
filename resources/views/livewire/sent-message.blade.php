@@ -87,21 +87,15 @@
             <x-input-label for="filter" value="{{ __('نوع پیام') }}"/>
             <x-select-input id="filter" wire:model.defer="filter">
                 <option value="">{{ __('همه پیام‌ها') }}</option>
-                <option value="MeetingInvitation">{{ __('دعوتنامه') }}</option>
-                <option value="MeetingGuestInvitation">{{ __('دعوتنامه به مهمان') }}</option>
-                <option value="MeetingConfirmed">{{ __(' برگزاری جلسه') }}</option>
-                <option value="MeetingCancelled">{{ __(' لغو جلسه') }}</option>
-                <option value="AcceptInvitation">{{ __('تایید دعوتنامه') }}</option>
-                <option value="DenyInvitation">{{ __('رد دعوتنامه') }}</option>
+                <option value="invitation">{{ __('دعوتنامه') }}</option>
+                <option value="invitation_response">{{ __('پاسخ دعوتنامه') }}</option>
+                <option value="meeting_status">{{ __('برگزاری یا لغو جلسه') }}</option>
                 <option value="ReplacementForMeeting">{{ __('انتخاب جانشین') }}</option>
-                <option value="AssignedNewTask">{{ __('ارسال اقدامات') }}</option>
-                <option value="UpdatedTaskTimeOut">{{ __('ویرایش مهلت اقدام') }}</option>
-                <option value="UpdatedTaskBody">{{ __('ویرایش بند مذاکره') }}</option>
+                <option value="AssignedNewTask">{{ __('ارسال اقدام') }}</option>
+                <option value="updated_task">{{ __('ویرایش اقدام') }}</option>
                 <option value="DeniedTaskNotification">{{ __('رد اقدام') }}</option>
             </x-select-input>
         </div>
-
-
         <div class="col-span-6 lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
             <x-search-button>{{ __('جست و جو') }}</x-search-button>
             @if($filter !== '')

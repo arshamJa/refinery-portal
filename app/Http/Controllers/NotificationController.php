@@ -17,17 +17,15 @@ class NotificationController extends Controller
                 'deleted_at' => now(),
                 'recipient_read_at' => now(), // mark as read
             ]);
-        return redirect()->route('received.message')
-            ->with('status', 'پیام دریافتی با موفقیت بایگانی شد.');
+        return to_route('received.message')->with('status', __('پیام دریافتی با موفقیت بایگانی شد.'));
     }
-    public function restoreNotification($notificationId)
-    {
-        DB::table('notifications')
-            ->where('id', $notificationId)
-            ->where('recipient_id', auth()->id())
-            ->whereNotNull('deleted_at') // only restore if it is archived
-            ->update(['deleted_at' => null]);
-        return redirect()->route('received.message')
-            ->with('status', 'پیام دریافتی با موفقیت از بایگانی خارج شد.');
-    }
+//    public function restoreNotification($notificationId)
+//    {
+//        DB::table('notifications')
+//            ->where('id', $notificationId)
+//            ->where('recipient_id', auth()->id())
+//            ->whereNotNull('deleted_at') // only restore if it is archived
+//            ->update(['deleted_at' => null]);
+//        return to_route('received.message')->with('status', __('پیام دریافتی با موفقیت از بایگانی خارج شد.'));
+//    }
 }

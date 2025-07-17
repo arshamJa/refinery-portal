@@ -34,8 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('received/message', ReceivedMessage::class)->name('received.message');
     Route::post('/notifications/{notification}/archive', [NotificationController::class, 'archiveNotification'])
         ->name('notifications.archive');
-    Route::post('/notifications/{notification}/restore', [NotificationController::class, 'restoreNotification'])
-        ->name('notifications.restore');
+//    Route::post('/notifications/{notification}/restore', [NotificationController::class, 'restoreNotification'])
+//        ->name('notifications.restore');
     Route::get('sent/message', SentMessage::class)->name('sent.message');
 
 
