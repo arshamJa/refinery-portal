@@ -9,13 +9,9 @@ class ParticipantsTaskController extends Controller
 {
     public function index($meeting_id, $user_id)
     {
-        $userInfo = UserInfo::with([
-                'user:id',
-                'department:id,department_name'
-            ])
+        $userInfo = UserInfo::with(['user:id'])
             ->select('id', 'user_id', 'position', 'department_id','full_name')
             ->findOrFail($user_id);
-
 
         $meeting = Meeting::with([
             'tasks.taskUsers' => function ($q) use ($userInfo) {

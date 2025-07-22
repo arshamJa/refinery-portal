@@ -23,9 +23,12 @@ class CompletedTasksWithDelayExport implements FromCollection, WithHeadings, Wit
 
     public function collection()
     {
-        $query = Task::with('meeting', 'user')
+        $query = Task::with([
+            'meeting.scriptorium.user_info',
+            'user.user_info'
+        ])
             ->where('is_completed', true)
-            ->whereColumn('sent_date', '>', 'time_out'); // Tasks that are delayed
+            ->whereColumn('sent_date', '>', 'time_out'); // delayed tasks
 
         // Apply date range filter (using the Jalali date as string)
         if ($this->startDate && $this->endDate) {
@@ -35,17 +38,18 @@ class CompletedTasksWithDelayExport implements FromCollection, WithHeadings, Wit
 
         // Apply search filter
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('time_out', 'like', '%'.$this->search.'%')
-                    ->orWhere('sent_date', 'like', '%'.$this->search.'%')
-                    ->orWhereHas('meeting', function ($meetingQuery) {
-                        $meetingQuery->where('title', 'like', '%'.$this->search.'%')
-                            ->orWhere('scriptorium', 'like', '%'.$this->search.'%');
+            $search = $this->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('time_out', 'like', '%' . $search . '%')
+                    ->orWhere('sent_date', 'like', '%' . $search . '%')
+                    ->orWhereHas('meeting', function ($meetingQuery) use ($search) {
+                        $meetingQuery->where('title', 'like', '%' . $search . '%')
+                            ->orWhereHas('scriptorium.user_info', function ($scriptoriumQuery) use ($search) {
+                                $scriptoriumQuery->where('full_name', 'like', '%' . $search . '%');
+                            });
                     })
-                    ->orWhereHas('user', function ($userQuery) {
-                        $userQuery->whereHas('user_info', function ($userInfoQuery) {
-                            $userInfoQuery->where('full_name', 'like', '%'.$this->search.'%');
-                        });
+                    ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
+                        $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
                     });
             });
         }
@@ -67,7 +71,7 @@ class CompletedTasksWithDelayExport implements FromCollection, WithHeadings, Wit
             return [
                 'Row Number' => $index + 1, // Loop index (1-based)
                 'Meeting Title' => $task->meeting->title ?? 'N/A',
-                'Secretary' => $task->meeting->scriptorium ?? 'N/A',
+                'Secretary'     => $task->meeting->scriptorium->user_info->full_name ?? 'N/A',
                 'Assigned User' => $task->user->user_info->full_name ?? 'N/A',
                 'Action Date' => $task->sent_date,
                 'Time Out' => $task->time_out,

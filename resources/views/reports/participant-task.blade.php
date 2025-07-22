@@ -1,4 +1,4 @@
-@php use App\Enums\UserPermission; @endphp
+@php use App\Enums\UserPermission;use App\Enums\UserRole; @endphp
 <x-app-layout>
 
     <nav class="flex justify-between mb-4 mt-20">
@@ -37,29 +37,32 @@
         </ol>
     </nav>
 
-    <div id="printable-meeting-content"
-         class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
+    @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
+        <div id="printable-meeting-content"
+             class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
 
-        @can('refinery-report')
 
             {{-- Meeting Overview --}}
+            <h2 class="text-2xl font-bold text-center mb-6 no-print">
+                {{ __('عنوان جلسه:') }} {{ $meeting->title ?? '---' }}
+            </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 {{-- Boss Info --}}
                 <div
                     class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">رئیس جلسه</h4>
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('رئیس جلسه')}}</h4>
                     <div class="space-y-1 text-sm">
-                        <p>
-                            <span class="font-medium">نام:</span>
-                            <span data-role="boss-name">{{ $meeting->boss }}</span>
+                        <p><span class="font-medium">{{__('نام:')}}</span>
+                            <span
+                                data-role="boss-name">{{ optional($meeting->boss->user_info)->full_name ?? '---' }}</span>
                         </p>
-                        <p>
-                            <span class="font-medium">واحد:</span>
-                            <span data-role="boss-unit">{{ $bossInfo->department->department_name ?? '---' }}</span>
+                        <p><span class="font-medium">{{__('واحد:')}}</span>
+                            <span
+                                data-role="boss-unit">{{ optional(optional($meeting->boss->user_info)->department)->department_name ?? '---' }}</span>
                         </p>
-                        <p>
-                            <span class="font-medium">سمت:</span>
-                            <span data-role="boss-position">{{ $bossInfo->position ?? '---' }}</span>
+                        <p><span class="font-medium">{{__('سمت:')}}</span>
+                            <span
+                                data-role="boss-position">{{ optional($meeting->boss->user_info)->position ?? '---' }}</span>
                         </p>
                     </div>
                 </div>
@@ -67,38 +70,37 @@
                 {{-- Scriptorium --}}
                 <div
                     class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">دبیر جلسه</h4>
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('دبیر جلسه')}}</h4>
                     <div class="space-y-1 text-sm">
-                        <p>
-                            <span class="font-medium">نام:</span>
-                            <span data-role="scriptorium-name">{{ $meeting->scriptorium }}</span>
+                        <p><span class="font-medium">{{__('نام:')}}</span>
+                            <span
+                                data-role="scriptorium-name">{{ optional($meeting->scriptorium->user_info)->full_name ?? '---' }}</span>
                         </p>
-                        <p>
-                            <span class="font-medium">واحد:</span>
-                            <span data-role="scriptorium-unit">{{ $meeting->scriptorium_department }}</span>
+                        <p><span class="font-medium">{{__('واحد:')}}</span>
+                            <span
+                                data-role="scriptorium-unit">{{ optional(optional($meeting->scriptorium->user_info)->department)->department_name ?? '---' }}</span>
                         </p>
-                        <p>
-                            <span class="font-medium">سمت:</span>
-                            <span data-role="scriptorium-position">{{ $meeting->scriptorium_position }}</span>
+                        <p><span class="font-medium">{{__('سمت:')}}</span>
+                            <span
+                                data-role="scriptorium-position">{{ optional($meeting->scriptorium->user_info)->position ?? '---' }}</span>
                         </p>
                     </div>
                 </div>
-
                 {{-- Time / Location --}}
                 <div
                     class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">زمان و مکان</h4>
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('زمان و مکان')}}</h4>
                     <div class="space-y-1 text-sm">
                         <p>
-                            <span class="font-medium">تاریخ:</span>
+                            <span class="font-medium">{{__('تاریخ:')}}</span>
                             <span data-role="meeting-date">{{ $meeting->date }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">ساعت:</span>
+                            <span class="font-medium">{{__('ساعت:')}}</span>
                             <span data-role="meeting-time">{{ $meeting->time }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">مکان:</span>
+                            <span class="font-medium">{{__('مکان:')}}</span>
                             <span data-role="meeting-location">{{ $meeting->location }}</span>
                         </p>
                     </div>
@@ -106,14 +108,14 @@
                 {{-- Committee / Treat --}}
                 <div
                     class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">اطلاعات تکمیلی</h4>
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('اطلاعات تکمیلی')}}</h4>
                     <div class="space-y-1 text-sm">
                         <p>
-                            <span class="font-medium">برگزار کننده:</span>
+                            <span class="font-medium">{{__('واحد برگزار کننده:')}}</span>
                             <span data-role="meeting-unit">{{ $meeting->unit_held }}</span>
                         </p>
                         <p>
-                            <span class="font-medium">پذیرایی:</span>
+                            <span class="font-medium">{{__('پذیرایی:')}}</span>
                             <span data-role="meeting-treat">{{ $meeting->treat ? 'دارد' : 'ندارد' }}</span>
                         </p>
                     </div>
@@ -129,14 +131,14 @@
 
                     @foreach ($taskUsers as $taskUser)
                         <article
-                            class="bg-white border border-gray-200 rounded-2xl shadow-md p-6 space-y-5 transition-shadow hover:shadow-lg">
+                            class="bg-white border border-gray-200 rounded-2xl shadow-md p-6 space-y-5 transition-shadow hover:shadow-lg print:break-inside-avoid"
+                            style="break-inside: avoid;">
                             <header>
                                 <h3 class="text-indigo-700 font-bold text-md mb-3 pb-2">
                                     {{ __('بند مذاکره: ') }}
                                     <p class="text-gray-800 leading-relaxed select-text">{{ $task->body }}</p>
                                 </h3>
                             </header>
-
                             <div
                                 class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-gray-600 select-text leading-snug">
 
@@ -204,8 +206,8 @@
 
             <script src="{{ asset('js/printParticipantTask.js') }}"></script>
 
-        @endcan
-    </div>
 
+        </div>
+    @endcan
 
 </x-app-layout>

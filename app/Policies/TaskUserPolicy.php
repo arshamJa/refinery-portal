@@ -42,6 +42,16 @@ class TaskUserPolicy
         return $isScriptorium && $isAssignedScriptorium && $isTaskEmpty;
     }
 
+    public function canViewDeniedTasks(User $user, TaskUser $taskUser): bool
+    {
+        $meeting = $taskUser->task->meeting;
+        // Check if user is the scriptorium
+        $isScriptorium = $user->id === $meeting->scriptorium_id;
+        // Check if user is the boss
+        $isBoss = $user->id === $meeting->boss_id;
+        return $isScriptorium || $isBoss;
+    }
+
     public function participantTask(User $user, TaskUser $taskUser): bool
     {
 //        $todayDate = $this->getTodayDate();

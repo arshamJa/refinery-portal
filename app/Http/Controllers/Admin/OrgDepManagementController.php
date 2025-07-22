@@ -52,7 +52,7 @@ class OrgDepManagementController extends Controller
             });
         }
 
-        $users = $query->paginate(5)->appends(['search' => $request->input('search')]);
+        $users = $query->paginate(10)->appends(['search' => $request->input('search')]);
         $filteredUsersCount = $users->total();
 
         return view('admin.dep-org-management', [

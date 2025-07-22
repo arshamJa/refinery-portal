@@ -160,15 +160,12 @@
         </div>
     </form>
 
-    <div class="relative overflow-visible shadow-md rounded-t-md mb-12 mt-4" wire:poll.visible.60s>
+
+    <div class="relative overflow-x-auto shadow-md rounded-t-md mb-12 mt-4" wire:poll.visible.60s>
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach ([
-                              '#','موضوع جلسه','دبیر جلسه','نقش شما','واحد متولی جلسه','تاریخ','ساعت',
-//                              'رد/تایید(جلسه)',
-                              'وضعیت جلسه','اتاق جلسه','جزئیات'
-                          ] as $th)
+                    @foreach (['#','موضوع جلسه','دبیر جلسه','نقش شما','واحد متولی جلسه','تاریخ','ساعت','وضعیت جلسه','اتاق جلسه','جزئیات'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ $loop->first ? '' : 'border-r border-gray-200 dark:border-gray-700' }}">
                             {{ __($th) }}
@@ -255,6 +252,7 @@
         {{ $this->meetings->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
 
+
     <x-modal name="view-meeting-modal" maxWidth="4xl" :closable="false">
         @if ($selectedMeeting)
             @php
@@ -263,8 +261,7 @@
                     : (is_array($selectedMeeting->guest) ? $selectedMeeting->guest : []);
 
                 $innerGuests = $selectedMeeting->meetingUsers->where('is_guest', true);
-                $participants = $selectedMeeting->meetingUsers->where('is_guest', false)
-                ->filter(fn($mu) => $mu->user_id !== $selectedMeeting->boss_id);
+                $participants = $selectedMeeting->meetingUsers->where('is_guest', false);
             @endphp
 
             <div class="p-6 max-h-[85vh] overflow-y-auto text-sm text-gray-800 dark:text-gray-200 space-y-10">

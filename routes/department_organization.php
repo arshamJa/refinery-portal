@@ -7,44 +7,43 @@ use App\Livewire\admin\OrganizationTable;
 use App\Livewire\employee\EmployeesOrganization;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'adminMiddleware'])->group(function () {
+Route::middleware('auth')->group(function () {
 
-    Route::get('department/organization/manage',[OrgDepManagementController::class, 'index'])
-        ->name('organization.department.manage');
+    Route::middleware('adminMiddleware')->group(function () {
+        Route::get('department/organization/manage',[OrgDepManagementController::class, 'index'])
+            ->name('organization.department.manage');
 
-    Route::get('department/organization/connection', [OrgDepManagementController::class, 'departmentOrganizationConnection'])
-        ->name('department.organization.connection');
+        Route::get('department/organization/connection', [OrgDepManagementController::class, 'departmentOrganizationConnection'])
+            ->name('department.organization.connection');
 
-    Route::post('/department/organization/connection', [OrgDepManagementController::class, 'store'])
-        ->name('departments.organizations.store');
+        Route::post('/department/organization/connection', [OrgDepManagementController::class, 'store'])
+            ->name('departments.organizations.store');
 
+        Route::get('/addOrganization/{id}', [AddOrganizationController::class, 'index'])
+            ->name('addOrganization');
 
-    Route::get('/addOrganization/{id}', [AddOrganizationController::class, 'index'])
-        ->name('addOrganization');
+        Route::post('/addOrganization/{id}', [AddOrganizationController::class, 'store'])
+            ->name('addOrganization.store');
 
-    Route::post('/addOrganization/{id}', [AddOrganizationController::class, 'store'])
-        ->name('addOrganization.store');
+        Route::delete('/addOrganization/{id}/{organizations}',
+            [AddOrganizationController::class, 'destroy'])
+            ->name('addOrganization.delete');
 
-    Route::delete('/addOrganization/{id}/{organizations}',
-        [AddOrganizationController::class, 'destroy'])
-        ->name('addOrganization.delete');
+        // Department Route
+        Route::get('/departments', DepartmentTable::class)
+            ->name('departments.index');
 
+        // Organization Route
+        Route::get('organizations', OrganizationTable::class)
+            ->name('organizations');
 
-    // Department Route
-    Route::get('/departments', DepartmentTable::class)
-        ->name('departments.index');
+        // this is for deleting the organization
+        Route::delete('organization/{organizationId}',[AddOrganizationController::class,'deleteOrganization'])
+            ->name('organization.destroy');
 
-    // Organization Route
-    Route::get('organizations', OrganizationTable::class)
-        ->name('organizations');
-
-    // this is for deleting the organization
-    Route::delete('organization/{organizationId}',[AddOrganizationController::class,'deleteOrganization'])
-        ->name('organization.destroy');
-
+    });
 
     Route::get('employee/organization', EmployeesOrganization::class)
         ->name('employee.organization');
-
 
 });

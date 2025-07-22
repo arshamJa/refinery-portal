@@ -25,21 +25,15 @@ class CompletedTasksExport implements FromCollection, WithHeadings, WithColumnFo
 
     public function collection()
     {
+
         $query = TaskUser::with([
-            'task' => function($query) {
-                $query->select('id', 'meeting_id'); // Select only the necessary columns for task
-            },
-            'task.meeting' => function($query) {
-                $query->select('id', 'title', 'scriptorium'); // Select necessary columns from meeting
-            },
-            'user' => function($query) {
-                $query->select('id'); // Only select the user id to avoid duplicates
-            },
-            'user.user_info' => function($query) {
-                $query->select('user_id', 'full_name'); // Select necessary columns from user_info
-            }
+            'task:id,meeting_id',
+            'task.meeting:id,title,scriptorium_id',
+            'task.meeting.scriptorium.user_info:id,user_id,full_name',
+            'user:id',
+            'user.user_info:id,user_id,full_name',
         ])
-            ->where('task_status', TaskStatus::ACCEPTED->value)
+            ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
             ->whereColumn('sent_date', '<=', 'time_out');
 
         // Apply date range filter (using the Jalali date as string)
@@ -51,15 +45,18 @@ class CompletedTasksExport implements FromCollection, WithHeadings, WithColumnFo
 
         // Apply search filter
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('time_out', 'like', '%' . $this->search . '%')
-                    ->orWhere('sent_date', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('task.meeting', function ($meetingQuery) {
-                        $meetingQuery->where('title', 'like', '%' . $this->search . '%')
-                            ->orWhere('scriptorium', 'like', '%' . $this->search . '%');
+            $search = $this->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('time_out', 'like', "%{$search}%")
+                    ->orWhere('sent_date', 'like', "%{$search}%")
+                    ->orWhereHas('task.meeting', function ($q2) use ($search) {
+                        $q2->where('title', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('user.user_info', function ($userInfoQuery) {
-                        $userInfoQuery->where('full_name', 'like', '%' . $this->search . '%');
+                    ->orWhereHas('task.meeting.scriptorium.user_info', function ($q3) use ($search) {
+                        $q3->where('full_name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('user.user_info', function ($q4) use ($search) {
+                        $q4->where('full_name', 'like', "%{$search}%");
                     });
             });
         }
@@ -67,12 +64,12 @@ class CompletedTasksExport implements FromCollection, WithHeadings, WithColumnFo
         // Fetch the filtered data with necessary columns and map it
         return $query->get()->map(function ($taskUser, $index) {
             return [
-                'Row' => $index + 1,  // Add the row number
+                'Row' => $index + 1,
                 'Meeting Title' => $taskUser->task->meeting->title ?? 'N/A',
-                'Secretary' => $taskUser->task->meeting->scriptorium ?? 'N/A',
-                'Task Performer' => $taskUser->user->user_info->full_name ?? 'N/A',
-                'Sent Date' => $taskUser->sent_date,
-                'Time Out' => $taskUser->time_out,
+                'Secretary' => $taskUser->task->meeting->scriptorium->user_info->full_name ?? 'نامشخص',
+                'Task Performer' => $taskUser->user->user_info->full_name ?? 'نامشخص',
+                'Sent Date' => $taskUser->sent_date ?? 'N/A',
+                'Time Out' => $taskUser->time_out ?? 'N/A',
             ];
         });
     }

@@ -50,9 +50,6 @@
                     </a>
                 </div>
             </div>
-
         </form>
     </div>
-
-
 </x-app-layout>

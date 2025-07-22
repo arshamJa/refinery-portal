@@ -2,7 +2,14 @@ function printMeetingSummary(title = 'بدون عنوان') {
     const meetingElement = document.getElementById("meeting-summary");
     const clone = meetingElement.cloneNode(true);
 
-    const getText = (selector) => meetingElement.querySelector(selector)?.innerText.trim() || '---';
+    // Remove the <h2 class="text-2xl font-bold text-center mb-6"> from the cloned content
+    const meetingTitle = clone.querySelector('h2.text-2xl.font-bold.text-center.mb-6');
+    if (meetingTitle) {
+        meetingTitle.remove();
+    }
+
+    const getText = (selector) =>
+        meetingElement.querySelector(selector)?.innerText.trim() || '---';
 
     const bossName = getText('[data-role="boss-name"]');
     const bossUnit = getText('[data-role="boss-unit"]');
@@ -145,6 +152,18 @@ function printMeetingSummary(title = 'بدون عنوان') {
                 break-inside: avoid-page !important;
                 page-break-inside: avoid !important;
             }
+            ul.print\\:avoid-break,
+            ul.print\\:avoid-break li {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            /* Prevent page break inside the container with important content */
+            .no-page-break {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+                page-break-before: auto !important;
+                page-break-after: auto !important;
+            }
         }
     </style>`);
     printWindow.document.write('</head><body>');
@@ -164,4 +183,3 @@ function printMeetingSummary(title = 'بدون عنوان') {
         printWindow.print();
     }, 1000);
 }
-

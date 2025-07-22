@@ -6,35 +6,26 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreNewUserRequest;
 use App\Http\Requests\UpdateNewUserRequest;
-use App\Imports\UserInfoImport;
-use App\Imports\UsersImport;
 use App\Models\Department;
 use App\Models\Organization;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
-use App\Traits\UserSearchTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Maatwebsite\Excel\Facades\Excel;
 
 
 class UsersTableController extends Controller
 {
-    use UserSearchTrait;
 
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-
-        Gate::authorize('users-info');
-
+        // Gate::authorize('users-info');
         $user = auth()->user();
 
         $query = UserInfo::with([
@@ -45,41 +36,57 @@ class UsersTableController extends Controller
             'user.roles.permissions:id,name',
         ])
             ->where('full_name', '!=', 'Arsham Jamali')
-            ->select(['id', 'user_id', 'department_id', 'full_name', 'n_code', 'position'])->oldest();
+            ->select(['id', 'user_id', 'department_id', 'full_name', 'n_code', 'position'])
+            ->oldest();
 
+        // Sanitize search input
+        $searchTerm = null;
+        if ($request->filled('search')) {
+            $searchTerm = trim(strip_tags($request->input('search')));
 
-         $originalUsersCount = $query->count();
-        // Get role list with filtering
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('full_name', 'like', "%{$searchTerm}%")
+                    ->orWhere('n_code', 'like', "%{$searchTerm}%")
+                    ->orWhere('position', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', fn($q) =>
+                    $q->where('p_code', 'like', "%{$searchTerm}%"))
+                    ->orWhereHas('department', fn($q) =>
+                    $q->where('department_name', 'like', "%{$searchTerm}%"))
+                    ->orWhereHas('user.roles', fn($q) =>
+                    $q->where('name', 'like', "%{$searchTerm}%"))
+                    ->orWhereHas('user.permissions', fn($q) =>
+                    $q->where('name', 'like', "%{$searchTerm}%"));
+            });
+        }
+
+        // Count original before pagination
+        $originalUsersCount = UserInfo::where('full_name', '!=', 'Arsham Jamali')->count();
+
         $roles = Role::select(['id', 'name'])
             ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
             ->get();
 
         $permissions = Permission::select(['id', 'name'])->get();
 
+        $users = $query->paginate(10)->appends($request->except('page'));
 
-        $query = $this->applyUserSearch($request, $query); // Use the trait
-
-        // Apply filtering and pagination
-        $users = $this->applyUserSearch($request, $query)->paginate(5)->appends($request->except('page'));
-
-        // Attach merged permissions to each UserInfo object
         foreach ($users as $userInfo) {
             $userModel = $userInfo->user;
             if ($userModel) {
                 $rolePermissions = $userModel->roles->flatMap->permissions;
                 $directPermissions = $userModel->permissions;
-                $allPermissions = $rolePermissions->merge($directPermissions)->unique('id')->pluck('name')->values(); // reset keys
-                $userInfo->all_permissions = $allPermissions; // Virtual property for Blade\
+                $allPermissions = $rolePermissions->merge($directPermissions)->unique('id')->pluck('name')->values();
+                $userInfo->all_permissions = $allPermissions;
                 $userInfo->display_permission = $allPermissions->first();
                 $userInfo->more_permissions_count = max($allPermissions->count() - 1, 0);
             } else {
-                $userInfo->all_permissions = collect(); // Empty collection fallback
+                $userInfo->all_permissions = collect();
                 $userInfo->display_permission = null;
                 $userInfo->more_permissions_count = 0;
             }
         }
-        $filteredUsersCount = $users->total();
 
+        $filteredUsersCount = $users->total();
 
         return view('users.index', [
             'userInfos' => $users,
@@ -95,16 +102,17 @@ class UsersTableController extends Controller
      */
     public function create()
     {
-        Gate::authorize('users-info');
+//        Gate::authorize('users-info');
         $user = auth()->user();
         $roles = Role::select(['id', 'name'])
             ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
             ->get();
         $permissions = Permission::select(['id', 'name'])->get();
         $departments = Department::select(['id','department_name'])->get();
-
+        $organizations = Organization::select(['id','organization_name'])->get();
         return view('users.create', [
             'departments' => $departments,
+            'organization' => $organizations,
             'roles' => $roles,
             'permissions' => $permissions
         ]);
@@ -115,25 +123,23 @@ class UsersTableController extends Controller
     public function store(StoreNewUserRequest $request)
     {
         // Authorization check
-        Gate::authorize('users-info');
-
+//        Gate::authorize('users-info');
         $validatedData = $request->validated();
         $newUser = User::create([
             'password' => Hash::make($validatedData['password']),
             'p_code' => $validatedData['p_code'],
         ]);
 
-        // Sync roles and permissions
-        $newUser->syncRoles([$validatedData['role']]);
         $permissions = isset($validatedData['permissions'])
             ? Permission::whereIn('name', array_keys($validatedData['permissions']))->pluck('id')->toArray()
             : [];
-        $newUser->syncPermissions($permissions);
 
+        $newUser->roles()->sync([$validatedData['role']]);
+        $newUser->permissions()->sync($permissions);
         $signature_path = $validatedData['signature']->store('signatures','public');
 
         // Create UserInfo record
-        $userInfo = UserInfo::create([
+        UserInfo::create([
             'user_id' => $newUser->id,
             'department_id' => $validatedData['departmentId'],
             'full_name' => $validatedData['full_name'],
@@ -144,12 +150,9 @@ class UsersTableController extends Controller
             'position' => $validatedData['position'],
             'signature' => $signature_path
         ]);
-
-        // Attach organizations to the new user based on the department
-        $organizations = Organization::where('department_id', $validatedData['departmentId'])->get();
-        foreach ($organizations as $organization) {
-            $organization->users()->attach($newUser->id);
-        }
+        $organizationIds = explode(',', $validatedData['organization']);
+        $organizationIds = array_filter(array_map('trim', $organizationIds), fn($id) => $id !== '');
+        $newUser->organizations()->attach($organizationIds);
         return to_route('users.index')->with('status', 'کاربر جدید ساخته شد');
     }
 

@@ -17,14 +17,25 @@ class Time implements ValidationRule
     {
         // Normalize time if needed
         if (!str_contains($value, ':')) {
+            // If no colon, assume hour only, set minutes to 00
             $hour = intval($value);
             $value = sprintf('%02d:00', $hour);
+        } else {
+            // If colon exists, normalize hour and minute parts
+            [$hour, $minute] = explode(':', $value);
+            // Pad hour with leading zero if needed
+            $hour = str_pad($hour, 2, '0', STR_PAD_LEFT);
+            // Pad minute with leading zero if needed, default to '00' if empty
+            $minute = $minute === '' ? '00' : str_pad($minute, 2, '0', STR_PAD_LEFT);
+            $value = "$hour:$minute";
         }
+
         // Validate time format (HH:MM)
         if (!preg_match('/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', $value)) {
             $fail('فرمت زمان معتبر نیست. فرمت درست: HH:MM');
             return;
         }
+
         $year = request()->input('year');
         $month = request()->input('month');
         $day = request()->input('day');

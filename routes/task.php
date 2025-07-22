@@ -68,25 +68,23 @@ Route::middleware(['auth'])->group(function () {
         ->name('meeting.details.show');
 
     // this is the table for all the meeting in refinery
-    Route::get('meeting/report/table', [MeetingReportTableController::class, 'meetingTable'])
-        ->name('meeting.report.table')
-        ->can('refinery-report');
+//    Route::get('meeting/report/table', [MeetingReportTableController::class, 'meetingTable'])
+//        ->name('meeting.report.table');
+    Route::get('meeting/report/table',\App\Livewire\MeetingReport::class)
+        ->name('meeting.report.table');
 
     Route::get('meeting/report/export', [MeetingReportTableController::class, 'downloadMeetingReport'])
         ->name('meeting.report.download');
 
     Route::get('task/report/table', [MeetingReportTableController::class, 'taskTable'])
-        ->name('task.report.table')
-        ->can('refinery-report');
+        ->name('task.report.table');
 
 
     Route::get('/tasks/report/export', [MeetingReportTableController::class, 'exportTasks'])
         ->name('tasks.report.download');
 
-
     Route::get('refinery/reports', [RefineryReportController::class, 'index'])
-        ->name('refinery.report')
-        ->can('refinery-report');
+        ->name('refinery.report');
 
 });
 

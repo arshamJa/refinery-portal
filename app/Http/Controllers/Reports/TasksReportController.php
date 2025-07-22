@@ -20,12 +20,14 @@ class TasksReportController extends Controller
     {
         $query = TaskUser::with([
             'task:id,meeting_id',
-            'task.meeting:id,title,scriptorium',
+            'task.meeting:id,title,scriptorium_id',
+            'task.meeting.scriptorium.user_info:id,user_id,full_name',
             'user:id', // Must include 'id' for the relation to work
             'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
         ])
             ->where('task_status', TaskStatus::SENT_TO_SCRIPTORIUM->value)
             ->whereColumn('sent_date', '<=', 'time_out');
+
 
         // Get the start and end date inputs from the request.
         $startDate = trim($request->input('start_date') ?? '');
@@ -38,6 +40,7 @@ class TasksReportController extends Controller
                 ->where('time_out', '<=', $endDate);
         }
 
+
         // Apply the search filter if a search term is provided.
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -45,7 +48,9 @@ class TasksReportController extends Controller
                     ->orWhere('sent_date', 'like', '%' . $search . '%')
                     ->orWhereHas('task.meeting', function ($meetingQuery) use ($search) {
                         $meetingQuery->where('title', 'like', '%' . $search . '%')
-                            ->orWhere('scriptorium', 'like', '%' . $search . '%');
+                            ->orWhereHas('scriptorium.user_info', function ($userInfoQuery) use ($search) {
+                                $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
+                            });
                     })
                     ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
                         $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
@@ -66,11 +71,13 @@ class TasksReportController extends Controller
         return Excel::download(new CompletedTasksExport($startDate, $endDate, $search), 'completed_tasks.xlsx');
     }
 
+
     public function completedTasksWithDelay(Request $request)
     {
         $query = TaskUser::with([
             'task:id,meeting_id',
-            'task.meeting:id,title,scriptorium',
+            'task.meeting:id,title,scriptorium_id',
+            'task.meeting.scriptorium.user_info:id,user_id,full_name',
             'user:id', // Must include 'id' for the relation to work
             'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
         ])
@@ -87,16 +94,16 @@ class TasksReportController extends Controller
         }
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('time_out', 'like', '%'.$search.'%')
-                    ->orWhere('sent_date', 'like', '%'.$search.'%')
-                    ->orWhereHas('meeting', function ($meetingQuery) use ($search) {
-                        $meetingQuery->where('title', 'like', '%'.$search.'%')
-                            ->orWhere('scriptorium', 'like', '%'.$search.'%');
+                $q->where('time_out', 'like', '%' . $search . '%')
+                    ->orWhere('sent_date', 'like', '%' . $search . '%')
+                    ->orWhereHas('task.meeting', function ($meetingQuery) use ($search) {
+                        $meetingQuery->where('title', 'like', '%' . $search . '%')
+                            ->orWhereHas('scriptorium.user_info', function ($scriptoriumQuery) use ($search) {
+                                $scriptoriumQuery->where('full_name', 'like', '%' . $search . '%');
+                            });
                     })
-                    ->orWhereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->whereHas('user_info', function ($userInfoQuery) use ($search) {
-                            $userInfoQuery->where('full_name', 'like', '%'.$search.'%');
-                        });
+                    ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
+                        $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
                     });
             });
         }
@@ -114,16 +121,20 @@ class TasksReportController extends Controller
     }
 
 
+
+
     public function incompleteTasks(Request $request)
     {
 
-        $getDate = list($ja_year, $ja_month, $ja_day) = explode('/',
-            gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-        $now = sprintf('%04d/%02d/%02d', $ja_year,$ja_month,$ja_day);
+        list($ja_year, $ja_month, $ja_day) = explode('/',
+            gregorian_to_jalali(now()->year, now()->month, now()->day, '/')
+        );
+        $now = sprintf('%04d/%02d/%02d', $ja_year, $ja_month, $ja_day);
 
         $query = TaskUser::with([
             'task:id,meeting_id',
-            'task.meeting:id,title,scriptorium',
+            'task.meeting:id,title,scriptorium_id',
+            'task.meeting.scriptorium.user_info:id,user_id,full_name',
             'user:id', // Must include 'id' for the relation to work
             'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
         ])
@@ -146,7 +157,9 @@ class TasksReportController extends Controller
                     ->orWhere('sent_date', 'like', '%' . $search . '%')
                     ->orWhereHas('task.meeting', function ($meetingQuery) use ($search) {
                         $meetingQuery->where('title', 'like', '%' . $search . '%')
-                            ->orWhere('scriptorium', 'like', '%' . $search . '%');
+                            ->orWhereHas('scriptorium.user_info', function ($scriptoriumQuery) use ($search) {
+                                $scriptoriumQuery->where('full_name', 'like', '%' . $search . '%');
+                            });
                     })
                     ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
                         $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
@@ -174,18 +187,21 @@ class TasksReportController extends Controller
 
     public function incompleteTasksWithDelay(Request $request)
     {
-        $getDate = list($ja_year, $ja_month, $ja_day) = explode('/',
-            gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-        $now = sprintf('%04d/%02d/%02d', $ja_year,$ja_month,$ja_day);
+        list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
+        $now = sprintf('%04d/%02d/%02d', $ja_year, $ja_month, $ja_day);
+
         $query = TaskUser::with([
             'task:id,meeting_id',
-            'task.meeting:id,title,scriptorium',
-            'user:id', // Must include 'id' for the relation to work
-            'user.user_info:id,user_id,full_name', // Must include user_id to relate properly
+            'task.meeting:id,title,scriptorium_id',
+            'task.meeting.scriptorium:id',  // Load user who is the scriptorium
+            'task.meeting.scriptorium.user_info:id,user_id,full_name',  // Load their full name
+            'user:id',
+            'user.user_info:id,user_id,full_name',
         ])
             ->where('task_status', TaskStatus::PENDING->value)
-            ->where('sent_date', null)
-            ->where('time_out', '<=' , $now);
+            ->whereNull('sent_date')              // Only incomplete tasks
+            ->where('time_out', '<=', $now);     // Tasks past due or due today
+
 
         $startDate = trim($request->input('start_date'));
         $endDate = trim($request->input('end_date'));
@@ -202,7 +218,9 @@ class TasksReportController extends Controller
                     ->orWhere('sent_date', 'like', '%' . $search . '%')
                     ->orWhereHas('task.meeting', function ($meetingQuery) use ($search) {
                         $meetingQuery->where('title', 'like', '%' . $search . '%')
-                            ->orWhere('scriptorium', 'like', '%' . $search . '%');
+                            ->orWhereHas('scriptorium.user_info', function ($userQuery) use ($search) {
+                                $userQuery->where('full_name', 'like', '%' . $search . '%');
+                            });
                     })
                     ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
                         $userInfoQuery->where('full_name', 'like', '%' . $search . '%');

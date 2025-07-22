@@ -38,6 +38,7 @@ class StoreNewUserRequest extends FormRequest
             'work_phone'  => ['bail', 'required', 'numeric', 'digits_between:5,10'],
             'position' => ['bail', 'required', 'string', 'max:255'],
             'departmentId' => ['bail', 'required'],
+            'organization' => ['bail','required'],
             'signature' => ['bail', 'required'],
             'password' => ['bail','required','confirmed',
                 \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],

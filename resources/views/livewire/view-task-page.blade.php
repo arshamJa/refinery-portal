@@ -1,6 +1,5 @@
 @php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use App\Enums\UserRole;use Illuminate\Support\Str; @endphp
 <div>
-
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -21,7 +20,7 @@
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard.meeting')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>{{__('جلسات')}}</span>
+                    <span>{{__('جدول جلسات')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -58,17 +57,33 @@
         <div id="meeting-info"
              class="grid grid-cols-2 gap-x-6 gap-y-2 bg-gray-50 border border-gray-300 rounded-md p-4 text-gray-700 text-sm print:text-[16px] print:leading-[1.4] print:grid print:grid-cols-2 print:gap-2 print:border print:border-gray-400">
             <div><strong>{{ __('واحد/کمیته: ') }}</strong><span>{{ $this->meetings->unit_held }}</span></div>
-            <div><strong>{{ __('تهیه کننده(دبیرجلسه): ') }}</strong><span>{{ $this->meetings->scriptorium?->user_info?->full_name }}</span></div>
-            <div><strong>{{ __('رئیس جلسه: ') }}</strong><span>{{  $this->meetings->boss?->user_info?->full_name }}</span></div>
-            <div><strong>{{ __('پیوست: ') }}</strong><span>{{ $this->meetings->tasks->flatMap->taskUsers->flatMap->taskUserFiles->count() > 0 ? 'دارد' : 'ندارد' }}</span></div>
+            <div>
+                <strong>{{ __('تهیه کننده(دبیرجلسه): ') }}</strong><span>{{ $this->meetings->scriptorium?->user_info?->full_name }}</span>
+            </div>
+            <div>
+                <strong>{{ __('رئیس جلسه: ') }}</strong><span>{{  $this->meetings->boss?->user_info?->full_name }}</span>
+            </div>
+            <div>
+                <strong>{{ __('پیوست: ') }}</strong><span>{{ $this->meetings->tasks->flatMap->taskUsers->flatMap->taskUserFiles->count() > 0 ? 'دارد' : 'ندارد' }}</span>
+            </div>
             <div><strong>{{ __('تاریخ جلسه: ') }}</strong><span>{{ $this->meetings->date }}</span></div>
-            <div><strong>{{ __('زمان جلسه: ') }}</strong><span>{{ $this->meetings->time }}@if($this->meetings->end_time)- {{ $this->meetings->end_time }}@endif</span></div>
+            <div><strong>{{ __('زمان جلسه: ') }}</strong><span>{{ $this->meetings->time }}@if($this->meetings->end_time)
+                        - {{ $this->meetings->end_time }}
+                    @endif</span></div>
             <div><strong>{{ __('مکان جلسه: ') }}</strong><span>{{ $this->meetings->location }}</span></div>
             <div><strong>{{ __('موضوع جلسه: ') }}</strong><span>{{ $this->meetings->title }}</span></div>
             <div class="col-span-2 print:col-span-2"><strong>{{ __('حاضرین: ') }}</strong>
                 <span>
+{{--                    @foreach ($this->participants as $participant)--}}
+                    {{--                        {{ $participant['full_name'] }}{{ !$loop->last ? ' -' : '' }}--}}
+                    {{--                    @endforeach--}}
                     @foreach ($this->participants as $participant)
-                        {{ $participant['full_name'] }}{{ !$loop->last ? ' -' : '' }}
+                        @if ($participant['replacing'])
+                            {{ $participant['replacing'] }}  <span class="text-gray-600 text-sm">(حاضر به‌جای {{ $participant['full_name'] }})</span>
+                        @else
+                            {{ $participant['full_name'] }}
+                        @endif
+                        {{ !$loop->last ? ' - ' : '' }}
                     @endforeach
                 </span>
             </div>
@@ -184,7 +199,6 @@
                                            value='{{ json_encode(explode(",", old("holders", ""))) }}'/>
                                     <x-input-error :messages="$errors->get('holders')" class="mt-2"/>
                                 </div>
-
                             </div>
                             <div>
                                 <x-input-label for="time_out" :value="__('مهلت اقدام')" class="mb-2"/>
@@ -276,13 +290,13 @@
                             <div
                                 class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                                 <h2 class="text-2xl font-bold text-gray-800">{{ __('درج مشارکت‌کننده جدید') }}</h2>
-                                <button type="button" x-on:click="$dispatch('close')"
-                                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                                <a href="{{route('view.task.page',$this->meetings->id)}}"
+                                   class="text-gray-400 hover:text-red-500 transition duration-150">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                                     </svg>
-                                </button>
+                                </a>
                             </div>
                             <!-- Body -->
                             <div
@@ -368,25 +382,28 @@
                                     <span wire:loading
                                           wire:target="submitParticipantForm">{{ __('در حال ثبت...') }}</span>
                                 </x-primary-button>
-                                <x-cancel-button x-on:click="$dispatch('close')">
-                                    {{ __('انصراف') }}
-                                </x-cancel-button>
+                                <a href="{{route('view.task.page',$this->meetings->id)}}">
+                                    <x-cancel-button>
+                                        {{ __('انصراف') }}
+                                    </x-cancel-button>
+                                </a>
                             </div>
                         </form>
                     </x-modal>
+
                     <x-modal name="delete-task" maxWidth="4xl" :closable="false">
                         <form wire:submit.prevent="deleteTask">
                             <!-- Header -->
                             <div
                                 class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                                 <h2 class="text-2xl font-bold text-gray-800">{{ __('حذف بند مذاکره') }}</h2>
-                                <button type="button" x-on:click="$dispatch('close')"
-                                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                                <a href="{{route('view.task.page',$this->meetings->id)}}"
+                                   class="text-gray-400 hover:text-red-500 transition duration-150">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                                     </svg>
-                                </button>
+                                </a>
                             </div>
 
                             <!-- Body -->
@@ -426,9 +443,11 @@
                                     <span wire:loading
                                           wire:target="submitParticipantForm">{{ __('در حال حذف...') }}</span>
                                 </x-primary-button>
-                                <x-cancel-button x-on:click="$dispatch('close')">
-                                    {{ __('انصراف') }}
-                                </x-cancel-button>
+                                <a href="{{route('view.task.page',$this->meetings->id)}}">
+                                    <x-cancel-button>
+                                        {{ __('انصراف') }}
+                                    </x-cancel-button>
+                                </a>
                             </div>
                         </form>
                     </x-modal>
@@ -458,7 +477,7 @@
                                     <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
                                         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
                                             <p class="font-semibold">{{ __('هشدار:') }}</p>
-                                            <p>{{ __('با قفل کردن این بند مذاکره، امکان ویرایش یا تغییر توسط دبیر غیرفعال می‌شود.') }}</p>
+                                            <p>{{ __('با قفل کردن این صورتجلسه، امکان ویرایش یا تغییر توسط دبیر غیرفعال می‌شود.') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -467,9 +486,11 @@
                                     <x-primary-button type="submit">
                                         {{ __('قفل کردن') }}
                                     </x-primary-button>
-                                    <x-cancel-button x-on:click="$dispatch('close')">
-                                        {{ __('انصراف') }}
-                                    </x-cancel-button>
+                                    <a href="{{route('view.task.page',$this->meetings->id)}}">
+                                        <x-cancel-button>
+                                            {{ __('انصراف') }}
+                                        </x-cancel-button>
+                                    </a>
                                 </div>
                             </form>
                         </x-modal>
@@ -642,39 +663,39 @@
 
         {{--  Table to show the participants task rejection , this is gate --}}
         @if($this->taskUsers->whereNotNull('request_task')->count() > 0)
-            {{--            @can('view-denied-tasks')--}}
-            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
-                <x-table.table>
-                    <x-slot name="head">
-                        <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                            @foreach (['نام', 'بند مذاکره','دلیل رد', ] as $th)
-                                <x-table.heading
-                                    class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
-                                    {{ __($th) }}
-                                </x-table.heading>
-                            @endforeach
-                        </x-table.row>
-                    </x-slot>
-                    <x-slot name="body">
-                        @foreach($this->taskUsers->where('task_status', TaskStatus::DENIED->value) as $taskRequest)
-                            <x-table.row wire:key="taskRequest-{{ $taskRequest->id }}"
-                                         class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                                <x-table.cell>{{ $taskRequest->user->user_info->full_name }}</x-table.cell>
-                                <x-table.cell>{{ $taskRequest->task->body }}</x-table.cell>
-                                <x-table.cell>{{ $taskRequest->request_task }}</x-table.cell>
+            @can('canViewDeniedTasks',$taskUser)
+                <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12">
+                    <x-table.table>
+                        <x-slot name="head">
+                            <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                                @foreach (['نام', 'بند مذاکره','دلیل رد', ] as $th)
+                                    <x-table.heading
+                                        class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                                        {{ __($th) }}
+                                    </x-table.heading>
+                                @endforeach
                             </x-table.row>
-                        @endforeach
-                    </x-slot>
-                </x-table.table>
-            </div>
-            {{--            @endcan--}}
+                        </x-slot>
+                        <x-slot name="body">
+                            @foreach($this->taskUsers->where('task_status', TaskStatus::DENIED->value) as $taskRequest)
+                                <x-table.row wire:key="taskRequest-{{ $taskRequest->id }}"
+                                             class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                                    <x-table.cell>{{ $taskRequest->user->user_info->full_name }}</x-table.cell>
+                                    <x-table.cell>{{ $taskRequest->task->body }}</x-table.cell>
+                                    <x-table.cell>{{ $taskRequest->request_task }}</x-table.cell>
+                                </x-table.row>
+                            @endforeach
+                        </x-slot>
+                    </x-table.table>
+                </div>
+            @endcan
         @endif
         {{--  this is for showing the signatures --}}
         @if($this->presentUsers->isNotEmpty())
             <div id="signature-section">
                 <div style="margin-top: 40px;">
                     <h3 style="font-size: 1.2rem; font-weight: bold; margin-bottom: 16px; border-bottom: 1px solid #ccc; padding-bottom: 8px;">
-                        امضا حاضرین
+                        {{__('امضا حاضرین')}}
                     </h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
                         @foreach($this->presentUsers as $user)
@@ -699,13 +720,13 @@
         @if ($selectedTaskUser)
             <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                 <h2 class="text-2xl font-bold text-gray-800">{{ __('شرح اقدام') }}</h2>
-                <button type="button" x-on:click="$dispatch('close')"
-                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                <a href="{{route('view.task.page',$meeting)}}"
+                   class="text-gray-400 hover:text-red-500 transition duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                          stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                     </svg>
-                </button>
+                </a>
             </div>
             <div class="px-6 py-6 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
                 <div class="grid grid-cols-2 gap-4">
@@ -722,9 +743,12 @@
                 </div>
             </div>
             <div class="flex justify-end px-6 py-4 bg-gray-100 border-t border-gray-200">
-                <x-cancel-button x-on:click="$dispatch('close')">
-                    {{ __('بستن') }}
-                </x-cancel-button>
+                <a href="{{route('view.task.page',$meeting)}}">
+                    <x-cancel-button>
+                        {{ __('بستن') }}
+                    </x-cancel-button>
+                </a>
+
             </div>
         @endif
     </x-modal>
@@ -737,13 +761,13 @@
                     <!-- Header -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                         <h2 class="text-2xl font-bold text-gray-800">{{ __('جزئیات') }}</h2>
-                        <button type="button" x-on:click="$dispatch('close')"
-                                class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <a href="{{route('view.task.page',$meeting)}}"
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                             </svg>
-                        </button>
+                        </a>
                     </div>
 
                     <!-- Body -->
@@ -809,10 +833,11 @@
                             <span wire:loading wire:target="submitTaskForm"
                                   class="ml-2">{{ __('در حال ثبت...') }}</span>
                         </x-primary-button>
-
-                        <x-cancel-button x-on:click="$dispatch('close')">
-                            {{ __('انصراف') }}
-                        </x-cancel-button>
+                        <a href="{{route('view.task.page',$meeting)}}">
+                            <x-cancel-button>
+                                {{ __('انصراف') }}
+                            </x-cancel-button>
+                        </a>
                     </div>
                 </form>
             @endcan
@@ -827,13 +852,13 @@
                     <!-- Header -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                         <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش اقدام') }}</h2>
-                        <button type="button" x-on:click="$dispatch('close')"
-                                class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <a href="{{route('view.task.page',$meeting)}}"
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                             </svg>
-                        </button>
+                        </a>
                     </div>
 
                     <!-- Body -->
@@ -915,10 +940,11 @@
                             <span wire:loading wire:target="updateTaskForm"
                                   class="ml-2">{{ __('در حال ثبت...') }}</span>
                         </x-primary-button>
-
-                        <x-cancel-button x-on:click="$dispatch('close')">
-                            {{ __('انصراف') }}
-                        </x-cancel-button>
+                        <a href="{{route('view.task.page',$meeting)}}">
+                            <x-cancel-button>
+                                {{ __('انصراف') }}
+                            </x-cancel-button>
+                        </a>
                     </div>
                 </form>
             @endcan
@@ -935,13 +961,13 @@
                         <!-- Header -->
                         <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                             <h2 class="text-2xl font-bold text-gray-800">{{ __('آیا از خاتمه این جلسه مطمئن هستید؟') }}</h2>
-                            <button type="button" x-on:click="$dispatch('close')"
-                                    class="text-gray-400 hover:text-red-500 transition duration-150">
+                            <a href="{{route('view.task.page',$meeting)}}"
+                               class="text-gray-400 hover:text-red-500 transition duration-150">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                                 </svg>
-                            </button>
+                            </a>
                         </div>
                         <!-- Body -->
                         <div class="px-6 py-4 text-red-500 text-md">
@@ -953,9 +979,11 @@
                             <x-accept-button type="submit">
                                 {{ __('تایید') }}
                             </x-accept-button>
-                            <x-cancel-button x-on:click="$dispatch('close')">
-                                {{ __('انصراف') }}
-                            </x-cancel-button>
+                            <a href="{{route('view.task.page',$meeting)}}">
+                                <x-cancel-button>
+                                    {{ __('انصراف') }}
+                                </x-cancel-button>
+                            </a>
                         </div>
                     </form>
                 </x-modal>
@@ -969,13 +997,13 @@
                     <!-- Header -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                         <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش اقدام') }}</h2>
-                        <button type="button" x-on:click="$dispatch('close')"
-                                class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <a href="{{route('view.task.page',$meeting)}}"
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                             </svg>
-                        </button>
+                        </a>
                     </div>
 
                     <!-- Body -->
@@ -1040,15 +1068,18 @@
                             <span wire:loading wire:target="updateTaskForm"
                                   class="ml-2">{{ __('در حال ثبت...') }}</span>
                         </x-primary-button>
+                        <a href="{{route('view.task.page',$meeting)}}">
+                            <x-cancel-button>
+                                {{ __('انصراف') }}
+                            </x-cancel-button>
+                        </a>
 
-                        <x-cancel-button x-on:click="$dispatch('close')">
-                            {{ __('انصراف') }}
-                        </x-cancel-button>
                     </div>
                 </form>
                 {{--                @endcan--}}
             @endif
         </x-modal>
+
         <x-modal name="edit-task-body" maxWidth="4xl" :closable="false">
             @if($task_id)
                 <form wire:submit.prevent="editTaskBody">
@@ -1106,13 +1137,13 @@
                     <!-- Header with Close Button -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                         <h2 class="text-2xl font-bold text-gray-800">{{ __('رد خلاصه مذاکره') }}</h2>
-                        <button type="button" x-on:click="$dispatch('close')"
-                                class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <a href="{{route('view.task.page',$meeting)}}"
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                             </svg>
-                        </button>
+                        </a>
                     </div>
 
                     <!-- Body -->
@@ -1141,9 +1172,11 @@
                         <x-primary-button type="submit">
                             {{ __('ثبت') }}
                         </x-primary-button>
-                        <x-cancel-button x-on:click="$dispatch('close')">
-                            {{ __('انصراف') }}
-                        </x-cancel-button>
+                        <a href="{{route('view.task.page',$meeting)}}">
+                            <x-cancel-button>
+                                {{ __('انصراف') }}
+                            </x-cancel-button>
+                        </a>
                     </div>
                 </form>
             @endcan

@@ -28,6 +28,7 @@ class ReceivedMessage extends Component
     public $meetingUserId;
     public $reason;
     public bool $checkBox = false;
+    public bool $absent = false;
     public $full_name;
     public $p_code;
     public $filter = '';
@@ -75,8 +76,10 @@ class ReceivedMessage extends Component
             $query->whereIn('type', ['MeetingConfirmed', 'MeetingCancelled']);
         } elseif ($this->filter === 'invitation_response') {
             $query->whereIn('type', ['AcceptInvitation', 'DenyInvitation']);
-        } elseif ($this->filter === 'updated_task') {
-            $query->whereIn('type', ['UpdatedTaskTimeOut', 'UpdatedTaskBody']);
+        } elseif ($this->filter === 'UpdatedTask') {
+            $query->where('type', 'UpdatedTask');
+        } elseif ($this->filter === 'task_action') {
+            $query->whereIn('type', ['AcceptedTask', 'DeniedTask']);
         } elseif (in_array($this->filter, ['ReplacementForMeeting', 'AssignedNewTask', 'DeniedTaskNotification'])) {
             $query->where('type', $this->filter);
         } elseif ($this->filter) {
@@ -170,18 +173,36 @@ class ReceivedMessage extends Component
             ->where('replacement', auth()->id())
             ->exists();
     }
+
+    #[Computed]
+    public function hasNotificationType(string $type): bool
+    {
+        return Notification::where('type', $type)
+            ->where('recipient_id', auth()->id()) // or another user ID context
+            ->where('notifiable_type', Meeting::class)
+            ->where('notifiable_id', $this->meetingId) // or whatever meeting ID you track
+            ->exists();
+    }
     /**
      * @throws ValidationException
      */
+
     public function deny()
     {
-        $allowedReasons = ['دلیل اول', 'دلیل دوم', 'دلیل سوم', 'دلیل چهارم'];
+        $allowedReasons = [
+            'در تاریخ برگزاری جلسه در شرکت حضور ندارم',
+            'در تاریخ برگزاری جلسه در جلسه دیگری دعوت هستم',
+            'دلیل سوم', 'دلیل چهارم'];
 
         $validatedReason = Validator::make(
-            ['reason' => $this->reason],
-            ['reason' => ['required', 'string', 'in:' . implode(',', $allowedReasons)]],
+            ['reason' => $this->reason , 'absent' => $this->absent],
+            [
+                'reason' => ['required', 'string', 'in:' . implode(',', $allowedReasons)],
+                'absent' => ['accepted']
+            ],
             [
                 'reason.required' => 'فیلد دلیل رد درخواست اجباری است.',
+                'absent.accepted' => 'برای ادامه، باید تیک عدم حضور در جلسه را بزنید.',
                 'reason.in' => 'دلیل انتخاب شده معتبر نیست.'
             ]
         )->validate();
@@ -195,23 +216,19 @@ class ReceivedMessage extends Component
         if ($this->checkBox) {
             $validated = Validator::make(
                 ['full_name' => $this->full_name, 'p_code' => $this->p_code],
-                [
-                    'full_name' => 'required|string|max:255',
+                ['full_name' => 'required|string|max:255',
                     'p_code' => 'required|numeric|digits:6',
                 ],
-                [
-                    'full_name.required' => 'فیلد نام کامل اجباری است.',
-                    'p_code.required' => 'فیلد کد پرسنلی اجباری است.',
-                    'p_code.numeric' => 'کد پرسنلی باید عدد باشد.',
-                    'p_code.digits' => 'کد پرسنلی باید 6 رقمی باشد.',
+                ['full_name.required' => 'فیلد نام کامل اجباری است.', 'p_code.required' => 'فیلد کد پرسنلی اجباری است.',
+                    'p_code.numeric' => 'کد پرسنلی باید عدد باشد.', 'p_code.digits' => 'کد پرسنلی باید 6 رقمی باشد.',
                 ]
             )->validate();
 
-            $this->full_name = Str::deduplicate(trim($validated['full_name']));
+            $full_name = $this->normalizeText($validated['full_name']);
         }
 
         if ($this->checkBox) {
-                $userInfo = UserInfo::where('full_name', $this->full_name)->first();
+                $userInfo = UserInfo::where('full_name', $full_name)->first();
 
                 if (!$userInfo) {
                     $this->addError('full_name', 'نام و نام خانوادگی یافت نشد');
@@ -238,10 +255,6 @@ class ReceivedMessage extends Component
                 $meetingUser = MeetingUser::with('meeting')->findOrFail($this->meetingUserId);
                 $scriptoriumUserId = $meetingUser->meeting->scriptorium_id;
 
-                if (!$scriptoriumUserId) {
-                    $this->addError('checkBox', 'دبیر جلسه تعیین نشده است و نمی‌توان اطلاع‌رسانی کرد.');
-                    return;
-                }
 
                 DB::table('meeting_users')
                     ->where('id', $this->meetingUserId)
@@ -261,35 +274,34 @@ class ReceivedMessage extends Component
                     'updated_at' => now(),
                 ]);
 
-                Notification::create([
-                    'type' => 'ReplacementForMeeting',
-                    'data' => json_encode(['message' => 'شما در این جلسه در تاریخ ' .
-                        $meetingUser->meeting->date . ' و ساعت ' . $meetingUser->meeting->time .
-                        ' به عنوان جانشین از طرف ' . auth()->user()->user_info->full_name . ' دعوت شده‌اید.']),
-                    'notifiable_type' => Meeting::class,
-                    'notifiable_id' => $meetingUser->meeting->id,
-                    'sender_id' => auth()->id(),
-                    'recipient_id' => $userInfo->user_id,
-                ]);
+            $replacementMessage = 'شما در این جلسه در تاریخ ' .
+                $meetingUser->meeting->date . ' و ساعت ' . $meetingUser->meeting->time .
+                ' به عنوان جانشین از طرف ' . auth()->user()->user_info->full_name . ' دعوت شده‌اید.';
 
-                Notification::create([
-                    'type' => 'DenyInvitation',
-                    'data' => json_encode(['message' => 'شما این دعوت را رد کردید و آقای/خانم ' .
-                        $userInfo->full_name . ' به جای شما در جلسه شرکت خواهد کرد.']),
-                    'notifiable_type' => Meeting::class,
-                    'notifiable_id' => $meetingUser->meeting->id,
-                    'sender_id' => auth()->id(),
-                    'recipient_id' => $scriptoriumUserId,
-                ]);
+            $denyMessage = 'شما این دعوت را رد کردید و آقای/خانم ' .
+                $userInfo->full_name . ' به جای شما در جلسه شرکت خواهد کرد.';
+
+            Notification::create([
+                'type' => 'ReplacementForMeeting',
+                'data' => json_encode(['message' => $replacementMessage]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meetingUser->meeting->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $userInfo->user_id,
+            ]);
+
+            Notification::create([
+                'type' => 'DenyInvitation',
+                'data' => json_encode(['message' => $denyMessage]),
+                'notifiable_type' => Meeting::class,
+                'notifiable_id' => $meetingUser->meeting->id,
+                'sender_id' => auth()->id(),
+                'recipient_id' => $scriptoriumUserId,
+            ]);
 
             } else {
             $meetingUser = MeetingUser::with('meeting')->findOrFail($this->meetingUserId);
             $scriptoriumUserId = $meetingUser->meeting->scriptorium_id;
-
-            if (!$scriptoriumUserId) {
-                    $this->addError('checkBox', 'دبیر جلسه تعیین نشده است و نمی‌توان اطلاع‌رسانی کرد.');
-                    return;
-                }
 
             DB::table('meeting_users')
                 ->where('id', $this->meetingUserId)
@@ -313,9 +325,7 @@ class ReceivedMessage extends Component
     }
     protected function normalizeText($text)
     {
-        $text = strip_tags($text); // Remove HTML tags
-        $text = preg_replace('/\s+/', ' ', trim($text));
-        $words = explode(' ', $text);
-        return implode(' ', $words);
+        $text = strip_tags($text);                         // Remove HTML tags
+        return preg_replace('/\s+/', ' ', trim($text));    // Normalize whitespace
     }
 }

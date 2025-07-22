@@ -45,17 +45,35 @@ class MeetingDashboard extends Component
 
         foreach ($participantUserIds as $userId) {
             $notification = Notification::where('notifiable_type', Meeting::class)
-                ->where('notifiable_id', $meeting->id)->where('recipient_id', $userId)
+                ->where('notifiable_id', $meeting->id)
+                ->where('recipient_id', $userId)
                 ->first();
-            // Update existing notification
-            $notification->type = 'MeetingConfirmed';
-            $notification->data = json_encode([
-                'message' => "جلسه '{$meetingName}' در تاریخ {$meetingDate} و ساعت {$meetingTime} برگزار خواهد شد."
-            ]);
-            $notification->recipient_read_at = null;
-            $notification->updated_at = now();
-            $notification->save();
+
+            if ($notification) {
+                // Update existing notification
+                $notification->type = 'MeetingConfirmed';
+                $notification->data = json_encode([
+                    'message' => "جلسه '{$meetingName}' در تاریخ {$meetingDate} و ساعت {$meetingTime} برگزار خواهد شد."
+                ]);
+                $notification->recipient_read_at = null;
+                $notification->updated_at = now();
+                $notification->save();
+            } else {
+                // Optionally create a new notification if one doesn't exist
+                Notification::create([
+                    'notifiable_type' => Meeting::class,
+                    'notifiable_id' => $meeting->id,
+                    'recipient_id' => $userId,
+                    'type' => 'MeetingConfirmed',
+                    'data' => json_encode([
+                        'message' => "جلسه '{$meetingName}' در تاریخ {$meetingDate} و ساعت {$meetingTime} برگزار خواهد شد."
+                    ]),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
+
         $this->dispatch('close-modal');
         return to_route('dashboard.meeting')->with('status', 'جلسه با موفقیت تایید نهایی شد و شرکت‌کنندگان مطلع شدند.');
     }

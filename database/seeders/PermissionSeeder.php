@@ -39,8 +39,8 @@ class PermissionSeeder extends Seeder
         $meetingCreate = Permission::create(['name' => 'ایجاد جلسه']);
         $TASK_REPORT_TABLE = Permission::create(['name' => 'گزارش جلسات شرکت']);
         $SCRIPTORIUM_PERMISSIONS = Permission::create(['name' => 'دسترسی های دبیر جلسه']);
-        $PHONE_PERMISSIONS = Permission::create(['name' => 'دسترسی های دفترچه تلفنی']);
-        $NEWS_PERMISSIONS = Permission::create(['name' => 'دسترسی های اخبارواطلاعیه']);
+        $PHONE_PERMISSIONS = Permission::create(['name' => 'مدیریت دفترچه تلفنی']);
+        $NEWS_PERMISSIONS = Permission::create(['name' => 'مدیریت اخبارواطلاعیه']);
 
 
         // Assign Permissions to Roles

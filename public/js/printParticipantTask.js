@@ -27,6 +27,7 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
 
     const overviewParagraph = `
     <div class="info-box print:break-inside-avoid-page">
+        <p><span>عنوان جلسه: </span><span>${title}</span></p>
         <p><span>رئیس جلسه: </span><span>${bossName}</span>، <span>واحد: </span><span>${bossUnit}</span>، <span>سمت: </span><span>${bossPosition}</span></p>
         <p><span>دبیر جلسه: </span><span>${scriptoriumName}</span>، <span>واحد: </span><span>${scriptoriumUnit}</span>، <span>سمت: </span><span>${scriptoriumPosition}</span></p>
         <p><span>تاریخ: </span><span>${date}</span>، <span>ساعت: </span><span>${time}</span>، <span>مکان: </span><span>${location}</span></p>
@@ -79,7 +80,7 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
         <html lang="fa" dir="rtl">
         <head>
             <meta charset="UTF-8" />
-            <title>چاپ اقدامات جلسه</title>
+<!--            <title>چاپ اقدامات جلسه</title>-->
             <style>
                 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css');
                 body {

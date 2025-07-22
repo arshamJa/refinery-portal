@@ -18,61 +18,39 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li>
-                <a href="{{route('dashboard')}}"
-                   class="inline-flex items-center px-2 py-1.5 cursor-default active-breadcrumb space-x-1.5 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="w-3.5 h-3.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M14.25 9.75v-4.5m0 4.5h4.5m-4.5 0 6-6m-3 18c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"/>
-                    </svg>
-                    <span>{{__('دفترچه تلفنی')}}</span>
-                </a>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+            {{__('دفترچه تلفنی')}}
+            </span>
             </li>
         </ol>
     </nav>
 
-    <form method="GET" action="{{ route('phone-list.index') }}" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4  pt-3">
-            <div>
-                <x-input-label for="department">{{ __('دپارتمان') }}</x-input-label>
-                <x-text-input type="text" name="department" id="department" value="{{ request('department') }}"/>
+    <form method="GET" action="{{ route('phone-list.index') }}"
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-white border-gray-200 rounded-t-xl">
+        <div class="grid gap-4 px-3 w-full sm:px-0 lg:grid-cols-6 items-end">
+            <!-- Search Input -->
+            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                <x-search-input>
+                    <x-text-input type="text" id="search" name="search" class="block ps-10"
+                                  placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                </x-search-input>
             </div>
-            <div>
-                <x-input-label for="full_name">{{ __('نام و نام حانوادگی') }}</x-input-label>
-                <x-text-input type="text" name="full_name" id="full_name" value="{{ request('full_name') }}"/>
+            <!-- Search + Show All Buttons -->
+            <div class="lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
+                <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                @if ($originalUsersCount != $filteredUsersCount)
+                    <x-view-all-link href="{{route('phone-list.index')}}">{{__('نمایش همه')}}</x-view-all-link>
+                @endif
             </div>
-            <div>
-                <x-input-label for="work_phone">{{ __('تلفن محل کار') }}</x-input-label>
-                <x-text-input type="text" name="work_phone" id="work_phone" value="{{ request('work_phone') }}"/>
+            <div class="col-span-2 flex justify-end">
+                <a href="{{route('phone-list.create')}}">
+                    <x-primary-button type="button">
+                        {{__('اقزودن ')}}
+                    </x-primary-button>
+                </a>
             </div>
-            @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
-                <div>
-                    <x-input-label for="phone">{{ __('تلفن همراه') }}</x-input-label>
-                    <x-text-input type="text" name="phone" id="phone" value="{{ request('phone') }}"/>
-                </div>
-                <div>
-                    <x-input-label for="house_phone">{{ __('تلفن منزل') }}</x-input-label>
-                    <x-text-input type="text" name="house_phone" id="house_phone"
-                                  value="{{ request('house_phone') }}"/>
-                </div>
-                <div>
-                    <x-label for="role">{{ __('نقش') }}</x-label>
-                    <select name="role" id="role"
-                            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full">
-                        <option value="">{{ __('همه نقش ها') }}</option>
-                        @foreach($roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            @endcan
-
-        </div>
-        <div class="w-full flex gap-4 items-center pb-3">
-            <x-search-button>{{__('جست و جو')}}</x-search-button>
-            @if ($originalUsersCount != $filteredUsersCount)
-                <x-view-all-link href="{{route('phone-list.index')}}">{{__('نمایش همه')}}</x-view-all-link>
-            @endif
         </div>
     </form>
 
@@ -129,6 +107,8 @@
     <div class="mt-2 mb-12">
         {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
+
+
 
 
 </x-app-layout>

@@ -23,9 +23,13 @@ class IncompleteTasksExport implements FromCollection, WithHeadings, WithColumnF
 
     public function collection()
     {
-        $query = Task::with('meeting', 'user')
+        $query = Task::with([
+            'meeting',
+            'meeting.scriptorium.user_info',
+            'user.user_info'
+        ])
             ->where('is_completed', false)  // Incomplete tasks filter
-            ->where('sent_date', null);  // Only tasks that haven't been completed yet
+            ->whereNull('sent_date');  // Only tasks that haven't been completed yet
 
         // Apply date range filter (using the Jalali date as string)
         if ($this->startDate && $this->endDate) {
@@ -35,17 +39,18 @@ class IncompleteTasksExport implements FromCollection, WithHeadings, WithColumnF
 
         // Apply search filter
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('time_out', 'like', '%'.$this->search.'%')
-                    ->orWhere('sent_date', 'like', '%'.$this->search.'%')
-                    ->orWhereHas('meeting', function ($meetingQuery) {
-                        $meetingQuery->where('title', 'like', '%'.$this->search.'%')
-                            ->orWhere('scriptorium', 'like', '%'.$this->search.'%');
+            $search = $this->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('time_out', 'like', '%' . $search . '%')
+                    ->orWhere('sent_date', 'like', '%' . $search . '%')
+                    ->orWhereHas('meeting', function ($meetingQuery) use ($search) {
+                        $meetingQuery->where('title', 'like', '%' . $search . '%')
+                            ->orWhereHas('scriptorium.user_info', function ($scriptoriumQuery) use ($search) {
+                                $scriptoriumQuery->where('full_name', 'like', '%' . $search . '%');
+                            });
                     })
-                    ->orWhereHas('user', function ($userQuery) {
-                        $userQuery->whereHas('user_info', function ($userInfoQuery) {
-                            $userInfoQuery->where('full_name', 'like', '%'.$this->search.'%');
-                        });
+                    ->orWhereHas('user.user_info', function ($userInfoQuery) use ($search) {
+                        $userInfoQuery->where('full_name', 'like', '%' . $search . '%');
                     });
             });
         }
@@ -79,7 +84,7 @@ class IncompleteTasksExport implements FromCollection, WithHeadings, WithColumnF
             return [
                 'Row Number' => $index + 1,  // Loop index (1-based)
                 'Meeting Title' => $task->meeting->title ?? 'N/A',
-                'Secretary' => $task->meeting->scriptorium ?? 'N/A',
+                'Secretary' => $task->meeting->scriptorium->user_info->full_name ?? 'N/A',
                 'Assigned User' => $task->user->user_info->full_name ?? 'N/A',
                 'Action Date' => $task->sent_date ?? 'N/A',
                 'Time Out' => $task->time_out ?? 'N/A',

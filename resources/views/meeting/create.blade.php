@@ -176,7 +176,7 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
                 {{-- Boss Dropdown --}}
-                <div id="boss_dropdown" data-users='@json($users)' class="relative w-full col-span-2"
+                <div id="boss_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
                      style="direction: rtl;">
                     <x-input-label class="mb-1.5" :value="__('رئیس جلسه')"/>
                     <button id="boss-dropdown-btn" type="button"
@@ -277,7 +277,6 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-2">
 
                 {{-- Participants Dropdown (multi-select) --}}
-
                 <div id="participants_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
                      style="direction: rtl;">
                     <x-input-label class="mb-1.5" :value="__('شرکت‌کنندگان')"/>
@@ -303,7 +302,7 @@
                            value='{{ json_encode(explode(",", old("holders", ""))) }}'>
                     <x-input-error :messages="$errors->get('holders')" class="mt-2"/>
                 </div>
-                {{-- Inner Guests Dropdown (multi-select) --}}
+                {{-- innerGuest Dropdown (multi-select) --}}
                 <div id="innerGuest_dropdown" data-users='@json($participants)' class="relative w-full col-span-2"
                      style="direction: rtl;">
                     <x-input-label class="mb-1.5" :value="__('مهمانان داخلی')"/>

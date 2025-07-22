@@ -92,8 +92,8 @@
                 <option value="meeting_status">{{ __('برگزاری یا لغو جلسه') }}</option>
                 <option value="ReplacementForMeeting">{{ __('انتخاب جانشین') }}</option>
                 <option value="AssignedNewTask">{{ __('ارسال اقدام') }}</option>
-                <option value="updated_task">{{ __('ویرایش اقدام') }}</option>
-                <option value="DeniedTaskNotification">{{ __('رد اقدام') }}</option>
+                <option value="UpdatedTask">{{ __('بروزرسانی اقدام') }}</option>
+                <option value="task_action">{{ __('تایید یا رد بند مذاکره') }}</option>
             </x-select-input>
         </div>
         <div class="col-span-6 lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
@@ -105,7 +105,6 @@
             @endif
         </div>
     </form>
-
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-12" wire:poll.visible.60s>
         <x-table.table>
@@ -134,7 +133,9 @@
                         <x-table.cell>{{ $notification->recipient->user_info->full_name ?? 'N/A' }}
                             <span class="text-sm text-gray-500">({{ $notification->getReceiverRoleLabel() }})</span>
                         </x-table.cell>
-                        <x-table.cell>{{ $notification->getSentMessage() }}</x-table.cell>
+                        <x-table.cell>
+                            {{ $notification->getSentMessage() }}
+                        </x-table.cell>
                     </x-table.row>
                 @empty
                     <x-table.row>

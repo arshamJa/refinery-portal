@@ -20,33 +20,30 @@ class MeetingsExport implements FromCollection, WithHeadings
     {
         return $this->meetings->values()->map(function ($meeting, $index) {
             // Safely retrieve scriptorium info
-            $scriptoriumUserInfo = optional($meeting->scriptorium)->user_info;
-            $scriptoriumName = optional($scriptoriumUserInfo)->full_name ?? '—';
+            $scriptoriumUserInfo = optional($meeting->scriptorium->user_info);
+            $scriptoriumName = $scriptoriumUserInfo->full_name ?? '—';
             $scriptoriumDepartment = optional($scriptoriumUserInfo->department)->department_name ?? '—';
-            $scriptoriumPosition = optional($scriptoriumUserInfo)->position ?? '—';
+            $scriptoriumPosition = $scriptoriumUserInfo->position ?? '—';
 
-            // Safely retrieve boss info
-            $bossUserInfo = optional($meeting->boss)->user_info;
-            $bossName = optional($bossUserInfo)->full_name ?? '—';
+            // Boss is a user related by boss_id
+            $bossUserInfo = optional($meeting->boss->user_info);
+            $bossName = $bossUserInfo->full_name ?? '—';
 
             // Participants: exclude guests and boss
             $participants = $meeting->meetingUsers
                 ->filter(fn($mu) => !$mu->is_guest && $mu->user_id !== $meeting->boss_id)
                 ->map(fn($mu) => optional($mu->user->user_info)->full_name)
-                ->filter()
-                ->join(', ');
+                ->filter()->join(', ');
 
             // Inner Guests (users marked as guests)
             $innerGuests = $meeting->meetingUsers
                 ->filter(fn($mu) => $mu->is_guest)
                 ->map(fn($mu) => optional($mu->user->user_info)->full_name)
-                ->filter()
-                ->join(', ');
+                ->filter()->join(', ');
 
             // Outer Guests (from guest JSON)
             $outerGuests = collect(is_array($meeting->guest) ? $meeting->guest : json_decode($meeting->guest, true))
-                ->filter()
-                ->join(', ');
+                ->filter()->join(', ');
 
             return [
                 'ردیف' => $index + 1,

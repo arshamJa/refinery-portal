@@ -1,6 +1,6 @@
-@php use App\Enums\MeetingStatus;use App\Enums\UserPermission;use App\Enums\UserRole;use Illuminate\Support\Facades\Route; @endphp
-<x-app-layout>
-
+@php use App\Enums\UserPermission; @endphp
+@php use App\Enums\UserRole; @endphp
+<div>
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -18,16 +18,6 @@
                  stroke="currentColor" class="w-3 h-3 text-gray-400">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
-            <li class="flex items-center h-full">
-                <a href="{{route('refinery.report')}}"
-                   class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>{{__('نمودار جلسات/اقدامات')}}</span>
-                </a>
-            </li>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                 stroke="currentColor" class="w-3 h-3 text-gray-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
-            </svg>
             <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
@@ -36,8 +26,8 @@
             </li>
         </ol>
     </nav>
-    @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
 
+    @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <a href="{{ route('meeting.report.table') }}"
                class="{{Route::is('meeting.report.table') ? 'bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none' : 'bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black'}} flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
@@ -52,23 +42,21 @@
             </span>
             </a>
         </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
             <div
                 class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-6 col-span-1">
                 <h3 class="text-lg font-semibold text-gray-700 dark:text-white mb-4">
                     {{ __('نمودار وضعیت جلسات') }}
                 </h3>
-                @if(request()->has('statusFilter'))
-                    <div class="w-full mb-4">
-                        <a href="{{ route('meeting.report.table') }}">
-                            <x-primary-button>
-                                {{__('نمایش همه وضعیت')}}
-                            </x-primary-button>
-                        </a>
-                    </div>
+                @if ($statusFilter !== null)
+                    <a href="{{ route('meeting.report.table') }}">
+                        <x-primary-button>
+                            {{__('نمایش همه وضعیت')}}
+                        </x-primary-button>
+                    </a>
                 @endif
-                <div class="bg-gray-500 grid">
+
+                <div class="pr-12 mt-2" wire:ignore>
                     <div id="pie-chart" class="w-48 h-48"></div>
                 </div>
                 <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
@@ -89,47 +77,68 @@
                     @endforeach
                 </div>
             </div>
+
             <div
                 class="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-4">
-                <form method="GET" action="{{ route('meeting.report.table') }}">
+                <form wire:submit="filterMeetings">
                     <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end mb-2">
                         <div class="col-span-6 sm:col-span-3 lg:col-span-3">
-                            <x-input-label for="search" value="{{ __('جست و جو') }}"/>
-                            <x-search-input>
-                                <x-text-input type="text" id="search" name="search" value="{{ request('search') }}"
-                                              class="block ps-10"
-                                              placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
-                            </x-search-input>
+                            <!-- Search Input -->
+                            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                                <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                                <x-search-input>
+                                    <x-text-input type="text" id="search" wire:model="search" class="block ps-10"
+                                                  placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                                </x-search-input>
+                            </div>
                         </div>
+                        <!-- Dates Input -->
                         <div class="col-span-6 sm:col-span-3 lg:col-span-3">
                             <div class="flex flex-col sm:flex-row gap-4">
                                 <div class="flex-1">
                                     <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
                                     <x-date-input>
-                                        <x-text-input type="text" id="start_date" name="start_date"
-                                                      value="{{ request('start_date') }}" class="block ps-10"/>
+                                        <x-text-input id="start_date" wire:model="start_date" class="block ps-10"/>
                                     </x-date-input>
                                 </div>
                                 <div class="flex-1">
                                     <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
                                     <x-date-input>
-                                        <x-text-input type="text" id="end_date" name="end_date"
-                                                      value="{{ request('end_date') }}" class="block ps-10"/>
+                                        <x-text-input id="end_date" wire:model="end_date" class="block ps-10"/>
                                     </x-date-input>
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-span-6 lg:col-span-3 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
                             <x-search-button>{{ __('جست و جو') }}</x-search-button>
-                            @if(request()->hasAny(['search', 'start_date', 'end_date', 'statusFilter']))
+                            @if($search || $start_date)
                                 <x-view-all-link href="{{ route('meeting.report.table') }}">
                                     {{ __('نمایش همه') }}
                                 </x-view-all-link>
                             @endif
                         </div>
+
+                        <!-- Export Button -->
                         <div class="col-span-6 lg:col-start-5 lg:col-span-3 flex justify-start lg:justify-end mt-2">
-                            <x-export-link href="{{ route('meeting.report.download', request()->query()) }}">
-                                {{ __('خروجی Excel') }}
+                            <x-export-link wire:click.prevent="exportExcel" wire:loading.attr="disabled"
+                                           class="relative">
+                                {{-- Spinner while loading --}}
+                                <svg wire:loading wire:target="exportExcel"
+                                     class="animate-spin h-5 w-5 mr-2 text-white"
+                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                            stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor"
+                                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+                                </svg>
+                                {{-- Button Text --}}
+                                <span wire:loading.remove wire:target="exportExcel">
+                            {{ __('خروجی Excel') }}
+                        </span>
+                                <span wire:loading wire:target="exportExcel">
+                            {{ __('در حال دریافت...') }}
+                        </span>
                             </x-export-link>
                         </div>
                     </div>
@@ -148,10 +157,10 @@
                             </x-table.row>
                         </x-slot>
                         <x-slot name="body">
-                            @forelse($meetings as $meeting)
+                            @forelse($this->meetings as $meeting)
                                 <x-table.row
                                     class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50 {{ $loop->last ? 'border-b border-gray-200 dark:border-gray-700' : '' }}">
-                                    <x-table.cell>{{ ($meetings->currentPage() - 1) * $meetings->perPage() + $loop->iteration }}</x-table.cell>
+                                    <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
                                     <x-table.cell>{{ $meeting->title }}</x-table.cell>
                                     <x-table.cell>{{ $meeting->boss->user_info->full_name }}</x-table.cell>
                                     <x-table.cell>{{ $meeting->scriptorium->user_info->full_name }}</x-table.cell>
@@ -185,81 +194,15 @@
                 </div>
 
                 <div class="mt-4">
-                    {{ $meetings->withQueryString()->links() }}
+                    {{ $this->meetings->withQueryString()->links() }}
                 </div>
             </div>
         </div>
 
         <script>
-            // Meetings chart
-            {{--document.addEventListener('DOMContentLoaded', function () {--}}
-            {{--    const meetingPercentages = @json($percentages);--}}
-            {{--    const MeetingStatus = {--}}
-            {{--        PENDING: 0,--}}
-            {{--        IS_CANCELLED: 1,--}}
-            {{--        IS_NOT_CANCELLED: -1,--}}
-            {{--        IS_IN_PROGRESS: 2,--}}
-            {{--        IS_FINISHED: 3--}}
-            {{--    };--}}
-            {{--    const meetingLabels = {--}}
-            {{--        [MeetingStatus.PENDING]: "در حال بررسی دعوتنامه",--}}
-            {{--        [MeetingStatus.IS_CANCELLED]: "لغو شد",--}}
-            {{--        [MeetingStatus.IS_NOT_CANCELLED]: "برگزار می‌شود",--}}
-            {{--        [MeetingStatus.IS_IN_PROGRESS]: "در حال برگزاری",--}}
-            {{--        [MeetingStatus.IS_FINISHED]: "جلسه خاتمه یافت",--}}
-            {{--    };--}}
-            {{--    const chartData = Object.keys(MeetingStatus).map(key => {--}}
-            {{--        const statusValue = MeetingStatus[key].toString();--}}
-            {{--        return meetingPercentages[statusValue] || 0;--}}
-            {{--    });--}}
-            {{--    const chartLabels = Object.keys(MeetingStatus).map(key => meetingLabels[MeetingStatus[key]]);--}}
-            {{--    const getChartOptions = () => ({--}}
-            {{--        series: chartData,--}}
-            {{--        labels: chartLabels,--}}
-            {{--        colors: [--}}
-            {{--            "#3B82F6", // Blue → Reviewing Invitations--}}
-            {{--            "#F87171", // Red → Cancelled--}}
-            {{--            "#34D399", // Green → Will Be Held--}}
-            {{--            "#FBBF24", // Amber → In Progress--}}
-            {{--            "#A78BFA"  // Purple → Finished--}}
-            {{--        ],--}}
-            {{--        chart: {--}}
-            {{--            type: "pie",--}}
-            {{--            height: 250, // ✅ Fixed height--}}
-            {{--            width: 250,  // ✅ Fixed width to maintain circular shape--}}
-            {{--        },--}}
-            {{--        stroke: {--}}
-            {{--            colors: ["white"],--}}
-            {{--        },--}}
-            {{--        dataLabels: {--}}
-            {{--            enabled: true,--}}
-            {{--            style: {--}}
-            {{--                fontFamily: "Inter, sans-serif",--}}
-            {{--            },--}}
-            {{--            formatter: val => val.toFixed(1) + "%"--}}
-            {{--        },--}}
-            {{--        legend: {--}}
-            {{--            show: false, // ✅ Removes labels below the pie--}}
-            {{--        },--}}
-            {{--        plotOptions: {--}}
-            {{--            pie: {--}}
-            {{--                size: 160, // ✅ Controls inner size to keep it circular--}}
-            {{--                dataLabels: {--}}
-            {{--                    offset: -20--}}
-            {{--                },--}}
-            {{--                offsetX: 0,--}}
-            {{--                offsetY: 0,--}}
-            {{--            },--}}
-            {{--        },--}}
-            {{--    });--}}
-            {{--    if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {--}}
-            {{--        const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());--}}
-            {{--        chart.render();--}}
-            {{--    }--}}
-            {{--});--}}
-            // Meetings chart
             document.addEventListener('DOMContentLoaded', function () {
-                const meetingPercentages = @json($percentages);
+                const meetingPercentages = @json($this->percentages);
+
                 const MeetingStatus = {
                     PENDING: 0,
                     IS_CANCELLED: 1,
@@ -267,6 +210,7 @@
                     IS_IN_PROGRESS: 2,
                     IS_FINISHED: 3
                 };
+
                 const meetingLabels = {
                     [MeetingStatus.PENDING]: "در حال بررسی دعوتنامه",
                     [MeetingStatus.IS_CANCELLED]: "لغو شد",
@@ -274,21 +218,19 @@
                     [MeetingStatus.IS_IN_PROGRESS]: "در حال برگزاری",
                     [MeetingStatus.IS_FINISHED]: "جلسه خاتمه یافت"
                 };
+
                 const chartData = Object.keys(MeetingStatus).map(key => {
                     const statusValue = MeetingStatus[key].toString();
                     return meetingPercentages[statusValue] || 0;
                 });
+
                 const chartLabels = Object.keys(MeetingStatus).map(key => meetingLabels[MeetingStatus[key]]);
 
                 const getChartOptions = () => ({
                     series: chartData,
                     labels: chartLabels,
                     colors: [
-                        "#3B82F6", // Reviewing Invitations
-                        "#F87171", // Cancelled
-                        "#34D399", // Will Be Held
-                        "#FBBF24", // In Progress
-                        "#A78BFA"  // Finished
+                        "#3B82F6", "#F87171", "#34D399", "#FBBF24", "#A78BFA"
                     ],
                     chart: {
                         type: "pie",
@@ -296,10 +238,11 @@
                         width: 250,
                         events: {
                             dataPointSelection: function (event, chartContext, config) {
-                                const statusValues = [0, 1, -1, 2, 3]; // Order must match chartData
+                                const statusValues = [0, 1, -1, 2, 3];
                                 const selectedStatus = statusValues[config.dataPointIndex];
-                                const baseUrl = "{{ route('meeting.report.table') }}";
-                                window.location.href = `${baseUrl}?statusFilter=${selectedStatus}`;
+
+                                // 🔥 Livewire update
+                                Livewire.dispatch('updateStatusFilter', {status: selectedStatus});
                             }
                         }
                     },
@@ -308,24 +251,17 @@
                     },
                     dataLabels: {
                         enabled: true,
-                        style: {
-                            fontFamily: "Inter, sans-serif",
-                        },
                         formatter: val => val.toFixed(1) + "%"
                     },
-                    legend: {
-                        show: false,
-                    },
+                    legend: {show: false},
                     plotOptions: {
                         pie: {
                             size: 160,
                             dataLabels: {
                                 offset: -20
-                            },
-                            offsetX: 0,
-                            offsetY: 0,
-                        },
-                    },
+                            }
+                        }
+                    }
                 });
 
                 if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
@@ -334,5 +270,8 @@
                 }
             });
         </script>
+
     @endcan
-</x-app-layout>
+
+
+</div>

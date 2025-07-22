@@ -31,10 +31,10 @@ class TaskUserExport implements FromCollection, WithHeadings, WithTitle
     public function collection()
     {
         $query = TaskUser::with([
-            'task' => fn($q) => $q->select('id', 'meeting_id'),
-            'task.meeting' => fn($q) => $q->select('id', 'title', 'scriptorium'),
-            'user' => fn($q) => $q->select('id'),
-            'user.user_info' => fn($q) => $q->select('user_id', 'full_name'),
+            'task:id,meeting_id',
+            'task.meeting:id,title,scriptorium_id,boss_id',
+            'user:id',
+            'user.user_info:id,user_id,full_name',
         ]);
 
         // Apply status filter logic
@@ -80,19 +80,25 @@ class TaskUserExport implements FromCollection, WithHeadings, WithTitle
                     ->orWhere('sent_date', 'like', '%' . $search . '%')
                     ->orWhereHas('task.meeting', function ($q2) use ($search) {
                         $q2->where('title', 'like', '%' . $search . '%')
-                            ->orWhere('scriptorium', 'like', '%' . $search . '%');
+                            ->orWhereHas('scriptorium.user_info', function ($q3) use ($search) {
+                                $q3->where('full_name', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('boss.user_info', function ($q4) use ($search) {
+                                $q4->where('full_name', 'like', '%' . $search . '%');
+                            });
                     })
-                    ->orWhereHas('user.user_info', function ($q3) use ($search) {
-                        $q3->where('full_name', 'like', '%' . $search . '%');
+                    ->orWhereHas('user.user_info', function ($q5) use ($search) {
+                        $q5->where('full_name', 'like', '%' . $search . '%');
                     });
             });
         }
+
 
         return $query->get()->map(function ($taskUser, $index) {
             return [
                 'ردیف' => $index + 1,
                 'موضوع جلسه' => $taskUser->task->meeting->title ?? 'N/A',
-                'دبیر جلسه' => $taskUser->task->meeting->scriptorium ?? 'N/A',
+                'دبیر جلسه' => $taskUser->task->meeting->scriptorium->user_info->full_name ?? 'N/A',
                 'اقدام کننده' => $taskUser->user->user_info->full_name ?? 'N/A',
                 'تاریخ انجام اقدام' => $taskUser->sent_date ?? '---',
                 'تاریخ مهلت اقدام' => $taskUser->time_out ?? '---',

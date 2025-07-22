@@ -64,9 +64,9 @@ class ProfilePageController extends Controller
     {
         Gate::authorize('profile-page');
         $validated = $request->validate([
-            'photo' => ['nullable','mimes:jpg,png,jpeg,webp','max:1024']
+            'photo' => ['nullable','image','max:1024']
         ]);
-        $path = $request->file('photo')->store('profiles','public');
+        $path = $request->file($validated['photo'])->store('profiles','public');
         DB::table('users')->where('id',\auth()->user()->id)->update([
             'profile_photo_path' => $path
         ]);

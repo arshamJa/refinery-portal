@@ -37,119 +37,121 @@
         </ol>
     </nav>
 
-    @can('has-permission',UserPermission::TASK_REPORT_TABLE)
-        <form method="GET" action="{{route('completedTasks')}}">
-            @csrf
-            <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
-                <!-- Search Input -->
-                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
-                    <x-search-input>
-                        <x-text-input type="text" id="search" name="search"
-                                      class="block ps-10"
-                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
-                    </x-search-input>
-                </div>
-                <!-- Date Inputs (side-by-side) -->
-                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <div class="flex-1">
-                            <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
-                            <x-date-input>
-                                <x-text-input id="start_date" name="start_date" class="block ps-10"/>
-                            </x-date-input>
-                        </div>
-                        <div class="flex-1">
-                            <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
-                            <x-date-input>
-                                <x-text-input id="end_date" name="end_date" class="block ps-10"/>
-                            </x-date-input>
-                        </div>
+    <form method="GET" action="{{route('completedTasks')}}">
+        @csrf
+        <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end">
+            <!-- Search Input -->
+            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                <x-search-input>
+                    <x-text-input type="text" id="search" name="search"
+                                  class="block ps-10"
+                                  placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                </x-search-input>
+            </div>
+            <!-- Date Inputs (side-by-side) -->
+            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-1">
+                        <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
+                        <x-date-input>
+                            <x-text-input id="start_date" name="start_date" class="block ps-10"/>
+                        </x-date-input>
+                    </div>
+                    <div class="flex-1">
+                        <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
+                        <x-date-input>
+                            <x-text-input id="end_date" name="end_date" class="block ps-10"/>
+                        </x-date-input>
                     </div>
                 </div>
-
-
-                <!-- Search + Show All Buttons -->
-                <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
-                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
-                    @if(request()->has('search') || request()->has('start_date'))
-                        <x-view-all-link href="{{route('completedTasks')}}">
-                            {{ __('نمایش همه') }}
-                        </x-view-all-link>
-                    @endif
-                </div>
-                <!-- Export Button under the right group -->
-                <!-- For Completed Tasks -->
-                <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
-                    <x-export-link href="{{ route('tasks.report.completed.download', request()->query()) }}">
-                        {{ __('خروجی Excel') }}
-                    </x-export-link>
-                </div>
             </div>
-        </form>
 
-        <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
-            <x-table.table>
-                <x-slot name="head">
-                    <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                        @foreach (['#', 'موضوع جلسه و دبیر جلسه', 'اقدام کننده', 'تاریخ انجام اقدام', 'تاریخ مهلت اقدام', 'قابلیت'] as $th)
-                            <x-table.heading
-                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
-                                {{ __($th) }}
-                            </x-table.heading>
-                        @endforeach
-                    </x-table.row>
-                </x-slot>
 
-                <x-slot name="body">
+            <!-- Search + Show All Buttons -->
+            <div class="col-span-6 lg:col-span-2 flex justify-start lg:justify-end flex-row gap-4 mt-4 lg:mt-0">
+                <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                @if(request()->has('search') || request()->has('start_date'))
+                    <x-view-all-link href="{{route('completedTasks')}}">
+                        {{ __('نمایش همه') }}
+                    </x-view-all-link>
+                @endif
+            </div>
+            <!-- Export Button under the right group -->
+            <!-- For Completed Tasks -->
+            <div class="col-span-6 lg:col-start-5 lg:col-span-2 flex justify-start lg:justify-end mt-2">
+                <x-export-link href="{{ route('tasks.report.completed.download', request()->query()) }}">
+                    {{ __('خروجی Excel') }}
+                </x-export-link>
+            </div>
+        </div>
+    </form>
+
+    <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
+        <x-table.table>
+            <x-slot name="head">
+                <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                    @foreach (['#', 'موضوع جلسه و دبیر جلسه', 'اقدام کننده', 'تاریخ انجام اقدام', 'تاریخ مهلت اقدام',
+//'قابلیت'
+] as $th)
+                        <x-table.heading
+                            class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                            {{ __($th) }}
+                        </x-table.heading>
+                    @endforeach
+                </x-table.row>
+            </x-slot>
+
+            <x-slot name="body">
+                @php
+                    $grouped = $taskUsers->groupBy(fn($item) => $item->task->meeting->id);
+                    $rowIndex = ($taskUsers->currentPage() - 1) * $taskUsers->perPage();
+                @endphp
+
+                @forelse ($grouped as $meetingId => $group)
                     @php
-                        $grouped = $taskUsers->groupBy(fn($item) => $item->task->meeting->id);
-                        $rowIndex = ($taskUsers->currentPage() - 1) * $taskUsers->perPage();
+                        $rowspan = $group->count();
                     @endphp
 
-                    @forelse ($grouped as $meetingId => $group)
-                        @php
-                            $rowspan = $group->count();
-                        @endphp
-
-                        @foreach ($group as $i => $taskUser)
-                            <x-table.row class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-100">
-                                {{-- Row number --}}
-                                <x-table.cell>{{ ++$rowIndex }}</x-table.cell>
-                                {{-- Meeting summary + Scriptorium (only for first row in group) --}}
-                                @if ($i === 0)
-                                    <x-table.cell class="text-right align-top" rowspan="{{ $rowspan }}">
-                                        <div>
-                                            <strong>{{ $taskUser->task->meeting->title  }}</strong>
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            دبیر جلسه: {{$taskUser->task->meeting->scriptorium}}
-                                        </div>
-                                    </x-table.cell>
-                                @endif
-                                <x-table.cell>{{ $taskUser->user->user_info->full_name ?? '---' }}</x-table.cell>
-                                <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
-                                <x-table.cell>{{ $taskUser->time_out ?? '---' }}</x-table.cell>
-                                <x-table.cell>
-                                    <a href="{{ route('participant.task.report', ['meeting_id' => $taskUser->task->meeting_id, 'user_id' => $taskUser->user_id]) }}">
-                                        <x-edit-button>{{ __('نمایش جزئیات') }}</x-edit-button>
-                                    </a>
+                    @foreach ($group as $i => $taskUser)
+                        <x-table.row
+                            class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-100">
+                            {{-- Row number --}}
+                            <x-table.cell>{{ ++$rowIndex }}</x-table.cell>
+                            {{-- Meeting summary + Scriptorium (only for first row in group) --}}
+                            @if ($i === 0)
+                                <x-table.cell class="text-right align-top" rowspan="{{ $rowspan }}">
+                                    <div>
+                                        <strong>{{ $taskUser->task->meeting->title  }}</strong>
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        دبیر جلسه: {{$taskUser->task->meeting->scriptorium->user_info->full_name}}
+                                    </div>
                                 </x-table.cell>
-                            </x-table.row>
-                        @endforeach
-                    @empty
-                        <x-table.row>
-                            <x-table.cell colspan="7" class="py-6 text-center">
-                                {{ __('رکوردی یافت نشد ...') }}
-                            </x-table.cell>
+                            @endif
+                            <x-table.cell>{{ $taskUser->user->user_info->full_name ?? '---' }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
+                            <x-table.cell>{{ $taskUser->time_out ?? '---' }}</x-table.cell>
+{{--                            <x-table.cell>--}}
+{{--                                <a href="{{ route('participant.task.report', ['meeting_id' => $taskUser->task->meeting_id, 'user_id' => $taskUser->user_id]) }}">--}}
+{{--                                    <x-edit-button>{{ __('نمایش جزئیات') }}</x-edit-button>--}}
+{{--                                </a>--}}
+{{--                            </x-table.cell>--}}
                         </x-table.row>
-                    @endforelse
-                </x-slot>
-            </x-table.table>
-        </div>
-        <div class="mt-2">
-            {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
-        </div>
-    @endcan
+                    @endforeach
+                @empty
+                    <x-table.row>
+                        <x-table.cell colspan="7" class="py-6 text-center">
+                            {{ __('رکوردی یافت نشد ...') }}
+                        </x-table.cell>
+                    </x-table.row>
+                @endforelse
+            </x-slot>
+        </x-table.table>
+    </div>
+    <div class="mt-2">
+        {{ $taskUsers->withQueryString()->links(data: ['scrollTo' => false]) }}
+    </div>
+
 
 </x-app-layout>

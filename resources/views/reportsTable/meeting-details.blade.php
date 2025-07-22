@@ -1,4 +1,4 @@
-@php use App\Enums\MeetingUserStatus; @endphp
+@php use App\Enums\MeetingUserStatus;use App\Enums\UserPermission;use App\Enums\UserRole; @endphp
 <x-app-layout>
 
     <nav class="flex justify-between mb-4 mt-20">
@@ -49,173 +49,185 @@
         </ol>
     </nav>
 
-
-
-
-    <div id="meeting-summary"
-         class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
-        {{-- Meeting Overview --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {{-- Boss Info --}}
-            <div
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">رئیس جلسه</h4>
-                <div class="space-y-1 text-sm">
-                    <p>
-                        <span class="font-medium">نام:</span>
-                        <span data-role="boss-name">{{ $meeting->boss }}</span>
-                    </p>
-                    <p>
-                        <span class="font-medium">واحد:</span>
-                        <span data-role="boss-unit">{{ $bossInfo->department->department_name ?? '---' }}</span>
-                    </p>
-                    <p>
-                        <span class="font-medium">سمت:</span>
-                        <span data-role="boss-position">{{ $bossInfo->position ?? '---' }}</span>
-                    </p>
+    @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
+        <div id="meeting-summary"
+             class="py-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
+            {{-- Meeting Overview --}}
+            <h2 class="text-2xl font-bold text-center mb-6">
+                {{ __('عنوان جلسه:') }} {{ $meeting->title ?? '---' }}
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                {{-- Boss Info --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('رئیس جلسه')}}</h4>
+                    <div class="space-y-1 text-sm">
+                        <p><span class="font-medium">{{__('نام:')}}</span>
+                            <span
+                                data-role="boss-name">{{ optional($meeting->boss->user_info)->full_name ?? '---' }}</span>
+                        </p>
+                        <p><span class="font-medium">{{__('واحد:')}}</span>
+                            <span
+                                data-role="boss-unit">{{ optional(optional($meeting->boss->user_info)->department)->department_name ?? '---' }}</span>
+                        </p>
+                        <p><span class="font-medium">{{__('سمت:')}}</span>
+                            <span
+                                data-role="boss-position">{{ optional($meeting->boss->user_info)->position ?? '---' }}</span>
+                        </p>
+                    </div>
+                </div>
+                {{-- Scriptorium --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('دبیر جلسه')}}</h4>
+                    <div class="space-y-1 text-sm">
+                        <p><span class="font-medium">{{__('نام:')}}</span>
+                            <span
+                                data-role="scriptorium-name">{{ optional($meeting->scriptorium->user_info)->full_name ?? '---' }}</span>
+                        </p>
+                        <p><span class="font-medium">{{__('واحد:')}}</span>
+                            <span
+                                data-role="scriptorium-unit">{{ optional(optional($meeting->scriptorium->user_info)->department)->department_name ?? '---' }}</span>
+                        </p>
+                        <p><span class="font-medium">{{__('سمت:')}}</span>
+                            <span
+                                data-role="scriptorium-position">{{ optional($meeting->scriptorium->user_info)->position ?? '---' }}</span>
+                        </p>
+                    </div>
+                </div>
+                {{-- Time / Location --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('زمان و مکان')}}</h4>
+                    <div class="space-y-1 text-sm">
+                        <p>
+                            <span class="font-medium">{{__('تاریخ:')}}</span>
+                            <span data-role="meeting-date">{{ $meeting->date }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('ساعت:')}}</span>
+                            <span data-role="meeting-time">{{ $meeting->time }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('مکان:')}}</span>
+                            <span data-role="meeting-location">{{ $meeting->location }}</span>
+                        </p>
+                    </div>
+                </div>
+                {{-- Committee / Treat --}}
+                <div
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
+                    <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">{{__('اطلاعات تکمیلی')}}</h4>
+                    <div class="space-y-1 text-sm">
+                        <p>
+                            <span class="font-medium">{{__('واحد برگزار کننده:')}}</span>
+                            <span data-role="meeting-unit">{{ $meeting->unit_held }}</span>
+                        </p>
+                        <p>
+                            <span class="font-medium">{{__('پذیرایی:')}}</span>
+                            <span data-role="meeting-treat">{{ $meeting->treat ? 'دارد' : 'ندارد' }}</span>
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            {{-- Scriptorium --}}
-            <div
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">دبیر جلسه</h4>
-                <div class="space-y-1 text-sm">
-                    <p>
-                        <span class="font-medium">نام:</span>
-                        <span data-role="scriptorium-name">{{ $meeting->scriptorium }}</span>
-                    </p>
-                    <p>
-                        <span class="font-medium">واحد:</span>
-                        <span data-role="scriptorium-unit">{{ $meeting->scriptorium_department }}</span>
-                    </p>
-                    <p>
-                        <span class="font-medium">سمت:</span>
-                        <span data-role="scriptorium-position">{{ $meeting->scriptorium_position }}</span>
-                    </p>
-                </div>
-            </div>
-
-            {{-- Time / Location --}}
-            <div
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">زمان و مکان</h4>
-                <div class="space-y-1 text-sm">
-                    <p>
-                        <span class="font-medium">تاریخ:</span>
-                        <span data-role="meeting-date">{{ $meeting->date }}</span>
-                    </p>
-                    <p>
-                        <span class="font-medium">ساعت:</span>
-                        <span data-role="meeting-time">{{ $meeting->time }}</span>
-                    </p>
-                    <p>
-                        <span class="font-medium">مکان:</span>
-                        <span data-role="meeting-location">{{ $meeting->location }}</span>
-                    </p>
-                </div>
-            </div>
-            {{-- Committee / Treat --}}
-            <div
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-md">
-                <h4 class="text-base font-semibold mb-3 text-gray-900 dark:text-white">اطلاعات تکمیلی</h4>
-                <div class="space-y-1 text-sm">
-                    <p>
-                        <span class="font-medium">برگزار کننده:</span>
-                        <span data-role="meeting-unit">{{ $meeting->unit_held }}</span>
-                    </p>
-                    <p>
-                        <span class="font-medium">پذیرایی:</span>
-                        <span data-role="meeting-treat">{{ $meeting->treat ? 'دارد' : 'ندارد' }}</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg my-12">
-            <x-table.table>
-                <caption class="caption-top">{{__('اعضای جلسه')}}</caption>
-                <x-slot name="head">
-                    <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                        @foreach (['#','نام','واحد','سمت','وضعیت','جایگزین','دلیل غیبت'] as $th)
-                            <x-table.heading
-                                class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
-                                {{ __($th) }}
-                            </x-table.heading>
-                        @endforeach
-                    </x-table.row>
-                </x-slot>
-                <x-slot name="body">
-                    @foreach($participants as $user)
-                        <x-table.row
-                            class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                            <x-table.cell>{{  $loop->iteration }}</x-table.cell>
-                            <x-table.cell>{{$user->user->user_info->full_name ?? 'N/A'}}</x-table.cell>
-                            <x-table.cell>{{$user->user->user_info->department->department_name ?? 'N/A'}}</x-table.cell>
-                            <x-table.cell>{{$user->user->user_info->position ?? 'N/A'}}</x-table.cell>
-                            <x-table.cell>
-                                @php
-                                    $status = $user->is_present;
-                                    $statusText = match($status) {
-                                        MeetingUserStatus::IS_PRESENT->value => 'حاضر',
-                                        MeetingUserStatus::IS_NOT_PRESENT->value => 'غایب',
-                                        MeetingUserStatus::PENDING->value => 'نامشخص',
-                                    };
-                                @endphp
-                                {{ $statusText }}
-                            </x-table.cell>
-                            <x-table.cell>{{$user->replacementName() ?? '-' }}</x-table.cell>
-                            <x-table.cell>{{ $status == -1 ? $user->reason_for_absent : '-' }}</x-table.cell>
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg my-12">
+                <x-table.table>
+                    <caption class="caption-top">{{__('اعضای جلسه')}}</caption>
+                    <x-slot name="head">
+                        <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
+                            @foreach (['#','نام','واحد','سمت','وضعیت','جایگزین','دلیل غیبت'] as $th)
+                                <x-table.heading
+                                    class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
+                                    {{ __($th) }}
+                                </x-table.heading>
+                            @endforeach
                         </x-table.row>
-                    @endforeach
-                </x-slot>
-            </x-table.table>
-        </div>
+                    </x-slot>
+                    <x-slot name="body">
+                        @php
+                            $replacementUserIds = $participants->pluck('replacement')->filter()->unique();
+                            $rowNumber = 1;
+                        @endphp
 
-        {{-- Inner Guests --}}
-        <div class="mb-10">
-            <h3 class="text-lg font-semibold border-b pb-1 mb-3">مهمانان درون سازمانی</h3>
-            @if ($innerGuests->isNotEmpty())
-                <ul class="space-y-1 list-disc pl-5">
-                    @foreach($innerGuests as $user)
-                        <li>
-                            {{ $user->user->user_info->full_name ?? 'N/A' }} -
-                            {{ $user->user->user_info->department->department_name ?? '---' }} -
-                            {{ $user->user->user_info->position ?? '---' }}
-                        </li>
-                    @endforeach
-                </ul>
-            @else
-                <p class="text-gray-500">مهمان درون سازمانی وجود ندارد</p>
-            @endif
-        </div>
+                        @foreach($participants as $user)
+                            @php
+                                $userInfo = optional($user->user->user_info);
+                                $currentUserId = $userInfo?->user_id;
+                            @endphp
 
-        {{-- Outer Guests --}}
-        <div>
-            <h3 class="text-lg font-semibold border-b pb-1 mb-3">مهمانان برون سازمانی</h3>
-            @if (!empty($guests))
-                <ul class="space-y-1 list-disc pl-5">
-                    @foreach ($guests as $guest)
-                        <li>
-                            {{ $guest['name'] ?? 'نام ندارد' }}
-                            @if (!empty($guest['companyName']))
-                                - شرکت: {{ $guest['companyName'] }}
+                            @if ($replacementUserIds->contains($currentUserId))
+                                @continue
                             @endif
-                        </li>
-                    @endforeach
-                </ul>
-            @else
-                <p class="text-gray-500">مهمان برون سازمانی وجود ندارد</p>
-            @endif
+
+                            <x-table.row
+                                class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
+                                <x-table.cell>{{ $rowNumber++ }}</x-table.cell>
+                                <x-table.cell>{{ $userInfo->full_name ?? 'N/A' }}</x-table.cell>
+                                <x-table.cell>{{ $userInfo->department?->department_name ?? '---' }}</x-table.cell>
+                                <x-table.cell>{{ $userInfo->position ?? '---' }}</x-table.cell>
+                                <x-table.cell>
+                                    @php
+                                        $status = $user->is_present;
+                                        $statusText = match($status) {
+                                            MeetingUserStatus::IS_PRESENT->value => 'حاضر',
+                                            MeetingUserStatus::IS_NOT_PRESENT->value => 'غایب',
+                                            MeetingUserStatus::PENDING->value => 'نامشخص',
+                                        };
+                                    @endphp
+                                    {{ $statusText }}
+                                </x-table.cell>
+                                <x-table.cell>{{ $user->replacementName() ?? '-' }}</x-table.cell>
+                                <x-table.cell>{{ $status == MeetingUserStatus::IS_NOT_PRESENT->value ? $user->reason_for_absent : '-' }}</x-table.cell>
+                            </x-table.row>
+                        @endforeach
+                    </x-slot>
+                </x-table.table>
+            </div>
+
+            {{-- Inner Guests --}}
+            <div class="mb-10 no-page-break">
+                <h3 class="text-lg font-semibold border-b pb-1 mb-3">{{__('مهمانان درون سازمانی')}}</h3>
+                @if ($innerGuests->isNotEmpty())
+                    <ul class="space-y-1 list-disc mr-6">
+                        @foreach($innerGuests as $user)
+                            <li>
+                                {{ optional($user->user->user_info)->full_name ?? 'N/A' }} -
+                                {{ optional(optional($user->user->user_info)->department)->department_name ?? '---' }} -
+                                {{ optional($user->user->user_info)->position ?? '---' }}
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-gray-500">{{__('مهمان درون سازمانی وجود ندارد')}}</p>
+                @endif
+            </div>
+
+            {{-- Outer Guests --}}
+            <div class="mb-10 no-page-break">
+                <h3 class="text-lg font-semibold border-b pb-1 mb-3">{{__('مهمانان برون سازمانی')}}</h3>
+                @if (!empty($guests))
+                    <ul class="space-y-1 list-disc mr-6">
+                        @foreach ($guests as $guest)
+                            <li>
+                                {{ $guest['name'] ?? 'نام ندارد' }}
+                                @if (!empty($guest['companyName']))
+                                    - شرکت: {{ $guest['companyName'] }}
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-gray-500">{{__('مهمان برون سازمانی وجود ندارد')}}</p>
+                @endif
+            </div>
+
+            <button onclick="printMeetingSummary(`{{ $meeting->title }}`)"
+                    class="px-4 py-2 mt-4 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-xs uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
+                {{__('چاپ اطلاعات جلسه')}}
+            </button>
+
+            <script src="{{ asset('js/printMeeting.js') }}"></script>
         </div>
-
-        <button onclick="printMeetingSummary(`{{ $meeting->title }}`)"
-                class="px-4 py-2 mt-4 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-xs uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
-            {{__('چاپ اطلاعات جلسه')}}
-        </button>
-
-        <script src="{{ asset('js/printMeeting.js') }}"></script>
-    </div>
-
-
+    @endcan
 </x-app-layout>

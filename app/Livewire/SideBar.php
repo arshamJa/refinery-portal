@@ -4,8 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Notification;
 use App\Traits\HasNotificationCount;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -24,13 +22,6 @@ class SideBar extends Component
     {
         return Notification::where('recipient_id', auth()->id())
             ->whereNull('recipient_read_at')
-            ->count();
-    }
-    #[Computed]
-    public function unreadSentCount()
-    {
-        return Notification::where('sender_id', auth()->id())
-            ->whereNull('sender_read_at')
             ->count();
     }
 }

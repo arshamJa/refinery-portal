@@ -91,7 +91,9 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="bg-gray-100 dark:bg-gray-800 whitespace-nowrap">
-                    @foreach (['#','موضوع جلسه و دبیر جلسه','افدام کننده','تاریخ مهلت اقدام','تاریخ انجام اقدام','مدت زمان','قابلیت'] as $th)
+                    @foreach (['#','موضوع جلسه و دبیر جلسه','افدام کننده','تاریخ مهلت اقدام','تاریخ انجام اقدام','مدت زمان',
+//'قابلیت'
+] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -125,7 +127,7 @@
                                         <strong>{{ $taskUser->task->meeting->title  }}</strong>
                                     </div>
                                     <div class="text-sm text-gray-500">
-                                        دبیر جلسه: {{$taskUser->task->meeting->scriptorium}}
+                                        دبیر جلسه: {{$taskUser->task->meeting->scriptorium->user_info->full_name}}
                                     </div>
                                 </x-table.cell>
                             @endif
@@ -144,14 +146,14 @@
                                     <span class="text-green-600 font-bold">{{ $taskUser->remaining_diff }}</span>
                                 @endif
                             </x-table.cell>
-                            <x-table.cell>
-                                <a href="{{route('participant.task.report',
-                                ['meeting_id'=>$taskUser->task->meeting_id,'user_id'=>$taskUser->user_id])}}">
-                                    <x-edit-button>
-                                        {{__('نمایش جزئیات')}}
-                                    </x-edit-button>
-                                </a>
-                            </x-table.cell>
+{{--                            <x-table.cell>--}}
+{{--                                <a href="{{route('participant.task.report',--}}
+{{--                                ['meeting_id'=>$taskUser->task->meeting_id,'user_id'=>$taskUser->user_id])}}">--}}
+{{--                                    <x-edit-button>--}}
+{{--                                        {{__('نمایش جزئیات')}}--}}
+{{--                                    </x-edit-button>--}}
+{{--                                </a>--}}
+{{--                            </x-table.cell>--}}
                         </x-table.row>
                     @endforeach
                 @empty

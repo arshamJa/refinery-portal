@@ -13,10 +13,10 @@ class Role extends Model
     protected $fillable = ['name'];
 
     // Many-to-many relationship with Permission
-//    public function permissions(): BelongsToMany
-//    {
-//        return $this->belongsToMany(Permission::class);
-//    }
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
 
     // Many-to-many relationship with User
     public function users(): BelongsToMany

@@ -78,15 +78,15 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
-    public function assignRole(Role $role): self
-        {
-            // Eager load roles before syncing
-            if (! $this->relationLoaded('roles')) {
-                $this->load('roles');
-            }
-            $this->roles()->syncWithoutDetaching($role);
-            return $this;
-        }
+//    public function assignRole(Role $role): self
+//        {
+//            // Eager load roles before syncing
+//            if (! $this->relationLoaded('roles')) {
+//                $this->load('roles');
+//            }
+//            $this->roles()->syncWithoutDetaching($role);
+//            return $this;
+//        }
     public function removeRole(Role $role): self
     {
         // Eager load roles before detaching
@@ -105,14 +105,14 @@ class User extends Authenticatable
         $this->roles()->sync($roles);
         return $this;
     }
-    public function syncPermissions(array $permissions): self
-    {
-        if (! $this->relationLoaded('permissions')) {
-            $this->load('permissions');
-        }
-        $this->permissions()->sync($permissions);
-        return $this;
-    }
+//    public function syncPermissions(array $permissions): self
+//    {
+//        if (! $this->relationLoaded('permissions')) {
+//            $this->load('permissions');
+//        }
+//        $this->permissions()->sync($permissions);
+//        return $this;
+//    }
     public function hasRole(string $role): bool
     {
         if (!$this->relationLoaded('roles')) {

@@ -218,11 +218,11 @@ class ViewTaskPage extends Component
         }
 
         // Clear previous notifications of these types for this user and meeting
-        \App\Models\Notification::where('recipient_id', $taskUser->user_id)
-            ->whereIn('type', ['UpdatedTaskTimeOut', 'UpdatedTaskBody'])
-            ->where('notifiable_type', \App\Models\Meeting::class)
-            ->where('notifiable_id', $meetingId)
-            ->delete();
+//        \App\Models\Notification::where('recipient_id', $taskUser->user_id)
+//            ->whereIn('type', ['UpdatedTaskTimeOut', 'UpdatedTaskBody'])
+//            ->where('notifiable_type', \App\Models\Meeting::class)
+//            ->where('notifiable_id', $meetingId)
+//            ->delete();
 
         // Insert one combined notification if any changes were made
         if ($notificationMessage) {
@@ -256,7 +256,8 @@ class ViewTaskPage extends Component
     }
     public function deleteTask()
     {
-        abort_if(!Gate::allows('scriptorium-role'), 403);
+        $scriptorium_id = Meeting::find($this->meeting)->scriptorium_id;
+        abort_unless($scriptorium_id === auth()->id(), 403);
         $validated = Validator::make(
             ['task_id' => $this->task_id,],
             ['task_id' => 'required|exists:tasks,id'],
@@ -265,11 +266,8 @@ class ViewTaskPage extends Component
 
         // Fetch the task for ownership check
         $task = DB::table('tasks')->where('id', $this->task_id)->first();
-
         // Optional: add null check just in case
         abort_if(!$task, 404);
-
-
         // Perform deletion in a transaction
         DB::transaction(function () {
             DB::table('task_users')->where('task_id', $this->task_id)->delete();
@@ -349,24 +347,60 @@ class ViewTaskPage extends Component
 //        }
 //        return $this->loadedEmployees;
 //    }
+//    #[Computed]
+//    public function participants()
+//    {
+//        $meeting = $this->meetings();
+//        $bossId = $meeting->boss_id;
+//        $meetingUsers = $meeting->meetingUsers
+//            ->filter(fn($mu) => !$mu->is_guest && $mu->user->user_info->user_id != $bossId);
+//
+//        return $meetingUsers->map(function ($meetingUser) {
+//            $userInfo = $meetingUser->user->user_info;
+//            return [
+//                'user_id' => $userInfo->user_id,
+//                'full_name' => $userInfo->full_name,
+//                'position' => $userInfo->position ?? '',
+//                'department_name' => $userInfo->department ? $userInfo->department->department_name : '',
+//            ];
+//        })->values();
+//    }
     #[Computed]
     public function participants()
     {
         $meeting = $this->meetings();
         $bossId = $meeting->boss_id;
+
         $meetingUsers = $meeting->meetingUsers
             ->filter(fn($mu) => !$mu->is_guest && $mu->user->user_info->user_id != $bossId);
 
-        return $meetingUsers->map(function ($meetingUser) {
+        // Get a list of replaced user IDs
+        $replacedUserIds = $meetingUsers->pluck('replacement')->filter()->unique();
+
+        return $meetingUsers->filter(function ($mu) use ($replacedUserIds) {
+            // Skip users who were replaced by someone else
+            return !$replacedUserIds->contains($mu->user_id);
+        })->map(function ($meetingUser) use ($meeting) {
             $userInfo = $meetingUser->user->user_info;
+
+            $replacedUser = null;
+            if ($meetingUser->replacement) {
+                $replaced = $meeting->meetingUsers->firstWhere('user_id', $meetingUser->replacement);
+                if ($replaced && $replaced->user && $replaced->user->user_info) {
+                    $replacedUser = $replaced->user->user_info->full_name;
+                }
+            }
+
             return [
                 'user_id' => $userInfo->user_id,
                 'full_name' => $userInfo->full_name,
                 'position' => $userInfo->position ?? '',
-                'department_name' => $userInfo->department ? $userInfo->department->department_name : '',
+                'department_name' => $userInfo->department?->department_name ?? '',
+                'replacing' => $replacedUser,
             ];
         })->values();
     }
+
     #[Computed]
     public function tasks()
     {
@@ -418,31 +452,20 @@ class ViewTaskPage extends Component
      */
     public function acceptTask($taskUserId)
     {
-        // Load TaskUser with related task
+        // Load TaskUser with its related Task (which includes meeting_id and body)
         $taskUser = TaskUser::with('task:id,meeting_id,body')->findOrFail($taskUserId);
-
-        // Select specific columns from related Meeting
-        $meeting = Meeting::select('id', 'title', 'scriptorium', 'scriptorium_position')
-            ->findOrFail($taskUser->task->meeting_id);
-
-        // Authorization: user must own this TaskUser record
+        // Authorization: only the assigned user can accept the task
         abort_unless($taskUser->user_id === auth()->id(), 403);
-
-        // Get user info of meeting scriptorium
-        $userInfo = UserInfo::where('full_name', $meeting->scriptorium)
-            ->where('position', $meeting->scriptorium_position)
-            ->first();
-
-        // Update task status directly on the model
+        // Load related Meeting (only needed fields)
+        $meeting = Meeting::select('id', 'title', 'scriptorium_id')->findOrFail($taskUser->task->meeting_id);
+        // Get the scriptorium user's user_id from meeting->scriptorium_id
+        $recipientId = $meeting->scriptorium_id;
+        // Update the task status
         $taskUser->update(['task_status' => TaskStatus::ACCEPTED->value]);
-
-        // Prepare notification message
-        $notificationMessage = "این شخص ".
+        // Build notification message
+        $notificationMessage = "این شخص " .
             " بند با عنوان «" . $taskUser->task->body . "» را در جلسه «" . $meeting->title . "» قبول کرد.";
-
-        $recipientId = $userInfo->user_id;
-
-        // Create notification
+        // Create notification for the scriptorium
         Notification::create([
             'type' => 'AcceptedTask',
             'data' => json_encode(['message' => $notificationMessage]),
@@ -451,7 +474,6 @@ class ViewTaskPage extends Component
             'sender_id' => auth()->id(),
             'recipient_id' => $recipientId,
         ]);
-
         session()->flash('status', 'بند تایید شد');
         return to_route('view.task.page', $taskUser->task->meeting_id);
     }
@@ -669,11 +691,6 @@ class ViewTaskPage extends Component
         $this->dispatch('crud-modal', name: 'lock-task');
     }
 
-
-
-
-
-
     /**
      * To deny the Task by participant
      * @throws AuthorizationException
@@ -692,39 +709,42 @@ class ViewTaskPage extends Component
      */
     public function denyTask()
     {
+        // Validate the reason for denial
         $validated = Validator::make(
             ['request_task' => $this->request_task],
-            ['request_task' => 'required|min:3'],
-            ['required' => 'فیلد دلیل رد خلاصه مذاکره اجباری است.', 'min' => 'دلیل رد باید حداقل ۳ کاراکتر باشد.']
+            ['request_task' => 'required|string|min:3|max:255'],
+            ['required' => 'فیلد دلیل رد خلاصه مذاکره اجباری است.',
+                'min' => 'دلیل رد باید حداقل ۳ کاراکتر باشد.',
+                'max' => 'دلیل رد نباید بیشتر از ۲۵۵ کاراکتر باشد.'
+            ]
         )->validate();
 
+        // Normalize the input
         $request_task = $this->normalizeText($validated['request_task']);
 
-        // Find the Task model
+        // Find the task assignment for the authenticated user
+        $taskUser = TaskUser::where('id', $this->selectedTaskUserId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
-        $taskUser = TaskUser::where('id', $this->selectedTaskUserId)->where('user_id', auth()->id())->firstOrFail();
-
+        // Double-check authorization (optional, since query already filters by user_id)
         abort_unless($taskUser->user_id === auth()->id(), 403);
 
-        // Update the task's status and reason
+        // Update the taskUser with denial status and reason
         $taskUser->update([
             'task_status' => TaskStatus::DENIED,
             'request_task' => $request_task,
         ]);
 
-        // Get the related meeting
+        // Get meeting and task info
         $meeting = $taskUser->task->meeting;
-
         $meetingTitle = $meeting->title ?? 'بدون عنوان';
         $taskBody = $taskUser->task->body ?? 'بدون توضیح';
 
-        $notificationMessage = "بند مذاکره با عنوان «{$taskBody}» در جلسه «{$meetingTitle}» توسط این شخص رد شده است. دلیل: {$request_task}";
-
-        // Find the scriptorium (recipient) user ID
-        $recipientId = User::whereHas('user_info', function ($query) use ($meeting) {
-            $query->where('full_name', $meeting->scriptorium);
-        })->value('id');
-
+        $notificationMessage = "این شخص " ." بند با عنوان «" . $taskBody . "» را در جلسه «" . $meetingTitle . "» رد کرد. " ."دلیل رد: «" . $request_task . "».";
+        // Use scriptorium_id directly
+        $recipientId = $meeting->scriptorium_id;
+        // Send notification to the scriptorium
         if ($recipientId) {
             Notification::create([
                 'type' => 'DeniedTask',
@@ -735,10 +755,11 @@ class ViewTaskPage extends Component
                 'recipient_id' => $recipientId,
             ]);
         }
-        $this->dispatch('close-modal');
 
+        $this->dispatch('close-modal');
         session()->flash('status', 'درخواست رد شما به دبیر جلسه ارسال شد.');
-        return to_route('view.task.page',$this->meeting);
+
+        return to_route('view.task.page', $this->meeting);
     }
 
     public function sendToScriptorium($taskId)
@@ -752,6 +773,7 @@ class ViewTaskPage extends Component
             abort(404);
         }
 
+        // Convert Gregorian date to Jalali date (assuming gregorian_to_jalali() exists)
         list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
         $newTime = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
 
@@ -763,30 +785,19 @@ class ViewTaskPage extends Component
                 'task_status' => TaskStatus::SENT_TO_SCRIPTORIUM->value,
             ]);
 
-        // === Notification Logic ===
+        // Load task and meeting models
         $task = \App\Models\Task::with('meeting')->findOrFail($taskId);
         $meeting = $task->meeting;
 
-        // Extract scriptorium full name and position from meeting
-        $scriptoriumName = $meeting->scriptorium;
-        $scriptoriumPosition = $meeting->scriptorium_position;
-
-        // Find the corresponding user_id from user_info
-        $scriptoriumUser = DB::table('user_infos')
-            ->where('full_name', $scriptoriumName)
-            ->where('position', $scriptoriumPosition)
-            ->first();
-
-        $scriptoriumId = $scriptoriumUser?->user_id ?? null;
+        // Get scriptorium user ID directly from meeting
+        $scriptoriumId = $meeting->scriptorium_id;
 
         if ($scriptoriumId) {
-            $senderName = auth()->user()->user_info->full_name ?? 'کاربر';
-            $message = "{$senderName} وظیفه خود را برای جلسه «{$meeting->title}» در تاریخ {$newTime} تکمیل کرد.";
-
-            \App\Models\Notification::create([
+            $message = "این شخص اقدام خود را برای جلسه «{$meeting->title}» در تاریخ {$newTime} تکمیل کرد.";
+            Notification::create([
                 'type' => 'TaskSentToScriptorium',
                 'data' => json_encode(['message' => $message]),
-                'notifiable_type' => \App\Models\Meeting::class,
+                'notifiable_type' => Meeting::class,
                 'notifiable_id' => $meeting->id,
                 'sender_id' => auth()->id(),
                 'recipient_id' => $scriptoriumId,
@@ -795,14 +806,12 @@ class ViewTaskPage extends Component
             ]);
         }
         session()->flash('status', 'شرح اقدام تکمیل و دبیرجلسه مطلع شد');
-        return to_route('view.task.page',$this->meeting);
+        return to_route('view.task.page', $meeting->id);
     }
 
     protected function normalizeText($text)
     {
         $text = strip_tags($text);                         // Remove HTML tags
-        $text = preg_replace('/\s+/', ' ', trim($text));   // Normalize whitespace
-        $words = explode(' ', $text);                      // Split into words
-        return implode(' ', $words);                 // Join back to string
+        return preg_replace('/\s+/', ' ', trim($text));    // Normalize whitespace
     }
 }

@@ -68,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
 
 
         Gate::define('lock-task', function (User $user) {
-            return $user->permissions->contains('name', UserPermission::SCRIPTORIUM_PERMISSIONS);
+            return $user->permissions->contains('name', UserPermission::SCRIPTORIUM_PERMISSIONS->value);
         });
 
 

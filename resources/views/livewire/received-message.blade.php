@@ -83,7 +83,6 @@
         </a>
     </div>
 
-
     <form wire:submit.prevent="filterMessage" class="flex flex-col sm:flex-row items-start sm:items-end gap-4 mb-6">
         {{-- Message Type Dropdown --}}
         <div class="w-full sm:w-64">
@@ -94,9 +93,9 @@
                 <option value="invitation_response">{{ __('پاسخ دعوتنامه') }}</option>
                 <option value="meeting_status">{{ __('برگزاری یا لغو جلسه') }}</option>
                 <option value="ReplacementForMeeting">{{ __('انتخاب جانشین') }}</option>
-                <option value="updated_task">{{ __('ویرایش اقدام') }}</option>
+                <option value="UpdatedTask">{{ __('بروزرسانی اقدام') }}</option>
                 <option value="AssignedNewTask">{{ __('دریافت اقدام') }}</option>
-                <option value="DeniedTaskNotification">{{ __('رد اقدام') }}</option>
+                <option value="task_action">{{ __('تایید یا رد بند مذاکره') }}</option>
             </x-select-input>
         </div>
 
@@ -356,7 +355,6 @@
     <x-modal name="deny-invitation" maxWidth="4xl" :closable="false">
         @if($meetingUserId)
             <form wire:submit="deny" class="text-sm text-gray-800">
-
                 {{-- Header --}}
                 <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                     <h2 class="text-2xl font-bold text-gray-800">{{ __('رد دعوت به جلسه') }}</h2>
@@ -379,7 +377,10 @@
 
                     {{-- Denial Reason --}}
                     <div class="space-y-2">
-                        @foreach (['دلیل اول', 'دلیل دوم', 'دلیل سوم', 'دلیل چهارم'] as $reasonOption)
+                        @foreach (['در تاریخ برگزاری جلسه در شرکت حضور ندارم',
+                                    'در تاریخ برگزاری جلسه در جلسه دیگری دعوت هستم',
+                                    'دلیل سوم',
+                                    'دلیل چهارم'] as $reasonOption)
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="radio" wire:model="reason" value="{{ $reasonOption }}" name="reason"
                                        class="text-blue-600">
@@ -388,13 +389,22 @@
                         @endforeach
                         <x-input-error :messages="$errors->get('reason')" class="mt-2"/>
                     </div>
+                    <div class="border-b mb-2 pb-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" wire:model="absent" class="mr-2">
+                            <span>{{__('امکان شرکت در جلسه را ندارم.')}}</span>
+                        </label>
+                        <x-input-error :messages="$errors->get('absent')" class="mt-2"/>
+                    </div>
 
                     {{-- Replacement Fields --}}
                     @if (!$this->hasNotificationType('ReplacementForMeeting'))
                         <div class="space-y-3">
+
+
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" wire:model="checkBox" class="mr-2">
-                                <span>{{__('در صورت انتخاب جانشین، فیلدهای زیر را پر کنید:')}}</span>
+                                <span>{{__('در صورت انتخاب جانشین، گزینه تیک را زده و فیلدهای زیر را پر کنید:')}}</span>
                             </label>
                             <div class="space-y-3" x-show="$wire.checkBox">
                                 <div class="flex items-center gap-2">

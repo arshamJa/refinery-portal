@@ -92,8 +92,8 @@ class CreateNewMeetingController extends Controller
                 })
                 ->filter(fn($guest) => $guest['name'] !== null || $guest['companyName'] !== null)
                 ->values();
-
-            $newDate = $this->getCurrentDate($validated['year'], $validated['month'], $validated['day']);
+            $getCurrentDate = $this->getCurrentDate( $validated['year'], $validated['month'], $validated['day']);
+            $newDate = sprintf('%04d/%02d/%02d', $validated['year'], $validated['month'], $validated['day']);
 
             // Load boss and scriptorium user info
 //            $userIdsToFetch = array_filter([$validated['boss'], $validated['scriptorium']]);
@@ -108,8 +108,9 @@ class CreateNewMeetingController extends Controller
                 ? $validated['time']
                 : sprintf('%02d:00', intval($validated['time']));
 
+            $oldDate = sprintf('%04d/%02d/%02d', $validated['year'], $validated['month'], $validated['day']);
             // Check for time conflict
-            if (Meeting::where('date', $newDate)->where('time', $validated['time'])->exists()) {
+            if (Meeting::where('date', $oldDate)->where('time', $validated['time'])->exists()) {
                 throw ValidationException::withMessages([
                     'time' => 'در این زمان جلسه ثبت شده است',
                 ]);
@@ -255,6 +256,11 @@ class CreateNewMeetingController extends Controller
             ->select('id', 'user_id', 'full_name', 'department_id', 'position')
             ->get();
 
+        $users = $users->map(function ($user) {
+            $user->department_name = $user->department->department_name ?? 'نامشخص';
+            return $user;
+        });
+
         // Filter participants excluding current logged-in user
         $participants = $users->filter(fn($userInfo) => $userInfo->user_id !== auth()->id())->values();
 
@@ -281,56 +287,49 @@ class CreateNewMeetingController extends Controller
         $validated = $request->validated();
 
         $validated['time'] = str_contains($validated['time'], ':')
-            ? $validated['time']
-            : sprintf('%02d:00', intval($validated['time']));
+            ? $validated['time'] : sprintf('%02d:00', intval($validated['time']));
 
-        $newDate = $this->getCurrentDate($validated['year'], $validated['month'], $validated['day']);
+        $getCurrentDate = $this->getCurrentDate( $validated['year'], $validated['month'], $validated['day']);
 
+        $newDate = sprintf('%04d/%02d/%02d', $validated['year'], $validated['month'], $validated['day']);
+        $oldDate = sprintf('%04d/%02d/%02d', $validated['year'], $validated['month'], $validated['day']);
+        // Check for time conflict
+        if (Meeting::where('date', $oldDate)->where('time', $validated['time'])->exists()) {
+            throw ValidationException::withMessages([
+                'time' => 'در این زمان جلسه ثبت شده است',
+            ]);
+        }
         $meeting = Meeting::with('meetingUsers')->findOrFail($id);
 
-        // Original and new boss IDs
-        $originalBossId = $meeting->boss_id;
-        $newBossId = $validated['boss_id'] ?? $meeting->boss_id;
+        $newBossId = $validated['boss'];
+        $originalBossId =  $meeting->boss_id;
 
-//        $scriptoriumId = $validated['scriptorium_id'] ?? $meeting->scriptorium_id;
-//        $scriptoriumPosition = $validated['scriptorium_position'] ?? $meeting->scriptorium_position;
-//
-//        $scriptoriumDepartment = null;
-//        if ($scriptoriumId) {
-//            $scriptoriumUserInfo = UserInfo::where('user_id', $scriptoriumId)->first();
-//            if ($scriptoriumUserInfo) {
-//                $department = Department::find($scriptoriumUserInfo->department_id);
-//                $scriptoriumDepartment = $department ? $department->department_name : null;
-//            }
-//        }
-
-        // Process inner guests
+        // Guests (excluding boss)
         $innerGuestIds = collect(explode(',', $request->input('innerGuest', '')))
-            ->filter()->unique()->values();
+            ->filter()
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values();
 
-        // Process outer guests
+        // Outer Guests
         $newOuterGuests = collect($request->input('guests.outer', []))
-            ->map(function ($guest) {
-                $name = preg_replace('/\s+/', ' ', trim($guest['name'] ?? ''));
-                $companyName = preg_replace('/\s+/', ' ', trim($guest['companyName'] ?? ''));
-                return [
-                    'name' => $name !== '' ? $name : null,
-                    'companyName' => $companyName !== '' ? $companyName : null,
-                ];
-            })
-            ->filter(fn($guest) => $guest['name'] !== null || $guest['companyName'] !== null)
+            ->map(fn($guest) => [
+                'name' => trim(preg_replace('/\s+/', ' ', $guest['name'] ?? '')) ?: null,
+                'companyName' => trim(preg_replace('/\s+/', ' ', $guest['companyName'] ?? '')) ?: null,
+            ])
+            ->filter(fn($guest) => $guest['name'] || $guest['companyName'])
             ->values();
 
         $existingOuterGuests = collect($meeting->guest ?? []);
-        $mergedOuterGuests = $existingOuterGuests->merge($newOuterGuests)
-            ->unique(fn($guest) => $guest['name'].'-'.$guest['companyName'])
+        $mergedOuterGuests = $existingOuterGuests
+            ->merge($newOuterGuests)
+            ->unique(fn($guest) => $guest['name'] . '-' . $guest['companyName'])
             ->values()
             ->toArray();
 
-        // Update meeting
+        // Update meeting info
         $meeting->update([
             'title' => $validated['title'],
-//            'scriptorium_id' => $scriptoriumId,
             'scriptorium_id' => auth()->id(),
             'boss_id' => $newBossId,
             'location' => $validated['location'],
@@ -341,8 +340,56 @@ class CreateNewMeetingController extends Controller
             'guest' => $mergedOuterGuests,
         ]);
 
-        // Add new inner guests
-        $existingGuestUserIds = $meeting->meetingUsers()->where('is_guest', true)->pluck('user_id');
+
+        // Holders - exclude boss user_id here
+        $holders = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
+            ->filter(fn($id) => is_numeric($id))
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->reject(fn($id) => $id === $newBossId); // Exclude boss from holders
+
+        $existingHolders = $meeting->meetingUsers()->where('is_guest', false)
+            ->pluck('user_id');
+
+        $newHolders = $holders->diff($existingHolders);
+
+        foreach ($newHolders as $id) {
+            $meeting->meetingUsers()->create([
+                'user_id' => $id,
+                'is_guest' => false,
+                'is_present' => false,
+                'read_by_user' => false,
+                'read_by_scriptorium' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Boss user update - update old boss invitation notification if changed
+        if ($originalBossId !== $newBossId) {
+            $bossMessage = 'شما به عنوان رئیس در جلسه: ' . $meeting->title . ' در تاریخ ' . $newDate . ' و در ساعت ' . $validated['time'] . ' دعوت شده‌اید.';
+
+            Notification::where('notifiable_type', Meeting::class)
+                ->where('notifiable_id', $meeting->id)
+                ->where('recipient_id', $originalBossId)
+                ->where('type', 'MeetingBossInvitation')
+                ->update([
+                    'recipient_id' => $newBossId,
+                    'data' => json_encode(['message' => $bossMessage]),
+                    'sender_id' => auth()->id(),
+                    'recipient_read_at' => null,
+                    'updated_at' => now(),
+                ]);
+            $meeting->meetingUsers()->where('user_id',$originalBossId)
+                ->update(['user_id' => $newBossId]);
+        }
+
+
+
+        // Inner Guests - add new guest meeting users
+        $existingGuestUserIds = $meeting->meetingUsers()->where('is_guest', true)
+            ->pluck('user_id');
+
         $newGuestUserIds = $innerGuestIds->diff($existingGuestUserIds);
 
         foreach ($newGuestUserIds as $userId) {
@@ -354,73 +401,58 @@ class CreateNewMeetingController extends Controller
             ]);
         }
 
-        // Manage Holders
-        $holders = collect(explode(',', preg_replace('/\s+/', '', $request->holders ?? '')))
-            ->filter(fn($id) => is_numeric($id))
-            ->unique()
-            ->map(fn($id) => (int) $id);
+        // Reset all present flags
+        $meeting->meetingUsers()->update(['is_present' => false]);
 
-        $existingHolders = $meeting->meetingUsers()->where('is_guest', false)->pluck('user_id');
-        $newHolders = $holders->diff($existingHolders);
-        $newHolders->each(fn($id) => $meeting->meetingUsers()->create([
-            'user_id' => $id,
-            'is_guest' => false,
-            'is_present' => false,
-            'read_by_user' => false,
-            'read_by_scriptorium' => false,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]));
+        // Prepare participant list for notifications (holders + guests)
+        $participants = $holders->merge($innerGuestIds);
+        $allRelevantUserIds = $participants->unique();
 
-        // Manage Notifications
+        // Remove accept/deny notifications
+        Notification::where('notifiable_type', Meeting::class)
+            ->where('notifiable_id', $meeting->id)
+            ->whereIn('type', ['AcceptInvitation', 'DenyInvitation'])
+            ->forceDelete();
 
-        // If boss changed, delete old boss notification
-        if ($originalBossId && $originalBossId != (int) $newBossId) {
-            Notification::where('notifiable_type', Meeting::class)
-                ->where('notifiable_id', $meeting->id)
-                ->where('recipient_id', $originalBossId)
-                ->delete();
-        }
-
-        // Prepare notification recipients
-        $participants = $holders;
-
-        $notificationRecipients = $innerGuestIds->merge($participants);
-
-        // Only add boss to notification list **if the boss has changed**
-        if ((int) $newBossId !== (int) $originalBossId) {
-            $notificationRecipients->push((int) $newBossId);
-        }
-
-        $allUserIds = $notificationRecipients->unique()->filter(fn($id) => is_numeric($id));
-
-        // Create notifications
+        $newlyAddedUserIds = collect()->merge($newGuestUserIds)->merge($newHolders)->unique();
         $notificationsData = [];
-        foreach ($allUserIds as $userId) {
+
+        foreach ($allRelevantUserIds as $userId) {
             $isGuest = $innerGuestIds->contains($userId);
-            $notificationType = $isGuest ? 'MeetingGuestInvitation' : 'MeetingInvitation';
-            $notificationMessage = 'شما ' . ($isGuest ? 'به عنوان مهمان ' : '') .
+            $type = $isGuest ? 'MeetingGuestInvitation' : 'MeetingInvitation';
+
+            $message = 'شما ' . ($isGuest ? 'به عنوان مهمان ' : '') .
                 'در جلسه: ' . $meeting->title .
                 ' در تاریخ ' . $newDate .
-                ' و در ساعت ' . $validated['time'] . ' دعوت شده اید';
+                ' و در ساعت ' . $validated['time'] . ' دعوت شده‌اید.';
 
-            $notificationsData[] = [
-                'type' => $notificationType,
-                'data' => json_encode(['message' => $notificationMessage]),
-                'notifiable_type' => Meeting::class,
-                'notifiable_id' => $meeting->id,
-                'sender_id' => auth()->id(),
-                'recipient_id' => (int) $userId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+            if ($newlyAddedUserIds->contains($userId)) {
+                $notificationsData[] = [
+                    'type' => $type,
+                    'data' => json_encode(['message' => $message]),
+                    'notifiable_type' => Meeting::class,
+                    'notifiable_id' => $meeting->id,
+                    'sender_id' => auth()->id(),
+                    'recipient_id' => $userId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            } else {
+                Notification::where('notifiable_type', Meeting::class)
+                    ->where('notifiable_id', $meeting->id)
+                    ->where('recipient_id', $userId)
+                    ->update([
+                        'data' => json_encode(['message' => $message]),
+                        'sender_id' => auth()->id(),
+                        'recipient_read_at' => null,
+                        'updated_at' => now(),
+                    ]);
+            }
         }
 
-        Notification::upsert(
-            $notificationsData,
-            ['notifiable_type', 'notifiable_id', 'recipient_id'],
-            ['data', 'sender_id', 'updated_at']
-        );
+        if (!empty($notificationsData)) {
+            Notification::insert($notificationsData);
+        }
 
         return to_route('dashboard.meeting')->with('status', __('جلسه با موفقیت بروز شد'));
     }

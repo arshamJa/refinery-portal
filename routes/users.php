@@ -3,7 +3,7 @@
 use App\Http\Controllers\Admin\UsersTableController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth','adminMiddleware'])->group(function () {
 
     Route::get('users/table', [UsersTableController::class, 'index'])
         ->name('users.index');

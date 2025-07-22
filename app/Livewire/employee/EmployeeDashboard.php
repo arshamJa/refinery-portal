@@ -29,15 +29,14 @@ class EmployeeDashboard extends Component
     #[Computed]
     public function getTodaysMeeting()
     {
-
-        // Convert current Gregorian date to Jalali
         list($ja_year, $ja_month, $ja_day) = explode('/', gregorian_to_jalali(now()->year, now()->month, now()->day, '/'));
-
         $newDate = sprintf("%04d/%02d/%02d", $ja_year, $ja_month, $ja_day);
-
-        return Meeting::where('date',$newDate)
-            ->where('status',MeetingStatus::IS_NOT_CANCELLED->value)
-            ->select('id','title','date','time','location')
+        return Meeting::where('date', $newDate)
+            ->whereIn('status', [
+                MeetingStatus::IS_NOT_CANCELLED->value,
+                MeetingStatus::IS_IN_PROGRESS->value
+            ])
+            ->select('id', 'title', 'date', 'time', 'location', 'status')
             ->orderBy('time', 'asc')
             ->get();
     }

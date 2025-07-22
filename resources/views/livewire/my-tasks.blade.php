@@ -139,13 +139,13 @@
                         </x-table.cell>
                         <x-table.cell>{{ $taskUser->time_out ?? '-' }}</x-table.cell>
                         <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
-                        <x-table.cell class="flex flex-col gap-2">
-                            <a href="{{route('view.task.page', $taskUser->task->meeting->id )}}">
-                                <x-secondary-button>
-                                    {{__('نمایش صورتجلسه')}}
+                        <x-table.cell class="flex flex-col gap-2 w-full">
+                            <a href="{{ route('view.task.page', $taskUser->task->meeting->id) }}" class="w-full">
+                                <x-secondary-button class="w-full">
+                                    {{ __('نمایش صورتجلسه') }}
                                 </x-secondary-button>
                             </a>
-                            <x-edit-button wire:click.prevent="view({{$taskUser->id}})">
+                            <x-edit-button wire:click.prevent="view({{ $taskUser->id }})" class="w-full">
                                 {{ __('نمایش جزئیات') }}
                             </x-edit-button>
                         </x-table.cell>
