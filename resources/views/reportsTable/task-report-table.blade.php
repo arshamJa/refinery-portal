@@ -103,6 +103,7 @@
                 </div>
             </div>
         </form>
+
         <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
             <x-table.table>
                 <x-slot name="head">

@@ -14,14 +14,14 @@ Route::middleware('auth')->group(function () {
     Route::post('phone/list/store',[PhoneListController::class,'store'])
         ->name('phone-list.store');
 
-    Route::get('phone/list/{id}/edit', [PhoneListController::class, 'edit'])
+    Route::get('phone/list/{source}/{id}/edit', [PhoneListController::class, 'edit'])
         ->name('phone-list.edit');
 
-    Route::put('phone/list/{id}', [PhoneListController::class, 'update'])
+    Route::put('phone/list/{source}/{id}', [PhoneListController::class, 'update'])
         ->name('phone-list.update');
 
-    Route::post('phone/list/{id}', [PhoneListController::class, 'update'])
-        ->name('phone-list.update');
+    Route::delete('phone/list/{source}/{id}', [PhoneListController::class, 'destroy'])
+        ->name('phone-list.destroy');
 
 });
 

@@ -166,12 +166,12 @@ class User extends Authenticatable
         return $this->permissions->contains('id', $permission->id);
     }
     // use this for checking which user has a specific permission
-    function userHasPermission($permission): bool
-    {
-        $user = Auth::user()->load('permissions');
-        // Check if the authenticated user has the specified permission
-        return $user->permissions->contains('name', $permission);
-    }
+//    function userHasPermission($permission): bool
+//    {
+//        $user = Auth::user()->load('permissions');
+//        // Check if the authenticated user has the specified permission
+//        return $user->permissions->contains('name', $permission);
+//    }
     public function assignPermission(Permission $permission)
     {
         $this->permissions()->attach($permission);

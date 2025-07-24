@@ -20,12 +20,14 @@ class OrganizationExport implements FromCollection, WithHeadings, WithMapping, R
         'Content-Type' => 'text/csv',
     ];
 
+    private $rowNumber = 0;
+
     /**
      * Return all organizations with their department loaded
      */
     public function collection()
     {
-        return Organization::with('department')->get(); // Eager load the department relation
+        return Organization::with('department')->get();
     }
 
     /**
@@ -34,6 +36,7 @@ class OrganizationExport implements FromCollection, WithHeadings, WithMapping, R
     public function headings(): array
     {
         return [
+            'ردیف',              // Row number
             'نام واحد سازمانی',   // department_name
             'نام سامانه',         // organization
             'لینک سامانه',        // url
@@ -45,7 +48,10 @@ class OrganizationExport implements FromCollection, WithHeadings, WithMapping, R
      */
     public function map($organization): array
     {
+        $this->rowNumber++;
+
         return [
+            $this->rowNumber,
             $organization->department->department_name ?? '---',
             $organization->organization_name,
             $organization->url,

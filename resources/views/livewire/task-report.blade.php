@@ -21,12 +21,11 @@
             <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-               <span> {{__('گزارش جلسات شرکت')}}</span>
+               <span> {{__('گزارش اقدامات شرکت')}}</span>
             </span>
             </li>
         </ol>
     </nav>
-
     @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <a href="{{ route('meeting.report.table') }}"
@@ -42,14 +41,16 @@
             </span>
             </a>
         </div>
+
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
             <div
                 class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-6 col-span-1">
                 <h3 class="text-lg font-semibold text-gray-700 dark:text-white mb-4">
-                    {{ __('نمودار وضعیت جلسات') }}
+                    {{ __('نمودار وضعیت اقدامات') }}
                 </h3>
                 @if ($statusFilter !== null)
-                    <a href="{{ route('meeting.report.table') }}">
+                    <a href="{{ route('task.report.table') }}">
                         <x-primary-button>
                             {{__('نمایش همه وضعیت')}}
                         </x-primary-button>
@@ -57,16 +58,15 @@
                 @endif
 
                 <div class="pr-12 mt-2" wire:ignore>
-                    <div id="pie-chart" class="w-48 h-48"></div>
+                    <div class="w-48 h-48" id="pie-chart"></div>
                 </div>
                 <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                     @php
                         $statuses = [
-                            ['color' => 'bg-yellow-600', 'text' => ' text-yellow-600' , 'label' => 'در حال بررسی دعوتنامه'],
-                            ['color' => 'bg-red-600', 'text' => ' text-red-600','label' => 'لغو شد'],
-                            ['color' => 'bg-green-600 ','text' => ' text-green-600','label' => 'برگزار می‌شود'],
-                            ['color' => 'bg-blue-600 ', 'text' => ' text-blue-600' ,'label' => 'در حال برگزاری'],
-                            ['color' => 'bg-gray-600 ','text' => ' text-gray-700', 'label' => 'جلسه خاتمه یافت'],
+                            ['color' => 'bg-yellow-600', 'text' => ' text-yellow-600' , 'label' => 'انجام شده در مهلت مقرر'],
+                            ['color' => 'bg-red-600', 'text' => ' text-red-600','label' => 'انجام شده خارج مهلت مقرر'],
+                            ['color' => 'bg-green-600 ','text' => ' text-green-600','label' => 'انجام نشده در مهلت مقرر'],
+                            ['color' => 'bg-blue-600 ', 'text' => ' text-blue-600' ,'label' => 'انجام نشده خارج مهلت مقرر'],
                         ];
                     @endphp
                     @foreach ($statuses as $status)
@@ -80,7 +80,7 @@
 
             <div
                 class="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-4">
-                <form wire:submit="filterMeetings">
+                <form wire:submit="filterTasks">
                     <div class="grid gap-4 px-3 sm:px-0 lg:grid-cols-6 items-end mb-2">
                         <div class="col-span-6 sm:col-span-3 lg:col-span-3">
                             <!-- Search Input -->
@@ -109,16 +109,14 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-span-6 lg:col-span-3 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
                             <x-search-button>{{ __('جست و جو') }}</x-search-button>
                             @if($search || $start_date)
-                                <x-view-all-link href="{{ route('meeting.report.table') }}">
+                                <x-view-all-link href="{{route('task.report.table')}}">
                                     {{ __('نمایش همه') }}
                                 </x-view-all-link>
                             @endif
                         </div>
-
                         <!-- Export Button -->
                         <div class="col-span-6 lg:col-start-5 lg:col-span-3 flex justify-start lg:justify-end mt-2">
                             <x-export-link wire:click.prevent="exportExcel" wire:loading.attr="disabled"
@@ -143,11 +141,13 @@
                         </div>
                     </div>
                 </form>
-                <div class="overflow-x-auto">
+
+
+                <div class="overflow-x-auto shadow-md sm:rounded-lg mt-4">
                     <x-table.table>
                         <x-slot name="head">
                             <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                                @foreach (['#','موضوع جلسه','رییس جلسه','دبیر جلسه','تاریخ','ساعت','وضعیت جلسه','قابلیت'] as $th)
+                                @foreach (['#', 'موضوع جلسه و دبیر جلسه', 'اقدام کننده',  'تاریخ مهلت اقدام', 'تاریخ انجام اقدام','وضعیت زمان','قابلیت'] as $th)
                                     <x-table.heading
                                         class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                                         {{ __($th) }}
@@ -156,111 +156,121 @@
                             </x-table.row>
                         </x-slot>
                         <x-slot name="body">
-                            @forelse($this->meetings as $meeting)
+                            @php
+                                $rowIndex = ($this->tasks->currentPage() - 1) * $this->tasks->perPage();
+                            @endphp
+
+                            @forelse ($this->tasks as $taskUser)
                                 <x-table.row
-                                    class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50 {{ $loop->last ? 'border-b border-gray-200 dark:border-gray-700' : '' }}">
-                                    <x-table.cell>{{ ($this->meetings->currentPage() - 1) * $this->meetings->perPage() + $loop->iteration }}</x-table.cell>
-                                    <x-table.cell>{{ $meeting->title }}</x-table.cell>
-                                    <x-table.cell>{{ $meeting->boss->user_info->full_name ?? ''}}</x-table.cell>
-                                    <x-table.cell>{{ $meeting->scriptorium->user_info->full_name ?? ''}}</x-table.cell>
-                                    <x-table.cell>{{ $meeting->date }}</x-table.cell>
-                                    <x-table.cell class="whitespace-nowrap">
-                                        {{ $meeting->time }}{{ $meeting->end_time ? ' - '.$meeting->end_time : '' }}
-                                    </x-table.cell>
-                                    <x-table.cell class="whitespace-nowrap">
-                                                <span
-                                                    class="{{ $meeting->status->badgeColor() }} text-xs font-medium px-3 py-1 rounded-lg">
-                                                    {{ $meeting->status->label() }}
-                                                </span>
-                                    </x-table.cell>
+                                    class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800">
+                                    <x-table.cell>{{ ++$rowIndex }}</x-table.cell>
+
                                     <x-table.cell>
-                                        <a href="{{route('meeting.details.show',$meeting->id)}}">
-                                            <x-secondary-button>
-                                                {{__('نمایش')}}
-                                            </x-secondary-button>
-                                        </a>
+                                        <div><strong>{{ $taskUser->task->meeting->title }}</strong></div>
+                                        <div class="text-sm text-gray-500">
+                                            {{ __('دبیر جلسه:') }} {{ $taskUser->task->meeting->scriptorium->user_info->full_name ?? '---'}}
+                                        </div>
+                                    </x-table.cell>
+
+                                    <x-table.cell>{{  $taskUser->user->user_info->full_name ?? '---' }}</x-table.cell>
+
+                                    <x-table.cell>{{ $taskUser->time_out ?? '---' }}</x-table.cell>
+
+                                    <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
+
+                                    <x-table.cell>
+                                        @if (!empty($taskUser->sent_date))
+                                            <span class="font-bold text-blue-600">ارسال شده</span>
+                                        @elseif ($taskUser->remaining_diff)
+                                            <span
+                                                class="font-bold text-green-500">{{ $taskUser->remaining_diff }}</span>
+                                        @elseif ($taskUser->past_diff)
+                                            <span class="font-bold text-red-600">{{ $taskUser->past_diff }}</span>
+                                        @else
+                                            ---
+                                        @endif
+                                    </x-table.cell>
+
+                                    <x-table.cell>
+                                        @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
+                                            <a href="{{ route('participant.task.report', $taskUser->id) }}">
+                                                <x-edit-button>{{ __('نمایش') }}</x-edit-button>
+                                            </a>
+                                        @endcan
                                     </x-table.cell>
                                 </x-table.row>
                             @empty
                                 <x-table.row>
-                                    <x-table.cell colspan="7" class="py-6">
-                                        {{ __('رکوردی یافت نشد...') }}
+                                    <x-table.cell colspan="7" class="py-6 text-center">
+                                        {{ __('رکوردی یافت نشد ...') }}
                                     </x-table.cell>
                                 </x-table.row>
                             @endforelse
                         </x-slot>
+
                     </x-table.table>
                 </div>
-                <div class="mt-4">
-                    {{ $this->meetings->withQueryString()->links() }}
+                <div class="mt-2 mb-4">
+                    {{ $this->tasks->withQueryString()->links(data: ['scrollTo' => false]) }}
                 </div>
+
             </div>
         </div>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const meetingPercentages = @json($this->percentages);
+                const taskPercentages = @json($this->percentages);
 
-                const MeetingStatus = {
-                    PENDING: 0,
-                    IS_CANCELLED: 1,
-                    IS_NOT_CANCELLED: -1,
-                    IS_IN_PROGRESS: 2,
-                    IS_FINISHED: 3
+                const StatusCodes = {
+                    EARLY_SENT: 1,
+                    LATE_SENT: 2,
+                    PENDING_IN_TIME: 3,
+                    PENDING_LATE: 4
                 };
 
-                const meetingLabels = {
-                    [MeetingStatus.PENDING]: "در حال بررسی دعوتنامه",
-                    [MeetingStatus.IS_CANCELLED]: "لغو شد",
-                    [MeetingStatus.IS_NOT_CANCELLED]: "برگزار می‌شود",
-                    [MeetingStatus.IS_IN_PROGRESS]: "در حال برگزاری",
-                    [MeetingStatus.IS_FINISHED]: "جلسه خاتمه یافت"
+                const chartLabels = {
+                    1: "انجام شده در مهلت مقرر",
+                    2: "انجام شده خارج مهلت مقرر",
+                    3: "انجام نشده در مهلت مقرر",
+                    4: "انجام نشده خارج مهلت مقرر"
                 };
 
-                const chartData = Object.keys(MeetingStatus).map(key => {
-                    const statusValue = MeetingStatus[key].toString();
-                    return meetingPercentages[statusValue] || 0;
-                });
-
-                const chartLabels = Object.keys(MeetingStatus).map(key => meetingLabels[MeetingStatus[key]]);
-
-                const getChartOptions = () => ({
-                    series: chartData,
-                    labels: chartLabels,
-                    colors: [
-                        "#A8D858", "#DC2626", "#16A34A", "#2563EB", "#4B5563"
-                    ],
-                    chart: {
-                        type: "pie",
-                        height: 250,
-                        width: 250,
-                        events: {
-                            dataPointSelection: function (event, chartContext, config) {
-                                const statusValues = [0, 1, -1, 2, 3];
-                                const selectedStatus = statusValues[config.dataPointIndex];
-
-                                // 🔥 Livewire update
-                                Livewire.dispatch('updateStatusFilter', {status: selectedStatus});
+                const getChartOptions = () => {
+                    return {
+                        series: [1, 2, 3, 4].map(key => taskPercentages[key] || 0),
+                        labels: [1, 2, 3, 4].map(key => chartLabels[key]),
+                        colors: [
+                            "#A8D858", "#DC2626", "#16A34A", "#2563EB", "#4B5563"
+                        ],
+                        chart: {
+                            type: "pie",
+                            height: 250,
+                            width: 250,
+                            events: {
+                                dataPointSelection: function (event, chartContext, config) {
+                                    const selectedStatus = [1, 2, 3, 4][config.dataPointIndex];
+                                    Livewire.dispatch('updateTaskStatusFilter', {status: selectedStatus});
+                                }
+                            }
+                        },
+                        stroke: {
+                            colors: ["white"],
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            formatter: val => val.toFixed(1) + "%"
+                        },
+                        legend: {show: false},
+                        plotOptions: {
+                            pie: {
+                                size: 160,
+                                dataLabels: {
+                                    offset: -20
+                                }
                             }
                         }
-                    },
-                    stroke: {
-                        colors: ["white"],
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        formatter: val => val.toFixed(1) + "%"
-                    },
-                    legend: {show: false},
-                    plotOptions: {
-                        pie: {
-                            size: 160,
-                            dataLabels: {
-                                offset: -20
-                            }
-                        }
-                    }
-                });
+                    };
+                };
 
                 if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
                     const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
@@ -270,6 +280,5 @@
         </script>
 
     @endcan
-
 
 </div>

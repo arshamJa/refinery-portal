@@ -114,7 +114,7 @@
                     </div>
                 </div>
             </li>
-            @can('refinery-report')
+            @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
                 <li class="mb-2">
                     <div x-data="{ openReport: false }" class="w-full">
                         <button @click="openReport = !openReport"
@@ -253,8 +253,8 @@
                     {{__('دفترچه تلفنی')}}
                 </x-link.responsive-link>
             </li>
-            <li class="mb-2">
-                @can('admin-role')
+            @can('admin-role')
+                <li class="mb-2">
                     <div x-data="{ openSetting: false }" class="w-full mb-4">
                         <button @click="openSetting = !openSetting"
                                 class="w-full flex items-center justify-between pl-2 pr-3 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition">
@@ -277,7 +277,8 @@
                         </button>
                         <div x-show="openSetting" x-transition class="mt-1 space-y-1 pr-3">
 
-                            <x-link.responsive-link href="{{route('organizations')}}" :active="request()->is('organizations')"
+                            <x-link.responsive-link href="{{route('organizations')}}"
+                                                    :active="request()->is('organizations')"
                                                     class="flex items-center gap-x-2 text-xs">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5"
@@ -287,8 +288,9 @@
                                 </svg>
                                 {{__('جدول سامانه')}}
                             </x-link.responsive-link>
-                            <x-link.responsive-link href="{{route('departments.index')}}" :active="request()->is('departments')"
-                                                     class="flex items-center gap-x-2 text-xs">
+                            <x-link.responsive-link href="{{route('departments.index')}}"
+                                                    :active="request()->is('departments')"
+                                                    class="flex items-center gap-x-2 text-xs">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5"
                                      stroke="currentColor" class="size-4">
@@ -297,12 +299,6 @@
                                 </svg>
                                 {{__('جدول دپارتمان')}}
                             </x-link.responsive-link>
-
-
-
-
-
-
                             <x-link.responsive-link href="{{route('users.create')}}"
                                                     :active="request()->is('users/create')"
                                                     class="flex items-center text-sm gap-x-2 text-xs">
@@ -324,7 +320,18 @@
                                 </svg>
                                 {{__('مدیریت کاربران')}}
                             </x-link.responsive-link>
-
+                            <x-link.responsive-link
+                                href="{{route('organization.department.manage')}}"
+                                :active="request()->is('department/organization/manage')"
+                                class="flex items-center gap-x-2 text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>
+                                </svg>
+                                {{__('مدیریت سامانه/دپارتمان')}}
+                            </x-link.responsive-link>
                             @if(auth()->user()->hasRole(UserRole::SUPER_ADMIN->value))
                                 <x-link.responsive-link href="{{route('role.permission.table')}}"
                                                         :active="request()->is('roles/permissions')"
@@ -337,23 +344,11 @@
                                     </svg>
                                     {{__('مدیریت نقش و دسترسی')}}
                                 </x-link.responsive-link>
-                                <x-link.responsive-link
-                                    href="{{route('organization.department.manage')}}"
-                                    :active="request()->is('department/organization/manage')"
-                                    class="flex items-center gap-x-2 text-xs">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5"
-                                         stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>
-                                    </svg>
-                                    {{__('مدیریت سامانه/دپارتمان')}}
-                                </x-link.responsive-link>
                             @endif
                         </div>
                     </div>
-                @endcan
-            </li>
+                </li>
+            @endcan
         </ul>
     </nav>
 

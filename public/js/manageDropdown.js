@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
         {id: "scriptorium", type: "single"},
         {id: "participants", type: "multi"},
         {id: "innerGuest", type: "multi"},
-        {id: "organizations", type: "multi"} // Added organizations here
+        {id: "organizations", type: "multi"},
+
     ];
 
     const selectedUserIds = new Set();

@@ -36,8 +36,8 @@
             </li>
         </ol>
     </nav>
-    @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
 
+    @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <a href="{{ route('meeting.report.table') }}"
                class="{{Route::is('meeting.report.table') ? 'bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none' : 'bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black'}} flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
@@ -191,72 +191,6 @@
         </div>
 
         <script>
-            // Meetings chart
-            {{--document.addEventListener('DOMContentLoaded', function () {--}}
-            {{--    const meetingPercentages = @json($percentages);--}}
-            {{--    const MeetingStatus = {--}}
-            {{--        PENDING: 0,--}}
-            {{--        IS_CANCELLED: 1,--}}
-            {{--        IS_NOT_CANCELLED: -1,--}}
-            {{--        IS_IN_PROGRESS: 2,--}}
-            {{--        IS_FINISHED: 3--}}
-            {{--    };--}}
-            {{--    const meetingLabels = {--}}
-            {{--        [MeetingStatus.PENDING]: "در حال بررسی دعوتنامه",--}}
-            {{--        [MeetingStatus.IS_CANCELLED]: "لغو شد",--}}
-            {{--        [MeetingStatus.IS_NOT_CANCELLED]: "برگزار می‌شود",--}}
-            {{--        [MeetingStatus.IS_IN_PROGRESS]: "در حال برگزاری",--}}
-            {{--        [MeetingStatus.IS_FINISHED]: "جلسه خاتمه یافت",--}}
-            {{--    };--}}
-            {{--    const chartData = Object.keys(MeetingStatus).map(key => {--}}
-            {{--        const statusValue = MeetingStatus[key].toString();--}}
-            {{--        return meetingPercentages[statusValue] || 0;--}}
-            {{--    });--}}
-            {{--    const chartLabels = Object.keys(MeetingStatus).map(key => meetingLabels[MeetingStatus[key]]);--}}
-            {{--    const getChartOptions = () => ({--}}
-            {{--        series: chartData,--}}
-            {{--        labels: chartLabels,--}}
-            {{--        colors: [--}}
-            {{--            "#3B82F6", // Blue → Reviewing Invitations--}}
-            {{--            "#F87171", // Red → Cancelled--}}
-            {{--            "#34D399", // Green → Will Be Held--}}
-            {{--            "#FBBF24", // Amber → In Progress--}}
-            {{--            "#A78BFA"  // Purple → Finished--}}
-            {{--        ],--}}
-            {{--        chart: {--}}
-            {{--            type: "pie",--}}
-            {{--            height: 250, // ✅ Fixed height--}}
-            {{--            width: 250,  // ✅ Fixed width to maintain circular shape--}}
-            {{--        },--}}
-            {{--        stroke: {--}}
-            {{--            colors: ["white"],--}}
-            {{--        },--}}
-            {{--        dataLabels: {--}}
-            {{--            enabled: true,--}}
-            {{--            style: {--}}
-            {{--                fontFamily: "Inter, sans-serif",--}}
-            {{--            },--}}
-            {{--            formatter: val => val.toFixed(1) + "%"--}}
-            {{--        },--}}
-            {{--        legend: {--}}
-            {{--            show: false, // ✅ Removes labels below the pie--}}
-            {{--        },--}}
-            {{--        plotOptions: {--}}
-            {{--            pie: {--}}
-            {{--                size: 160, // ✅ Controls inner size to keep it circular--}}
-            {{--                dataLabels: {--}}
-            {{--                    offset: -20--}}
-            {{--                },--}}
-            {{--                offsetX: 0,--}}
-            {{--                offsetY: 0,--}}
-            {{--            },--}}
-            {{--        },--}}
-            {{--    });--}}
-            {{--    if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {--}}
-            {{--        const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());--}}
-            {{--        chart.render();--}}
-            {{--    }--}}
-            {{--});--}}
             // Meetings chart
             document.addEventListener('DOMContentLoaded', function () {
                 const meetingPercentages = @json($percentages);

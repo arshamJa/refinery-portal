@@ -37,17 +37,29 @@
                                   placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
                 </x-search-input>
             </div>
+            <div class="col-span-6 sm:col-span-1">
+                <x-input-label for="source" value="{{ __('فیلتر بر اساس') }}"/>
+                <x-select-input name="source" id="source">
+                    <option value="all" {{ request('source') === 'all' ? 'selected' : '' }}>{{ __('همه') }}</option>
+                    <option
+                        value="user_info" {{ request('source') === 'user_info' ? 'selected' : '' }}>{{ __('فقط کارمندان شرکت') }}</option>
+                    <option
+                        value="phone" {{ request('source') === 'phone' ? 'selected' : '' }}>{{ __('فقط عموم') }}</option>
+                </x-select-input>
+            </div>
             <!-- Search + Show All Buttons -->
-            <div class="lg:col-span-2 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
+            <div class="col-span-6 sm:col-span-4 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
                 <x-search-button>{{ __('جست و جو') }}</x-search-button>
-                @if ($originalUsersCount != $filteredUsersCount)
-                    <x-view-all-link href="{{route('phone-list.index')}}">{{__('نمایش همه')}}</x-view-all-link>
+                @if (($originalUsersCount != $filteredUsersCount)|| in_array($selectedSource, ['user_info', 'phone']))
+                    @if ($selectedSource !== 'all')
+                        <x-view-all-link href="{{ route('phone-list.index') }}">{{ __('نمایش همه') }}</x-view-all-link>
+                    @endif
                 @endif
             </div>
             <div class="col-span-2 flex justify-end">
                 <a href="{{route('phone-list.create')}}">
                     <x-primary-button type="button">
-                        {{__('اقزودن ')}}
+                        {{__('اقزودن شماره')}}
                     </x-primary-button>
                 </a>
             </div>
@@ -75,29 +87,53 @@
                 </x-table.row>
             </x-slot>
             <x-slot name="body">
-                @forelse($userInfos as $userInfo)
+                @forelse ($combinedData as $index => $entry)
                     <x-table.row
                         class="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 hover:bg-gray-50">
-                        <x-table.cell>{{ ($userInfos->currentPage() - 1) * $userInfos->perPage() + $loop->iteration }}</x-table.cell>
-                        <x-table.cell> {{ $userInfo->full_name }}</x-table.cell>
-                        <x-table.cell>{{ $userInfo->department->department_name ?? 'بدون واحد'}}</x-table.cell>
-                        <x-table.cell>{{ $userInfo->work_phone }}</x-table.cell>
-                        @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
-                            <x-table.cell> {{ $userInfo->phone }}</x-table.cell>
-                            <x-table.cell>{{ $userInfo->house_phone }}</x-table.cell>
+                        <x-table.cell>{{ $index + 1 }}</x-table.cell>
+                        <x-table.cell>{{ $entry['full_name'] }}</x-table.cell>
+                        <x-table.cell>{{ $entry['department_name'] ?? '—' }}</x-table.cell>
+                        <x-table.cell>{{ $entry['work_phone'] ?? '—' }}</x-table.cell>
+
+                        @can('has-permission-and-role', [UserPermission::PHONE_PERMISSIONS->value, UserRole::ADMIN->value])
+                            <x-table.cell>{{ $entry['phone'] ?? '—' }}</x-table.cell>
+                            <x-table.cell>{{ $entry['house_phone'] ?? '—' }}</x-table.cell>
                             <x-table.cell>
-                                <a href="{{route('phone-list.edit',$userInfo->id)}}">
-                                    <x-secondary-button>
-                                        {{__('ویرایش')}}
-                                    </x-secondary-button>
-                                </a>
+
+                                <x-dropdown>
+                                    <x-slot name="trigger">
+                                        <button class="hover:bg-gray-200 rounded-full p-1 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                 class="w-5 h-5 text-gray-600">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                            </svg>
+                                        </button>
+                                    </x-slot>
+                                    <x-slot name="content">
+                                        <x-dropdown-link href="{{ route('phone-list.edit', ['source' => $entry['source'], 'id' => $entry['id']] ) }}">
+                                            {{ __('ویرایش') }}
+                                        </x-dropdown-link>
+                                        <form action="{{ route('phone-list.destroy', ['source' => $entry['source'], 'id' => $entry['id']]) }}" method="POST"
+                                            onsubmit="return confirm('آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="block cursor-pointer w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
+                                                {{ __('حذف') }}
+                                            </button>
+                                        </form>
+                                    </x-slot>
+                                </x-dropdown>
+
+
                             </x-table.cell>
                         @endcan
                     </x-table.row>
                 @empty
                     <x-table.row>
-                        <x-table.cell colspan="7" class="py-6">
-                            {{__('رکوردی یافت نشد...')}}
+                        <x-table.cell colspan="7" class="py-6 text-center">
+                            {{ __('رکوردی یافت نشد...') }}
                         </x-table.cell>
                     </x-table.row>
                 @endforelse
@@ -105,10 +141,8 @@
         </x-table.table>
     </div>
     <div class="mt-2 mb-12">
-        {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
+        {{ $combinedData->withQueryString()->links(data: ['scrollTo' => false]) }}
     </div>
-
-
 
 
 </x-app-layout>

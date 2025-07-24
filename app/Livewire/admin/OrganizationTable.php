@@ -3,11 +3,10 @@
 namespace App\Livewire\admin;
 
 use App\Models\Organization;
-use App\Rules\farsi_chs;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithoutUrlPagination;
@@ -16,11 +15,12 @@ use Livewire\WithPagination;
 class OrganizationTable extends Component
 {
     use WithPagination,WithFileUploads, WithoutUrlPagination;
-    public string $organization = '';
+    public $organization = '';
     public string $url = '';
     public $image;
     public ?string $search = '';
-    public $organizationId = null;
+    public $organizationId = '';
+    public $organizationName;
 
     public function filterOrganizations()
     {
@@ -66,19 +66,29 @@ class OrganizationTable extends Component
      */
     public function createOrg()
     {
-        $validated = $this->validate([
-            'organization' => ['bail','required','max:250'],
-            'url' => ['bail','required','starts_with:www.'],
-            'image' => ['nullable','mimes:jpg,jpeg,png,webp','max:1024']
-        ]);
-        $imagePath = null; // Initialize imagePath to null
-        if ($this->image) { // Check if an image was uploaded
+        $validated = Validator::make(
+            ['organization' => $this->organization, 'url' => $this->url, 'image' => $this->image,
+            ],
+            ['organization' => ['bail', 'required', 'max:250'],
+                'url' => ['bail', 'required', 'starts_with:www.'],
+                'image' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            ],
+            ['organization.required' => 'نام سازمان اجباری است.',
+                'url.required' => 'آدرس وب‌سایت اجباری است.', 'url.starts_with' => 'آدرس باید با www. شروع شود.',
+                'image.mimes' => 'فرمت تصویر باید jpg, jpeg, png یا webp باشد.',
+                'image.max' => 'حجم تصویر نباید بیشتر از 1MB باشد.',
+            ]
+        );
+
+        $imagePath = null;
+        if ($this->image) {
             $imagePath = $validated['image']->store('organizations', 'public');
         }
+
         Organization::create([
             'organization_name' => $validated['organization'],
             'url' => $validated['url'],
-            'image' => $imagePath
+            'image' => $imagePath,
         ]);
         $this->close();
         session()->flash('status', 'سامانه جدید با موفقیت ثبت شد');
@@ -90,36 +100,53 @@ class OrganizationTable extends Component
     public function updateOrg()
     {
         $organization = Organization::findOrFail($this->organizationId);
-        $validated = $this->validate([
-            'organization' => ['bail','required','max:250'],
-            'url' => ['bail','required','starts_with:www.'],
-            'image' => ['nullable','mimes:jpg,jpeg,png,webp','max:1024']
-        ]);
-        // Handle Image Upload
-        if ($validated['image']) { // If a new image is uploaded
-            // Delete old image only if it exists
+
+        $validated = Validator::make(
+            [
+                'organization' => $this->organization,
+                'url' => $this->url,
+                'image' => $this->image,
+            ],
+            [
+                'organization' => ['bail', 'required', 'max:250'],
+                'url' => ['bail', 'required', 'starts_with:www.'],
+                'image' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            ],
+            [
+                'organization.required' => 'نام سازمان اجباری است.',
+                'url.required' => 'آدرس وب‌سایت اجباری است.',
+                'url.starts_with' => 'آدرس باید با www. شروع شود.',
+                'image.mimes' => 'فرمت تصویر باید jpg, jpeg, png یا webp باشد.',
+                'image.max' => 'حجم تصویر نباید بیشتر از 1MB باشد.',
+            ]
+        );
+
+        // Handle image upload
+        if ($validated['image']) {
             if (!empty($organization->image)) {
                 $oldImagePath = public_path('storage/' . $organization->image);
                 if (file_exists($oldImagePath)) {
                     unlink($oldImagePath);
                 }
             }
-            // Upload new image
             $validated['image'] = $validated['image']->store('organizations', 'public');
+        } else {
+            // If no new image uploaded, preserve the old one
+            unset($validated['image']);
         }
+
         // Update organization
         $organization->update($validated);
 
-        // Reset and close modal
-        $this->reset(['organization', 'url', 'image']);
         $this->close();
         session()->flash('status', 'سامانه با موفقیت آپدیت شد');
     }
     public function openModalDelete($id)
     {
-        $this->organization = Organization::where('id',$id)->value('organization_name');
+        $this->organization = Organization::findOrFail($id);
         $this->organizationId = $id;
-        $this->dispatch('crud-modal',name:'delete');
+        $this->organizationName = $this->organization->organization_name;
+        $this->dispatch('crud-modal', name: 'delete');
     }
     public function close()
     {

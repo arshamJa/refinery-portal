@@ -24,90 +24,182 @@
             </span>
             </li>
         </x-breadcrumb>
-        <x-sessionMessage name="status"/>
 
-        <x-modal name="create">
+        <x-modal name="create" maxWidth="2xl" :closable="false">
             <form wire:submit="createNewDepartment">
-                <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                    {{__('ایجاد دپارتمان جدید')}}
+                <!-- Header -->
+                <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">{{ __('ایجاد دپارتمان جدید') }}</h2>
+                    <a href="{{route('departments.index')}}"
+                       class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                        </svg>
+                    </a>
                 </div>
-                <div class="px-6 py-4" dir="rtl">
-                    <div class="mt-4 text-sm text-gray-600">
-                        <div class="w-full">
-                            <x-input-label for="department" :value="__('دپارتمان')"/>
-                            <x-text-input wire:model="department" id="department" class="block my-2 w-full" type="text"
-                                          autofocus required/>
-                            <x-input-error :messages="$errors->get('department')" class="mt-2"/>
-                        </div>
+
+                <!-- Body -->
+                <div class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200" dir="rtl">
+                    <div>
+                        <x-input-label for="department" :value="__('نام دپارتمان')"/>
+                        <x-text-input wire:model="department" id="department" class="block my-2 w-full" type="text"
+                                      autofocus/>
+                        <x-input-error :messages="$errors->get('department')" class="my-2"/>
                     </div>
                 </div>
-                <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                    <x-secondary-button wire:click="close">
-                        {{ __('لفو') }}
-                    </x-secondary-button>
-                    <x-primary-button type="submit">
-                        {{ __('ثبت') }}
+
+                <!-- Footer -->
+                <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                    <x-primary-button type="submit"
+                                      wire:target="createNewDepartment"
+                                      wire:loading.attr="disabled"
+                                      wire:loading.class="opacity-50">
+                        <span wire:loading.remove wire:target="createNewDepartment">{{ __('ثبت') }}</span>
+                        <span wire:loading wire:target="createNewDepartment">{{ __('در حال ثبت...') }}</span>
                     </x-primary-button>
+                    <a href="{{route('departments.index')}}">
+                        <x-cancel-button>
+                            {{ __('لغو') }}
+                        </x-cancel-button>
+                    </a>
+
                 </div>
             </form>
         </x-modal>
-        <x-modal name="update">
+
+
+
+        <x-modal name="update" maxWidth="2xl" :closable="false">
             @if($departmentId)
-                <form wire:submit="updateDep({{$departmentId}})">
-                    <div class="flex flex-row px-6 py-4 bg-gray-100 text-start">
-                        {{__('ویرایش دپارتمان')}}
+                <form wire:submit.prevent="updateDep({{ $departmentId }})">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش دپارتمان') }}</h2>
+                        <a href="{{route('departments.index')}}"
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
                     </div>
-                    <div class="px-6 py-4" dir="rtl">
-                        <div class="mt-4 text-sm text-gray-600">
-                            <div class="w-full">
-                                <x-input-label for="department" :value="__('دپارتمان')"/>
-                                <x-text-input wire:model="department" id="department" class="block my-2 w-full"
-                                              type="text"
-                                              autofocus/>
-                                <x-input-error :messages="$errors->get('department')" class="mt-2"/>
-                            </div>
+
+                    <!-- Body -->
+                    <div class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200" dir="rtl">
+                        <div>
+                            <x-input-label for="department" :value="__('دپارتمان')"/>
+                            <x-text-input wire:model="department" id="department" class="block my-2 w-full" type="text"
+                                          autofocus/>
+                            <x-input-error :messages="$errors->get('department')" class="my-2"/>
                         </div>
                     </div>
-                    <div class="flex flex-row justify-between px-6 py-4 bg-gray-100">
-                        <x-secondary-button wire:click="close">
-                            {{ __('لفو') }}
-                        </x-secondary-button>
-                        <x-primary-button type="submit">
-                            {{ __('ثبت') }}
+
+                    <!-- Footer -->
+                    <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                        <x-primary-button type="submit" wire:loading.attr="disabled" wire:target="updateDep">
+                            <span wire:loading.remove wire:target="updateDep">{{ __('ثبت') }}</span>
+                            <span wire:loading wire:target="updateDep">{{ __('در حال ثبت...') }}</span>
                         </x-primary-button>
+                        <a href="{{route('departments.index')}}">
+                            <x-cancel-button>
+                                {{ __('لغو') }}
+                            </x-cancel-button>
+                        </a>
                     </div>
                 </form>
             @endif
         </x-modal>
-        <x-modal name="delete">
+
+
+        <x-modal name="delete" maxWidth="2xl" :closable="false">
             @if($departmentId)
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" dir="rtl">
-                    <div class="sm:flex sm:items-center">
-                        <div
-                            class="mx-auto shrink-0 flex items-center justify-center size-12 rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                            <svg class="size-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                <form method="POST" action="{{ route('department.destroy', $departmentId) }}">
+                    @csrf
+                    @method('DELETE')
+
+                    <!-- Header -->
+                    <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-800">{{ __('حذف دپارتمان') }}</h2>
+                        <a href="{{route('departments.index')}}"
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                             </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
-                            <h3 class="text-sm text-gray-900 dark:text-gray-100">
-                                {{ __('آیا مطمئن هستید که ') }} <span
-                                    class="font-medium">{{$department}}</span> {{__('پاک شود ؟')}}
-                            </h3>
-                        </div>
+                        </a>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="px-6 py-4 bg-white" dir="rtl">
+                        <p class="text-xl font-bold text-red-600 dark:text-red-400 mb-4">
+                            {{ __('آیا مطمئن هستید که دپارتمان زیر حذف شود؟') }}
+                        </p>
+
+                        <ul class="list-disc list-inside text-sm space-y-2 text-gray-800 dark:text-gray-200">
+                            <li><strong>{{ __('نام دپارتمان:') }}</strong> {{ $department }}</li>
+                            {{-- Add more organization info here if needed --}}
+                        </ul>
+
+                        <p class="text-xs text-red-500 dark:text-red-300 mt-4">
+                            {{ __('توجه: این عملیات غیرقابل بازگشت است و تمامی اطلاعات مرتبط با این دپارتمان حذف خواهند شد.') }}
+                        </p>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                        <x-primary-button type="submit">
+                            {{ __('حذف دپارتمان') }}
+                        </x-primary-button>
+                        <a href="{{route('departments.index')}}">
+                            <x-cancel-button type="button">
+                                {{ __('لغو') }}
+                            </x-cancel-button>
+                        </a>
+
+                    </div>
+                </form>
+            @endif
+        </x-modal>
+
+        <x-modal name="import" maxWidth="2xl" :closable="false">
+            <form action="/department_import" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <!-- Header -->
+                <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">{{ __('درون‌ریزی فایل دپارتمان') }}</h2>
+                    <a href="{{ route('departments.index') }}"
+                       class="text-gray-400 hover:text-red-500 transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Body -->
+                <div class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200" dir="rtl">
+                    <div>
+                        <x-input-label for="excel_file" :value="__('فایل اکسل دپارتمان')"/>
+                        <input type="file" name="excel_file" id="excel_file"
+                               class="block my-2 w-full p-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none"/>
+                        <x-input-error :messages="$errors->get('excel_file')" class="my-2"/>
                     </div>
                 </div>
-                <div class="flex flex-row justify-between px-6 gap-x-3 py-4 bg-gray-100">
-                    <x-secondary-button wire:click="close">
-                        {{ __('لغو') }}
-                    </x-secondary-button>
-                    <x-danger-button wire:click="delete({{$departmentId}})">
-                        {{ __('حذف') }}
-                    </x-danger-button>
+
+                <!-- Footer -->
+                <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
+                    <x-primary-button type="submit">
+                        {{ __('ثبت') }}
+                    </x-primary-button>
+                    <a href="{{ route('departments.index') }}">
+                        <x-cancel-button>
+                            {{ __('لغو') }}
+                        </x-cancel-button>
+                    </a>
                 </div>
-            @endif
+            </form>
         </x-modal>
 
 
@@ -175,12 +267,12 @@
                             <x-table.cell>{{ ($this->departments->currentPage() - 1) * $this->departments->perPage() + $loop->iteration }}</x-table.cell>
                             <x-table.cell>{{$department->department_name}}</x-table.cell>
                             <x-table.cell>
-                                <x-primary-button class="ml-2" wire:click="openModalEdit({{$department->id}})">
+                                <x-edit-button class="ml-2" wire:click="openModalEdit({{$department->id}})">
                                     {{__('ویرایش')}}
-                                </x-primary-button>
-                                <x-danger-button wire:click="openModalDelete({{$department->id}})">
+                                </x-edit-button>
+                                <x-cancel-button wire:click="openModalDelete({{$department->id}})">
                                     {{__('حذف')}}
-                                </x-danger-button>
+                                </x-cancel-button>
                             </x-table.cell>
                         </x-table.row>
                     @empty

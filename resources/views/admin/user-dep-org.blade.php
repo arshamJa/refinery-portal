@@ -48,7 +48,6 @@
                     </div>
                     <x-input-error :messages="$errors->get('departmentId')" class="my-2"/>
                 </div>
-
                 <div class="mt-2 mb-4">
                     <x-input-label class="mb-2" :value="__('سامانه')"/>
                     <div class="custom-select">
@@ -85,7 +84,6 @@
                     </div>
                     <x-input-error :messages="$errors->get('organization_ids')" class="my-2"/>
                 </div>
-
                 <x-primary-button type="submit">
                     {{ __('ذخیره') }}
                 </x-primary-button>

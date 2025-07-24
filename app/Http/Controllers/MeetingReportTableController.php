@@ -137,11 +137,6 @@ class MeetingReportTableController extends Controller
         return Excel::download(new MeetingsExport($meetings), 'meeting_report.xlsx');
     }
 
-
-
-
-
-
     public function show(Meeting $meeting)
     {
         $meeting->load([
@@ -159,6 +154,7 @@ class MeetingReportTableController extends Controller
             'participants' => $participants
         ]);
     }
+
     public function taskTable(Request $request)
     {
         // Convert current date to Jalali

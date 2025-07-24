@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -67,6 +68,14 @@ class AddOrganizationController extends Controller
         $organization->delete();
         return redirect()->route('organizations')
             ->with('success', 'سامانه با موفقیت حذف شد.');
+    }
+
+    public function deleteDepartment(string $id)
+    {
+        $department = Department::findOrFail($id);
+        $department->delete();
+        return redirect()->route('departments.index')
+            ->with('success', 'دپارتمان با موفقیت حذف شد.');
     }
 
 }

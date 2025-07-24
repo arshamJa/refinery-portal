@@ -72,10 +72,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
 
-        // Gate for only the bosses to see the refinery report
-        Gate::define('refinery-report', function (User $user) {
-            return $user->permissions->contains('name', UserPermission::TASK_REPORT_TABLE->value);
-        });
+//        // Gate for only the bosses to see the refinery report
+//        Gate::define('refinery-report', function (User $user) {
+//            return $user->permissions->contains('name', UserPermission::TASK_REPORT_TABLE->value);
+//        });
 
 
         // Gate for the scriptorium to handle only his meeting

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserInfo;
@@ -15,52 +16,30 @@ class OrgDepManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with([
-            'user_info:id,department_id,user_id,full_name',
-            'organizations:id,organization_name',
-            'user_info.department:id,department_name'
-        ])
-            ->whereDoesntHave('roles', fn($q) => $q->where('name', UserRole::SUPER_ADMIN->value)
-            )
-            ->select('id');
+        $query = Organization::with(['department:id,department_name']);
+        $originalOrganizationsCount = (clone $query)->count();
 
-        $originalUsersCount = (clone $query)->count(); // Clone to get unfiltered count
-
-        if (
-            $request->filled('full_name') ||
-            $request->filled('department_name') ||
-            $request->filled('organization')
-        ) {
-            $query->where(function ($q) use ($request) {
-                if ($request->filled('full_name')) {
-                    $q->whereHas('user_info', function ($userInfoQuery) use ($request) {
-                        $userInfoQuery->where('full_name', 'like', '%'.$request->input('full_name').'%');
-                    });
-                }
-
-                if ($request->filled('department_name')) {
-                    $q->whereHas('user_info.department', function ($departmentQuery) use ($request) {
-                        $departmentQuery->where('department_name', 'like', '%'.$request->input('department_name').'%');
-                    });
-                }
-
-                if ($request->filled('organization')) {
-                    $q->whereHas('organizations', function ($orgQuery) use ($request) {
-                        $orgQuery->where('organization_name', 'like', '%'.$request->input('organization').'%');
-                    });
-                }
-            });
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where('organization_name', 'like', "%{$searchTerm}%")
+                ->orWhereHas('department', function ($q) use ($searchTerm) {
+                    $q->where('department_name', 'like', "%{$searchTerm}%");
+                });
         }
-
-        $users = $query->paginate(10)->appends(['search' => $request->input('search')]);
-        $filteredUsersCount = $users->total();
-
+        $departments = Department::all();
+        $organizations = $query->paginate(10)->appends(['search' => $request->input('search')]);
+        $filteredOrganizationsCount = $organizations->total();
+        $orgs = Organization::select('id', 'organization_name')->get();
         return view('admin.dep-org-management', [
-            'users' => $users,
-            'originalUsersCount' => $originalUsersCount,
-            'filteredUsersCount' => $filteredUsersCount,
+            'organizations' => $organizations,
+            'orgs' => $orgs,
+            'originalOrganizationsCount' => $originalOrganizationsCount,
+            'filteredOrganizationsCount' => $filteredOrganizationsCount,
+            'departments' => $departments
         ]);
     }
+
+
 
     public function departmentOrganizationConnection()
     {
@@ -79,6 +58,7 @@ class OrgDepManagementController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->all());
         Gate::authorize('admin-role');
         $validated = $request->validate([
             'departmentId' => 'required',

@@ -42,15 +42,10 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
         gridContainer.remove();
     }
 
-    // Add <hr> after each article inside the cloned content for print separation
-    printableContent.querySelectorAll('article').forEach(article => {
-        const hr = document.createElement('hr');
-        hr.style.margin = '30px 0';
-        hr.style.border = 'none';
-        hr.style.borderTop = '1px solid #ccc';
-        article.after(hr);
+    // Removed adding <hr> after articles
 
-        // Remove background color and border for print
+    // Remove background color and border for print for each article
+    printableContent.querySelectorAll('article').forEach(article => {
         article.style.background = 'transparent';
         article.style.border = 'none';
         article.style.boxShadow = 'none';
@@ -80,7 +75,6 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
         <html lang="fa" dir="rtl">
         <head>
             <meta charset="UTF-8" />
-<!--            <title>چاپ اقدامات جلسه</title>-->
             <style>
                 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css');
                 body {
@@ -133,8 +127,7 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
                     font-size: 20px;
                     color: #1e40af;
                     font-weight: 700;
-                    margin-bottom: 12px;
-                    padding-bottom: 8px;
+                    display: inline-block;
                 }
                 article header h3 span.label {
                     font-weight: 900;
@@ -144,18 +137,19 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
                     font-size: 17px;
                     color: #1e293b;
                     margin: 0;
-                    line-height: 1.5;
                     user-select: text;
-                }
-                hr {
-                    border: none;
-                    border-top: 1px solid #ccc;
-                    margin: 30px 0;
                 }
                 button, .no-print, .screen-only {
                     display: none !important;
                 }
                 @media print {
+                    .file-print{
+                      margin-bottom: 4px !important;
+                    }
+
+                 .print-task-item {
+                        margin-bottom: 2px !important;
+                    }
                     .print\\:flex-nowrap {
                         flex-wrap: nowrap !important;
                     }
@@ -188,3 +182,4 @@ function printTask(title = 'بدون عنوان جلسه', personName = 'نام�
         printWindow.print();
     }, 1000);
 }
+

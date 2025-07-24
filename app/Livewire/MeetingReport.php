@@ -39,6 +39,7 @@ class MeetingReport extends Component
     #[Computed]
     public function meetings()
     {
+
         $filters = [
             'search' => $this->search,
             'start_date' => $this->start_date,
@@ -49,10 +50,14 @@ class MeetingReport extends Component
     }
     public function baseFilteredMeetingQuery($filters)
     {
-        $search = trim($filters['search'] ?? '');
-        $startDate = trim($filters['start_date'] ?? '');
-        $endDate = trim($filters['end_date'] ?? '');
-        $statusFilter = $filters['status'] ?? null;
+        $search = strip_tags(trim($filters['search'] ?? ''));
+        $startDate = strip_tags(trim($filters['start_date'] ?? ''));
+        $endDate = strip_tags(trim($filters['end_date'] ?? ''));
+
+        $statusFilter = array_key_exists('status', $filters) && $filters['status'] !== null
+            ? strip_tags(trim($filters['status']))
+            : null;
+
         return Meeting::with([
             'scriptorium.user_info.department',
             'boss.user_info.department',
@@ -96,25 +101,23 @@ class MeetingReport extends Component
     #[Computed]
     public function percentages(): array
     {
-        return Cache::remember('meeting_percentages', 3600, function () {
-            $counts = DB::table('meetings')
-                ->select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+        $counts = DB::table('meetings')
+            ->select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
 
-            $totalMeetings = array_sum($counts);
+        $totalMeetings = array_sum($counts);
 
-            $percentages = [];
-            foreach (MeetingStatus::cases() as $status) {
-                $count = $counts[$status->value] ?? 0;
-                $percentages[$status->value] = $totalMeetings > 0
-                    ? round(($count / $totalMeetings) * 100, 2)
-                    : 0;
-            }
+        $percentages = [];
+        foreach (MeetingStatus::cases() as $status) {
+            $count = $counts[$status->value] ?? 0;
+            $percentages[$status->value] = $totalMeetings > 0
+                ? round(($count / $totalMeetings) * 100, 2)
+                : 0;
+        }
 
-            return $percentages;
-        });
+        return $percentages;
     }
 
 

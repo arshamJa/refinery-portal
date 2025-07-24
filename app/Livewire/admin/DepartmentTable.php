@@ -3,10 +3,9 @@
 namespace App\Livewire\admin;
 
 use App\Models\Department;
-use App\Rules\farsi_chs;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
@@ -55,17 +54,20 @@ class DepartmentTable extends Component
         $this->departmentId = $department_id;
         $this->dispatch('crud-modal', name: 'delete');
     }
-    /**
-     * @throws AuthorizationException
-     */
+
     public function createNewDepartment()
     {
-//        $this->authorize('create-department-organization');
-        $this->validate([
-            'department' => ['bail','required','min:5','max:50','unique:departments,department_name', new farsi_chs()]
-        ]);
+        $validated = Validator::make(
+            ['department' => $this->department],
+            [
+                'department' => ['bail', 'required', 'min:5', 'max:255', 'unique:departments,department_name']
+            ],
+            ['department.required' => 'نام دپارتمان اجباری است.', 'department.min' => 'نام دپارتمان باید حداقل 5 کاراکتر باشد.',
+                'department.max' => 'نام دپارتمان نباید بیشتر از 255 کاراکتر باشد.', 'department.unique' => 'این دپارتمان قبلا ثبت شده است.',
+            ]
+        );
         Department::create([
-            'department_name' => $this->department
+            'department_name' => $validated['department'],
         ]);
         $this->close();
         session()->flash('status', 'دپارتمان جدید با موفقیت ثبت شد');
@@ -76,24 +78,20 @@ class DepartmentTable extends Component
      */
     public function updateDep($id)
     {
-//        $this->authorize('update-department-organization',$id);
-        $this->validate([
-            'department' => ['bail','required','min:5','max:50', new farsi_chs()]
-        ]);
-        Department::where('id', $id)->update(['department_name' => $this->department]);
+        $validated = $this->validate(
+            [
+                'department' => ['bail', 'required', 'min:5', 'max:255', 'unique:departments,department_name'],
+            ],
+            [
+                'department.required' => 'نام دپارتمان اجباری است.',
+                'department.min' => 'نام دپارتمان باید حداقل 5 کاراکتر باشد.',
+                'department.max' => 'نام دپارتمان نباید بیشتر از 255 کاراکتر باشد.',
+                'department.unique' => 'این دپارتمان قبلا ثبت شده است.',
+            ]
+        );
+        Department::where('id', $id)->update(['department_name' => $validated['department']]);
         $this->close();
         session()->flash('status', 'دپارتمان با موفقیت آپدیت شد');
-    }
-    /**
-     * @throws AuthorizationException
-     */
-    public function delete($id)
-    {
-//        $this->authorize('delete-department-organization',$id);
-        $department = Department::find($id);
-        $department->delete();
-        $this->close();
-        session()->flash('status', 'دپارتمان با موفقیت حذف شد');
     }
     public function close()
     {

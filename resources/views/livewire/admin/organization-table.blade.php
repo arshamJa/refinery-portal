@@ -25,7 +25,6 @@
             </li>
         </x-breadcrumb>
 
-
         <form wire:submit="filterOrganizations"
               class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
             <div class="grid gap-4 px-3 w-full sm:px-0 lg:grid-cols-6 items-end">
@@ -97,9 +96,9 @@
                                 <x-edit-button class="ml-2" wire:click="openModalEdit({{$organization->id}})">
                                     {{__('ویرایش')}}
                                 </x-edit-button>
-                                <x-danger-button wire:click="openModalDelete({{$organization->id}})">
+                                <x-cancel-button wire:click="openModalDelete({{$organization->id}})">
                                     {{__('حذف')}}
-                                </x-danger-button>
+                                </x-cancel-button>
                             </x-table.cell>
                         </x-table.row>
                     @empty
@@ -256,7 +255,7 @@
                         </p>
 
                         <ul class="list-disc list-inside text-sm space-y-2 text-gray-800 dark:text-gray-200">
-                            <li><strong>{{ __('نام سامانه:') }}</strong> {{ $organization->organization_name }}</li>
+                            <li><strong>{{ __('نام سامانه:') }}</strong> {{ $organizationName }}</li>
                             {{-- Add more organization info here if needed --}}
                         </ul>
 
@@ -266,9 +265,9 @@
                     </div>
                     <!-- Footer -->
                     <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
-                        <x-danger-button type="submit">
+                        <x-primary-button type="submit">
                             {{ __('حذف سامانه') }}
-                        </x-danger-button>
+                        </x-primary-button>
                         <a href="{{ route('organizations') }}">
                             <x-cancel-button>
                                 {{ __('لغو') }}
@@ -287,7 +286,7 @@
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                         <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش سامانه') }}</h2>
                         <a href="{{route('organizations')}}"
-                                class="text-gray-400 hover:text-red-500 transition duration-150">
+                           class="text-gray-400 hover:text-red-500 transition duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
@@ -353,9 +352,12 @@
                             <span wire:loading wire:target="updateOrg">{{ __('در حال ثبت...') }}</span>
                         </x-primary-button>
 
-                        <x-cancel-button wire:click.prevent="close">
-                            {{ __('لغو') }}
-                        </x-cancel-button>
+                        <a href="{{route('organizations')}}">
+                            <x-cancel-button>
+                                {{ __('لغو') }}
+                            </x-cancel-button>
+                        </a>
+
                     </div>
                 </form>
             @endif

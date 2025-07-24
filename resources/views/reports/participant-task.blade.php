@@ -122,73 +122,85 @@
                 </div>
             </div>
 
-            {{-- Task Cards --}}
+            {{-- Task Card --}}
             <section class="mt-12 grid grid-cols-1 gap-8">
-                @forelse ($meeting->tasks as $task)
-                    @php
-                        $taskUsers = $task->taskUsers->where('user_id', $userInfo->user_id);
-                    @endphp
+                @php
+                    $taskUser = $meeting->tasks
+                        ->flatMap(fn($task) => $task->taskUsers)
+                        ->first(fn($tu) => $tu->id == request()->route('taskUser_id'));
+                    $task = $taskUser?->task;
+                @endphp
 
-                    @foreach ($taskUsers as $taskUser)
-                        <article
-                            class="bg-white border border-gray-200 rounded-2xl shadow-md p-6 space-y-5 transition-shadow hover:shadow-lg print:break-inside-avoid"
-                            style="break-inside: avoid;">
-                            <header>
-                                <h3 class="text-indigo-700 font-bold text-md mb-3 pb-2">
-                                    {{ __('بند مذاکره: ') }}
-                                    <p class="text-gray-800 leading-relaxed select-text">{{ $task->body }}</p>
-                                </h3>
-                            </header>
-                            <div
-                                class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-gray-600 select-text leading-snug">
+                @if ($taskUser && $task)
+                    <article
+                        class="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 transition-all hover:shadow-xl print:break-inside-avoid">
 
-                                <div>
-                                    <span class="font-semibold text-gray-700">{{ __('اقدام کننده:') }}</span>
-                                    {{ $taskUser->user->user_info->full_name ?? '---' }}
-                                </div>
-                                <div>
-                                    <span class="font-semibold text-gray-700">{{ __('مهلت اقدام:') }}</span>
-                                    {{ $taskUser->time_out ?? '---' }}
-                                </div>
-                                <div>
-                                    <span class="font-semibold text-gray-700">{{ __('تاریخ انجام اقدام:') }}</span>
-                                    {{ $taskUser->sent_date ?? '---' }}
-                                </div>
-                                <div>
-                                    <span class="font-semibold text-gray-700">{{ __('شرح اقدام:') }}</span>
-                                    @if ($taskUser->body_task)
-                                        <p class="mt-1 text-gray-700 leading-relaxed">{{ $taskUser->body_task }}</p>
-                                    @else
-                                        <p class="mt-1 text-red-500 font-semibold">{{ __('هنوز اقدامی ثبت نشده') }}</p>
-                                    @endif
-                                </div>
+                        <!-- Title -->
+                        <header class="mb-4 border-b border-dashed pb-4">
+                            <h3 class="text-xl font-semibold text-indigo-700 mb-2 inline-block">{{ __('بند مذاکره:') }}</h3>
+                            <span class="text-gray-800 leading-relaxed">{{ $task->body }}</span>
+                        </header>
 
-                                <div class="md:col-span-2">
-                                    <span class="font-semibold text-gray-700">{{ __('فایل‌ها:') }}</span>
-                                    @if ($taskUser->taskUserFiles->isNotEmpty())
-                                        <ul class="list-disc list-inside mt-1 text-blue-600 text-xs space-y-1">
-                                            @foreach ($taskUser->taskUserFiles as $file)
-                                                <li>
-                                                    <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
-                                                       class="hover:underline">
-                                                        {{ $file->original_name }}
-                                                    </a>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        <p class="text-gray-400 text-xs mt-1">{{ __('بدون فایل') }}</p>
-                                    @endif
-                                </div>
+                        <!-- Task Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 text-sm text-gray-700">
+                            <div class="md:col-span-1 print-task-item">
+                                <span class="font-semibold text-gray-800">{{ __('اقدام کننده:') }}</span>
+                                <span class="mt-1">{{ $taskUser->user->user_info->full_name ?? '---' }}</span>
                             </div>
-                        </article>
-                    @endforeach
-                @empty
+                            <div class="md:col-span-1 print-task-item">
+                                <span class="font-semibold text-gray-800">{{ __('مهلت اقدام:') }}</span>
+                                <span class="mt-1">{{ $taskUser->time_out ?? '---' }}</span>
+                            </div>
+                            <div class="md:col-span-1 print-task-item">
+                                <span class="font-semibold text-gray-800">{{ __('تاریخ انجام اقدام:') }}</span>
+                                <span class="mt-1">{{ $taskUser->sent_date ?? '---' }}</span>
+                            </div>
+
+                            <!-- Files -->
+                            <div class="md:col-span-2">
+                                <div class="print:flex print:items-center print:gap-2 file-print">
+                                    <span class="font-semibold text-gray-800">{{ __('فایل‌ها:') }}</span>
+
+                                    @if ($taskUser->taskUserFiles->isEmpty())
+                                        <span class="text-gray-400 text-sm m-0 print:m-0">{{ __('بدون فایل') }}</span>
+                                    @endif
+                                </div>
+
+                                @if ($taskUser->taskUserFiles->isNotEmpty())
+                                    <ul class="mt-2 list-disc list-inside space-y-1 text-blue-600 text-sm">
+                                        @foreach ($taskUser->taskUserFiles as $file)
+                                            <li>
+                                                <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank" class="hover:underline">
+                                                    {{ $file->original_name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </div>
+
+                            <!-- Action Description -->
+                            <div class="md:col-span-3">
+                                <span class="font-semibold text-gray-800">{{ __('شرح اقدام:') }}</span>
+                                @if ($taskUser->body_task)
+                                    <p class="mt-2 text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-md border border-gray-100">
+                                        {{ $taskUser->body_task }}
+                                    </p>
+                                @else
+                                    <p class="mt-2 text-red-500 font-medium">{{ __('هنوز اقدامی ثبت نشده') }}</p>
+                                @endif
+                            </div>
+                        </div>
+
+                    </article>
+                @else
                     <div class="text-center text-gray-500 text-base mt-6 italic">
-                        {{ __('هیچ اقدامی برای این کاربر در این جلسه ثبت نشده است.') }}
+                        {{ __('اطلاعاتی برای این اقدام یافت نشد.') }}
                     </div>
-                @endforelse
+                @endif
             </section>
+
+
 
             {{-- Controls --}}
             <div class="no-print flex flex-wrap items-center gap-4 mt-10">
