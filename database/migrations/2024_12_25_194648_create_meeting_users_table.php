@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('meeting_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('meeting_id')->constrained();
-            $table->foreignId('user_id')->constrained(); //همون اعضای جلسه است
+            $table->foreignId('meeting_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); //همون اعضای جلسه است
             $table->boolean('is_guest')->default(false);
             $table->tinyInteger('is_present')->default(\App\Enums\MeetingUserStatus::PENDING->value);
             $table->text('reason_for_absent')->nullable();

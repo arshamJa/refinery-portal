@@ -3,15 +3,15 @@
 use App\Http\Controllers\PhoneListController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
 
     Route::get('phone/list', [PhoneListController::class, 'index'])
         ->name('phone-list.index');
 
-    Route::get('phone/list/create',[PhoneListController::class,'create'])
+    Route::get('phone/list/create', [PhoneListController::class, 'create'])
         ->name('phone-list.create');
 
-    Route::post('phone/list/store',[PhoneListController::class,'store'])
+    Route::post('phone/list/store', [PhoneListController::class, 'store'])
         ->name('phone-list.store');
 
     Route::get('phone/list/{source}/{id}/edit', [PhoneListController::class, 'edit'])
@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('phone/list/{source}/{id}', [PhoneListController::class, 'destroy'])
         ->name('phone-list.destroy');
+
 
 });
 

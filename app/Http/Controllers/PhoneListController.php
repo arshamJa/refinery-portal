@@ -16,48 +16,6 @@ use Illuminate\Support\Facades\Gate;
 
 class PhoneListController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-//    public function index(Request $request)
-//    {
-//        $user = auth()->user();
-//        $showAllColumns = $user->hasRole(UserRole::SUPER_ADMIN->value) || $user->hasRole(UserRole::ADMIN->value);
-//        $query = UserInfo::with([
-//            'user.roles:id,name',
-//            'department:id,department_name',
-//        ])
-//            ->whereDoesntHave('user.roles', fn ($q) => $q->where('name', UserRole::SUPER_ADMIN->value))
-//            ->select('id', 'user_id', 'department_id', 'full_name', 'work_phone', 'house_phone', 'phone');
-//        $originalUsersCount = $query->count();
-//        if ($search = $request->input('search')) {
-//            $query->where(function ($q) use ($search) {
-//                $user = auth()->user();
-//                // Everyone can search these fields
-//                $q->where('full_name', 'like', "%{$search}%")
-//                    ->orWhere('work_phone', 'like', "%{$search}%")
-//                    ->orWhereHas('department', fn ($q2) =>
-//                    $q2->where('department_name', 'like', "%{$search}%"))
-//                    ->orWhereHas('user.roles', fn ($q2) =>
-//                    $q2->where('name', 'like', "%{$search}%"));
-//                // Conditionally allow phone/house_phone search only for admins
-//                if ($user->hasRole(UserRole::SUPER_ADMIN->value) || $user->hasRole(UserRole::ADMIN->value) ||
-//                    $user->hasPermissionTo(UserPermission::PHONE_PERMISSIONS->value)) {
-//                    $q->orWhere('phone', 'like', "%{$search}%")
-//                        ->orWhere('house_phone', 'like', "%{$search}%");
-//                }
-//            });
-//        }
-//        $userInfos = $query->paginate(10);
-//        $filteredUsersCount = $userInfos->total();
-//        return view('phoneList.index', [
-//            'userInfos' => $userInfos,
-//            'showAllColumns' => $showAllColumns,
-//            'originalUsersCount' => $originalUsersCount,
-//            'filteredUsersCount' => $filteredUsersCount,
-//        ]);
-//    }
-
     public function index(Request $request)
     {
         $user = auth()->user();
@@ -162,14 +120,20 @@ class PhoneListController extends Controller
         ]);
     }
 
-
     public function create()
     {
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::PHONE_PERMISSIONS->value,
+            UserRole::ADMIN->value,
+        ]);
         return view('phoneList.create');
     }
-
     public function store(Request $request)
     {
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::PHONE_PERMISSIONS->value,
+            UserRole::ADMIN->value,
+        ]);
         $cleaned = $request->all();
 
         $cleaned['phone'] = $this->cleanPhone($request->input('phone'));
@@ -249,7 +213,6 @@ class PhoneListController extends Controller
 
         return to_route('phone-list.index')->with('status', 'اطلاعات با موفقیت آپدیت شد');
     }
-
     public function destroy(string $source, string $id)
     {
         Gate::authorize('has-permission-and-role', [

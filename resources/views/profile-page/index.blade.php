@@ -1,7 +1,6 @@
 @php use App\Enums\UserRole; @endphp
 <x-app-layout>
 
-
     <x-sessionMessage name="status"/>
     @can('profile-page')
         <nav class="flex justify-between mb-4 mt-20">
@@ -55,7 +54,7 @@
                           class="flex flex-col gap-2">
                         @csrf
                         <input type="file" id="photo" name="photo"
-                               class="block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 file:me-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
+                               class="block py-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 file:me-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
 
                         <x-primary-button type="submit" class="w-fit">
                             {{ __('ذخیره عکس') }}
@@ -69,9 +68,10 @@
                 @if(auth()->user()->profile_photo_path)
                     <form action="{{ route('deleteProfilePhoto') }}" method="POST" class="pt-2">
                         @csrf
-                        <x-secondary-button type="submit">
+                        @method('delete')
+                        <x-cancel-button type="submit">
                             {{ __('حذف پروفایل') }}
-                        </x-secondary-button>
+                        </x-cancel-button>
                     </form>
                 @endif
 
@@ -219,4 +219,5 @@
             </div>
         </div>
     @endcan
+
 </x-app-layout>

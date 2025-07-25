@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_infos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('department_id')->nullable()->index();
             $table->string('full_name')->index();
             $table->string('work_phone');
@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('n_code')->index();
             $table->string('position');
             $table->string('signature')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

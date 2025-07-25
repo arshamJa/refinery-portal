@@ -105,14 +105,14 @@ class User extends Authenticatable
         $this->roles()->sync($roles);
         return $this;
     }
-//    public function syncPermissions(array $permissions): self
-//    {
-//        if (! $this->relationLoaded('permissions')) {
-//            $this->load('permissions');
-//        }
-//        $this->permissions()->sync($permissions);
-//        return $this;
-//    }
+    public function syncPermissions(array $permissions): self
+    {
+        if (! $this->relationLoaded('permissions')) {
+            $this->load('permissions');
+        }
+        $this->permissions()->sync($permissions);
+        return $this;
+    }
     public function hasRole(string $role): bool
     {
         if (!$this->relationLoaded('roles')) {
@@ -189,17 +189,9 @@ class User extends Authenticatable
         return $this->permissions();
     }
 
-
-
-
-
-
-
-
-
     public function organizations():BelongsToMany
     {
-        return $this->belongsToMany(Organization::class);
+        return $this->belongsToMany(Organization::class, 'organization_user', 'user_id', 'organization_id');
     }
     public function user_info() : HasOne
     {

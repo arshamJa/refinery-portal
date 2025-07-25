@@ -36,15 +36,12 @@ class PermissionSeeder extends Seeder
         $superAdminUser->assignRole($superAdminRole);
 
         // Create Permissions
-        $meetingCreate = Permission::create(['name' => 'ایجاد جلسه']);
         $TASK_REPORT_TABLE = Permission::create(['name' => 'گزارش جلسات شرکت']);
         $SCRIPTORIUM_PERMISSIONS = Permission::create(['name' => 'دسترسی های دبیر جلسه']);
         $PHONE_PERMISSIONS = Permission::create(['name' => 'مدیریت دفترچه تلفنی']);
         $NEWS_PERMISSIONS = Permission::create(['name' => 'مدیریت اخبارواطلاعیه']);
 
 
-        // Assign Permissions to Roles
-        $superAdminRole->assignPermission($meetingCreate);
 
 
         $users = User::whereNotIn('id', [1, 2, 3, 4])->get();

@@ -37,7 +37,7 @@
                 </x-link.responsive-link>
             </li>
             <li class="mb-2">
-                <x-link.responsive-link wire:navigate href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
+                <x-link.responsive-link href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
                                         :active="request()->is('profile')" class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">
@@ -220,7 +220,7 @@
                 </div>
             </li>
             <li class="mb-2">
-                <x-link.responsive-link wire:navigate href="{{route('employee.organization')}}"
+                <x-link.responsive-link href="{{route('employee.organization')}}"
                                         :active="request()->is('employee/organization')"
                                         class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"

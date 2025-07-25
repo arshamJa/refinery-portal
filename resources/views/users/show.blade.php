@@ -36,7 +36,7 @@
             </li>
         </ol>
     </nav>
-    @can('users-info')
+    @can('admin-role')
         <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
             <!-- Personal Info -->
             <div class="border-b pb-6">

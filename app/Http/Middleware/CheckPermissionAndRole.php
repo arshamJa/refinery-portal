@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,15 @@ class CheckPermissionAndRole
     {
         $user = auth()->user();
 
-        if (!$user || !$user->hasPermissionTo($permission) || !$user->hasRole($role)) {
+        if (!$user) {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return $next($request);
+        }
+
+        if (!$user->hasPermissionTo($permission) || !$user->hasRole($role)) {
             abort(403, 'Unauthorized');
         }
 

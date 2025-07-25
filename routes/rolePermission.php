@@ -7,7 +7,7 @@ use App\Http\Controllers\TaskManagementController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::middleware(['auth', 'super_admin'])->group(function () {
+Route::middleware(['auth', 'super_admin','sanitizeInputs'])->group(function () {
 
 
 

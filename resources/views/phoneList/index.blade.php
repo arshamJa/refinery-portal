@@ -56,13 +56,15 @@
                     @endif
                 @endif
             </div>
-            <div class="col-span-2 flex justify-end">
-                <a href="{{route('phone-list.create')}}">
-                    <x-primary-button type="button">
-                        {{__('اقزودن شماره')}}
-                    </x-primary-button>
-                </a>
-            </div>
+            @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
+                <div class="col-span-2 flex justify-end">
+                    <a href="{{route('phone-list.create')}}">
+                        <x-primary-button type="button">
+                            {{__('اقزودن شماره')}}
+                        </x-primary-button>
+                    </a>
+                </div>
+            @endcan
         </div>
     </form>
 
@@ -99,7 +101,6 @@
                             <x-table.cell>{{ $entry['phone'] ?? '—' }}</x-table.cell>
                             <x-table.cell>{{ $entry['house_phone'] ?? '—' }}</x-table.cell>
                             <x-table.cell>
-
                                 <x-dropdown>
                                     <x-slot name="trigger">
                                         <button class="hover:bg-gray-200 rounded-full p-1 transition">
@@ -112,21 +113,23 @@
                                         </button>
                                     </x-slot>
                                     <x-slot name="content">
-                                        <x-dropdown-link href="{{ route('phone-list.edit', ['source' => $entry['source'], 'id' => $entry['id']] ) }}">
+                                        <x-dropdown-link
+                                            href="{{ route('phone-list.edit', ['source' => $entry['source'], 'id' => $entry['id']] ) }}">
                                             {{ __('ویرایش') }}
                                         </x-dropdown-link>
-                                        <form action="{{ route('phone-list.destroy', ['source' => $entry['source'], 'id' => $entry['id']]) }}" method="POST"
+                                        <form
+                                            action="{{ route('phone-list.destroy', ['source' => $entry['source'], 'id' => $entry['id']]) }}"
+                                            method="POST"
                                             onsubmit="return confirm('آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟');">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="block cursor-pointer w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
+                                            <button
+                                                class="block cursor-pointer w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
                                                 {{ __('حذف') }}
                                             </button>
                                         </form>
                                     </x-slot>
                                 </x-dropdown>
-
-
                             </x-table.cell>
                         @endcan
                     </x-table.row>

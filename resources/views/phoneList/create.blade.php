@@ -1,3 +1,5 @@
+@php use App\Enums\UserPermission; @endphp
+@php use App\Enums\UserRole; @endphp
 <x-app-layout>
 
     <nav class="flex justify-between mb-4 mt-20">
@@ -33,61 +35,64 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
             <li>
-            <span class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                {{__('افزودن')}}
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                {{__('ایجاد شماره جدید')}}
             </span>
             </li>
         </ol>
     </nav>
 
-    <form action="{{route('phone-list.store')}}" method="POST">
-        @csrf
-        <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
-                {{ __('افزودن ') }}
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-                <div>
-                    <x-input-label for="full_name" :value="__('نام و نام خانوادگی')"/>
-                    <x-text-input name="full_name" id="full_name"
-                                  value="{{old('full_name')}}" class="block "
-                                  type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('full_name')"/>
-                </div>
-                <div>
-                    <x-input-label for="phone" :value="__('شماره همراه')"/>
-                    <x-text-input name="phone" id="phone"
-                                  value="{{old('phone')}}" class="block "
-                                  type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('phone')"/>
-                </div>
-                <div>
-                    <x-input-label for="house_phone" :value="__('شماره منزل')"/>
-                    <x-text-input name="house_phone" id="house_phone"
-                                  value="{{old('house_phone')}}" class="block "
-                                  type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('house_phone')"/>
-                </div>
-                <div>
-                    <x-input-label for="work_phone" :value="__('شماره محل کار')"/>
-                    <x-text-input name="work_phone" id="work_phone"
-                                  value="{{old('work_phone')}}" class="block "
-                                  type="text" autofocus/>
-                    <x-input-error :messages="$errors->get('work_phone')"/>
-                </div>
-            </div>
-            <div class="mt-6">
-                <x-primary-button type="submit" class="ml-4">
-                    {{ __('ذخیره') }}
-                </x-primary-button>
-                <a href="{{route('phone-list.index')}}">
-                    <x-cancel-button>
-                        {{__('لغو')}}
-                    </x-cancel-button>
-                </a>
-            </div>
-        </div>
-    </form>
+    @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
 
+        <form action="{{route('phone-list.store')}}" method="POST">
+            @csrf
+            <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
+                    {{ __('افزودن شماره عموم ') }}
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
+                    <div>
+                        <x-input-label for="full_name" :value="__('نام و نام خانوادگی')"/>
+                        <x-text-input name="full_name" id="full_name"
+                                      value="{{old('full_name')}}" class="block "
+                                      type="text" autofocus/>
+                        <x-input-error :messages="$errors->get('full_name')"/>
+                    </div>
+                    <div>
+                        <x-input-label for="phone" :value="__('شماره همراه')"/>
+                        <x-text-input name="phone" id="phone"
+                                      value="{{old('phone')}}" class="block "
+                                      type="text" autofocus/>
+                        <x-input-error :messages="$errors->get('phone')"/>
+                    </div>
+                    <div>
+                        <x-input-label for="house_phone" :value="__('شماره منزل')"/>
+                        <x-text-input name="house_phone" id="house_phone"
+                                      value="{{old('house_phone')}}" class="block "
+                                      type="text" autofocus/>
+                        <x-input-error :messages="$errors->get('house_phone')"/>
+                    </div>
+                    <div>
+                        <x-input-label for="work_phone" :value="__('شماره محل کار')"/>
+                        <x-text-input name="work_phone" id="work_phone"
+                                      value="{{old('work_phone')}}" class="block "
+                                      type="text" autofocus/>
+                        <x-input-error :messages="$errors->get('work_phone')"/>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <x-primary-button type="submit" class="ml-4">
+                        {{ __('ذخیره') }}
+                    </x-primary-button>
+                    <a href="{{route('phone-list.index')}}">
+                        <x-cancel-button>
+                            {{__('لغو')}}
+                        </x-cancel-button>
+                    </a>
+                </div>
+            </div>
+        </form>
+    @endcan
 
 </x-app-layout>

@@ -44,43 +44,48 @@ class ProfilePageController extends Controller
     public function updateProfileInformation(UpdateProfileInformationRequest $request)
     {
         Gate::authorize('profile-page');
-        $request->validated();
+        $validated = $request->validated();
 
         $user = User::find(auth()->user()->id);
-        $user->p_code = $request->p_code;
+        $user->p_code = $validated['p_code'];
         $user->save();
 
         $userInfos = UserInfo::find($user->id);
-        $userInfos->full_name = $request->full_name;
-        $userInfos->work_phone = $request->work_phone;
-        $userInfos->house_phone = $request->house_phone;
-        $userInfos->phone = $request->phone;
-        $userInfos->n_code = $request->n_code;
+        $userInfos->full_name = $validated['full_name'];
+        $userInfos->work_phone = $validated['work_phone'];
+        $userInfos->house_phone = $validated['house_phone'];
+        $userInfos->phone = $validated['phone'];
+        $userInfos->n_code = $validated['n_code'];
         $userInfos->save();
 
         return redirect()->signedRoute('profile')->with('status','اطلاعات ذخیره شد');
     }
+
     public function updateProfilePhoto(Request $request)
     {
         Gate::authorize('profile-page');
         $validated = $request->validate([
-            'photo' => ['nullable','image','max:1024']
+            'photo' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024']
         ]);
-        $path = $request->file($validated['photo'])->store('profiles','public');
-        DB::table('users')->where('id',\auth()->user()->id)->update([
-            'profile_photo_path' => $path
-        ]);
-        return redirect()->signedRoute('profile')->with('status','عکس ذخیره شد');
-
+        // Only update if a file was uploaded
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('profiles', 'public');
+            DB::table('users')->where('id', auth()->id())->update([
+                'profile_photo_path' => $path
+            ]);
+            return redirect()->signedRoute('profile')->with('status','عکس ذخیره شد');
+        }
+        return redirect()->signedRoute('profile')->with('status', 'فایلی برای آپلود انتخاب نشد');
     }
-    public function deleteProfilePhoto(Request $request)
+
+    public function deleteProfilePhoto()
     {
         Gate::authorize('profile-page');
         $profile_path = public_path('storage/'.\auth()->user()->profile_photo_path);
         if (file_exists($profile_path)){
             unlink($profile_path);
         }
-        DB::table('users')->where('id',\auth()->user()->id)->update([
+        DB::table('users')->where('id',auth()->id())->update([
             'profile_photo_path' => null
         ]);
         return redirect()->signedRoute('profile')->with('status','عکس حذف شد');
@@ -93,13 +98,13 @@ class ProfilePageController extends Controller
     {
         Gate::authorize('profile-page');
         $validated = $request->validated();
-        if (!Hash::check($request->current_password,auth()->user()->password)){
+        if (!Hash::check($validated['current_password'],auth()->user()->password)){
             throw ValidationException::withMessages([
                 'current_password' => 'رمز فعلی شما اشتباه است'
             ]);
         }else{
             Auth::user()->update([
-                'password' => Hash::make($validated['password']),
+                'password' => $validated['password'],
             ]);
             return redirect()->signedRoute('profile')->with('status','رمز جدید ثبت شد');
         }

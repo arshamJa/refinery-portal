@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('organizations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('department_id')->nullable()->constrained();
+            $table->foreignId('department_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('organization_name')->index();
             $table->string('url')->nullable();
             $table->string('image')->nullable();

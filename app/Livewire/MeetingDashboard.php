@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Enums\MeetingStatus;
+use App\Enums\UserRole;
 use App\Exports\MeetingsExport;
 use App\Models\Meeting;
 use App\Models\MeetingUser;
@@ -124,14 +125,11 @@ class MeetingDashboard extends Component
     public $scriptoriumFilter = '';
     public $start_date;
     public $end_date;
-    public $bossInfo;
+
     public function filterMeetings()
     {
         $this->resetPage();
     }
-
-
-
 
     #[Computed]
     public function unreadReceivedCount()
@@ -171,11 +169,13 @@ class MeetingDashboard extends Component
                 'id', 'title', 'scriptorium_id', 'boss_id', 'location',
                 'date', 'time', 'end_time', 'status', 'unit_held', 'treat', 'guest'
             ])
-            ->where(function ($query) use ($userId) {
-                $query->where('scriptorium_id', $userId)
-                    ->orWhereHas('meetingUsers', function ($q) use ($userId) {
-                        $q->where('user_id', $userId);
-                    });
+            ->when(!auth()->user()->hasRole(UserRole::SUPER_ADMIN->value), function ($query) use ($userId) {
+                $query->where(function ($q) use ($userId) {
+                    $q->where('scriptorium_id', $userId)
+                        ->orWhereHas('meetingUsers', function ($q2) use ($userId) {
+                            $q2->where('user_id', $userId);
+                        });
+                });
             })
             ->when(!empty($search), function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
@@ -220,7 +220,6 @@ class MeetingDashboard extends Component
         return Excel::download(new MeetingsExport($meetings), 'meetings.xlsx');
     }
 
-
     public $selectedMeeting;
 
     public function view($id)
@@ -244,7 +243,6 @@ class MeetingDashboard extends Component
 
         $this->dispatch('crud-modal', name: 'view-meeting-modal');
     }
-
 
     public function deleteMeeting($id)
     {

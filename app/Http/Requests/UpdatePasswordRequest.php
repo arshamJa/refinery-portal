@@ -23,8 +23,9 @@ class UpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'current_password' => ['bail','required', 'string', 'current_password'],
-            'password' => ['bail','required', 'string', 'confirmed',Rules\Password::defaults()],
+            'current_password' => ['bail','required', 'string'],
+            'password' => ['bail','required','confirmed',
+                \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],
         ];
     }
 }

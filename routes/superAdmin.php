@@ -4,7 +4,7 @@ use App\Http\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::middleware(['auth', 'can:super-admin-only'])->group(function () {
+Route::middleware(['auth', 'can:super-admin-only','sanitizeInputs'])->group(function () {
 
     Route::get('super/admin', [SuperAdminController::class, 'index'])
         ->name('super.admin.page');

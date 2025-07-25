@@ -3,7 +3,7 @@
 use App\Http\Controllers\Admin\UsersTableController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth','adminMiddleware'])->group(function () {
+Route::middleware(['auth','adminMiddleware','sanitizeInputs'])->group(function () {
 
     Route::get('users/table', [UsersTableController::class, 'index'])
         ->name('users.index');
@@ -25,6 +25,9 @@ Route::middleware(['auth','adminMiddleware'])->group(function () {
 
     Route::delete('uses/{user}', [UsersTableController::class, 'destroy'])
         ->name('users.destroy');
+
+    Route::delete('user/{user}/organizations/{organization}', [UsersTableController::class, 'deleteOrganization'])
+        ->name('userOrganizationDelete');
 
 
     // Route for resting users password by admin

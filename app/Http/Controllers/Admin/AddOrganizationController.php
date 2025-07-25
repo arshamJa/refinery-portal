@@ -60,10 +60,13 @@ class AddOrganizationController extends Controller
     public function deleteOrganization(string $id)
     {
         $organization = Organization::findOrFail($id);
-        $old_image_path = public_path('storage/'.$organization->image);
+        // Delete old image if exists
+        $old_image_path = public_path('storage/' . $organization->image);
         if (File::exists($old_image_path)) {
             File::delete($old_image_path);
         }
+        // Detach all user relations (delete from pivot table)
+        $organization->users()->detach();
         // Delete the organization record
         $organization->delete();
         return redirect()->route('organizations')

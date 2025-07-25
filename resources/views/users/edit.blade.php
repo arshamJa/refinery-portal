@@ -1,8 +1,6 @@
 <x-app-layout>
 
-    @can('users-info')
-
-
+    @can('admin-role')
         <nav class="flex justify-between mb-4 mt-20">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
@@ -40,7 +38,6 @@
                 </li>
             </ol>
         </nav>
-
         <form action="{{route('users.update',$userInfo->id)}}" method="POST">
             @csrf
             @method('put')
@@ -51,7 +48,8 @@
                         <!-- Role -->
                         <div>
                             <x-input-label for="role" :value="__('نقش')"/>
-                            <select dir="ltr" name="role" id="role" class="block w-full mt-1.5 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+                            <select dir="ltr" name="role" id="role"
+                                    class="block w-full mt-1.5 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
                                 @foreach($roles as $role)
                                     <option value="{{ $role->id }}"
                                     @if(old('role'))
@@ -133,11 +131,8 @@
                 <!-- Department & Password Section -->
                 <div class="border-b pb-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
-
-
                         <!-- Department -->
-                        <div class="col-span-3 md:w-1/3 w-full">
-
+                        <div>
                             <x-input-label for="department" :value="__('انتخاب دپارتمان')"/>
                             <select dir="ltr" name="department" id="role"
                                     class="block w-full mt-1.5 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
@@ -151,18 +146,45 @@
                             </select>
                             <x-input-error :messages="$errors->get('department')" class="my-2"/>
                         </div>
+                        <div id="organizations_dropdown" data-users='@json($organization)' class="relative w-full"
+                             style="direction: rtl;">
+                            <x-input-label class="mb-1.5" :value="__('سازمان‌ها')"/>
+                            <button id="organizations-dropdown-btn" type="button"
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+                                <span id="organizations-selected-text" class="truncate">انتخاب سازمان‌ها</span>
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div id="organizations-dropdown-menu"
+                                 class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                                <div class="px-4 py-2">
+                                    <input id="organizations-dropdown-search" type="text" placeholder="جست و جو"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                                </div>
+                                <ul id="organizations-dropdown-list" class="max-h-48 overflow-auto"></ul>
+                                <div id="organizations-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت
+                                    نشد
+                                </div>
+                            </div>
+                            <div id="organizations-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
+                            <input type="hidden" name="organization" id="organizations-hidden-input"
+                                   value='{{ json_encode(explode(",", old("organization", ""))) }}'>
+                            <x-input-error :messages="$errors->get('organization')" class="mt-2"/>
+                        </div>
 
                     </div>
                 </div>
 
                 <!-- Permissions -->
                 <div class="pb-6 border-b">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('تعیین بخش دسترسی هر کاربر:')}}</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('تعیین بخش دسترسی کاربر:')}}</h2>
                     <div class="space-y-3 text-right text-gray-700">
                         @foreach($permissions as $permission)
                             <div class="flex items-center space-x-2 space-x-reverse">
                                 <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                     {{
                                         ((is_array(old('permissions')) && in_array($permission->id, old('permissions'))) // old input exists
                                             || (!old('permissions') && $user->permissions->contains($permission->id)) // no old input, load from user permissions
@@ -188,5 +210,35 @@
                 </div>
             </div>
         </form>
+        <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans my-4">
+            <div class="pb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('لیست سامانه‌های در دسترس:') }}</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-right text-gray-700">
+                    @forelse($relatedOrganizations as $org)
+                        <div
+                            class="flex items-center justify-between bg-white border border-gray-200 shadow-sm px-4 py-3 rounded-xl">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium truncate">{{ $org->organization_name }}</span>
+                            </div>
+                            <form
+                                action="{{ route('userOrganizationDelete', ['user' => $userInfo->user->id, 'organization' => $org->id]) }}"
+                                method="POST"
+                                onsubmit="return confirm('آیا مطمئن هستید که می‌خواهید این سازمان را از کاربر حذف کنید؟');">
+                                @csrf
+                                @method('DELETE')
+                                <x-danger-button type="submit">
+                                    {{ __('حذف') }}
+                                </x-danger-button>
+                            </form>
+                        </div>
+                    @empty
+                        <div class="col-span-full text-gray-500 text-sm text-center py-4">
+                            {{ __('هیچ سامانه‌ای به این کاربر اختصاص داده نشده است.') }}
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
     @endcan
 </x-app-layout>

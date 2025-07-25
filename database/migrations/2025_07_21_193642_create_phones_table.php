@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('phone')->index();
             $table->string('house_phone')->index();
             $table->string('work_phone')->index();
+            $table->softDeletes()->index();
             $table->timestamps();
         });
     }

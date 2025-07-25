@@ -156,7 +156,6 @@
                     </x-export-link>
                 </div>
             @endcan
-
         </div>
     </form>
 
@@ -221,14 +220,12 @@
                                     <x-dropdown-link wire:click.prevent="view({{$meeting->id}})">
                                         {{ __('نمایش') }}
                                     </x-dropdown-link>
-                                    @if($meeting->status === MeetingStatus::PENDING &&
-                                            auth()->id() === $meeting->scriptorium_id)
+                                    @if($meeting->status === MeetingStatus::PENDING && auth()->id() === $meeting->scriptorium_id )
                                         <x-dropdown-link href="{{ route('meeting.edit', $meeting->id) }}">
                                             {{ __('ویرایش') }}
                                         </x-dropdown-link>
                                     @endif
-                                    @if(($meeting->status === MeetingStatus::PENDING || $meeting->status === MeetingStatus::IS_CANCELLED) &&
-                                        auth()->id() === $meeting->scriptorium_id)
+                                    @if(($meeting->status === MeetingStatus::PENDING || $meeting->status === MeetingStatus::IS_CANCELLED) && auth()->id() === $meeting->scriptorium_id )
                                         <x-dropdown-link wire:click.prevent="deleteMeeting({{ $meeting->id }})"
                                                          class="text-red-600">
                                             {{ __('حذف') }}
@@ -421,6 +418,7 @@
             </div>
         @endif
     </x-modal>
+
     <x-modal name="delete-meeting-modal" maxWidth="4xl" :closable="false">
         @if ($selectedMeeting)
             @if(auth()->id() === $selectedMeeting->scriptorium_id)
@@ -450,9 +448,12 @@
                         <x-primary-button type="submit">
                             {{ __('حذف جلسه') }}
                         </x-primary-button>
-                        <x-cancel-button x-on:click="$dispatch('close')" class="text-gray-700 dark:text-gray-300">
-                            {{ __('لغو') }}
-                        </x-cancel-button>
+                        <a href="{{route('dashboard.meeting')}}">
+                            <x-cancel-button>
+                                {{ __('لغو') }}
+                            </x-cancel-button>
+                        </a>
+
                     </div>
                 </form>
             @endif

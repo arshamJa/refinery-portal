@@ -25,7 +25,7 @@
     </x-breadcrumb>
 
 
-@can('users-info')
+@can('admin-role')
         <form action="{{route('users.store')}}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
@@ -151,7 +151,7 @@
                         <x-input-label :value="__('تعیین بخش دسترسی:')"/>
                         @foreach($permissions as $permission)
                             <div>
-                                <input type="checkbox" name="permissions[{{$permission->name}}]"
+                                <input type="checkbox" name="permissions[{{$permission->name}}]" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                        value="{{$permission->name}}" @checked(old('permissions.' . $permission->name))>
                                 <label>{{ $permission->name }}</label>
                             </div>

@@ -44,7 +44,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Gate for SuperAdmin
         Gate::before(function (User $user, $ability) {
-            return $user->hasRole('super_admin') ? true : null;
+            if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+                return true; // Grant all abilities to super admin
+            }
+            return null; // Let others fall through to normal logic
         });
 
         Gate::define('super-admin-only', function (User $user) {
@@ -52,9 +55,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
 
-        Gate::define('users-info', function (User $user){
-            return $user->hasRole(UserRole::ADMIN->value);
-        });
+//        Gate::define('users-info', function (User $user){
+//            return $user->hasRole(UserRole::ADMIN->value);
+//        });
 
         // Gate For Side Bar
         Gate::define('side-bar-notifications',function (User $user){

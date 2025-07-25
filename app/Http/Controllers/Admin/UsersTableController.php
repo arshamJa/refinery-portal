@@ -13,6 +13,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
@@ -25,9 +26,8 @@ class UsersTableController extends Controller
      */
     public function index(Request $request)
     {
-        // Gate::authorize('users-info');
+        Gate::authorize('admin-role');
         $user = auth()->user();
-
         $query = UserInfo::with([
             'user:id,p_code',
             'department:id,department_name',
@@ -102,10 +102,11 @@ class UsersTableController extends Controller
      */
     public function create()
     {
-//        Gate::authorize('users-info');
+        Gate::authorize('admin-role');
         $user = auth()->user();
         $roles = Role::select(['id', 'name'])
-            ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
+            ->when(!$user->hasRole(UserRole::SUPER_ADMIN->value),
+                fn($q) => $q->where('name', '!=', UserRole::SUPER_ADMIN->value))
             ->get();
         $permissions = Permission::select(['id', 'name'])->get();
         $departments = Department::select(['id','department_name'])->get();
@@ -122,8 +123,7 @@ class UsersTableController extends Controller
      */
     public function store(StoreNewUserRequest $request)
     {
-        // Authorization check
-//        Gate::authorize('users-info');
+        Gate::authorize('admin-role');
         $validatedData = $request->validated();
         $newUser = User::create([
             'password' => Hash::make($validatedData['password']),
@@ -162,7 +162,7 @@ class UsersTableController extends Controller
      */
     public function show(string $id)
     {
-        Gate::authorize('users-info');
+        Gate::authorize('admin-role');
         $userInfo = UserInfo::findOrFail($id);
 
         // Load user with related roles and direct permissions
@@ -198,8 +198,7 @@ class UsersTableController extends Controller
      */
     public function edit(string $id)
     {
-        Gate::authorize('users-info');
-
+        Gate::authorize('admin-role');
         $userInfo = UserInfo::with(['user:id,p_code', 'department:id,department_name'])
             ->findOrFail($id);
 
@@ -214,9 +213,12 @@ class UsersTableController extends Controller
         $roles = Role::select(['id', 'name'])
             ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
             ->get();
-
+        $organizations = Organization::select(['id','organization_name'])->get();
+        $relatedOrganizations = $user->organizations()->select('organizations.id', 'organization_name')->get();
         return view('users.edit', [
             'userInfo' => $userInfo,
+            'organization' => $organizations,
+            'relatedOrganizations' => $relatedOrganizations,
             'departments' => $departments,
             'user' => $user,
             'roles' => $roles,
@@ -229,9 +231,9 @@ class UsersTableController extends Controller
      */
     public function update(UpdateNewUserRequest $request, string $id)
     {
-        Gate::authorize('users-info');
+        Gate::authorize('admin-role');
 
-        $request->validated();
+        $validated = $request->validated();
 
         $userInfo = UserInfo::findOrFail($id);
 
@@ -239,11 +241,9 @@ class UsersTableController extends Controller
 
         // Update user basic info
         $user->update([
-            'p_code' => $request->p_code,
+            'p_code' => $validated['p_code'],
         ]);
-
-
-        $role = Role::find($request->role);
+        $role = Role::find($validated['role']);
         // Sync role (only one role in your dropdown)
         if ($request->filled('role')) {
             $user->syncRoles([$role->id]);
@@ -255,13 +255,13 @@ class UsersTableController extends Controller
         // Update user info
         $userInfo->update([
             'user_id' => $user->id,
-            'department_id' => $request->department,
-            'full_name' => $request->full_name,
-            'work_phone' => $request->work_phone,
-            'house_phone' => $request->house_phone,
-            'phone' => $request->phone,
-            'n_code' => $request->n_code,
-            'position' => $request->position,
+            'department_id' => $validated['department'],
+            'full_name' => $validated['full_name'],
+            'work_phone' => $validated['work_phone'],
+            'house_phone' => $validated['house_phone'],
+            'phone' => $validated['phone'],
+            'n_code' => $validated['n_code'],
+            'position' => $validated['position'],
         ]);
 
         // Sync organizations related to new department
@@ -276,7 +276,7 @@ class UsersTableController extends Controller
             }
         }
 
-        return redirect()->route('users.index')->with('success', 'کاربر با موفقیت بروزرسانی شد.');
+        return redirect()->route('users.index')->with('status', 'کاربر با موفقیت بروزرسانی شد.');
     }
 
     /**
@@ -285,8 +285,10 @@ class UsersTableController extends Controller
     public function destroy(string $id)
     {
         Gate::authorize('has-permission-and-role',UserRole::SUPER_ADMIN->value);
-
         $user = User::with('user_info')->findOrFail($id);
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            abort(403, 'Cannot delete super admin.');
+        }
         // Delete related info first
         if ($user->user_info) {
             $user->user_info->delete();
@@ -297,14 +299,14 @@ class UsersTableController extends Controller
 
     public function resetPasswordPage(string $id)
     {
-        Gate::authorize('users-info');
+        Gate::authorize('admin-role');
         $user = User::with('user_info:id,user_id,full_name')->findOrFail($id);
         return view('users.reset-password',['user'=>$user]);
     }
 
     public function resetPassword(Request $request,string $id)
     {
-        Gate::authorize('users-info');
+        Gate::authorize('admin-role');
         $validated = $request->validate([
             'password' => ['required', 'confirmed',
                 \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],
@@ -314,6 +316,17 @@ class UsersTableController extends Controller
         $user->save();
 
         return redirect()->back()->with('status', 'رمز ورود با موفقیت آپدیت شد');
+    }
+
+    public function deleteOrganization($userId, $organizationId)
+    {
+        Gate::authorize('admin-role');
+        DB::table('organization_user')
+            ->where('user_id', $userId)
+            ->where('organization_id', $organizationId)
+            ->delete();
+
+        return redirect()->back()->with('status', 'سازمان با موفقیت از کاربر حذف شد.');
     }
 
 
