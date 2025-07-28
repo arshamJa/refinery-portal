@@ -126,7 +126,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
                                 </svg>
-                                <span>{{__('گزارش شرکت')}}</span>
+                                <span>{{__('گزارش جلسه و اقدامات')}}</span>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': openReport}"
                                  class="h-4 w-4 transition-transform"
@@ -219,39 +219,89 @@
                     </div>
                 </div>
             </li>
+            @if(!auth()->user()->hasRole(UserRole::ADMIN->value))
+                <li class="mb-2">
+                    <x-link.responsive-link href="{{route('employee.organization')}}"
+                                            :active="request()->is('employee/organization')"
+                                            class="flex items-center gap-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z"/>
+                        </svg>
+                        {{__('سامانه ها')}}
+                    </x-link.responsive-link>
+                </li>
+            @endif
             <li class="mb-2">
-                <x-link.responsive-link href="{{route('employee.organization')}}"
-                                        :active="request()->is('employee/organization')"
-                                        class="flex items-center gap-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z"/>
-                    </svg>
-                    {{__('سامانه ها')}}
-                </x-link.responsive-link>
-            </li>
-            <li class="mb-2">
-                <x-link.responsive-link wire:navigate href="{{route('blogs.index')}}"
-                                        :active="request()->is('blogs')" class="flex items-center gap-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/>
-                    </svg>
-                    {{__('اخبار و اطلاعیه')}}
-                </x-link.responsive-link>
-            </li>
-            <li class="mb-2">
-                <x-link.responsive-link href="{{route('phone-list.index')}}"
-                                        :active="request()->is('phone-list')" class="flex items-center gap-x-2">
+                <x-link.responsive-link href="{{ route('phone-list.index') }}"
+                                        :active="request()->is('phone/list')" class="flex items-center gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                          stroke="currentColor" class="size-5">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M14.25 9.75v-4.5m0 4.5h4.5m-4.5 0 6-6m-3 18c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"/>
                     </svg>
-                    {{__('دفترچه تلفنی')}}
+                    {{ auth()->user()->hasRole(UserRole::USER->value) ? __('دفترچه تلفنی') : __('مدیریت دفترچه تلفنی') }}
                 </x-link.responsive-link>
+            </li>
+            <li class="mb-2">
+                @if(auth()->user()->hasRole(UserRole::USER->value))
+                    <x-link.responsive-link href="{{route('blogs.index')}}"
+                                            :active="request()->is('blogs')"
+                                            class="flex items-center gap-x-2 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/>
+                        </svg>
+                        {{__('اخبار و اطلاعیه')}}
+                    </x-link.responsive-link>
+                @else
+                    <div x-data="{ openSetting: false }" class="w-full">
+                        <button @click="openSetting = !openSetting"
+                                class="w-full flex items-center justify-between pl-2 pr-3 py-2 font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition">
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M4.5 8.25h15m-15 4.5h15m-15 4.5h15"/>
+                                </svg>
+                                <span>{{ __('اخبار و اطلاعیه') }}</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': openSetting}"
+                                 class="h-4 w-4 transition-transform"
+                                 viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div x-show="openSetting" x-transition class="mt-1 space-y-1 pr-3">
+                            <x-link.responsive-link href="{{route('blogs.create')}}"
+                                                    :active="request()->is('blogs/create')"
+                                                    class="flex items-center gap-x-2 text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                     stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                </svg>
+                                {{__('درج خبر و اطلاعیه')}}
+                            </x-link.responsive-link>
+                            <x-link.responsive-link href="{{route('blogs.index')}}"
+                                                    :active="request()->is('blogs')"
+                                                    class="flex items-center gap-x-2 text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                     stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/>
+                                </svg>
+                                {{__('صفحه اخبار و اطلاعیه')}}
+                            </x-link.responsive-link>
+
+                        </div>
+                    </div>
+                @endif
             </li>
             @can('admin-role')
                 <li class="mb-2">
@@ -301,7 +351,7 @@
                             </x-link.responsive-link>
                             <x-link.responsive-link href="{{route('users.create')}}"
                                                     :active="request()->is('users/create')"
-                                                    class="flex items-center text-sm gap-x-2 text-xs">
+                                                    class="flex items-center gap-x-2 text-xs">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" class="size-4">
                                     <path stroke-linecap="round" stroke-linejoin="round"

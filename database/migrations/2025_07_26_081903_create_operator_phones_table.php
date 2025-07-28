@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('phones', function (Blueprint $table) {
+        Schema::create('operator_phones', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('department_id')->nullable();
             $table->string('full_name')->index();
-            $table->string('phone')->index();
-            $table->string('house_phone')->index();
             $table->string('work_phone')->index();
-            $table->softDeletes()->index();
+            $table->string('house_phone')->index();
+            $table->string('phone')->index();
+            $table->string('n_code')->index();
+            $table->string('p_code')->index();
+            $table->string('position')->index();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('phones');
+        Schema::dropIfExists('operator_phones');
     }
 };

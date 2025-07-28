@@ -13,7 +13,7 @@ use Livewire\WithPagination;
 class DepartmentTable extends Component
 {
     use WithPagination, WithoutUrlPagination;
-    public ?string $department;
+    public $department;
     public $departmentId;
     public $isUpdate = false;
     public ?string $search = '';
@@ -60,12 +60,15 @@ class DepartmentTable extends Component
         $validated = Validator::make(
             ['department' => $this->department],
             [
-                'department' => ['bail', 'required', 'min:5', 'max:255', 'unique:departments,department_name']
+                'department' => ['required', 'min:5', 'max:255', 'unique:departments,department_name']
             ],
-            ['department.required' => 'نام دپارتمان اجباری است.', 'department.min' => 'نام دپارتمان باید حداقل 5 کاراکتر باشد.',
-                'department.max' => 'نام دپارتمان نباید بیشتر از 255 کاراکتر باشد.', 'department.unique' => 'این دپارتمان قبلا ثبت شده است.',
+            [
+                'department.required' => 'نام دپارتمان اجباری است.',
+                'department.min' => 'نام دپارتمان باید حداقل 5 کاراکتر باشد.',
+                'department.max' => 'نام دپارتمان نباید بیشتر از 255 کاراکتر باشد.',
+                'department.unique' => 'این دپارتمان قبلا ثبت شده است.',
             ]
-        );
+        )->validate();
         Department::create([
             'department_name' => $validated['department'],
         ]);

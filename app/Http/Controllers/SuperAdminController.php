@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Imports\EmployeeImport;
 use App\Imports\UserInfoImport;
 use App\Imports\UsersImport;
 use App\Models\Role;
@@ -57,5 +58,14 @@ class SuperAdminController extends Controller
             $user->syncRoles([$role->id]);
         }
         return redirect()->back()->with('status', 'Roles assigned successfully.');
+    }
+    public function importEmployees(Request $request)
+    {
+        Gate::authorize('super-admin-only');
+        $request->validate([
+            'file' => ['required', 'mimes:xlsx,xls,csv']
+        ]);
+        Excel::import(new EmployeeImport(), $request->file('file'));
+        return redirect()->back()->with('status', 'Employees Imported Successfully');
     }
 }

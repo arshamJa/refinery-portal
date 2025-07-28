@@ -17,4 +17,8 @@ Route::middleware(['auth', 'can:super-admin-only','sanitizeInputs'])->group(func
 
     Route::post('/assign-roles', [SuperAdminController::class, 'assignRoles'])->name('roles.assign');
 
+
+    Route::post('/import/employees', [SuperAdminController::class, 'importEmployees'])->name('import.employees');
+
+
 });

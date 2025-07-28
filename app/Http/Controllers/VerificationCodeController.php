@@ -46,7 +46,7 @@ class VerificationCodeController extends Controller
         );
 
         // Send OTP (mocked here)
-        logger("OTP for $phone is: $otpCode");
+//        logger("OTP for $phone is: $otpCode");
 
         // Store phone temporarily
         Session::put('otp_phone', $phone);
@@ -64,6 +64,7 @@ class VerificationCodeController extends Controller
         $validated = $request->validate([
             'otp' => 'required|digits:6',
         ]);
+        $validated['otp'] = trim(strip_tags($validated['otp']));
 
         $phone = Session::get('otp_phone');
 

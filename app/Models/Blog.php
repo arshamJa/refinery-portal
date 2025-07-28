@@ -21,9 +21,9 @@ class Blog extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function blogImages(): HasMany
+    public function images()
     {
-        return $this->hasMany(BlogImage::class)->chaperone();
+        return $this->hasMany(BlogImage::class);
     }
 
 }

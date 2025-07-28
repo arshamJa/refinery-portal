@@ -29,15 +29,15 @@
     @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <a href="{{ route('meeting.report.table') }}"
-               class="{{Route::is('meeting.report.table') ? 'bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none' : 'bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black'}} flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
+               class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
             <span class="text-sm font-medium">
-                {{ __('گزارش جلسات') }}
+                {{ __('گزارش جلسات شرکت') }}
             </span>
             </a>
             <a href="{{ route('task.report.table') }}"
-               class="{{Route::is('task.report.table') ? 'bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none' : 'bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black'}} flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
+               class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
             <span class="text-sm font-medium">
-                {{ __('گزارش اقدامات') }}
+               {{ __('گزارش اقدامات شرکت') }}
             </span>
             </a>
         </div>
@@ -63,10 +63,10 @@
                 <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                     @php
                         $statuses = [
-                            ['color' => 'bg-yellow-600', 'text' => ' text-yellow-600' , 'label' => 'انجام شده در مهلت مقرر'],
-                            ['color' => 'bg-red-600', 'text' => ' text-red-600','label' => 'انجام شده خارج مهلت مقرر'],
-                            ['color' => 'bg-green-600 ','text' => ' text-green-600','label' => 'انجام نشده در مهلت مقرر'],
-                            ['color' => 'bg-blue-600 ', 'text' => ' text-blue-600' ,'label' => 'انجام نشده خارج مهلت مقرر'],
+                            ['color' => 'bg-green-500', 'text' => ' text-green-500' , 'label' => 'اقدامات انجام شده در مهلت مقرر'],
+                            ['color' => 'bg-blue-500 ','text' => ' text-blue-500','label' => 'اقدامات انجام نشده در مهلت مقرر'],
+                            ['color' => 'bg-yellow-500', 'text' => ' text-yellow-500','label' => 'اقدامات انجام شده خارج مهلت مقرر'],
+                            ['color' => 'bg-red-600 ', 'text' => ' text-red-600' ,'label' => 'اقدامات انجام نشده خارج مهلت مقرر'],
                         ];
                     @endphp
                     @foreach ($statuses as $status)
@@ -229,18 +229,17 @@
                 };
 
                 const chartLabels = {
-                    1: "انجام شده در مهلت مقرر",
-                    2: "انجام شده خارج مهلت مقرر",
-                    3: "انجام نشده در مهلت مقرر",
-                    4: "انجام نشده خارج مهلت مقرر"
+                    1: "اقدامات انجام شده در مهلت مقرر",
+                    2: "اقدامات انجام شده خارج مهلت مقرر",
+                    3: "اقدامات انجام نشده در مهلت مقرر",
+                    4: "اقدامات انجام نشده خارج مهلت مقرر"
                 };
-
                 const getChartOptions = () => {
                     return {
                         series: [1, 2, 3, 4].map(key => taskPercentages[key] || 0),
                         labels: [1, 2, 3, 4].map(key => chartLabels[key]),
                         colors: [
-                            "#A8D858", "#DC2626", "#16A34A", "#2563EB", "#4B5563"
+                            "#22c55e", "#facc15", "#3b82f6", "#dc2626"
                         ],
                         chart: {
                             type: "pie",

@@ -83,6 +83,7 @@
                 <h3 class="text-sm font-semibold">  {{__('پیام های ارسالی')}}</h3>
             </a>
         </div>
+
         <form action="{{route('meeting.store')}}" method="post" class="mb-12" enctype="multipart/form-data">
             @csrf
             <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">

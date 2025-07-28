@@ -18,8 +18,8 @@ class BlogImage extends Model
         return $this->belongsTo(Blog::class);
     }
 
-    public function getImageUrl()
+    public function getImageUrlAttribute()
     {
-        return url('storage/'.$this->image);
+        return url('storage/' . $this->image);
     }
 }

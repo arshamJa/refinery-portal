@@ -63,6 +63,25 @@
                         @endforeach
                     </ul>
                 </div>
+
+
+                <!-- Import Users in operator_phones -->
+                <div class="bg-white shadow rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Import Users in operator_phones table</h3>
+                    <div class="bg-white shadow rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-700">Import</h3>
+                        <form action="{{ route('import.employees') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Upload Excel File</label>
+                                <input type="file" name="file"
+                                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <x-input-error :messages="$errors->get('file')" class="mt-2 text-red-600 text-sm"/>
+                            </div>
+                            <x-primary-button type="submit">Import</x-primary-button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     @endcan

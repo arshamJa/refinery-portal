@@ -19,6 +19,16 @@
         <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                {{__('تنظیمات راهبری')}}
+            </span>
+        </li>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+             stroke="currentColor" class="w-3 h-3 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+        </svg>
+        <li>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
                 {{__('ساخت کاربر جدبد')}}
             </span>
         </li>
@@ -105,10 +115,10 @@
                         <x-input-error :messages="$errors->get('departmentId')" class="my-2"/>
                     </div>
                     <div id="organizations_dropdown" data-users='@json($organization)' class="relative w-full col-span-2" style="direction: rtl;">
-                        <x-input-label class="mb-1.5" :value="__('سازمان‌ها')"/>
+                        <x-input-label class="mb-1.5" :value="__('سامانه')"/>
                         <button id="organizations-dropdown-btn" type="button"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
-                            <span id="organizations-selected-text" class="truncate">انتخاب سازمان‌ها</span>
+                            <span id="organizations-selected-text" class="truncate">انتخاب سامانه</span>
                             <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
@@ -129,12 +139,12 @@
                     </div>
 
                     <div>
-                        <x-input-label for="password" :value="__('رمز')"/>
+                        <x-input-label for="password" :value="__('رمز عبور')"/>
                         <x-text-input name="password" id="password" class="block" type="text"  autofocus/>
                         <x-input-error :messages="$errors->get('password')" class="my-2"/>
                     </div>
                     <div>
-                        <x-input-label for="password_confirmation" :value="__('تکرار رمز')"/>
+                        <x-input-label for="password_confirmation" :value="__('تکرار رمز عبور')"/>
                         <x-text-input name="password_confirmation" id="password_confirmation" class="block" type="text" autofocus />
                         <x-input-error :messages="$errors->get('password_confirmation')"/>
                     </div>
@@ -148,7 +158,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-4">
                     <div class="col-span-4">
-                        <x-input-label :value="__('تعیین بخش دسترسی:')"/>
+                        <x-input-label :value="__('تعیین دسترسی ها:')"/>
                         @foreach($permissions as $permission)
                             <div>
                                 <input type="checkbox" name="permissions[{{$permission->name}}]" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"

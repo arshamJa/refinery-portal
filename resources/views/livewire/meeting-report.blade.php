@@ -30,15 +30,15 @@
     @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <a href="{{ route('meeting.report.table') }}"
-               class="{{Route::is('meeting.report.table') ? 'bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none' : 'bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black'}} flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
+               class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
             <span class="text-sm font-medium">
-                {{ __('گزارش جلسات') }}
+                {{ __('گزارش جلسات شرکت') }}
             </span>
             </a>
             <a href="{{ route('task.report.table') }}"
-               class="{{Route::is('task.report.table') ? 'bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white pointer-events-none' : 'bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black'}} flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
+               class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black flex gap-3 items-center justify-start shadow-lg rounded-lg p-4 transition-all duration-300 ease-in-out">
             <span class="text-sm font-medium">
-                {{ __('گزارش اقدامات') }}
+                {{ __('گزارش اقدامات شرکت') }}
             </span>
             </a>
         </div>
@@ -63,10 +63,10 @@
                     @php
                         $statuses = [
                             ['color' => 'bg-yellow-600', 'text' => ' text-yellow-600' , 'label' => 'در حال بررسی دعوتنامه'],
-                            ['color' => 'bg-red-600', 'text' => ' text-red-600','label' => 'لغو شد'],
-                            ['color' => 'bg-green-600 ','text' => ' text-green-600','label' => 'برگزار می‌شود'],
-                            ['color' => 'bg-blue-600 ', 'text' => ' text-blue-600' ,'label' => 'در حال برگزاری'],
-                            ['color' => 'bg-gray-600 ','text' => ' text-gray-700', 'label' => 'جلسه خاتمه یافت'],
+                            ['color' => 'bg-red-600', 'text' => ' text-red-600','label' => 'جلساتی که لغو شد'],
+                            ['color' => 'bg-green-600 ','text' => ' text-green-600','label' => 'جلساتی که برگزار می‌شود'],
+                            ['color' => 'bg-blue-600 ', 'text' => ' text-blue-600' ,'label' => 'جلساتی که در حال برگزاری است'],
+                            ['color' => 'bg-gray-600 ','text' => ' text-gray-700', 'label' => 'جلساتی که خاتمه یافت'],
                         ];
                     @endphp
                     @foreach ($statuses as $status)
@@ -211,12 +211,11 @@
 
                 const meetingLabels = {
                     [MeetingStatus.PENDING]: "در حال بررسی دعوتنامه",
-                    [MeetingStatus.IS_CANCELLED]: "لغو شد",
-                    [MeetingStatus.IS_NOT_CANCELLED]: "برگزار می‌شود",
-                    [MeetingStatus.IS_IN_PROGRESS]: "در حال برگزاری",
-                    [MeetingStatus.IS_FINISHED]: "جلسه خاتمه یافت"
+                    [MeetingStatus.IS_CANCELLED]: "جلساتی که لغو شد",
+                    [MeetingStatus.IS_NOT_CANCELLED]: "جلساتی که برگزار می‌شود",
+                    [MeetingStatus.IS_IN_PROGRESS]: "جلساتی که در حال برگزاری است",
+                    [MeetingStatus.IS_FINISHED]: "جلساتی که خاتمه یافت"
                 };
-
                 const chartData = Object.keys(MeetingStatus).map(key => {
                     const statusValue = MeetingStatus[key].toString();
                     return meetingPercentages[statusValue] || 0;

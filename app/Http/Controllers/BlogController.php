@@ -2,87 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserPermission;
+use App\Enums\UserRole;
 use App\Http\Requests\StoreBlogRequest;
-use App\Http\Requests\UpdateBlogRequest;
 use App\Models\Blog;
 use App\Models\BlogImage;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class BlogController extends Controller
 {
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         return view('blog.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @throws ValidationException
-     */
     public function store(StoreBlogRequest $request)
     {
-        $request->validated();
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
+        ]);
+        $validated = $request->validated();
         $blog = Blog::create([
             'user_id' => auth()->user()->id,
-            'title' => $request->title,
-            'body' => $request->body
+            'title'   => $validated['title'],
+            'body'    => $validated['body']
         ]);
-        if (is_array($request->images)){
-            foreach ($request->images as $img){
-                if ($img->extension() === 'jpg' || $img->extension() === 'png'
-                    || $img->extension() ==='jpeg' || $img->extension() === 'webp'){
-                    $path = $img->store('blogs','public');
-                    $newImage = BlogImage::create([
-                            'blog_id' => $blog->id,
-                            'image' => $path
-                        ]
-                    );
-                }else{
+
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $img) {
+                if (in_array($img->extension(), ['jpg', 'jpeg', 'png', 'webp'])) {
+                    $path = $img->store('blogs', 'public');
+
+                    BlogImage::create([
+                        'blog_id' => $blog->id,
+                        'image'   => $path
+                    ]);
+                } else {
                     throw ValidationException::withMessages([
-                        'images' => 'فرمت عکس اشتباه است'
+                        'image' => 'فرمت عکس اشتباه است.'
                     ]);
                 }
-
             }
         }
-        return to_route('blogs.index')->with('status','اخبار جدید درج شد');
-    }
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $blog = Blog::find($id);
-        $blogImages = BlogImage::where('blog_id',$blog->id)->get();
-        return view('blog.show',['blog' => $blog , 'blogImages' => $blogImages]);
+
+        return to_route('blogs.index')->with('status', 'اخبار جدید درج شد');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        $blog = Blog::find($id);
-        $blogImage = BlogImage::where('id',$blog->id)->get();
-        return view('blog.edit',['blog' => $blog , 'blogImage' => $blogImage]);
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
+        ]);
+        $blog = Blog::with('images')->findOrFail($id);
+        return view('blog.edit', [
+            'blog' => $blog,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @throws ValidationException
-     */
     public function update(StoreBlogRequest $request, string $id)
     {
-        $request->validated();
-
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
+        ]);
+        $validated = $request->validated();
         $blog = Blog::find($id);
-        $blog->title = $request->title;
-        $blog->body = $request->body;
+        $blog->title = $validated['title'];
+        $blog->body = $validated['body'];
         $blog->save();
-
         if (is_array($request->images)){
             foreach ($request->images as $img){
                 if ($img->extension() === 'jpg' || $img->extension() === 'png'
@@ -102,4 +90,36 @@ class BlogController extends Controller
         }
         return to_route('blogs.index')->with('status','اخبار با موفقیت بروز شد');
     }
+
+    public function deleteImage(string $id)
+    {
+         Gate::authorize('has-permission-and-role', [
+            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
+        ]);
+        $image = BlogImage::findOrFail($id);
+        $old_image_path = public_path('storage/' . $image->image);
+        if (file_exists($old_image_path)) {
+            unlink($old_image_path);
+        }
+        $image->delete();
+        return redirect()->back()->with('status', 'عکس با موفقیت حذف شد.');
+    }
+
+    public function destroy(string $id)
+    {
+         Gate::authorize('has-permission-and-role', [
+            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
+        ]);
+        $blog = Blog::with('images')->findOrFail($id);
+        foreach ($blog->images as $image) {
+            $filePath = public_path('storage/' . $image->image);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            $image->delete();
+        }
+        $blog->delete();
+        return redirect()->route('blogs.index')->with('status', 'خبر با موفقیت حذف شد.');
+    }
+
 }

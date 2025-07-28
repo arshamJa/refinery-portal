@@ -66,19 +66,27 @@ class OrganizationTable extends Component
      */
     public function createOrg()
     {
-        $validated = Validator::make(
-            ['organization' => $this->organization, 'url' => $this->url, 'image' => $this->image,
+        $validator = Validator::make(
+            [
+                'organization' => $this->organization,
+                'url' => $this->url,
+                'image' => $this->image,
             ],
-            ['organization' => ['bail', 'required', 'max:250'],
+            [
+                'organization' => ['bail', 'required', 'max:250'],
                 'url' => ['bail', 'required', 'starts_with:www.'],
                 'image' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
             ],
-            ['organization.required' => 'نام سازمان اجباری است.',
-                'url.required' => 'آدرس وب‌سایت اجباری است.', 'url.starts_with' => 'آدرس باید با www. شروع شود.',
+            [
+                'organization.required' => 'نام سازمان اجباری است.',
+                'url.required' => 'آدرس وب‌سایت اجباری است.',
+                'url.starts_with' => 'آدرس باید با www. شروع شود.',
                 'image.mimes' => 'فرمت تصویر باید jpg, jpeg, png یا webp باشد.',
                 'image.max' => 'حجم تصویر نباید بیشتر از 1MB باشد.',
             ]
         );
+
+        $validated = $validator->validate();
 
         $imagePath = null;
         if ($this->image) {
@@ -101,25 +109,19 @@ class OrganizationTable extends Component
     {
         $organization = Organization::findOrFail($this->organizationId);
 
-        $validated = Validator::make(
-            [
-                'organization' => $this->organization,
-                'url' => $this->url,
-                'image' => $this->image,
+        $validator = Validator::make(
+            ['organization' => $this->organization, 'url' => $this->url, 'image' => $this->image,
             ],
-            [
-                'organization' => ['bail', 'required', 'max:250'],
-                'url' => ['bail', 'required', 'starts_with:www.'],
+            ['organization' => ['bail', 'required', 'max:250'], 'url' => ['bail', 'required', 'starts_with:www.'],
                 'image' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
             ],
-            [
-                'organization.required' => 'نام سازمان اجباری است.',
-                'url.required' => 'آدرس وب‌سایت اجباری است.',
-                'url.starts_with' => 'آدرس باید با www. شروع شود.',
-                'image.mimes' => 'فرمت تصویر باید jpg, jpeg, png یا webp باشد.',
+            ['organization.required' => 'نام سازمان اجباری است.', 'url.required' => 'آدرس وب‌سایت اجباری است.',
+                'url.starts_with' => 'آدرس باید با www. شروع شود.', 'image.mimes' => 'فرمت تصویر باید jpg, jpeg, png یا webp باشد.',
                 'image.max' => 'حجم تصویر نباید بیشتر از 1MB باشد.',
             ]
         );
+        $validated = $validator->validate();
+
 
         // Handle image upload
         if ($validated['image']) {

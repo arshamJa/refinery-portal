@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\UserRole;
+use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreNewUserRequest;
 use App\Http\Requests\UpdateNewUserRequest;
 use App\Models\Department;
+use App\Models\OperatorPhones;
 use App\Models\Organization;
 use App\Models\Permission;
 use App\Models\Role;
@@ -16,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class UsersTableController extends Controller
@@ -39,8 +42,6 @@ class UsersTableController extends Controller
             ->select(['id', 'user_id', 'department_id', 'full_name', 'n_code', 'position'])
             ->oldest();
 
-        // Sanitize search input
-        $searchTerm = null;
         if ($request->filled('search')) {
             $searchTerm = trim(strip_tags($request->input('search')));
 
@@ -95,6 +96,12 @@ class UsersTableController extends Controller
             'originalUsersCount' => $originalUsersCount,
             'filteredUsersCount' => $filteredUsersCount,
         ]);
+    }
+    public function export(Request $request)
+    {
+        Gate::authorize('admin-role');
+        $searchTerm = $request->input('search');
+        return Excel::download(new UsersExport($searchTerm), 'users.xlsx');
     }
 
     /**
@@ -250,7 +257,7 @@ class UsersTableController extends Controller
         }
 
         // Sync permissions
-        $user->syncPermissions($request->permissions);
+        $user->syncPermissions(is_array($request->permissions) ? $request->permissions : []);
 
         // Update user info
         $userInfo->update([
@@ -274,6 +281,15 @@ class UsersTableController extends Controller
                     $organization->users()->syncWithoutDetaching([$user->id]);
                 }
             }
+        }
+
+        $operatorPhone = OperatorPhones::where('full_name', $validated['full_name'])
+            ->where('position', $validated['position'])
+            ->first();
+        if ($operatorPhone) {
+            $operatorPhone->update([
+                'department_id' => $validated['department'],
+            ]);
         }
 
         return redirect()->route('users.index')->with('status', 'کاربر با موفقیت بروزرسانی شد.');

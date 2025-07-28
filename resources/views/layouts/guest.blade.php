@@ -18,16 +18,29 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
-<body class="font-sans text-gray-900 bg-gray-100 antialiased overflow-y-hidden">
+<body class="min-h-screen bg-background font-sans text-gray-900">
+
 <x-sessionMessage name="status"/>
-<div class="flex flex-col sm:justify-center items-center pt-6 px-3 dark:bg-gray-900">
-    <div>
-        <x-application-logo/>
+
+
+<div class="min-h-screen flex relative">
+    <!-- Left Image / Branding Section -->
+    <div
+        class="hidden lg:flex lg:w-1/2 bg-cover bg-center relative"
+        style="background-image: url('{{ asset('sunset-refinery.jpg') }}');"
+    >
+        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
     </div>
-    <div class="w-full sm:max-w-md px-6 py-4 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-        {{ $slot }}
-    </div>
+    {{$slot}}
+    <!-- Mobile Background -->
+    <div
+        class="lg:hidden absolute inset-0 bg-cover bg-center opacity-10"
+        style="background-image: url('{{ asset('sunset-refinery.jpg') }}');"
+    ></div>
 </div>
+
+
+
 </body>
 </html>
 

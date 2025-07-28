@@ -1,5 +1,6 @@
 @php use App\Enums\UserPermission;use App\Enums\UserRole;use App\Models\User;use App\Models\UserInfo; @endphp
 <x-app-layout>
+
     <nav class="flex justify-between mb-4 mt-20">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
@@ -33,35 +34,38 @@
             <div class="col-span-6 sm:col-span-3 lg:col-span-2">
                 <x-input-label for="search" value="{{ __('جست و جو') }}"/>
                 <x-search-input>
-                    <x-text-input type="text" id="search" name="search" class="block ps-10"
-                                  placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                    <x-text-input type="text" id="search" name="search" class="block ps-10" placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"
+                                  value="{{ request('search') }}"/>
                 </x-search-input>
             </div>
             <div class="col-span-6 sm:col-span-1">
                 <x-input-label for="source" value="{{ __('فیلتر بر اساس') }}"/>
                 <x-select-input name="source" id="source">
-                    <option value="all" {{ request('source') === 'all' ? 'selected' : '' }}>{{ __('همه') }}</option>
-                    <option
-                        value="user_info" {{ request('source') === 'user_info' ? 'selected' : '' }}>{{ __('فقط کارمندان شرکت') }}</option>
-                    <option
-                        value="phone" {{ request('source') === 'phone' ? 'selected' : '' }}>{{ __('فقط عموم') }}</option>
+                    <option value="all" {{ request('source') === 'all' ? 'selected' : '' }}>همه</option>
+                    <option value="operator_phones" {{ request('source') === 'operator_phones' ? 'selected' : '' }}>فقط کارمندان شرکت</option>
+                    <option value="resident_phones" {{ request('source') === 'resident_phones' ? 'selected' : '' }}>فقط عموم</option>
                 </x-select-input>
             </div>
             <!-- Search + Show All Buttons -->
             <div class="col-span-6 sm:col-span-4 flex justify-start flex-row gap-4 mt-4 lg:mt-0">
                 <x-search-button>{{ __('جست و جو') }}</x-search-button>
-                @if (($originalUsersCount != $filteredUsersCount)|| in_array($selectedSource, ['user_info', 'phone']))
+                @if (($originalUsersCount != $filteredUsersCount)|| in_array($selectedSource, ['operator_phones', 'resident_phones']))
                     @if ($selectedSource !== 'all')
                         <x-view-all-link href="{{ route('phone-list.index') }}">{{ __('نمایش همه') }}</x-view-all-link>
                     @endif
                 @endif
             </div>
             @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
-                <div class="col-span-2 flex justify-end">
-                    <a href="{{route('phone-list.create')}}">
+                <div class="col-span-2 flex justify-end gap-x-2">
+                    <a href="{{ route('phone-list.resident.create') }}">
                         <x-primary-button type="button">
-                            {{__('اقزودن شماره')}}
+                            {{ __('افزودن شماره عموم') }}
                         </x-primary-button>
+                    </a>
+                    <a href="{{ route('phone-list.operator.create') }}">
+                        <x-danger-button type="button">
+                            {{ __('افزودن شماره کارمند شرکت') }}
+                        </x-danger-button>
                     </a>
                 </div>
             @endcan
@@ -113,10 +117,15 @@
                                         </button>
                                     </x-slot>
                                     <x-slot name="content">
-                                        <x-dropdown-link
-                                            href="{{ route('phone-list.edit', ['source' => $entry['source'], 'id' => $entry['id']] ) }}">
-                                            {{ __('ویرایش') }}
-                                        </x-dropdown-link>
+                                        @if ($entry['source'] === 'operator_phones')
+                                            <x-dropdown-link href="{{ route('operator-phones.edit', ['id' => $entry['id']]) }}">
+                                                {{ __('ویرایش') }}
+                                            </x-dropdown-link>
+                                        @elseif ($entry['source'] === 'resident_phones')
+                                            <x-dropdown-link href="{{ route('resident-phones.edit', ['id' => $entry['id']]) }}">
+                                                {{ __('ویرایش') }}
+                                            </x-dropdown-link>
+                                        @endif
                                         <form
                                             action="{{ route('phone-list.destroy', ['source' => $entry['source'], 'id' => $entry['id']]) }}"
                                             method="POST"

@@ -20,6 +20,16 @@
             <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                {{__('تنظیمات راهبری')}}
+            </span>
+            </li>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                 stroke="currentColor" class="w-3 h-3 text-gray-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+            </svg>
+            <li>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
                 {{__('جدول سامانه')}}
             </span>
             </li>
@@ -49,25 +59,13 @@
                 </div>
                 <!-- Search + Show All Buttons -->
                 <div class="col-span-6 lg:col-span-3 flex justify-start md:justify-end flex-row gap-4 mt-4 lg:mt-0">
-                    <x-dropdown>
-                        <x-slot name="trigger">
-                            <x-secondary-button class="flex items-center gap-2">
-                                {{ __('عملیات') }}
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5"
-                                     stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>
-                                </svg>
-                            </x-secondary-button>
-                        </x-slot>
-                        <x-slot name="content">
-                            <x-dropdown-link
-                                wire:click.prevent="openModalCreate">{{ __('افزودن سامانه') }}</x-dropdown-link>
-                            <x-dropdown-link href="{{ route('organization.export') }}">Export</x-dropdown-link>
-                            <x-dropdown-link wire:click.prevent="openImportModal">Import</x-dropdown-link>
-                        </x-slot>
-                    </x-dropdown>
+                    <x-primary-button wire:click.prevent="openModalCreate">{{ __('افزودن سامانه') }}</x-primary-button>
+                    <a href="{{ route('organization.export') }}">
+                        <x-accept-button>{{__('خروجی Excel')}}</x-accept-button>
+                    </a>
+                    <x-edit-button wire:click.prevent="openImportModal">
+                        {{__('Import')}}
+                    </x-edit-button>
                 </div>
             </div>
         </form>

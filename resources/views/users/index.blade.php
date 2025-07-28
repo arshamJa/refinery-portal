@@ -20,6 +20,16 @@
             <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                {{__('تنظیمات راهبری')}}
+            </span>
+            </li>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                 stroke="currentColor" class="w-3 h-3 text-gray-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+            </svg>
+            <li>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
                 {{__('مدیریت کاربران')}}
             </span>
             </li>
@@ -45,6 +55,14 @@
                         <x-view-all-link href="{{route('users.index')}}">{{__('نمایش همه')}}</x-view-all-link>
                     @endif
                 </div>
+                <div class="col-span-2 flex justify-end">
+                    <a href="{{ route('users.export', ['search' => request('search')]) }}">
+                        <x-accept-button type="button">
+                            {{ __('خروجی Excel') }}
+                        </x-accept-button>
+                    </a>
+                </div>
+
             </div>
         </form>
         <div class="relative overflow-visible shadow-md sm:rounded-lg mb-12 mt-4">

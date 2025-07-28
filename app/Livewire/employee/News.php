@@ -3,24 +3,26 @@
 namespace App\Livewire\employee;
 
 use App\Models\Blog;
-use Illuminate\Auth\Access\AuthorizationException;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Locked;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 class News extends Component
 {
-    use WithPagination, WithoutUrlPagination,WithFileUploads;
+    use WithPagination, WithoutUrlPagination;
 
-    #[Locked]
     public $blogId = '';
-
     public string $title ='';
-
     public ?string $search = '';
+    public $selectedBlog;
+    public $sort = 'newest';
+
+
+    public function filterNews()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -29,30 +31,29 @@ class News extends Component
     #[Computed]
     public function blogs()
     {
-        return Blog::where('title','like','%'.$this->search.'%')->latest()->paginate('6');
+        $query = Blog::where('title', 'like', '%' . strip_tags(trim($this->search)) . '%');
+        if ($this->sort === 'oldest') {
+            $query->orderBy('created_at', 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+        return $query->paginate(6);
     }
-
+    public function showBlog($id)
+    {
+        $this->selectedBlog = Blog::with('images')->find($id);
+        $this->dispatch('crud-modal', name: 'view');
+    }
     public function confirmDelete($blog_id)
     {
         $this->title = Blog::where('id',$blog_id)->value('title');
         $this->blogId = $blog_id;
         $this->dispatch('crud-modal',name:'delete');
     }
-    /**
-     * @throws AuthorizationException
-     */
-    public function delete($id)
-    {
-        $this->authorize('delete-blog',$id);
-        $news = Blog::find($id);
-        $news->delete();
-        $this->close();
-    }
     public function close()
     {
         $this->dispatch('close-modal');
         $this->redirectRoute('blogs.index');
     }
-
 
 }
