@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-use App\Enums\MeetingUserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
 
 class MeetingUser extends Model
 {
@@ -42,14 +38,6 @@ class MeetingUser extends Model
         return (int) $this->attributes['is_present'];
     }
 
-//    public function is_present(): bool
-//    {
-//        return $this->attributes['is_present'] == MeetingUserStatus::IS_PRESENT->value;
-//    }
-//    public function is_absent(): bool
-//    {
-//        return $this->attributes['is_present'] == MeetingUserStatus::IS_NOT_PRESENT->value;
-//    }
     public function replacementName(): ?string
     {
         if (! $this->replacement) {

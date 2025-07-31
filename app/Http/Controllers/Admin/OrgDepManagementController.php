@@ -39,26 +39,8 @@ class OrgDepManagementController extends Controller
         ]);
     }
 
-
-
-    public function departmentOrganizationConnection()
-    {
-        Gate::authorize('admin-role');
-        $departments = DB::table('departments')->select('id', 'department_name')->get();
-        $organizations = DB::table('organizations')->select('id', 'organization_name')->get();
-        $userInfos = DB::table('user_infos')->select('id', 'user_id', 'full_name')
-            ->get();
-
-        return view('admin.user-dep-org', [
-            'departments' => $departments,
-            'organizations' => $organizations,
-            'userInfos' => $userInfos
-        ]);
-    }
-
     public function store(Request $request)
     {
-        dd($request->all());
         Gate::authorize('admin-role');
         $validated = $request->validate([
             'departmentId' => 'required',
@@ -95,7 +77,7 @@ class OrgDepManagementController extends Controller
                 }
             }
         }
-        return to_route('department.organization.connection')->with('status', 'ارتباط دپارتمان و سامانه انجام شد');
+        return to_route('organization.department.manage')->with('status', 'ارتباط دپارتمان و سامانه انجام شد');
     }
 
 }

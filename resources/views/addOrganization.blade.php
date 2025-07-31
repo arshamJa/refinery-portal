@@ -16,10 +16,26 @@
                  stroke="currentColor" class="w-3 h-3 text-gray-400">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
             </svg>
-            <li class="flex items-center h-full">
+            <li>
+            <span
+                class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
+                {{__('تنظیمات راهبری')}}
+            </span>
+            </li>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                 stroke="currentColor" class="w-3 h-3 text-gray-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+            </svg>
+            <li>
                 <a href="{{route('organization.department.manage')}}"
                    class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
-                    <span>{{__('مدیریت سامانه/دپارتمان')}}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5"
+                         stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>
+                    </svg>
+                    <span>  {{__('مدیریت دپارتمان/سامانه')}}</span>
                 </a>
             </li>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
@@ -29,94 +45,93 @@
             <li>
             <span
                 class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                {{__('افزودن سامانه برای ')}} <span class="underline underline-offset-2 mr-1">{{auth()->user()->user_info->full_name}}</span>
+                {{__('افزودن سامانه')}}
             </span>
             </li>
         </ol>
     </nav>
-    <x-sessionMessage name="status"/>
 
 
+{{--    <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">--}}
+{{--        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">--}}
+{{--            {{ __('افزودن سامانه برای: ') }}--}}
+{{--        </h2>--}}
+{{--        <form action="{{route('addOrganization.store',$id)}}" method="post"--}}
+{{--              enctype="multipart/form-data">--}}
+{{--            @csrf--}}
+{{--            <div id="organizations_dropdown" data-users='@json($organizations)'--}}
+{{--                 class="relative w-full mt-2 mb-4" style="direction: rtl;">--}}
+{{--                <x-input-label class="mb-2" :value="__('سامانه')"/>--}}
+{{--                <button id="organizations-dropdown-btn" type="button"--}}
+{{--                        class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">--}}
+{{--                    <span id="organizations-selected-text" class="truncate">انتخاب سامانه‌ها</span>--}}
+{{--                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"--}}
+{{--                         viewBox="0 0 24 24">--}}
+{{--                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>--}}
+{{--                    </svg>--}}
+{{--                </button>--}}
+{{--                <div id="organizations-dropdown-menu"--}}
+{{--                     class="hidden absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">--}}
+{{--                    <div class="px-4 py-2">--}}
+{{--                        <input id="organizations-dropdown-search" type="text" placeholder="جست و جو"--}}
+{{--                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>--}}
+{{--                    </div>--}}
+{{--                    <ul id="organizations-dropdown-list" class="max-h-48 overflow-auto"></ul>--}}
+{{--                    <div id="organizations-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div id="organizations-selected-container" class="mt-2 flex flex-wrap gap-2"></div>--}}
+{{--                <input type="hidden" name="organization_ids" id="organizations-hidden-input"--}}
+{{--                       value='{{ json_encode(old("organization_ids") ?? []) }}'>--}}
+{{--                <x-input-error :messages="$errors->get('organization_ids')" class="mt-2"/>--}}
+{{--            </div>--}}
 
-    <div class="max-w-7xl space-y-6">
 
-        {{-- Relation Department & Organization--}}
-        <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-            <div class="max-w-xl">
-                <form action="{{route('addOrganization.store',$id)}}" method="post"
-                      enctype="multipart/form-data">
-                    @csrf
-                    <section>
-                        <div>
-                            <x-input-label :value="__('سامانه')" class="mb-2"/>
-                            <select multiple="" name="organization_ids[]" data-hs-select='{
-                                          "hasSearch": true,
-                                          "isSearchDirectMatch": false,
-                                          "searchPlaceholder": "جست و جو ...",
-                                          "searchClasses": "block w-full text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-[1] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 py-2 px-3",
-                                          "searchWrapperClasses": "bg-white p-2 -mx-1 sticky top-0 dark:bg-neutral-900",
-                                          "placeholder": "انتخاب سامانه ...",
-                                          "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
-                                          "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-neutral-600",
-                                          "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700",
-                                          "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-none focus:bg-gray-100 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800",
-                                          "optionTemplate": "<div class=\"flex items-center\"><div class=\"me-2\" data-icon></div><div><div class=\"hs-selected:font-semibold text-sm text-gray-800 \" data-title></div></div><div class=\"ms-auto\"><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-4 text-blue-600\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" viewBox=\"0 0 16 16\"><path d=\"M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z\"/></svg></span></div></div>",
-                                          "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
-                                        }' class="hidden">
-                                @foreach($organizations as $organization)
-                                    <option
-                                        value="{{$organization->id}}">{{$organization->organization_name}}</option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('organization_ids')" class="my-2"/>
-                        </div>
-                    </section>
-                    <x-primary-button type="submit" class="mt-6 ml-2">
-                        {{ __('ذخیره') }}
-                    </x-primary-button>
-                    <x-secondary-button>
-                        <a href="{{route('organization.department.manage')}}" class="flex">
-                            {{__('بازگشت')}}
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5"
-                                 stroke="currentColor" class="size-4 mr-1">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
-                            </svg>
-                        </a>
-                    </x-secondary-button>
-                </form>
-            </div>
-        </div>
-        <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-            <div class="max-w-xl">
-                <section>
-                    <header>
-                        <h2 class="text-lg mb-4 font-medium text-gray-900 dark:text-gray-100">
-                            {{ __('لیست سامانه های در دسترس کاربر') }}
-                        </h2>
-                    </header>
-                    <div>
-                        @foreach($users as $user)
-                            <div class="my-1" wire:key="{{$user->id}}">
-                                @foreach($user->organizations as $org)
-                                    {{$org->organization_name}}
-                                    <form action="{{route('addOrganization.delete',
-                                                [ 'id' => $user->id , 'organizations' => $org->id ])}}" method="post">
-                                        @csrf
-                                        @method('DELETE')
-                                        <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>
-                                    </form>
-                                    <br>
-                                @endforeach
-                            </div>
-                        @endforeach
-                    </div>
-                </section>
+{{--            <x-primary-button type="submit" class="mt-6 ml-2">--}}
+{{--                {{ __('ذخیره') }}--}}
+{{--            </x-primary-button>--}}
+{{--            <x-secondary-button>--}}
+{{--                <a href="{{route('organization.department.manage')}}" class="flex">--}}
+{{--                    {{__('بازگشت')}}--}}
+{{--                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
+{{--                         stroke-width="1.5"--}}
+{{--                         stroke="currentColor" class="size-4 mr-1">--}}
+{{--                        <path stroke-linecap="round" stroke-linejoin="round"--}}
+{{--                              d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>--}}
+{{--                    </svg>--}}
+{{--                </a>--}}
+{{--            </x-secondary-button>--}}
+{{--        </form>--}}
 
-            </div>
-        </div>
-    </div>
+{{--        <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">--}}
+{{--            <div class="max-w-xl">--}}
+{{--                <section>--}}
+{{--                    <header>--}}
+{{--                        <h2 class="text-lg mb-4 font-medium text-gray-900 dark:text-gray-100">--}}
+{{--                            {{ __('لیست سامانه های در دسترس کاربر') }}--}}
+{{--                        </h2>--}}
+{{--                    </header>--}}
+{{--                    <div>--}}
+{{--                        @foreach($users as $user)--}}
+{{--                            <div class="my-1">--}}
+{{--                                @foreach($user->organizations as $org)--}}
+{{--                                    {{$org->organization_name}}--}}
+{{--                                    <form action="{{route('addOrganization.delete',--}}
+{{--                                                [ 'id' => $user->id , 'organizations' => $org->id ])}}" method="post">--}}
+{{--                                        @csrf--}}
+{{--                                        @method('DELETE')--}}
+{{--                                        <x-danger-button type="submit">{{__('حذف')}}</x-danger-button>--}}
+{{--                                    </form>--}}
+{{--                                    <br>--}}
+{{--                                @endforeach--}}
+{{--                            </div>--}}
+{{--                        @endforeach--}}
+{{--                    </div>--}}
+{{--                </section>--}}
+
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 
 
 </x-app-layout>

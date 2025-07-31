@@ -4,13 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
-use App\Http\Requests\StorePhoneRequest;
 use App\Models\Department;
 use App\Models\OperatorPhones;
-use App\Models\Phone;
 use App\Models\ResidentPhones;
-use App\Models\Role;
-use App\Models\UserInfo;
 use App\Rules\farsi_chs;
 use App\Rules\NationalCodeRule;
 use App\Rules\PhoneNumberRule;
@@ -131,10 +127,18 @@ class PhoneListController extends Controller
 
     public function createResident()
     {
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::PHONE_PERMISSIONS->value,
+            UserRole::ADMIN->value,
+        ]);
         return view('phoneList.create-resident');
     }
     public function createOperator()
     {
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::PHONE_PERMISSIONS->value,
+            UserRole::ADMIN->value,
+        ]);
         $departments = Department::select('id', 'department_name')->get();
         return view('phoneList.create-operator', compact('departments'));
     }

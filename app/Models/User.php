@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -78,15 +76,15 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
-//    public function assignRole(Role $role): self
-//        {
-//            // Eager load roles before syncing
-//            if (! $this->relationLoaded('roles')) {
-//                $this->load('roles');
-//            }
-//            $this->roles()->syncWithoutDetaching($role);
-//            return $this;
-//        }
+    public function assignRole(Role $role): self
+        {
+            // Eager load roles before syncing
+            if (! $this->relationLoaded('roles')) {
+                $this->load('roles');
+            }
+            $this->roles()->syncWithoutDetaching($role);
+            return $this;
+        }
     public function removeRole(Role $role): self
     {
         // Eager load roles before detaching

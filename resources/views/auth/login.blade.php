@@ -1,35 +1,33 @@
 <x-guest-layout>
 
-    <!-- Login Form -->
-    <div class="flex-1 flex items-center justify-center p-6 sm:p-12 bg-gray-100 relative z-10">
-        <div class="w-full max-w-md bg-white shadow-xl rounded-xl p-8 border border-gray-100">
-            <div class="space-y-6">
 
-                <!-- Logo added here -->
+
+    <!-- Login Form -->
+    <div class="bg-gradient-to-br from-white via-blue-100 to-white border border-blue-100 backdrop-blur-sm shadow-2xl flex-1 flex items-center justify-center p-6 sm:p-12 bg-[#f0f4ff] relative z-10">
+        <div class="w-full max-w-md bg-white shadow-xl rounded-2xl p-8 border border-gray-100">
+            <div class="space-y-6" dir="rtl">
+
+                <!-- Logo -->
                 <div class="flex justify-center">
                     <x-application-logo/>
                 </div>
 
-                <!-- Tabs -->
-                <div class="flex w-full bg-gray-100 rounded-full shadow-sm overflow-hidden text-sm font-medium">
-                    <a href="{{ route('login') }}"
-                       class="w-1/2 text-center py-2 transition-all rounded-l-full bg-blue-500 text-white hover:bg-blue-600">
-                        {{ __('ورود با کد پرسنلی') }}
-                    </a>
-                    <a href="{{ route('otp.login') }}"
-                       class="w-1/2 text-center py-2 transition-all text-gray-600 hover:bg-blue-100 hover:text-blue-700 rounded-r-full">
-                        {{ __('ورود با رمز یکبارمصرف') }}
-                    </a>
-                </div>
-
+                <!-- Form Start -->
                 <form action="{{ route('login.store') }}" method="POST" dir="rtl" class="space-y-4">
                     @csrf
 
                     <!-- Personal Code -->
                     <div>
-                        <x-input-label for="p_code" :value="__('کد پرسنلی')"/>
-                        <x-text-input name="p_code" class="mt-2 w-full" autofocus/>
-                        <x-input-error :messages="$errors->get('p_code')" class="mt-1"/>
+                        <x-input-label for="p_code" :value="__('کد پرسنلی')" />
+                        <div class="relative mt-2">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            </div>
+                            <x-text-input name="p_code" class="w-full pl-10 text-sm" autofocus/>
+                        </div>
+                        <x-input-error :messages="$errors->get('p_code')" class="mt-1" />
                     </div>
 
                     <!-- Password -->
@@ -37,7 +35,7 @@
                         <x-input-label for="p_code" class="mt-2" :value="__('رمز')"/>
                         <div class="relative mt-2">
                             <input name="password" autofocus
-                                   class="w-full text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
+                                   class="w-full text-sm bg-white pl-10 border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
                                    :type="show ? 'password' : 'text'" type="password">
                             <div class="absolute top-1/2 left-4 cursor-pointer"
                                  style="transform: translateY(-50%);">
@@ -74,9 +72,24 @@
                             class="inline-flex justify-center w-full px-4 py-3 bg-blue-500 text-white border border-transparent rounded-md font-semibold text-sm uppercase shadow-sm hover:bg-blue-600 hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-300">
                         {{ __('ورود') }}
                     </button>
+
+                    <!-- Separator with "or" -->
+                    <div class="flex items-center justify-center gap-4 my-4 text-gray-500 text-sm">
+                        <hr class="w-full border-gray-300">
+                        <span class="whitespace-nowrap text-gray-500">{{ __('یا') }}</span>
+                        <hr class="w-full border-gray-300">
+                    </div>
+
+                    <!-- OTP Login Link -->
+                    <a href="{{ route('otp.login') }}">
+                        <x-primary-button type="button" class="inline-flex w-full justify-center px-4 py-3 mt-4 ">
+                            {{ __('ورود با رمز یکبارمصرف') }}
+                        </x-primary-button>
+                    </a>
                 </form>
             </div>
         </div>
     </div>
+
 
 </x-guest-layout>

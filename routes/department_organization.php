@@ -17,11 +17,8 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
         Route::get('department/organization/manage', [OrgDepManagementController::class, 'index'])
             ->name('organization.department.manage');
 
-        Route::get('department/organization/connection',
-            [OrgDepManagementController::class, 'departmentOrganizationConnection'])
-            ->name('department.organization.connection');
 
-        Route::post('/department/organization/connection', [OrgDepManagementController::class, 'store'])
+        Route::post('department/organization/connection', [OrgDepManagementController::class, 'store'])
             ->name('departments.organizations.store');
 
         Route::get('/addOrganization/{id}', [AddOrganizationController::class, 'index'])

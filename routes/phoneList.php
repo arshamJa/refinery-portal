@@ -8,21 +8,18 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
     Route::get('phone/list', [PhoneListController::class, 'index'])
         ->name('phone-list.index');
 
-//    Route::get('phone/list/create', [PhoneListController::class, 'create'])
-//        ->name('phone-list.create');
-//
-//    Route::post('phone/list/store', [PhoneListController::class, 'store'])
-//        ->name('phone-list.store');
 
     // ResidentPhones create form & store
     Route::get('/phone-list/resident/create', [PhoneListController::class, 'createResident'])
         ->name('phone-list.resident.create');
+
     Route::post('/phone-list/resident/store', [PhoneListController::class, 'storeResident'])
         ->name('phone-list.resident.store');
 
     // OperatorPhones create form & store
     Route::get('/phone-list/operator/create', [PhoneListController::class, 'createOperator'])
         ->name('phone-list.operator.create');
+
     Route::post('/phone-list/operator/store', [PhoneListController::class, 'storeOperator'])
         ->name('phone-list.operator.store');
 
@@ -37,7 +34,6 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
         Route::get('{id}/edit', [PhoneListController::class, 'editResident'])->name('edit');
         Route::put('{id}', [PhoneListController::class, 'updateResident'])->name('update');
     });
-
 
 
     Route::delete('phone/list/{source}/{id}', [PhoneListController::class, 'destroy'])
