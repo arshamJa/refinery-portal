@@ -19,8 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'operatorMiddleware' => \App\Http\Middleware\OperatorMiddleware::class,
             'employeeMiddleware' => \App\Http\Middleware\EmployeeMiddleware::class,
             'sanitizeInputs' => \App\Http\Middleware\SanitizeInputMiddleware::class,
-            'super_admin' => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
-            'permission.role' => \App\Http\Middleware\CheckPermissionAndRole::class,
+            'superAdminMiddleware' => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
 //            \Illuminate\Http\Middleware\TrustHosts::class,
         ]);
 

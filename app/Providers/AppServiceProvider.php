@@ -50,9 +50,9 @@ class AppServiceProvider extends ServiceProvider
             return null; // Let others fall through to normal logic
         });
 
-        Gate::define('super-admin-only', function (User $user) {
-            return $user->hasRole(UserRole::SUPER_ADMIN->value);
-        });
+//        Gate::define('super-admin-only', function (User $user) {
+//            return $user->hasRole(UserRole::SUPER_ADMIN->value);
+//        });
 
 
 //        Gate::define('users-info', function (User $user){
@@ -87,16 +87,11 @@ class AppServiceProvider extends ServiceProvider
             return $user->id === $meeting->scriptorium_id && $userInfo;
         });
 
-        Gate::define('has-permission-and-role', function ($user, UserPermission|string $permission, UserRole|string $role = null) {
+        Gate::define('has-permission-and-role', function ($user, $permission, $role = null) {
             $permissionName = $permission instanceof UserPermission ? $permission->value : $permission;
-            $hasPermission = $user->permissions->contains('name', $permissionName);
-            if ($role === null) {
-                // Only permission check
-                return $hasPermission;
-            }
             $roleName = $role instanceof UserRole ? $role->value : $role;
-            $hasRole = $user->roles->contains('name', $roleName);
-            // Return true if user has either the permission OR the role
+            $hasPermission = $user->permissions->contains('name', $permissionName);
+            $hasRole = $roleName ? $user->roles->contains('name', $roleName) : false;
             return $hasPermission || $hasRole;
         });
 

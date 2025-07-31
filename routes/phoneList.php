@@ -8,7 +8,6 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
     Route::get('phone/list', [PhoneListController::class, 'index'])
         ->name('phone-list.index');
 
-
     // ResidentPhones create form & store
     Route::get('/phone-list/resident/create', [PhoneListController::class, 'createResident'])
         ->name('phone-list.resident.create');

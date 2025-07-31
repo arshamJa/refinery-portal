@@ -46,5 +46,4 @@ require __DIR__.'/users.php';
 require __DIR__.'/task.php';
 require __DIR__.'/meeting.php';
 require __DIR__.'/profile.php';
-require __DIR__.'/rolePermission.php';
 require __DIR__.'/superAdmin.php';
