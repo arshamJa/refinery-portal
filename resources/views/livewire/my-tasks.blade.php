@@ -49,7 +49,7 @@
             </a>
         @endcan
         <span
-           class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white shadow-lg flex gap-3 items-center justify-start pointer-events-none p-4 rounded-lg">
+            class="bg-[#FF6F61] ring-2 ring-offset-2 ring-blue-400 text-white shadow-lg flex gap-3 items-center justify-start pointer-events-none p-4 rounded-lg">
             <span class="text-sm font-medium">
                 {{ __('اقدامات من') }}
             </span>
@@ -120,7 +120,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['#','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','تاریخ ارسال اقدام',''] as $th)
+                    @foreach (['#','موضوع جلسه','خلاصه مذاکره','مهلت انجام اقدام','تاریخ ارسال اقدام','قابلیت'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -139,16 +139,29 @@
                         </x-table.cell>
                         <x-table.cell>{{ $taskUser->time_out ?? '-' }}</x-table.cell>
                         <x-table.cell>{{ $taskUser->sent_date ?? '---' }}</x-table.cell>
-                        <x-table.cell class="flex flex-col gap-2 w-full">
-                            <a href="{{ route('view.task.page', $taskUser->task->meeting->id) }}" class="w-full">
-                                <x-secondary-button class="w-full">
-                                    {{ __('نمایش صورتجلسه') }}
-                                </x-secondary-button>
-                            </a>
-                            <x-edit-button wire:click.prevent="view({{ $taskUser->id }})" class="w-full">
-                                {{ __('نمایش جزئیات') }}
-                            </x-edit-button>
+                        <x-table.cell>
+                            <x-dropdown>
+                                <x-slot name="trigger">
+                                    <button class="hover:bg-gray-200 rounded-full p-1 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                             class="w-5 h-5 text-gray-600">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                        </svg>
+                                    </button>
+                                </x-slot>
+                                <x-slot name="content">
+                                    <x-dropdown-link href="{{ route('view.task.page', $taskUser->task->meeting->id) }}">
+                                        {{ __('نمایش صورتجلسه') }}
+                                    </x-dropdown-link>
+                                    <x-dropdown-link wire:click.prevent="view({{ $taskUser->id }})">
+                                        {{ __('نمایش جزئیات') }}
+                                    </x-dropdown-link>
+                                </x-slot>
+                            </x-dropdown>
                         </x-table.cell>
+
                     </x-table.row>
                 @empty
                     <x-table.row>
@@ -168,13 +181,13 @@
         @if ($selectedTaskUser)
             <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                 <h2 class="text-2xl font-bold text-gray-800">{{ __('جزئیات') }}</h2>
-                <button type="button" x-on:click="$dispatch('close')"
-                        class="text-gray-400 hover:text-red-500 transition duration-150">
+                <a href="{{route('my.task.table')}}"
+                   class="text-gray-400 hover:text-red-500 transition duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                          stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
                     </svg>
-                </button>
+                </a>
             </div>
 
             <div class="px-6 py-6 space-y-6 text-sm text-gray-800 dark:text-gray-200 max-h-[70vh] overflow-y-auto">
@@ -198,9 +211,11 @@
             </div>
 
             <div class="flex justify-end px-6 py-4 bg-gray-100 border-t border-gray-200">
-                <x-cancel-button x-on:click="$dispatch('close')">
-                    {{ __('بستن') }}
-                </x-cancel-button>
+                <a href="{{route('my.task.table')}}">
+                    <x-cancel-button>
+                        {{ __('بستن') }}
+                    </x-cancel-button>
+                </a>
             </div>
         @endif
     </x-modal>

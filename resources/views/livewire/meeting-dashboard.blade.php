@@ -111,13 +111,13 @@
                         <div class="flex-1">
                             <x-input-label for="start_date" value="{{ __('تاریخ شروع') }}"/>
                             <x-date-input>
-                                <x-text-input id="start_date" wire:model="start_date" class="block ps-10"/>
+                                <x-text-input id="start_date" wire:model="start_date" class="persian-date block ps-10"/>
                             </x-date-input>
                         </div>
                         <div class="flex-1">
                             <x-input-label for="end_date" value="{{ __('تاریخ پایان') }}"/>
                             <x-date-input>
-                                <x-text-input id="end_date" wire:model="end_date" class="block ps-10"/>
+                                <x-text-input id="end_date" wire:model="end_date" class="persian-date block ps-10"/>
                             </x-date-input>
                         </div>
                     </div>
