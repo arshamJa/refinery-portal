@@ -9,6 +9,7 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
     Route::get('blogs', News::class)
         ->name('blogs.index');
 
+
     Route::get('blogs/create', [BlogController::class, 'create'])
         ->name('blogs.create');
 
@@ -29,6 +30,5 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
 
     Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])
         ->name('blogs.destroy');
-
 
 });

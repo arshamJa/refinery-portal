@@ -15,6 +15,9 @@ class BlogController extends Controller
 
     public function create()
     {
+        Gate::authorize('has-permission-and-role', [
+            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
+        ]);
         return view('blog.create');
     }
 

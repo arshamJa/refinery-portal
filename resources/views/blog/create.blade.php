@@ -50,6 +50,7 @@
             </span>
         </li>
     </x-breadcrumb>
+
     @can('has-permission-and-role', [UserPermission::NEWS_PERMISSIONS,UserRole::ADMIN])
 
         <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">

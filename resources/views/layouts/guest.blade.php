@@ -29,7 +29,8 @@
         class="hidden lg:flex lg:w-1/2 bg-cover bg-center relative"
         style="background-image: url('{{ asset('sunset-refinery.jpg') }}');"
     >
-        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
+        <div class="absolute inset-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-black/30"></div>
     </div>
     {{$slot}}
     <!-- Mobile Background -->
@@ -38,7 +39,6 @@
         style="background-image: url('{{ asset('sunset-refinery.jpg') }}');"
     ></div>
 </div>
-
 
 
 </body>

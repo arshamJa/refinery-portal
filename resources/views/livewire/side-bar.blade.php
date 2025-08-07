@@ -244,7 +244,8 @@
                 </x-link.responsive-link>
             </li>
             <li class="mb-2">
-                @if(auth()->user()->hasRole(UserRole::USER->value))
+                @if(auth()->user()->hasRole(UserRole::USER->value) ||
+                    !auth()->user()->hasPermissionTo(UserPermission::NEWS_PERMISSIONS->value))
                     <x-link.responsive-link href="{{route('blogs.index')}}"
                                             :active="request()->is('blogs')"
                                             class="flex items-center gap-x-2">
@@ -298,7 +299,6 @@
                                 </svg>
                                 {{__('صفحه اخبار و اطلاعیه')}}
                             </x-link.responsive-link>
-
                         </div>
                     </div>
                 @endif
