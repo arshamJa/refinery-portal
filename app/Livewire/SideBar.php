@@ -11,6 +11,7 @@ class SideBar extends Component
 {
     use HasNotificationCount;
 
+
     protected $listeners = ['notificationRead' => '$refresh'];
     public function render()
     {
@@ -24,4 +25,5 @@ class SideBar extends Component
             ->whereNull('recipient_read_at')
             ->count();
     }
+
 }

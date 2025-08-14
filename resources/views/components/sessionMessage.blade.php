@@ -4,7 +4,7 @@
     <div
         x-data="{ showMessage: true }" x-show="showMessage" x-transition x-cloak
         x-init="setTimeout(() => showMessage = false, 4000)"
-        dir="rtl" class="fixed top-5 right-5 z-[99] max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
+        dir="rtl" class="fixed top-5 right-5 z-[9999] max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
         <div class="flex p-4">
             <div class="shrink-0">
                 <svg class="shrink-0 size-4 text-teal-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">

@@ -1,8 +1,11 @@
 @props(['align' => 'right', 'width' => '48', 'contentClasses' => 'py-1 bg-white dark:bg-gray-800 rounded-lg shadow-xl'])
 @php
     $alignmentClasses = match ($align) {
-        'left' => 'ltr:origin-top-left rtl:origin-top-right start-0',
-        'top' => 'origin-top',
+//        'left' => 'ltr:origin-top-left rtl:origin-top-right start-0',
+//        'top' => 'origin-top',
+         'left' => 'ltr:left-full ltr:top-0 rtl:right-full rtl:top-0 ml-1',  // dropdown right of trigger (LTR), left of trigger (RTL)
+        'right' => 'ltr:right-full ltr:top-0 rtl:left-full rtl:top-0 mr-1', // dropdown left of trigger (LTR), right of trigger (RTL)
+
         default => 'ltr:origin-top-right rtl:origin-top-left end-0',
     };
 

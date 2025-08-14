@@ -1,6 +1,5 @@
-@php use App\Models\MeetingUser; @endphp
 <div>
-    <div class="grid lg:grid-cols-2 mt-20">
+    <div class="grid lg:grid-cols-2 mt-16">
         <div class="p-2">
             <x-notifications/>
         </div>

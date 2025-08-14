@@ -1,6 +1,6 @@
 @php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use App\Enums\UserRole;use Illuminate\Support\Str; @endphp
 <div>
-    <nav class="flex justify-between mb-4 mt-20">
+    <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -36,7 +36,7 @@
         </ol>
     </nav>
 
-    <div class="p-6 max-w-6xl bg-white rounded-2xl shadow-md space-y-6 mb-6">
+    <div class="p-6 bg-white rounded-2xl shadow-md space-y-6 mb-6">
         <div class="w-full text-center">
             @switch($this->meetings->status)
                 @case(MeetingStatus::IS_IN_PROGRESS)

@@ -74,7 +74,7 @@
         </form>
 
         <!-- Blog List -->
-        <div class="flex flex-col space-y-8 max-w-7xl mx-auto">
+        <div class="flex flex-col space-y-8 mx-auto">
             @forelse($this->blogs as $blog)
                 <article
                     class="flex flex-row-reverse bg-white dark:bg-gray-900 shadow-sm rounded-2xl border border-gray-100 dark:border-gray-700 hover:shadow-md transition overflow-hidden"

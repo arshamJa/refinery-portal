@@ -90,7 +90,5 @@
             </form>
         </div>
     @endcan
-
-
 </x-app-layout>
 

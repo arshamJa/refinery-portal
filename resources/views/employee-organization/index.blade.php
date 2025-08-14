@@ -1,5 +1,5 @@
 <x-app-layout>
-    <nav class="flex justify-between mb-4 mt-20">
+    <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -25,7 +25,7 @@
         </ol>
     </nav>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" dir="rtl">
+    <div class="mx-auto px-4 py-8 space-y-8" dir="rtl">
 
         <!-- 🔍 Search Form -->
         <form method="GET" action="{{ route('employee.organization') }}"
