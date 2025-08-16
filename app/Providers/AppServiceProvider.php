@@ -50,9 +50,9 @@ class AppServiceProvider extends ServiceProvider
             return null; // Let others fall through to normal logic
         });
 
-//        Gate::define('super-admin-only', function (User $user) {
-//            return $user->hasRole(UserRole::SUPER_ADMIN->value);
-//        });
+        Gate::define('super-admin-only', function (User $user) {
+            return $user->hasRole(UserRole::SUPER_ADMIN->value);
+        });
 
 
 //        Gate::define('users-info', function (User $user){
@@ -65,10 +65,37 @@ class AppServiceProvider extends ServiceProvider
         });
 
 
+
+        // Gate to check if user has a specific permission
+        Gate::define('has-permission', function ($user, $permission) {
+            $permissionName = $permission instanceof UserPermission ? $permission->value : $permission;
+            return $user->permissions->contains('name', $permissionName);
+        });
+        // Gate to check if user has a specific role
+        Gate::define('has-role', function ($user, $role) {
+            $roleName = $role instanceof UserRole ? $role->value : $role;
+            return $user->roles->contains('name', $roleName);
+        });
+
+
+        Gate::define('edit-user', function (User $authUser, User $targetUser) {
+            // Super Admin can edit anyone
+            if ($authUser->hasRole(UserRole::SUPER_ADMIN->value)) {
+                return true;
+            }
+            // Admin can edit only themselves or non-admins
+            if ($authUser->hasRole(UserRole::ADMIN->value)) {
+                return $targetUser->id === $authUser->id || !$targetUser->hasRole(UserRole::ADMIN->value);
+            }
+            // Other roles cannot edit
+            return false;
+        });
+
+
+
         Gate::define('admin-role',function (User $user){
            return $user->hasRole(UserRole::ADMIN->value);
         });
-
 
         Gate::define('lock-task', function (User $user) {
             return $user->permissions->contains('name', UserPermission::SCRIPTORIUM_PERMISSIONS->value);
@@ -94,6 +121,7 @@ class AppServiceProvider extends ServiceProvider
             $hasRole = $roleName ? $user->roles->contains('name', $roleName) : false;
             return $hasPermission || $hasRole;
         });
+
 
         //gate definition for profile page
         Gate::define('profile-page', function (User $user) {

@@ -13,7 +13,7 @@
                 </div>
 
                 <!-- Form Start -->
-                <form action="{{ route('login.store') }}" method="POST" dir="rtl" class="space-y-4">
+                <form action="{{ route('login.store') }}" method="POST" dir="rtl" class="space-y-4" autocomplete="off">
                     @csrf
 
                     <!-- Personal Code -->

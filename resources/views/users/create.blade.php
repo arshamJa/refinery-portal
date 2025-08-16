@@ -49,31 +49,18 @@
     </x-breadcrumb>
 
 
-@can('admin-role')
+    @can('admin-role')
         <form action="{{route('users.store')}}" method="post" enctype="multipart/form-data">
             @csrf
-            <div class="p-4 mb-4 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-md sm:rounded-lg">
+            <div class="p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">
                     {{ __('ساخت کاربر جدید') }}
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
-                    <div>
-                        <x-input-label for="role" :value="__('نقش')"/>
-                        <x-select-input name="role">
-                            <option>...</option>
-                            @foreach($roles as $role)
-                                <option value="{{ $role->id }}" @selected(old('role') == $role->id)>
-                                    {{ $role->name }}
-                                </option>
-                            @endforeach
-                        </x-select-input>
-                        <x-input-error :messages="$errors->get('role')" class="my-2"/>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right text-gray-700">
                     <div>
                         <x-input-label for="full_name" :value="__('نام و نام خانوادگی')"/>
                         <x-text-input name="full_name" id="full_name" value="{{old('full_name')}}" class="block"
-                                      type="text"
-                                      autofocus/>
+                                      type="text" autofocus/>
                         <x-input-error :messages="$errors->get('full_name')"/>
                     </div>
                     <div>
@@ -88,8 +75,6 @@
                                       maxlength="10" autofocus/>
                         <x-input-error :messages="$errors->get('n_code')"/>
                     </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
                     <div>
                         <x-input-label for="phone" :value="__('تلفن همراه')"/>
                         <x-text-input name="phone" id="phone" value="{{old('phone')}}" class="block" type="text"
@@ -115,8 +100,6 @@
                                       autofocus/>
                         <x-input-error :messages="$errors->get('position')"/>
                     </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2">
                     <div>
                         <x-input-label :value="__('دپارتمان')"/>
                         <x-select-input name="departmentId">
@@ -128,12 +111,14 @@
                         </x-select-input>
                         <x-input-error :messages="$errors->get('departmentId')" class="my-2"/>
                     </div>
-                    <div id="organizations_dropdown" data-users='@json($organization)' class="relative w-full col-span-2" style="direction: rtl;">
+                    <div id="organizations_dropdown" data-users='@json($organization)' class="relative w-full"
+                         style="direction: rtl;">
                         <x-input-label class="mb-1.5" :value="__('سامانه')"/>
                         <button id="organizations-dropdown-btn" type="button"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
                             <span id="organizations-selected-text" class="truncate">انتخاب سامانه</span>
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
@@ -144,22 +129,23 @@
                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                             </div>
                             <ul id="organizations-dropdown-list" class="max-h-48 overflow-auto"></ul>
-                            <div id="organizations-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد</div>
+                            <div id="organizations-no-result" class="px-4 py-2 text-gray-500 hidden">موردی یافت نشد
+                            </div>
                         </div>
                         <div id="organizations-selected-container" class="mt-2 flex flex-wrap gap-2"></div>
                         <input type="hidden" name="organization" id="organizations-hidden-input"
                                value='{{ json_encode(explode(",", old("organization", ""))) }}'>
                         <x-input-error :messages="$errors->get('organization')" class="mt-2"/>
                     </div>
-
                     <div>
                         <x-input-label for="password" :value="__('رمز عبور')"/>
-                        <x-text-input name="password" id="password" class="block" type="text"  autofocus/>
+                        <x-text-input name="password" id="password" class="block" type="text" autofocus/>
                         <x-input-error :messages="$errors->get('password')" class="my-2"/>
                     </div>
                     <div>
                         <x-input-label for="password_confirmation" :value="__('تکرار رمز عبور')"/>
-                        <x-text-input name="password_confirmation" id="password_confirmation" class="block" type="text" autofocus />
+                        <x-text-input name="password_confirmation" id="password_confirmation" class="block" type="text"
+                                      autofocus/>
                         <x-input-error :messages="$errors->get('password_confirmation')"/>
                     </div>
                     <div>
@@ -168,23 +154,56 @@
                                       class="block p-2" type="file" autofocus/>
                         <x-input-error :messages="$errors->get('signature')"/>
                     </div>
-                </div>
+                    <div
+                        x-data="{
+            selectedRole: '',
+            rolePermissions: {{ json_encode($rolePermissionsMap ?? []) }},
+            selectedPermissions: [],
+            updateSelectedPermissions() {
+                if (this.rolePermissions[this.selectedRole]) {
+                    this.selectedPermissions = Object.keys(this.rolePermissions[this.selectedRole])
+                        .filter(p => this.rolePermissions[this.selectedRole].includes(p));
+                } else {
+                    this.selectedPermissions = [];
+                }
+            }
+        }"
+                        x-init=""
+                        x-cloak
+                        class="col-span-4 grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right"
+                    >
+                        <!-- Role Selector -->
+                        <div class="mb-2">
+                            <x-input-label for="role" :value="__('نقش')"/>
+                            <x-select-input name="role" x-model="selectedRole" @change="updateSelectedPermissions()">
+                                <option value="">...</option>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endforeach
+                            </x-select-input>
+                            <x-input-error :messages="$errors->get('role')" class="my-2"/>
+                        </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 mb-4">
-                    <div class="col-span-4">
-                        <x-input-label :value="__('تعیین دسترسی ها:')"/>
-                        @foreach($permissions as $permission)
-                            <div>
-                                <input type="checkbox" name="permissions[{{$permission->name}}]" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                       value="{{$permission->name}}" @checked(old('permissions.' . $permission->name))>
-                                <label>{{ $permission->name }}</label>
+                        <!-- Permissions -->
+                        <div class="col-span-4">
+                            <x-input-label :value="__('تعیین دسترسی ها:')"/>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                            @foreach($permissions as $permission)
+                                <div x-show="rolePermissions[selectedRole] && rolePermissions[selectedRole].includes('{{ $permission->name }}')">
+                                    <label class="flex items-center space-x-2 space-x-reverse">
+                                    <input type="checkbox"
+                                           name="permissions[{{ $permission->name }}]"
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                           value="{{ $permission->name }}"
+                                           x-model="selectedPermissions">
+                                        <span class="text-sm">{{ $permission->name }}</span>
+                                    </label>
+                                </div>
+                            @endforeach
                             </div>
-                        @endforeach
-                        <x-input-error :messages="$errors->get('permissions')"/>
-
+                        </div>
                     </div>
                 </div>
-
                 <div class="flex gap-4">
                     <x-primary-button type="submit">
                         {{ __('ذخیره') }}

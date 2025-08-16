@@ -68,11 +68,11 @@
                 <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                     @php
                         $statuses = [
-                            ['color' => 'bg-yellow-600', 'text' => ' text-yellow-600' , 'label' => 'در حال بررسی دعوتنامه'],
-                            ['color' => 'bg-red-600', 'text' => ' text-red-600','label' => 'جلساتی که لغو شد'],
+                            ['color' => 'bg-yellow-400', 'text' => ' text-yellow-400' , 'label' => 'جلساتی که در حال بررسی دعوتنامه است'],
+                            ['color' => 'bg-red-600', 'text' => ' text-red-600','label' => 'جلساتی که لغو شده است'],
                             ['color' => 'bg-green-600 ','text' => ' text-green-600','label' => 'جلساتی که برگزار می‌شود'],
                             ['color' => 'bg-blue-600 ', 'text' => ' text-blue-600' ,'label' => 'جلساتی که در حال برگزاری است'],
-                            ['color' => 'bg-gray-600 ','text' => ' text-gray-700', 'label' => 'جلساتی که خاتمه یافت'],
+                            ['color' => 'bg-gray-600 ','text' => ' text-gray-700', 'label' => 'جلساتی که برگزار شده و خاتمه یافت'],
                         ];
                     @endphp
                     @foreach ($statuses as $status)
@@ -206,7 +206,6 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const meetingPercentages = @json($this->percentages);
-
                 const MeetingStatus = {
                     PENDING: 0,
                     IS_CANCELLED: 1,
@@ -214,26 +213,24 @@
                     IS_IN_PROGRESS: 2,
                     IS_FINISHED: 3
                 };
-
                 const meetingLabels = {
-                    [MeetingStatus.PENDING]: "در حال بررسی دعوتنامه",
-                    [MeetingStatus.IS_CANCELLED]: "جلساتی که لغو شد",
+                    [MeetingStatus.PENDING]: "جلساتی که در حال بررسی دعوتنامه است",
+                    [MeetingStatus.IS_CANCELLED]: "جلساتی که لغو شده است",
                     [MeetingStatus.IS_NOT_CANCELLED]: "جلساتی که برگزار می‌شود",
                     [MeetingStatus.IS_IN_PROGRESS]: "جلساتی که در حال برگزاری است",
-                    [MeetingStatus.IS_FINISHED]: "جلساتی که خاتمه یافت"
+                    [MeetingStatus.IS_FINISHED]: "جلساتی که برگزار شده و خاتمه یافت"
+
                 };
                 const chartData = Object.keys(MeetingStatus).map(key => {
                     const statusValue = MeetingStatus[key].toString();
                     return meetingPercentages[statusValue] || 0;
                 });
-
                 const chartLabels = Object.keys(MeetingStatus).map(key => meetingLabels[MeetingStatus[key]]);
-
                 const getChartOptions = () => ({
                     series: chartData,
                     labels: chartLabels,
                     colors: [
-                        "#A8D858", "#DC2626", "#16A34A", "#2563EB", "#4B5563"
+                        "#FACC15", "#DC2626", "#16A34A", "#2563EB" , "#4B5563"
                     ],
                     chart: {
                         type: "pie",
@@ -266,7 +263,6 @@
                         }
                     }
                 });
-
                 if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
                     const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
                     chart.render();

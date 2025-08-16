@@ -31,7 +31,14 @@ class News extends Component
     #[Computed]
     public function blogs()
     {
-        $query = Blog::where('title', 'like', '%' . strip_tags(trim($this->search)) . '%');
+        $searchTerm = strip_tags(trim($this->search));
+        $query = Blog::with('user.user_info')
+        ->where(function ($q) use ($searchTerm) {
+            $q->where('title', 'like', '%' . $searchTerm . '%')
+                ->orWhereHas('user.user_info', function ($q2) use ($searchTerm) {
+                    $q2->where('full_name', 'like', '%' . $searchTerm . '%');
+                });
+        });
         if ($this->sort === 'oldest') {
             $query->orderBy('created_at', 'asc');
         } else {

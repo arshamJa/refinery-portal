@@ -1,7 +1,7 @@
+@php use App\Enums\UserRole; @endphp
 <x-app-layout>
-
     @can('admin-role')
-        <nav class="flex justify-between mb-4 mt-20">
+        <nav class="flex justify-between mb-4 mt-16">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
                     <a href="{{route('dashboard')}}"
@@ -41,30 +41,10 @@
         <form action="{{route('users.update',$userInfo->id)}}" method="POST">
             @csrf
             @method('put')
-            <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
+            <div class="p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
                 <div class="border-b pb-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('ویرایش اطلاعات')}}</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right">
-                        <!-- Role -->
-                        <div>
-                            <x-input-label for="role" :value="__('نقش')"/>
-                            <select dir="ltr" name="role" id="role"
-                                    class="block w-full mt-1.5 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-400 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
-                                @foreach($roles as $role)
-                                    <option value="{{ $role->id }}"
-                                    @if(old('role'))
-                                        {{ old('role') == $role->id ? 'selected' : '' }}
-                                        @else
-                                        {{ optional($user->roles->first())->id == $role->id ? 'selected' : '' }}
-                                        @endif
-                                    >
-                                        {{ $role->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('role')" class="my-2"/>
-                        </div>
-
+                    <div class="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right">
                         <!-- Name -->
                         <div>
                             <x-input-label for="full_name" :value="__('نام و نام خانوادگی')"/>
@@ -74,7 +54,6 @@
                                           type="text" autofocus/>
                             <x-input-error :messages="$errors->get('full_name')" class="my-2"/>
                         </div>
-
                         <!-- Personnel Code -->
                         <div>
                             <x-input-label for="p_code" :value="__('شماره پرسنلی')"/>
@@ -84,7 +63,6 @@
                                           type="text" autofocus/>
                             <x-input-error :messages="$errors->get('p_code')" class="my-2"/>
                         </div>
-
                         <!-- National ID -->
                         <div>
                             <x-input-label for="n_code" :value="__('کد ملی')"/>
@@ -94,7 +72,6 @@
                                           type="text" autofocus/>
                             <x-input-error :messages="$errors->get('n_code')" class="my-2"/>
                         </div>
-
                         <!-- Phone Numbers -->
                         <div>
                             <x-input-label for="phone" :value="__('شماره همراه')"/>
@@ -117,7 +94,6 @@
                                           class="block my-2 w-full" type="text" autofocus/>
                             <x-input-error :messages="$errors->get('work_phone')" class="my-2"/>
                         </div>
-
                         <!-- Position -->
                         <div>
                             <x-input-label for="position" :value="__('سمت')"/>
@@ -130,7 +106,7 @@
                 </div>
                 <!-- Department & Password Section -->
                 <div class="border-b pb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
+                    <div class="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right">
                         <!-- Department -->
                         <div>
                             <x-input-label for="department" :value="__('انتخاب دپارتمان')"/>
@@ -173,29 +149,156 @@
                                    value='{{ json_encode(explode(",", old("organization", ""))) }}'>
                             <x-input-error :messages="$errors->get('organization')" class="mt-2"/>
                         </div>
-
                     </div>
                 </div>
 
-                <!-- Permissions -->
-                <div class="pb-6 border-b">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('تعیین بخش دسترسی کاربر:')}}</h2>
-                    <div class="space-y-3 text-right text-gray-700">
-                        @foreach($permissions as $permission)
-                            <div class="flex items-center space-x-2 space-x-reverse">
-                                <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    {{
-                                        ((is_array(old('permissions')) && in_array($permission->id, old('permissions'))) // old input exists
-                                            || (!old('permissions') && $user->permissions->contains($permission->id)) // no old input, load from user permissions
-                                        ) ? 'checked' : ''
-                                    }}
-                                >
-                                <label class="text-sm">{{ $permission->name }}</label>
+                <!-- Role & Permissions -->
+                <div class="border-b pb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right">
+                        <div class="col-span-4">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                                {{ __('تعیین بخش دسترسی کاربر:') }}
+                            </h2>
+                        </div>
+
+                        {{-- Case 1: Super Admin (can edit anyone, including themselves) --}}
+                        @if(auth()->user()->hasRole(UserRole::SUPER_ADMIN->value))
+                            <div
+                                x-data='{
+                    selectedRole: @json(optional($user->roles->first())->id ?? ""),
+                    rolePermissions: @json($rolePermissionsMap ?? []),
+                    selectedPermissions: @json(old("permissions", $user->permissions->pluck("name")->toArray())),
+                    updateSelectedPermissions() {
+                        if (this.rolePermissions[this.selectedRole]) {
+                            this.selectedPermissions = this.selectedPermissions.filter(
+                                p => this.rolePermissions[this.selectedRole].includes(p)
+                            );
+                        } else {
+                            this.selectedPermissions = [];
+                        }
+                    }
+                }'
+                                x-init="updateSelectedPermissions()"
+                                x-cloak
+                                class="col-span-4 grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right"
+                            >
+                                <!-- Role Selector -->
+                                <div>
+                                    <x-input-label for="role" :value="__('نقش')"/>
+                                    <x-select-input name="role" x-model="selectedRole" @change="updateSelectedPermissions()">
+                                        <option value="">...</option>
+                                        @foreach($roles as $role)
+                                            <option value="{{ $role->id }}"
+                                                @selected(optional($user->roles->first())->id == $role->id)>
+                                                {{ $role->name }}
+                                            </option>
+                                        @endforeach
+                                    </x-select-input>
+                                    <x-input-error :messages="$errors->get('role')" class="my-2"/>
+                                </div>
+
+                                <!-- Permissions -->
+                                <div class="col-span-4">
+                                    <x-input-label :value="__('تعیین دسترسی ها:')"/>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                                        @foreach($permissions as $permission)
+                                            <div x-show="rolePermissions[selectedRole] && rolePermissions[selectedRole].includes('{{ $permission->name }}')">
+                                                <label class="flex items-center space-x-2 space-x-reverse">
+                                                    <input type="checkbox"
+                                                           name="permissions[]"
+                                                           value="{{ $permission->name }}"
+                                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                           x-model="selectedPermissions">
+                                                    <span class="text-sm">{{ $permission->name }}</span>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
-                        @endforeach
+
+                            {{-- Case 2: Admin editing their own account (role locked) --}}
+                        @elseif(auth()->id() === $userInfo->user->id && auth()->user()->hasRole(UserRole::ADMIN->value))
+                            <div>
+                                <x-input-label for="role" :value="__('نقش')"/>
+                                <x-text-input value="{{ auth()->user()->getTranslatedRole() }}"
+                                              class="block my-2 w-full bg-gray-100" disabled/>
+                                <input type="hidden" name="role" value="{{ optional($user->roles->first())->id }}">
+                            </div>
+                            <div class="col-span-4">
+                                <x-input-label :value="__('تعیین دسترسی ها:')"/>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                                    @foreach($permissions as $permission)
+                                        <label class="flex items-center space-x-2 space-x-reverse">
+                                            <input type="checkbox"
+                                                   name="permissions[]"
+                                                   value="{{ $permission->name }}"
+                                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                @checked(in_array($permission->name, old('permissions', $user->permissions->pluck('name')->toArray())))>
+                                            <span class="text-sm">{{ $permission->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- Case 3: Admin editing another user (role + permissions editable) --}}
+                        @else
+                            <div
+                                x-data='{
+                    selectedRole: @json(optional($user->roles->first())->id ?? ""),
+                    rolePermissions: @json($rolePermissionsMap ?? []),
+                    selectedPermissions: @json(old("permissions", $user->permissions->pluck("name")->toArray())),
+                    updateSelectedPermissions() {
+                        if (this.rolePermissions[this.selectedRole]) {
+                            this.selectedPermissions = this.selectedPermissions.filter(
+                                p => this.rolePermissions[this.selectedRole].includes(p)
+                            );
+                        } else {
+                            this.selectedPermissions = [];
+                        }
+                    }
+                }'
+                                x-init="updateSelectedPermissions()"
+                                x-cloak
+                                class="col-span-4 grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right"
+                            >
+                                <!-- Role Selector -->
+                                <div>
+                                    <x-input-label for="role" :value="__('نقش')"/>
+                                    <x-select-input name="role" x-model="selectedRole" @change="updateSelectedPermissions()">
+                                        <option value="">...</option>
+                                        @foreach($roles as $role)
+                                            <option value="{{ $role->id }}"
+                                                @selected(optional($user->roles->first())->id == $role->id)>
+                                                {{ $role->name }}
+                                            </option>
+                                        @endforeach
+                                    </x-select-input>
+                                    <x-input-error :messages="$errors->get('role')" class="my-2"/>
+                                </div>
+                                <!-- Permissions -->
+                                <div class="col-span-4">
+                                    <x-input-label :value="__('تعیین دسترسی ها:')"/>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                                        @foreach($permissions as $permission)
+                                            <div x-show="rolePermissions[selectedRole] && rolePermissions[selectedRole].includes('{{ $permission->name }}')">
+                                                <label class="flex items-center space-x-2 space-x-reverse">
+                                                    <input type="checkbox"
+                                                           name="permissions[]"
+                                                           value="{{ $permission->name }}"
+                                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                           x-model="selectedPermissions">
+                                                    <span class="text-sm">{{ $permission->name }}</span>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
+
 
                 <!-- Action Buttons -->
                 <div class="flex space-x-4 space-x-reverse">
@@ -210,10 +313,10 @@
                 </div>
             </div>
         </form>
-        <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans my-4">
+        <div class="p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans my-4">
             <div class="pb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('لیست سامانه‌های در دسترس:') }}</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-right text-gray-700">
+                <div class="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 text-right text-gray-700">
                     @forelse($relatedOrganizations as $org)
                         <div
                             class="flex items-center justify-between bg-white border border-gray-200 shadow-sm px-4 py-3 rounded-xl">
@@ -239,6 +342,5 @@
                 </div>
             </div>
         </div>
-
     @endcan
 </x-app-layout>

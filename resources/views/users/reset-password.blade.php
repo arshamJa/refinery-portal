@@ -1,7 +1,7 @@
 <x-app-layout>
 
     @can('admin-role')
-        <nav class="flex justify-between mb-4 mt-20">
+        <nav class="flex justify-between mb-4 mt-16">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
                     <a href="{{route('dashboard')}}"
@@ -22,7 +22,7 @@
                     <a href="{{route('users.index')}}"
                        class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
 
-                        <span> {{__('جدول کاربران')}}</span>
+                        <span> {{__('مدیریت کاربران')}}</span>
                     </a>
                     </span>
                 </li>
@@ -33,7 +33,7 @@
                 <li>
                 <span
                     class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-               <span>{{__('ویرایش رمز ورود کاربر')}}</span>
+               <span>{{__('ویرایش رمز ورود')}}</span>
             </span>
                 </li>
             </ol>
@@ -43,7 +43,7 @@
             @method('PUT')
             <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
                 <div class="pb-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6">{{ __('ویرایش رمز ورود کاربر') }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6">{{ __('ویرایش رمز ورود') }}</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
                         <div class="mb-4">
                             {{__('نام کاربر: ')}}{{ $user->user_info->full_name }}

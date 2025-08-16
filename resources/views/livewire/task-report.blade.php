@@ -66,19 +66,25 @@
                 <div class="pr-12 mt-2" wire:ignore>
                     <div class="w-48 h-48" id="pie-chart"></div>
                 </div>
-                <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <div class="text-sm text-gray-600 dark:text-gray-300">
                     @php
                         $statuses = [
-                            ['color' => 'bg-green-500', 'text' => ' text-green-500' , 'label' => 'اقدامات انجام شده در مهلت مقرر'],
-                            ['color' => 'bg-blue-500 ','text' => ' text-blue-500','label' => 'اقدامات انجام نشده در مهلت مقرر'],
-                            ['color' => 'bg-yellow-500', 'text' => ' text-yellow-500','label' => 'اقدامات انجام شده خارج مهلت مقرر'],
-                            ['color' => 'bg-red-600 ', 'text' => ' text-red-600' ,'label' => 'اقدامات انجام نشده خارج مهلت مقرر'],
+                            ['color' => 'bg-green-500', 'text' => 'text-green-500', 'label' => 'در مهلت مقرر اقدامات انجام شده'],
+                            ['color' => 'bg-yellow-500', 'text' => 'text-yellow-500', 'label' => 'در مهلت مقرر اقدامات انجام نشده'],
+                            ['color' => 'bg-blue-500', 'text' => 'text-blue-500', 'label' => 'خارج از مهلت مقرر اقدامات انجام شده'],
+                            ['color' => 'bg-red-600', 'text' => 'text-red-600', 'label' => 'خارج از مهلت مقرر اقدامات انجام نشده'],
                         ];
+
+                        $groups = array_chunk($statuses, 2);
                     @endphp
-                    @foreach ($statuses as $status)
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full {{ $status['color'] }}"></span>
-                            <span class="{{$status['text']}}">{{ $status['label'] }}</span>
+                    @foreach ($groups as $index => $group)
+                        <div class="{{ $index > 0 ? 'mt-6' : '' }} space-y-2">
+                            @foreach ($group as $status)
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full {{ $status['color'] }}"></span>
+                                    <span class="{{ $status['text'] }}">{{ $status['label'] }}</span>
+                                </div>
+                            @endforeach
                         </div>
                     @endforeach
                 </div>
@@ -235,17 +241,17 @@
                 };
 
                 const chartLabels = {
-                    1: "اقدامات انجام شده در مهلت مقرر",
-                    2: "اقدامات انجام شده خارج مهلت مقرر",
-                    3: "اقدامات انجام نشده در مهلت مقرر",
-                    4: "اقدامات انجام نشده خارج مهلت مقرر"
+                    1: " در مهلت مقرر اقدامات انجام شده",
+                    2: " در مهلت مقرر اقدامات انجام نشده",
+                    3: " خارج از مهلت مقرر اقدامات انجام شده",
+                    4: " خارج از مهلت مقرر اقدامات انجام نشده"
                 };
                 const getChartOptions = () => {
                     return {
                         series: [1, 2, 3, 4].map(key => taskPercentages[key] || 0),
                         labels: [1, 2, 3, 4].map(key => chartLabels[key]),
                         colors: [
-                            "#22c55e", "#facc15", "#3b82f6", "#dc2626"
+                            "#22c55e", "#3b82f6","#facc15", "#dc2626"
                         ],
                         chart: {
                             type: "pie",

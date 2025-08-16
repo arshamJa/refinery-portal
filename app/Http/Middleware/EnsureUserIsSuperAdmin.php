@@ -9,27 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserIsSuperAdmin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
-    public function handle($request, Closure $next , $permission, $role)
+    public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            abort(403, 'Unauthorized');
-        }
-
-        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+        $user = $request->user();
+        if ($user && $user->hasRole(UserRole::SUPER_ADMIN->value)) {
             return $next($request);
         }
-
-        if (!$user->hasPermissionTo($permission) || !$user->hasRole($role)) {
-            abort(403, 'Unauthorized');
-        }
-
-        return $next($request);
+        abort(403, 'Unauthorized');
     }
 }

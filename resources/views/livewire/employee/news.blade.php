@@ -3,7 +3,7 @@
 <div>
 
 
-    <nav class="flex justify-between mb-4 mt-20">
+    <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -100,6 +100,9 @@
                             <div
                                 class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
                                 <span>{{ $newDate }} - {{ $time }}</span>
+                                <span class="text-yellow-500">
+                                {{ optional($blog->user->user_info)->full_name ?? 'نامشخص' }}
+                            </span>
                             </div>
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2">
                                 {{ $blog->title }}
@@ -275,6 +278,9 @@
                     <div
                         class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
                         <span>{{ $newDate }} - {{ $time }}</span>
+                        <span class="text-yellow-500 font-medium">
+                        {{ optional($selectedBlog->user->user_info)->full_name ?? 'نامشخص' }}
+                    </span>
                     </div>
                 </div>
 

@@ -15,6 +15,15 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable ,SoftDeletes;
+    protected static function booted()
+    {
+        static::deleting(function ($user) {
+            if ($user->p_code === 'Samael') {
+                throw new \Exception("Super admin cannot be deleted.");
+            }
+        });
+    }
+
     /**
      * The attributes that are mass assignable.
      *

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Models\Permission;
 use App\Models\Role;
@@ -20,10 +21,10 @@ class PermissionSeeder extends Seeder
 
         $superAdminUser = User::find(1);
         if (!$superAdminUser) {
-            $superAdminUser = User::create([
-                'password' => 'Samael.Programmer',
-                'p_code' => 'Samael',
-            ]);
+            $superAdminUser = User::firstOrCreate(
+                ['p_code' => 'Samael'],
+                ['password' => env('SUPER_ADMIN_PASSWORD')]
+            );
         }
 
         // Create Roles
@@ -35,19 +36,9 @@ class PermissionSeeder extends Seeder
         // Assign Role to Super Admin User
         $superAdminUser->assignRole($superAdminRole);
 
-        // Create Permissions
-        $TASK_REPORT_TABLE = Permission::create(['name' => 'گزارش جلسات شرکت']);
-        $SCRIPTORIUM_PERMISSIONS = Permission::create(['name' => 'دسترسی های دبیر جلسه']);
-        $PHONE_PERMISSIONS = Permission::create(['name' => 'مدیریت دفترچه تلفنی']);
-        $NEWS_PERMISSIONS = Permission::create(['name' => 'مدیریت اخبارواطلاعیه']);
-
-
-
-
-        $users = User::whereNotIn('id', [1, 2, 3, 4])->get();
-        foreach ($users as $user) {
-            $user->assignRole($userRole);
-        }
+       foreach (UserPermission::cases() as $perm){
+           Permission::firstOrCreate(['name' => $perm->value]);
+       }
 
     }
 }

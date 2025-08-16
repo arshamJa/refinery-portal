@@ -1,5 +1,6 @@
+@php use App\Enums\UserRole; @endphp
 <x-app-layout>
-    <nav class="flex justify-between mb-4 mt-20">
+    <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -36,23 +37,26 @@
             </li>
         </ol>
     </nav>
+
     @can('admin-role')
-        <div class="max-w-5xl p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
+        <div class="p-6 bg-white shadow-lg rounded-2xl space-y-8 font-sans">
             <!-- Personal Info -->
             <div class="border-b pb-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-semibold text-gray-800">{{__('اطلاعات شخصی')}}</h2>
                     <div>
-                        <a href="{{ route('users.edit', $userInfo->id) }}" class="ml-2">
-                            <x-edit-button>
-                                {{__('ویرایش اطلاعات و دسترسی های کاربر')}}
-                            </x-edit-button>
-                        </a>
+                        @can('edit-user',$userInfo->user)
+                            <a href="{{ route('users.edit', $userInfo->id) }}" class="ml-2">
+                                <x-edit-button>
+                                    {{__('ویرایش اطلاعات و دسترسی های کاربر')}}
+                                </x-edit-button>
+                            </a>
                         <a href="{{ route('reset.password', $userInfo->user->id) }}">
                             <x-secondary-button>
                                 {{__('ویرایش رمز ورود کاربر')}}
                             </x-secondary-button>
                         </a>
+                        @endif
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-right text-gray-700">
@@ -64,39 +68,35 @@
                         @endif</div>
                     <div>
                         <span class="font-medium">{{__('نام و نام خانوادگی:')}}</span>
-                        {{ $userInfo->full_name }}
+                        {{ $userInfo->full_name ?? '' }}
                     </div>
                     <div>
                         <span class="font-medium">{{__('کد پرسنلی:')}}</span>
-                        {{ $userInfo->user->p_code }}
+                        {{ $userInfo->user->p_code ?? '' }}
                     </div>
                     <div>
                         <span class="font-medium">{{__('کد ملی:')}}</span>
-                        {{ $userInfo->n_code }}
+                        {{ $userInfo->n_code ?? '' }}
                     </div>
                     <div>
                         <span class="font-medium">{{__('شماره همراه:')}}</span>
-                        {{ $userInfo->phone }}
+                        {{ $userInfo->phone  ?? ''}}
                     </div>
                     <div>
                         <span class="font-medium">{{__('شماره منزل:')}}</span>
-                        {{ $userInfo->house_phone }}
+                        {{ $userInfo->house_phone ?? '' }}
                     </div>
                     <div>
                         <span class="font-medium">{{__('شماره محل کار:')}}</span>
-                        {{ $userInfo->work_phone }}
+                        {{ $userInfo->work_phone ?? '' }}
                     </div>
                     <div>
                         <span class="font-medium">{{__('سمت:')}}</span>
-                        {{ $userInfo->position }}
+                        {{ $userInfo->position ?? '' }}
                     </div>
                     <div>
                         <span class="font-medium">{{__('دپارتمان:')}}</span>
-                        @if($userInfo->department_id)
-                            {{ $userInfo->department->department_name }}
-                        @else
-                            {{ __('دپارتمان وجود ندارد') }}
-                        @endif
+                        {{ $userInfo->department?->department_name ?? 'دپارتمان وجود ندارد' }}
                     </div>
                 </div>
             </div>
@@ -135,6 +135,8 @@
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">{{__('امضای کاربر')}}</h2>
                 @if($userInfo->signature)
                     <img src="{{$userInfo->getImageUrl()}}" class="rounded-md w-24 h-24" alt="">
+                @else
+                    <li class="text-gray-700">{{ __('کاربر هیچ امضایی ندارد') }}</li>
                 @endif
             </div>
 

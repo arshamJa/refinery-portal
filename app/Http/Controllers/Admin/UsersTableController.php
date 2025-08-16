@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
@@ -14,6 +15,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
+use App\Rules\PasswordRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -24,9 +26,6 @@ use Maatwebsite\Excel\Facades\Excel;
 class UsersTableController extends Controller
 {
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         Gate::authorize('admin-role');
@@ -97,6 +96,7 @@ class UsersTableController extends Controller
             'filteredUsersCount' => $filteredUsersCount,
         ]);
     }
+
     public function export(Request $request)
     {
         Gate::authorize('admin-role');
@@ -104,46 +104,70 @@ class UsersTableController extends Controller
         return Excel::download(new UsersExport($searchTerm), 'users.xlsx');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         Gate::authorize('admin-role');
-        $user = auth()->user();
-        $roles = Role::select(['id', 'name'])
-            ->when(!$user->hasRole(UserRole::SUPER_ADMIN->value),
-                fn($q) => $q->where('name', '!=', UserRole::SUPER_ADMIN->value))
+        $roles = Role::where('name', '!=', UserRole::SUPER_ADMIN->value)
+            ->select(['id', 'name'])
             ->get();
         $permissions = Permission::select(['id', 'name'])->get();
         $departments = Department::select(['id','department_name'])->get();
         $organizations = Organization::select(['id','organization_name'])->get();
+
+        // Fetch all permissions once
+        $allPermissions = Permission::select(['id', 'name'])->get();
+        $rolePermissionsMap = $this->mapRolePermissions($roles, $allPermissions);
+
         return view('users.create', [
             'departments' => $departments,
             'organization' => $organizations,
             'roles' => $roles,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'rolePermissionsMap' => $rolePermissionsMap,
         ]);
     }
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(StoreNewUserRequest $request)
     {
         Gate::authorize('admin-role');
         $validatedData = $request->validated();
+
+        // Create the user
         $newUser = User::create([
             'password' => Hash::make($validatedData['password']),
             'p_code' => $validatedData['p_code'],
         ]);
 
-        $permissions = isset($validatedData['permissions'])
-            ? Permission::whereIn('name', array_keys($validatedData['permissions']))->pluck('id')->toArray()
-            : [];
+        // Fetch all permissions
+        $allPermissions = Permission::select(['id', 'name'])->get();
 
+        $roles = Role::where('name', '!=', UserRole::SUPER_ADMIN->value)
+            ->select(['id', 'name'])->get();
+
+        // Build role-permission mapping
+        $rolePermissionsMap = $this->mapRolePermissions($roles, $allPermissions);
+
+
+        // Filter submitted permissions to only allow valid ones for the selected role
+        $submittedPermissions = isset($validatedData['permissions'])
+            ? array_keys($validatedData['permissions'])
+            : [];
+        $allowedPermissionsForRole = $rolePermissionsMap[$validatedData['role']] ?? [];
+        $filteredPermissions = array_values(array_intersect($submittedPermissions, $allowedPermissionsForRole));
+
+        // Sync role and filtered permissions
         $newUser->roles()->sync([$validatedData['role']]);
-        $newUser->permissions()->sync($permissions);
-        $signature_path = $validatedData['signature']->store('signatures','public');
+        // Sync permissions if any
+        if (!empty($filteredPermissions)) {
+            $permissionIds = Permission::whereIn('name', $filteredPermissions)->pluck('id')->toArray();
+            $newUser->permissions()->sync($permissionIds); // Inserts user_id & permission_id in pivot
+        }
+
+        // Store user signature if provided
+        $signature_path = null;
+        if (isset($validatedData['signature'])) {
+            $signature_path = $validatedData['signature']->store('signatures', 'public');
+        }
 
         // Create UserInfo record
         UserInfo::create([
@@ -157,16 +181,15 @@ class UsersTableController extends Controller
             'position' => $validatedData['position'],
             'signature' => $signature_path
         ]);
+
+        // Attach organizations
         $organizationIds = explode(',', $validatedData['organization']);
         $organizationIds = array_filter(array_map('trim', $organizationIds), fn($id) => $id !== '');
         $newUser->organizations()->attach($organizationIds);
+
         return to_route('users.index')->with('status', 'کاربر جدید ساخته شد');
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         Gate::authorize('admin-role');
@@ -200,28 +223,35 @@ class UsersTableController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         Gate::authorize('admin-role');
-        $userInfo = UserInfo::with(['user:id,p_code', 'department:id,department_name'])
+        $userInfo = UserInfo::with(['user:id,p_code', 'department:id,department_name','user.roles'])
             ->findOrFail($id);
+
+        // Security check: admin can edit only own record or non-admins
+        Gate::authorize('edit-user', $userInfo->user);
 
         // Fetch departments and permissions
         $departments = Department::select(['id', 'department_name'])->get();
-        $permissions = Permission::select(['id', 'name'])->get();
 
         // Fetch the user with its related roles and permissions
         $user = User::with('roles:id,name', 'permissions:id,name')
             ->findOrFail($userInfo->user_id);
 
-        $roles = Role::select(['id', 'name'])
-            ->when(!$user->hasRole('super_admin'), fn($q) => $q->where('name', '!=', 'super_admin'))
-            ->get();
+        $roles = Role::where('name', '!=', UserRole::SUPER_ADMIN->value)
+            ->select(['id', 'name'])->get();
+
         $organizations = Organization::select(['id','organization_name'])->get();
         $relatedOrganizations = $user->organizations()->select('organizations.id', 'organization_name')->get();
+
+
+        // Fetch all permissions
+        $allPermissions = Permission::select(['id', 'name'])->get();
+
+        // Build role-permission mapping
+        $rolePermissionsMap = $this->mapRolePermissions($roles, $allPermissions);
+
         return view('users.edit', [
             'userInfo' => $userInfo,
             'organization' => $organizations,
@@ -229,35 +259,65 @@ class UsersTableController extends Controller
             'departments' => $departments,
             'user' => $user,
             'roles' => $roles,
-            'permissions' => $permissions,
+            'permissions' => $allPermissions,
+            'rolePermissionsMap' => $rolePermissionsMap
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateNewUserRequest $request, string $id)
     {
         Gate::authorize('admin-role');
 
         $validated = $request->validated();
 
-        $userInfo = UserInfo::findOrFail($id);
+        $userInfo = UserInfo::with(['user:id,p_code', 'department:id,department_name','user.roles'])
+            ->findOrFail($id);
 
         $user = User::findOrFail($userInfo->user_id);
+
+        // Admin-specific restriction: can delete only self or non-admins
+        Gate::authorize('edit-user', $user);
 
         // Update user basic info
         $user->update([
             'p_code' => $validated['p_code'],
         ]);
-        $role = Role::find($validated['role']);
-        // Sync role (only one role in your dropdown)
-        if ($request->filled('role')) {
-            $user->syncRoles([$role->id]);
-        }
 
-        // Sync permissions
-        $user->syncPermissions(is_array($request->permissions) ? $request->permissions : []);
+
+        $roles = Role::where('name', '!=', UserRole::SUPER_ADMIN->value)
+            ->select(['id', 'name'])->get();
+
+        // Fetch all permissions
+        $allPermissions = Permission::select(['id', 'name'])->get();
+
+        // Build role-permission mapping
+        $rolePermissionsMap = $this->mapRolePermissions($roles, $allPermissions);
+
+
+        // Permissions submitted
+        $submittedPermissions = $validated['permissions'] ?? [];
+
+        // CASE 1: Auth user editing themselves and is Admin → role is fixed, only permissions update
+        if (auth()->id() === $user->id && auth()->user()->hasRole(UserRole::ADMIN->value)) {
+            // Keep current role
+            $currentRoleId = $user->roles()->first()?->id;
+            $allowedPermissionsForRole = $rolePermissionsMap[$currentRoleId] ?? [];
+            $filteredPermissions = array_values(array_intersect($submittedPermissions, $allowedPermissionsForRole));
+            // Sync only permissions
+            $permissionIds = Permission::whereIn('name', $filteredPermissions)->pluck('id')->toArray();
+            $user->permissions()->sync($permissionIds);
+
+        } else {
+            // CASE 2: Admin editing another user → allow role + permissions change
+            $role = Role::find($validated['role']);
+            if ($request->filled('role') && $role) {
+                $user->syncRoles([$role->id]);
+            }
+            $allowedPermissionsForRole = $rolePermissionsMap[$validated['role']] ?? [];
+            $filteredPermissions = array_values(array_intersect($submittedPermissions, $allowedPermissionsForRole));
+            $permissionIds = Permission::whereIn('name', $filteredPermissions)->pluck('id')->toArray();
+            $user->permissions()->sync($permissionIds);
+        }
 
         // Update user info
         $userInfo->update([
@@ -276,13 +336,13 @@ class UsersTableController extends Controller
             $department = Department::find($request->departmentId);
             if ($department) {
                 $organizations = Organization::where('department_id', $department->id)->get();
-
                 foreach ($organizations as $organization) {
                     $organization->users()->syncWithoutDetaching([$user->id]);
                 }
             }
         }
 
+        // Update operator phone record if exists
         $operatorPhone = OperatorPhones::where('full_name', $validated['full_name'])
             ->where('position', $validated['position'])
             ->first();
@@ -295,16 +355,18 @@ class UsersTableController extends Controller
         return redirect()->route('users.index')->with('status', 'کاربر با موفقیت بروزرسانی شد.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         Gate::authorize('has-permission-and-role',UserRole::SUPER_ADMIN->value);
         $user = User::with('user_info')->findOrFail($id);
+        // Prevent deletion of super admin
         if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
             abort(403, 'Cannot delete super admin.');
         }
+
+        // Admin-specific restriction: can delete only self or non-admins
+        Gate::authorize('edit-user', $user);
+
         // Delete related info first
         if ($user->user_info) {
             $user->user_info->delete();
@@ -317,20 +379,30 @@ class UsersTableController extends Controller
     {
         Gate::authorize('admin-role');
         $user = User::with('user_info:id,user_id,full_name')->findOrFail($id);
+        // Admin-specific restriction: can edit only self or non-admins
+        Gate::authorize('edit-user', $user);
         return view('users.reset-password',['user'=>$user]);
     }
 
-    public function resetPassword(Request $request,string $id)
+    public function resetPassword(Request $request, string $id)
     {
         Gate::authorize('admin-role');
-        $validated = $request->validate([
-            'password' => ['required', 'confirmed',
-                \Illuminate\Validation\Rules\Password::min(6)->max(8)->letters()->numbers()],
-        ]);
+        // Fetch the user
         $user = User::findOrFail($id);
-        $user->password = $validated['password']; // auto-hashed via cast
+        $roleName = $user->roles()->first()?->name;
+        // Default password rules
+        $rules = [
+            'password' => ['required', 'confirmed',
+                \Illuminate\Validation\Rules\Password::min(6)->max(10)->letters()->numbers()],
+        ];
+        if ($roleName === UserRole::ADMIN->value) {
+            $rules['password'] = ['required', 'confirmed', 'string', 'min:6', 'max:30', new PasswordRule()];
+        }
+        // Validate request
+        $validated = $request->validate($rules);
+        // Update password (auto-hashed via cast)
+        $user->password = $validated['password'];
         $user->save();
-
         return redirect()->back()->with('status', 'رمز ورود با موفقیت آپدیت شد');
     }
 
@@ -341,8 +413,61 @@ class UsersTableController extends Controller
             ->where('user_id', $userId)
             ->where('organization_id', $organizationId)
             ->delete();
-
         return redirect()->back()->with('status', 'سازمان با موفقیت از کاربر حذف شد.');
+    }
+
+
+    /**
+     * Get allowed permissions for each role
+     *
+     * @param \Illuminate\Support\Collection $roles
+     * @param \Illuminate\Support\Collection $allPermissions
+     * @return array
+     */
+    function mapRolePermissions($roles, $allPermissions): array
+    {
+        // Define permissions for each role
+        $permissionsByRole = [
+            UserRole::USER->value => [
+                UserPermission::VIEW_BLOG->value,
+                UserPermission::VIEW_ORGANIZATIONS->value,
+                UserPermission::VIEW_MEETING_DASHBOARD->value,
+                UserPermission::VIEW_PHONE_LISTS->value,
+            ],
+            UserRole::OPERATOR->value => [
+                UserPermission::PHONE_PERMISSIONS->value,
+                UserPermission::NEWS_PERMISSIONS->value,
+                UserPermission::SCRIPTORIUM_PERMISSIONS->value,
+                UserPermission::VIEW_ORGANIZATIONS->value,
+                UserPermission::VIEW_MEETING_DASHBOARD->value,
+            ],
+            UserRole::ADMIN->value => [
+                UserPermission::TASK_REPORT_TABLE->value,
+                UserPermission::PHONE_PERMISSIONS->value,
+                UserPermission::NEWS_PERMISSIONS->value,
+                UserPermission::SCRIPTORIUM_PERMISSIONS->value,
+                UserPermission::VIEW_MEETING_DASHBOARD->value,
+            ],
+            UserRole::SUPER_ADMIN->value => 'all', // special case
+        ];
+
+        $rolePermissionsMap = [];
+
+        foreach ($roles as $role) {
+            if (isset($permissionsByRole[$role->name])) {
+                if ($permissionsByRole[$role->name] === 'all') {
+                    $allowed = $allPermissions;
+                } else {
+                    $allowed = $allPermissions->whereIn('name', $permissionsByRole[$role->name]);
+                }
+            } else {
+                $allowed = collect();
+            }
+
+            $rolePermissionsMap[$role->id] = $allowed->pluck('name')->toArray();
+        }
+
+        return $rolePermissionsMap;
     }
 
 

@@ -61,7 +61,7 @@
         </div>
     </div>
     <!-- Main Content -->
-    <main class="flex-1 px-4 mt-4">
+    <main class="px-4 mt-4 flex-1 overflow-auto">
         <x-sessionMessage name="status"/>
         {{ $slot }}
     </main>

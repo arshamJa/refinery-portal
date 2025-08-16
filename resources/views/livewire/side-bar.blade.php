@@ -1,5 +1,5 @@
 @php use App\Enums\UserRole; @endphp
-@php use App\Enums\UserPermission; @endphp
+@php use App\Enums\UserPermission;use App\Models\User; @endphp
 {{--<div class="h-full flex flex-col">--}}
 {{--    <!-- Profile Image and Name -->--}}
 {{--    <div--}}
@@ -304,7 +304,7 @@
              style="transition-property: opacity, max-width, margin-left;">
             <p>{{auth()->user()->full_name()}}</p>
             <p> {{__('نقش:')}} {{ auth()->user()->getTranslatedRole() }}</p>
-            <p>{{__('واحد:')}} {{auth()->user()->user_info->department->department_name}}</p>
+            <p>{{__('واحد:')}} {{auth()->user()->user_info->department->department_name ?? ''}}</p>
         </div>
     </div>
 
@@ -312,6 +312,7 @@
     <!-- Normal Icon -->
     <div class="flex items-center gap-x-2 whitespace-nowrap">
         <ul class="w-full mt-2 relative">
+            <!-- Dashboard -->
             <li class="mb-2">
                 <x-link.responsive-link wire:navigate href="{{route('dashboard')}}"
                                         :active="request()->is('dashboard')" class="flex items-center gap-x-2">
@@ -319,6 +320,8 @@
                     <span x-show="expanded">{{__('داشبورد')}}</span>
                 </x-link.responsive-link>
             </li>
+
+            <!-- Profile -->
             <li class="mb-2">
                 <x-link.responsive-link href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
                                         :active="request()->is('profile')" class="flex items-center gap-x-2">
@@ -326,33 +329,51 @@
                     <span x-show="expanded"> {{__('پروفایل')}}</span>
                 </x-link.responsive-link>
             </li>
-            <li class="mb-2">
-                @if(!auth()->user()->hasRole(UserRole::ADMIN->value))
-                    <x-link.responsive-link href="{{route('employee.organization')}}"
-                                            :active="request()->is('employee/organization')"
-                                            class="flex items-center gap-x-2">
-                        <span> <x-icon.organization-icon/></span>
-                        <span x-show="expanded"> {{__('سامانه ها')}}</span>
+
+            <!-- Organizations -->
+            @can('has-permission' , UserPermission::VIEW_ORGANIZATIONS)
+                <li class="mb-2">
+                    @if(!auth()->user()->hasRole(UserRole::ADMIN->value))
+                        <x-link.responsive-link href="{{route('employee.organization')}}"
+                                                :active="request()->is('employee/organization')"
+                                                class="flex items-center gap-x-2">
+                            <span> <x-icon.organization-icon/></span>
+                            <span x-show="expanded"> {{__('سامانه ها')}}</span>
+                        </x-link.responsive-link>
+                    @endif
+                </li>
+            @endcan
+
+            <!-- Phone list -->
+            @can('has-permission', UserPermission::PHONE_PERMISSIONS)
+                <li class="mb-2">
+                    <x-link.responsive-link href="{{ route('phone-list.index') }}"
+                                            :active="request()->is('phone/list')" class="flex items-center gap-x-2">
+                        <span><x-icon.phone-icon/></span>
+                        <span x-show="expanded">{{ __('مدیریت دفترچه تلفنی') }}</span>
                     </x-link.responsive-link>
-                @endif
-            </li>
-            <li class="mb-2">
-                <x-link.responsive-link href="{{ route('phone-list.index') }}"
-                                        :active="request()->is('phone/list')" class="flex items-center gap-x-2">
-                    <span><x-icon.phone-icon/></span>
-                    <span
-                        x-show="expanded">{{ auth()->user()->hasRole(UserRole::USER->value) ? __('دفترچه تلفنی') : __('مدیریت دفترچه تلفنی') }}</span>
-                </x-link.responsive-link>
-            </li>
-            <!-- Meeting Dropdown -->
-            <li class="mb-2 cursor-pointer relative" x-data="{ dropdownOpen: false }"
-                @click.away="dropdownOpen = false">
-                <div @click="dropdownOpen = !dropdownOpen"
-                     class="flex items-center gap-x-2 text-sm rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white">
-                    <span><x-icon.meeting-icon fill="white"/></span>
-                    <span x-show="expanded" class="flex items-center justify-between w-full gap-x-2">
+                </li>
+            @elsecan('has-permission', UserPermission::VIEW_PHONE_LISTS)
+                <li class="mb-2">
+                    <x-link.responsive-link href="{{ route('phone-list.index') }}"
+                                            :active="request()->is('phone/list')" class="flex items-center gap-x-2">
+                        <span><x-icon.phone-icon/></span>
+                        <span x-show="expanded">{{ __('دفترچه تلفنی')}}</span>
+                    </x-link.responsive-link>
+                </li>
+            @endcan
+
+            <!-- Meeting -->
+            @can('has-permission', UserPermission::VIEW_MEETING_DASHBOARD)
+                <!-- Meeting Dropdown -->
+                <li class="mb-2 cursor-pointer relative" x-data="{ dropdownOpen: false }"
+                    @click.away="dropdownOpen = false">
+                    <div @click="dropdownOpen = !dropdownOpen"
+                         class="flex items-center gap-x-2 text-sm rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <span><x-icon.meeting-icon fill="white"/></span>
+                        <span x-show="expanded" class="flex items-center justify-between w-full gap-x-2">
                        <span> {{__('داشبورد جلسات')}}</span>
-                        <!-- Rotating Arrow SVG -->
+                            <!-- Rotating Arrow SVG -->
                             <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': dropdownOpen}"
                                  class="h-4 w-4 transition-transform"
                                  viewBox="0 0 20 20" fill="currentColor">
@@ -361,44 +382,51 @@
                                       clip-rule="evenodd"/>
                             </svg>
                         </span>
-                </div>
-                <!-- Dropdown when sidebar is expanded -->
-                <div x-show="dropdownOpen && expanded" x-transition class="mt-1 space-y-1 pr-3">
-                    <x-link.responsive-link href="{{route('meeting.create')}}"
-                                            :active="request()->is('create/new/meeting')"
-                                            class="flex items-center gap-x-2 text-xs">
-                        {{__('ایجاد جلسه جدید')}}
-                    </x-link.responsive-link>
-                    <x-link.responsive-link wire:navigate href="{{route('my.task.table')}}"
-                                            :active="request()->is('my/task/table')"
-                                            class="flex items-center gap-x-2 text-xs">
-                        {{__('اقدامات من')}}
-                    </x-link.responsive-link>
-                    <x-link.responsive-link wire:navigate href="{{route('dashboard.meeting')}}"
-                                            :active="request()->is('meeting/dashboard')"
-                                            class="flex items-center gap-x-2 text-xs">
-                        {{__('جدول جلسات')}}
-                    </x-link.responsive-link>
-                </div>
-                <!-- Dropdown when sidebar is collapsed -->
-                <div x-show="dropdownOpen && !expanded" x-transition
-                     class="absolute right-full top-0 mt-0 mr-2 bg-white rounded-lg shadow-lg w-40 z-[9999]"
-                     style="min-width: 10rem;">
-                    <div class="rounded-lg ring-1 ring-black ring-opacity-10 py-1 bg-white dark:bg-gray-800 shadow-xl">
-                        <x-dropdown-link href="{{route('meeting.create')}}">
-                            {{__('ایجاد جلسه جدید')}}
-                        </x-dropdown-link>
-                        <x-dropdown-link wire:navigate href="{{route('my.task.table')}}">
-                            {{__('اقدامات من')}}
-                        </x-dropdown-link>
-                        <x-dropdown-link wire:navigate href="{{route('dashboard.meeting')}}">
-                            {{__('جدول جلسات')}}
-                        </x-dropdown-link>
                     </div>
-                </div>
-            </li>
+                    <!-- Dropdown when sidebar is expanded -->
+                    <div x-show="dropdownOpen && expanded" x-transition class="mt-1 space-y-1 pr-3">
+                        @can('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS)
+                            <x-link.responsive-link href="{{route('meeting.create')}}"
+                                                    :active="request()->is('create/new/meeting')"
+                                                    class="flex items-center gap-x-2 text-xs">
+                                {{__('ایجاد جلسه جدید')}}
+                            </x-link.responsive-link>
+                        @endcan
+                        <x-link.responsive-link wire:navigate href="{{route('my.task.table')}}"
+                                                :active="request()->is('my/task/table')"
+                                                class="flex items-center gap-x-2 text-xs">
+                            {{__('اقدامات من')}}
+                        </x-link.responsive-link>
+                        <x-link.responsive-link href="{{route('dashboard.meeting')}}"
+                                                :active="request()->is('meeting/dashboard')"
+                                                class="flex items-center gap-x-2 text-xs">
+                            {{__('جدول جلسات')}}
+                        </x-link.responsive-link>
+                    </div>
+                    <!-- Dropdown when sidebar is collapsed -->
+                    <div x-show="dropdownOpen && !expanded" x-transition
+                         class="absolute right-full top-0 mt-0 mr-2 bg-white rounded-lg shadow-lg w-40 z-[9999]"
+                         style="min-width: 10rem;">
+                        <div
+                            class="rounded-lg ring-1 ring-black ring-opacity-10 py-1 bg-white dark:bg-gray-800 shadow-xl">
+                            @can('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS)
+                                <x-dropdown-link href="{{route('meeting.create')}}">
+                                    {{__('ایجاد جلسه جدید')}}
+                                </x-dropdown-link>
+                            @endcan
+                            <x-dropdown-link wire:navigate href="{{route('my.task.table')}}">
+                                {{__('اقدامات من')}}
+                            </x-dropdown-link>
+                            <x-dropdown-link href="{{route('dashboard.meeting')}}">
+                                {{__('جدول جلسات')}}
+                            </x-dropdown-link>
+                        </div>
+                    </div>
+                </li>
+            @endcan
+
             <!-- Message Dropdown -->
-            <li class="mb-2 relative cursor-pointer" x-data="{ messageDropdown: false }"
+            <li class="mb-2 relative cursor-pointer" wire:poll.visible.60s x-data="{ messageDropdown: false }"
                 @click.away="messageDropdown = false">
                 <div @click="messageDropdown = !messageDropdown"
                      class="flex items-center w-full justify-between gap-x-2 text-sm rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white">
@@ -419,7 +447,6 @@
                               clip-rule="evenodd"/>
                     </svg>
                 </div>
-
                 <!-- Dropdown when sidebar is expanded -->
                 <div x-show="messageDropdown && expanded" x-transition class="mt-1 space-y-1 pr-3">
                     <x-link.responsive-link wire:navigate href="{{route('received.message')}}"
@@ -440,7 +467,6 @@
                         {{__('پیام های ارسالی')}}
                     </x-link.responsive-link>
                 </div>
-
                 <!-- Dropdown when sidebar is collapsed -->
                 <div x-show="messageDropdown && !expanded" x-transition
                      class="absolute right-full top-0 mt-0 mr-2 bg-white rounded-lg shadow-lg w-40 z-50"
@@ -461,17 +487,20 @@
                     </div>
                 </div>
             </li>
-            <!-- Blog Dropdown -->
-            <li class="mb-2 relative cursor-pointer" x-data="{ blogDropdown: false }"
-                @click.away="blogDropdown = false">
-                @if(auth()->user()->hasRole(UserRole::USER->value) ||
-                    !auth()->user()->hasPermissionTo(UserPermission::NEWS_PERMISSIONS->value))
-                    <x-link.responsive-link href="{{route('blogs.index')}}" :active="request()->is('blogs')"
+
+            <!-- Blog -->
+            @can('has-permission', UserPermission::VIEW_BLOG)
+                <li class="mb-2">
+                    <x-link.responsive-link href="{{ route('blogs.index') }}" :active="request()->is('blogs')"
                                             class="flex items-center gap-x-2 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition ease-in-out duration-300">
                         <x-icon.blog-icon/>
                         <span x-show="expanded">{{ __('صفحه اخبار و اطلاعیه') }}</span>
                     </x-link.responsive-link>
-                @else
+                </li>
+            @elsecan('has-permission',UserPermission::NEWS_PERMISSIONS)
+                <!-- Render same dropdown for users with NEWS_PERMISSIONS -->
+                <li class="mb-2 relative cursor-pointer" x-data="{ blogDropdown: false }"
+                    @click.away="blogDropdown = false">
                     <div>
                         <div @click="blogDropdown = !blogDropdown"
                              class="flex items-center gap-x-2 text-sm rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer select-none">
@@ -490,12 +519,12 @@
 
                         <!-- Dropdown when sidebar is expanded -->
                         <div x-show="blogDropdown && expanded" x-transition class="mt-1 space-y-1 pr-3">
-                            <x-link.responsive-link href="{{route('blogs.create')}}"
+                            <x-link.responsive-link href="{{ route('blogs.create') }}"
                                                     :active="request()->is('blogs/create')"
                                                     class="flex items-center gap-x-2 text-xs">
                                 {{ __('درج خبر و اطلاعیه') }}
                             </x-link.responsive-link>
-                            <x-link.responsive-link href="{{route('blogs.index')}}"
+                            <x-link.responsive-link href="{{ route('blogs.index') }}"
                                                     :active="request()->is('blogs')"
                                                     class="flex items-center gap-x-2 text-xs">
                                 {{ __('صفحه اخبار و اطلاعیه') }}
@@ -508,35 +537,39 @@
                              style="min-width: 10rem;">
                             <div
                                 class="rounded-lg ring-1 ring-black ring-opacity-10 py-1 bg-white dark:bg-gray-800 shadow-xl">
-                                <x-dropdown-link href="{{route('blogs.create')}}">
+                                <x-dropdown-link href="{{ route('blogs.create') }}">
                                     {{ __('درج خبر و اطلاعیه') }}
                                 </x-dropdown-link>
-                                <x-dropdown-link href="{{route('blogs.index')}}">
+                                <x-dropdown-link href="{{ route('blogs.index') }}">
                                     {{ __('صفحه اخبار و اطلاعیه') }}
                                 </x-dropdown-link>
                             </div>
                         </div>
                     </div>
-                @endif
-            </li>
-            {{-- Company Report Dropdown --}}
-            @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE, UserRole::ADMIN])
+                </li>
+            @endcan
+
+
+
+
+            <!-- Refinery report -->
+            @can('has-permission',UserPermission::TASK_REPORT_TABLE)
                 <li class="mb-2 cursor-pointer relative" x-data="{ reportDropdown: false }"
                     @click.away="reportDropdown = false">
                     <div @click="reportDropdown = !reportDropdown"
                          class="flex items-center gap-x-2 text-sm rounded-md px-3 py-2 font-medium transition ease-in-out duration-300 text-gray-300 hover:bg-gray-700 hover:text-white">
                         <span><x-icon.report-icon fill="white"/></span>
                         <span x-show="expanded" class="flex items-center justify-between w-full gap-x-2">
-                <span>{{ __('گزارش شرکت') }}</span>
-                            <!-- Rotating Arrow -->
-                <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': reportDropdown}"
-                     class="h-4 w-4 transition-transform"
-                     viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                          d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"
-                          clip-rule="evenodd"/>
-                </svg>
-            </span>
+                            <span>{{ __('گزارش جلسات و اقدامات') }}</span>
+                                        <!-- Rotating Arrow -->
+                            <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': reportDropdown}"
+                                 class="h-4 w-4 transition-transform"
+                                 viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </span>
                     </div>
                     <!-- Dropdown when sidebar is expanded -->
                     <div x-show="reportDropdown && expanded" x-transition class="mt-1 space-y-1 pr-3">
@@ -567,8 +600,9 @@
                     </div>
                 </li>
             @endcan
-            <!-- Setting Dropdown -->
-            @can('admin-role')
+
+            <!-- Setting -->
+            @can('has-role', UserRole::ADMIN)
                 <li class="mb-2 relative cursor-pointer" x-data="{ settingDropdown: false }"
                     @click.away="settingDropdown = false">
                     <div @click="settingDropdown = !settingDropdown"

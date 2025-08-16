@@ -10,7 +10,6 @@ use Maatwebsite\Excel\Concerns\ToModel;
 class OrganizationImport implements ToCollection, ToModel
 {
     private $current = 0;
-
     /**
     * @param Collection $collection
     */

@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-
-use App\Models\UserInfo;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,6 +16,5 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
         ]);
         \App\Models\Blog::factory(10)->create();
-        UserInfo::factory(20)->create();
     }
 }

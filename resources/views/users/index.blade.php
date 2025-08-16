@@ -1,6 +1,6 @@
 @php use App\Enums\UserRole;use App\Models\UserInfo; @endphp
 <x-app-layout>
-    <nav class="flex justify-between mb-4 mt-20">
+    <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -143,12 +143,14 @@
                                         <x-dropdown-link href="{{ route('users.show', $userInfo->id) }}">
                                             {{ __('نمایش اطلاعات') }}
                                         </x-dropdown-link>
-                                        <x-dropdown-link href="{{ route('users.edit', $userInfo->id) }}">
-                                            {{ __('ویرایش اطلاعات') }}
-                                        </x-dropdown-link>
-                                        <x-dropdown-link href="{{route('reset.password',$userInfo->user->id)}}">
-                                            {{ __('ویرایش رمز ورود') }}
-                                        </x-dropdown-link>
+                                        @can('edit-user',$userInfo->user)
+                                            <x-dropdown-link href="{{ route('users.edit', $userInfo->id) }}">
+                                                {{ __('ویرایش اطلاعات') }}
+                                            </x-dropdown-link>
+                                            <x-dropdown-link href="{{route('reset.password',$userInfo->user->id)}}">
+                                                {{ __('ویرایش رمز ورود') }}
+                                            </x-dropdown-link>
+                                        @endcan
                                         @can('has-permission-and-role',UserRole::SUPER_ADMIN->value)
                                             <form action="{{route('users.destroy',$userInfo->user->id)}}">
                                                 @csrf
@@ -176,5 +178,6 @@
         <div class="mt-2 mb-10">
             {{ $userInfos->withQueryString()->links(data: ['scrollTo' => false]) }}
         </div>
+
     @endcan
 </x-app-layout>

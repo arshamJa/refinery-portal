@@ -160,7 +160,7 @@
     </form>
 
 
-    <div class="relative overflow-x-auto shadow-md rounded-t-md mb-12 mt-4" wire:poll.visible.60s>
+    <div class="relative overflow-x-auto shadow-md rounded-t-md mb-12 mt-4">
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">

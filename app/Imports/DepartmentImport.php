@@ -8,8 +8,9 @@ use App\Models\Organization;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class DepartmentImport implements ToCollection, ToModel
+class DepartmentImport implements ToModel,WithHeadingRow
 {
     private $current = 0;
 

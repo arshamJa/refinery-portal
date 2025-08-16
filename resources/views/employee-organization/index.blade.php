@@ -26,10 +26,7 @@
     </nav>
 
     <div class="mx-auto px-4 py-8 space-y-8" dir="rtl">
-
-        <!-- 🔍 Search Form -->
-        <form method="GET" action="{{ route('employee.organization') }}"
-             >
+        <form method="GET" action="{{ route('employee.organization') }}">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
 
                 <!-- Search Field -->
