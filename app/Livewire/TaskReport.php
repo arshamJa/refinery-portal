@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Enums\TaskStatus;
+use App\Exports\TaskUserExport;
 use App\Models\Meeting;
 use App\Models\TaskUser;
 use Illuminate\Support\Carbon;
@@ -11,6 +12,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaskReport extends Component
 {
@@ -135,7 +137,6 @@ class TaskReport extends Component
         return $query->orderBy('created_at');
     }
 
-
     #[Computed]
     public function percentages()
     {
@@ -152,6 +153,20 @@ class TaskReport extends Component
             return $total ? round(($count / $total) * 100, 1) : 0;
         }, $counts);
     }
+
+    public function exportTasksExcel()
+    {
+        return Excel::download(
+            new TaskUserExport(
+                $this->start_date,
+                $this->end_date,
+                $this->search,
+                $this->statusFilter
+            ),
+            'tasks.xlsx'
+        );
+    }
+
 
 
     #[Computed]

@@ -24,7 +24,7 @@ class CreateNewMeetingController extends Controller
      */
     public function create()
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
         $unreadReceivedCount = Notification::where('recipient_id', auth()->id())
             ->whereNull('recipient_read_at')
             ->count();
@@ -67,7 +67,7 @@ class CreateNewMeetingController extends Controller
      */
     public function store(MeetingStoreRequest $request)
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
         $validated = $request->validated();
         return DB::transaction(function () use ($validated, $request) {
             // Parse comma-separated inner guest IDs
@@ -219,7 +219,7 @@ class CreateNewMeetingController extends Controller
      */
     public function edit(string $id)
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
         // Load meeting with meetingUsers and nested relations
         $meeting = Meeting::with([
             'meetingUsers.user.user_info.department',
@@ -284,7 +284,7 @@ class CreateNewMeetingController extends Controller
      */
     public function update(MeetingUpdateRequest $request, string $id)
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
         $validated = $request->validated();
 
         $validated['time'] = str_contains($validated['time'], ':')
@@ -460,8 +460,7 @@ class CreateNewMeetingController extends Controller
 
     public function deleteUser(Request $request, $meetingId, $userId)
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
-
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
 
         // Delete the meeting user record
         MeetingUser::where('user_id', $userId)
@@ -478,7 +477,7 @@ class CreateNewMeetingController extends Controller
     }
     public function deleteGuest(Request $request, $guestId)
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
 
         // Get meeting_id and guest_id from the request
         $meetingId = $request->meeting_id;
@@ -511,7 +510,7 @@ class CreateNewMeetingController extends Controller
     }
     public function deleteOuterGuest($meetingId, $guestIndex)
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
         $meeting = Meeting::findOrFail($meetingId);
 
         if (is_array($meeting->guest) && isset($meeting->guest[$guestIndex])) {
@@ -530,7 +529,7 @@ class CreateNewMeetingController extends Controller
      */
     public function destroy(string $id)
     {
-        Gate::authorize('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN]);
+        Gate::authorize('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS);
         $meeting = Meeting::with('meetingUsers')->findOrFail($id);
         try {
             DB::transaction(function () use ($meeting) {

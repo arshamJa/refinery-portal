@@ -46,7 +46,6 @@
 
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-            <!-- Form on the left or right -->
             <div
                 class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-6 col-span-1">
                 <form action="{{route('departments.organizations.store')}}" method="post" enctype="multipart/form-data">

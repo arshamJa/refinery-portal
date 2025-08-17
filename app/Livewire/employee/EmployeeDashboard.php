@@ -40,7 +40,6 @@ class EmployeeDashboard extends Component
             ->orderBy('time', 'asc')
             ->get();
     }
-
     #[Computed]
     public function unreadReceivedCount()
     {
@@ -48,39 +47,28 @@ class EmployeeDashboard extends Component
             ->whereNull('recipient_read_at')
             ->count();
     }
-    #[Computed]
-    public function unreadSentCount()
-    {
-        return Notification::where('sender_id', auth()->id())
-            ->whereNull('sender_read_at')
-            ->count();
-    }
-
     public function render()
     {
         return view('livewire.employee.employee-dashboard');
     }
-
-
-    #[Computed]
-    public function meetings(){
-        return Meeting::where('scriptorium', '=' ,auth()->user()->user_info->full_name)
-            ->where('is_cancelled', '=','-1')
-            ->count();
-    }
-
-    #[Computed]
-    public function meetingsSchedule()
-    {
-        return Meeting::with('meetingUsers')
-            ->where('is_cancelled','=','-1')
-            ->whereRelation('meetingUsers','user_id','=',auth()->user()->id)
-            ->get(['title','location','date','time']);
-    }
-    #[Computed]
-    public function invitation()
-    {
-        return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
-    }
+//    #[Computed]
+//    public function meetings(){
+//        return Meeting::where('scriptorium', '=' ,auth()->user()->user_info->full_name)
+//            ->where('is_cancelled', '=','-1')
+//            ->count();
+//    }
+//    #[Computed]
+//    public function meetingsSchedule()
+//    {
+//        return Meeting::with('meetingUsers')
+//            ->where('is_cancelled','=','-1')
+//            ->whereRelation('meetingUsers','user_id','=',auth()->user()->id)
+//            ->get(['title','location','date','time']);
+//    }
+//    #[Computed]
+//    public function invitation()
+//    {
+//        return MeetingUser::where('user_id',auth()->user()->id)->where('is_present',0)->count();
+//    }
 
 }

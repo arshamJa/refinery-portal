@@ -9,12 +9,8 @@ Route::middleware(['auth', 'sanitizeInputs'])->group(function () {
     Route::get('blogs', News::class)
         ->name('blogs.index');
 
-
     Route::get('blogs/create', [BlogController::class, 'create'])
         ->name('blogs.create');
-
-    Route::post('upload-image', [App\Http\Controllers\BlogController::class, 'uploadImage'])
-        ->name('upload.image');
 
     Route::post('blogs', [BlogController::class, 'store'])
         ->name('blogs.store');

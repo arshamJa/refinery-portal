@@ -120,8 +120,6 @@ class MeetingReport extends Component
         return $percentages;
     }
 
-
-
     public function render()
     {
         return view('livewire.meeting-report');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserPermission;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Organization;
@@ -9,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 
 
 class AddOrganizationController extends Controller
@@ -73,8 +75,16 @@ class AddOrganizationController extends Controller
 
     public function deleteDepartment(string $id)
     {
+        Gate::authorize('has-permission',UserPermission::DEPARTMENT_TABLE);
         $department = Department::findOrFail($id);
         $department->delete();
+
+        // Set department_id to null in related tables
+        DB::table('organizations')
+            ->where('department_id', $id)->update(['department_id' => null]);
+        DB::table('user_infos')
+            ->where('department_id', $id)->update(['department_id' => null]);
+
         return redirect()->route('departments.index')
             ->with('success', 'دپارتمان با موفقیت حذف شد.');
     }

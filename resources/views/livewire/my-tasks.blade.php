@@ -1,4 +1,4 @@
-@php use App\Enums\UserPermission;use App\Enums\UserRole;@endphp
+@php use App\Enums\UserPermission;@endphp
 <div>
 
     <x-breadcrumb>
@@ -36,7 +36,7 @@
     </x-breadcrumb>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
+        @can('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS)
             <a href="{{ route('meeting.create') }}"
                class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"

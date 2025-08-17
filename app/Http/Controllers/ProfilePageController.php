@@ -22,22 +22,12 @@ class ProfilePageController extends Controller
     public function index()
     {
         Gate::authorize('profile-page');
-        $department_id = \auth()->user()->user_info->department_id;
-        $userinfo = UserInfo::where('user_id',\auth()->user()->id)->value('department_id');
-        if ($userinfo){
-            $department = Department::find($department_id)->value('department_name');
-        }else{
-            $department = 'دپارتمان وجود ندارد';
-        }
-
         $users = User::with([
             'user_info:id,department_id,user_id,full_name,work_phone,house_phone,phone,n_code,position',
             'permissions'
-        ])->find(auth()->user()->id);
-
+        ])->find(auth()->id());
         return view('profile-page.index' , [
             'users' => $users,
-            'department' => $department,
         ]);
     }
 
@@ -58,7 +48,7 @@ class ProfilePageController extends Controller
         $userInfos->n_code = $validated['n_code'];
         $userInfos->save();
 
-        return redirect()->signedRoute('profile')->with('status','اطلاعات ذخیره شد');
+        return to_route('profile')->with('status','اطلاعات ذخیره شد');
     }
 
     public function updateProfilePhoto(Request $request)
@@ -73,9 +63,9 @@ class ProfilePageController extends Controller
             DB::table('users')->where('id', auth()->id())->update([
                 'profile_photo_path' => $path
             ]);
-            return redirect()->signedRoute('profile')->with('status','عکس ذخیره شد');
+            return to_route('profile')->with('status','عکس ذخیره شد');
         }
-        return redirect()->signedRoute('profile')->with('status', 'فایلی برای آپلود انتخاب نشد');
+        return to_route('profile')->with('status', 'فایلی برای آپلود انتخاب نشد');
     }
 
     public function deleteProfilePhoto()
@@ -88,7 +78,7 @@ class ProfilePageController extends Controller
         DB::table('users')->where('id',auth()->id())->update([
             'profile_photo_path' => null
         ]);
-        return redirect()->signedRoute('profile')->with('status','عکس حذف شد');
+        return to_route('profile')->with('status','عکس حذف شد');
     }
 
     /**
@@ -106,7 +96,7 @@ class ProfilePageController extends Controller
             Auth::user()->update([
                 'password' => $validated['password'],
             ]);
-            return redirect()->signedRoute('profile')->with('status','رمز جدید ثبت شد');
+            return to_route('profile')->with('status','رمز جدید ثبت شد');
         }
 
     }

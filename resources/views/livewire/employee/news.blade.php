@@ -23,14 +23,6 @@
             <li>
                     <span
                         class="inline-flex items-center gap-1 px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-                       <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5"
-                                 stroke="currentColor" class="w-3.5 h-3.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/>
-                                </svg>
-                       </span>
                         {{__('صفحه اخبار و اطلاعیه')}}
                     </span>
             </li>
@@ -116,7 +108,7 @@
                             <x-primary-button wire:click="showBlog({{ $blog->id }})">
                                 {{ __('مشاهده خبر') }}
                             </x-primary-button>
-                            @can('has-permission-and-role', [UserPermission::NEWS_PERMISSIONS,UserRole::ADMIN])
+                            @can('has-permission',UserPermission::NEWS_PERMISSIONS)
                                 <a href="{{ route('blogs.edit', $blog->id) }}">
                                     <x-edit-button>
                                         {{__('ویرایش')}}
@@ -144,7 +136,7 @@
     </div>
 
 
-    @can('has-permission-and-role', [UserPermission::NEWS_PERMISSIONS,UserRole::ADMIN])
+    @can('has-permission', UserPermission::NEWS_PERMISSIONS)
         <x-modal name="delete" maxWidth="4xl" :closable="false">
             @if($blogId)
                 <!-- Header -->
@@ -199,6 +191,7 @@
             @endif
         </x-modal>
     @endcan
+
     <x-modal name="view" maxWidth="4xl" :closable="false">
         @if($selectedBlog)
             <!-- Header -->

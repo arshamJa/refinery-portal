@@ -34,9 +34,6 @@ class AdminDashboard extends Component
             ->orderBy('time', 'asc')
             ->get();
     }
-
-
-
     #[Computed]
     public function unreadReceivedCount()
     {
@@ -51,6 +48,8 @@ class AdminDashboard extends Component
             ->whereNull('sender_read_at')
             ->count();
     }
+
+
 
 //    #[Computed]
 //    public function tasksOnTime()

@@ -1,7 +1,7 @@
-@php use App\Enums\UserPermission;use App\Enums\UserRole;use App\Models\User;use App\Models\UserInfo; @endphp
+@php use App\Enums\UserPermission;@endphp
 <x-app-layout>
 
-    <nav class="flex justify-between mb-4 mt-20">
+    <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -21,13 +21,6 @@
             <li>
             <span
                 class="inline-flex items-center gap-1 px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
-            <span>
-                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" class="w-3.5 h-3.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M14.25 9.75v-4.5m0 4.5h4.5m-4.5 0 6-6m-3 18c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"/>
-                    </svg>
-            </span>
                 {{__('دفترچه تلفنی')}}
             </span>
             </li>
@@ -62,7 +55,7 @@
                     @endif
                 @endif
             </div>
-            @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
+            @can('has-permission',UserPermission::PHONE_PERMISSIONS)
                 <div class="col-span-2 flex justify-end gap-x-2">
                     <a href="{{ route('phone-list.resident.create') }}">
                         <x-primary-button type="button">
@@ -89,7 +82,7 @@
                             {{ __($th) }}
                         </x-table.heading>
                     @endforeach
-                    @can('has-permission-and-role',[UserPermission::PHONE_PERMISSIONS->value,UserRole::ADMIN->value])
+                    @can('has-permission',UserPermission::PHONE_PERMISSIONS)
                         <x-table.heading
                             class="px-6 py-3 border-r border-gray-200 dark:border-gray-700">{{ __('تلفن همراه') }}</x-table.heading>
                         <x-table.heading
@@ -108,7 +101,7 @@
                         <x-table.cell>{{ $entry['department_name'] ?? '—' }}</x-table.cell>
                         <x-table.cell>{{ $entry['work_phone'] ?? '—' }}</x-table.cell>
 
-                        @can('has-permission-and-role', [UserPermission::PHONE_PERMISSIONS->value, UserRole::ADMIN->value])
+                        @can('has-permission', UserPermission::PHONE_PERMISSIONS)
                             <x-table.cell>{{ $entry['phone'] ?? '—' }}</x-table.cell>
                             <x-table.cell>{{ $entry['house_phone'] ?? '—' }}</x-table.cell>
                             <x-table.cell>

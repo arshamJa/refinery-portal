@@ -1,5 +1,6 @@
 @php use App\Enums\UserPermission;use App\Enums\UserRole; @endphp
 <x-app-layout>
+    @can('has-permission',UserPermission::TASK_REPORT_TABLE)
 
     <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -37,7 +38,6 @@
         </ol>
     </nav>
 
-    @can('has-permission-and-role', [UserPermission::TASK_REPORT_TABLE,UserRole::ADMIN])
         <div id="printable-meeting-content"
              class="p-6 text-gray-900 font-sans text-[14px] leading-6 print:bg-white print:text-black print:p-6 print:text-[12px]">
 

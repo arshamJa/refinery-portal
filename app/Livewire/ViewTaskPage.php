@@ -71,7 +71,6 @@ class ViewTaskPage extends Component
     public $employee_id,$task_id,$year,$month,$day;
     public function submitParticipantForm()
     {
-//        abort_if(!Gate::allows('scriptorium-role'), 403);
         $validated = Validator::make(
             ['employee_id' => $this->employee_id, 'task_id' => $this->task_id,
                 'year' => $this->year, 'month' => $this->month, 'day' => $this->day,],
@@ -339,32 +338,6 @@ class ViewTaskPage extends Component
         }
         return $this->loadedMeeting;
     }
-//    #[Computed]
-//    public function employees()
-//    {
-//        if (!$this->loadedEmployees) {
-//            $this->loadedEmployees = $this->meetings()->meetingUsers->where('is_guest',false);
-//        }
-//        return $this->loadedEmployees;
-//    }
-//    #[Computed]
-//    public function participants()
-//    {
-//        $meeting = $this->meetings();
-//        $bossId = $meeting->boss_id;
-//        $meetingUsers = $meeting->meetingUsers
-//            ->filter(fn($mu) => !$mu->is_guest && $mu->user->user_info->user_id != $bossId);
-//
-//        return $meetingUsers->map(function ($meetingUser) {
-//            $userInfo = $meetingUser->user->user_info;
-//            return [
-//                'user_id' => $userInfo->user_id,
-//                'full_name' => $userInfo->full_name,
-//                'position' => $userInfo->position ?? '',
-//                'department_name' => $userInfo->department ? $userInfo->department->department_name : '',
-//            ];
-//        })->values();
-//    }
     #[Computed]
     public function participants()
     {
@@ -424,15 +397,6 @@ class ViewTaskPage extends Component
             return $meetingUser->user;
         })->values();
     }
-//    #[Computed]
-//    public function presentUsers()
-//    {
-//        return $this->employees->filter(function ($employee) {
-//            return $employee->is_present; // Adjust this to match your actual logic
-//        })->map(function ($employee) {
-//            return $employee->user;
-//        });
-//    }
     #[Computed]
     public function taskUsers()
     {

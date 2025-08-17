@@ -8,6 +8,7 @@ Route::middleware(['auth','adminMiddleware','sanitizeInputs'])->group(function (
     Route::get('users/table', [UsersTableController::class, 'index'])
         ->name('users.index');
 
+
     Route::get('/users/export', [UsersTableController::class, 'export'])
         ->name('users.export');
 

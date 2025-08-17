@@ -1,3 +1,4 @@
+@php use App\Enums\UserPermission; @endphp
 <x-app-layout>
     <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -24,68 +25,69 @@
             </li>
         </ol>
     </nav>
+    @can('has-permission',UserPermission::VIEW_ORGANIZATIONS)
+        <div class="mx-auto px-4 py-8 space-y-8" dir="rtl">
+            <form method="GET" action="{{ route('employee.organization') }}">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
 
-    <div class="mx-auto px-4 py-8 space-y-8" dir="rtl">
-        <form method="GET" action="{{ route('employee.organization') }}">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                    <!-- Search Field -->
+                    <div>
+                        <x-input-label for="search" value="{{ __('جست و جو') }}"/>
+                        <x-search-input>
+                            <x-text-input type="text" id="search" name="search" value="{{ $search }}"
+                                          class="block ps-10"
+                                          placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
+                        </x-search-input>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
+                        <x-search-button>{{ __('جست و جو') }}</x-search-button>
+                        @if($search !== '')
+                            <x-view-all-link href="{{ route('employee.organization') }}">
+                                {{ __('نمایش همه') }}
+                            </x-view-all-link>
+                        @endif
+                    </div>
+                </div>
+            </form>
+            <!--  Organization Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @forelse($organizations as $organization)
+                    <div
+                        class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all p-6 flex flex-col items-center text-center">
+                        @if($organization->image)
+                            <img src="{{ $organization->getImageUrl() }}"
+                                 class="w-20 h-20 rounded-full object-cover mb-4 border border-gray-300 shadow"
+                                 alt="{{ $organization->organization_name }}">
+                        @else
+                            <div
+                                class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-4">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M12 14l6.16-3.422A12.083 12.083 0 0120 13.5c0 2.485-2.015 4.5-4.5 4.5S11 15.985 11 13.5c0-.497.072-.977.21-1.435L12 14z"/>
+                                </svg>
+                            </div>
+                        @endif
 
-                <!-- Search Field -->
-                <div>
-                    <x-input-label for="search" value="{{ __('جست و جو') }}"/>
-                    <x-search-input>
-                        <x-text-input type="text" id="search" name="search" value="{{ $search }}" class="block ps-10"
-                                      placeholder="{{ __('عبارت مورد نظر را وارد کنید...') }}"/>
-                    </x-search-input>
-                </div>
-                <!-- Action Buttons -->
-                <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
-                    <x-search-button>{{ __('جست و جو') }}</x-search-button>
-                    @if($search !== '')
-                        <x-view-all-link href="{{ route('employee.organization') }}">
-                            {{ __('نمایش همه') }}
-                        </x-view-all-link>
-                    @endif
-                </div>
+                        <h2 class="text-lg font-bold text-gray-800 mb-1">{{ $organization->organization_name }}</h2>
+                        @if($organization->url)
+                            <a href="{{ $organization->url }}" target="_blank"
+                               class="text-sm text-blue-600 hover:underline break-words">
+                                {{ $organization->url }}
+                            </a>
+                        @else
+                            <span class="text-sm text-gray-400">{{ __('بدون لینک') }}</span>
+                        @endif
+                    </div>
+                @empty
+                    <div class="col-span-full text-center text-gray-500 py-12">
+                        <p class="text-lg font-medium">{{ __('هیچ سازمانی یافت نشد.') }}</p>
+                    </div>
+                @endforelse
             </div>
-        </form>
-
-        <!-- 🏢 Organization Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($organizations as $organization)
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all p-6 flex flex-col items-center text-center">
-                    @if($organization->image)
-                        <img src="{{ $organization->getImageUrl() }}"
-                             class="w-20 h-20 rounded-full object-cover mb-4 border border-gray-300 shadow"
-                             alt="{{ $organization->organization_name }}">
-                    @else
-                        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-4">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 14l9-5-9-5-9 5 9 5z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 14l6.16-3.422A12.083 12.083 0 0120 13.5c0 2.485-2.015 4.5-4.5 4.5S11 15.985 11 13.5c0-.497.072-.977.21-1.435L12 14z"/>
-                            </svg>
-                        </div>
-                    @endif
-
-                    <h2 class="text-lg font-bold text-gray-800 mb-1">{{ $organization->organization_name }}</h2>
-                    @if($organization->url)
-                        <a href="{{ $organization->url }}" target="_blank"
-                           class="text-sm text-blue-600 hover:underline break-words">
-                            {{ $organization->url }}
-                        </a>
-                    @else
-                        <span class="text-sm text-gray-400">{{ __('بدون لینک') }}</span>
-                    @endif
-                </div>
-            @empty
-                <div class="col-span-full text-center text-gray-500 py-12">
-                    <p class="text-lg font-medium">{{ __('هیچ سازمانی یافت نشد.') }}</p>
-                </div>
-            @endforelse
         </div>
-    </div>
-
-
+    @endcan
 </x-app-layout>

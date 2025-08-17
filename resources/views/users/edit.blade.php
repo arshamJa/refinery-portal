@@ -1,6 +1,6 @@
 @php use App\Enums\UserRole; @endphp
 <x-app-layout>
-    @can('admin-role')
+    @can('has-role',UserRole::ADMIN)
         <nav class="flex justify-between mb-4 mt-16">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
@@ -19,10 +19,20 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
                 </svg>
                 <li>
+                <span
+                    class="inline-flex items-center gap-1 px-2 py-1.5 font-normal rounded cursor-default focus:outline-none">
+                    {{__('تنظیمات راهبری')}}
+                </span>
+                </li>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                     stroke="currentColor" class="w-3 h-3 text-gray-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+                </svg>
+                <li>
                     <a href="{{route('users.index')}}"
                        class="inline-flex items-center px-2 py-1.5 space-x-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100">
 
-                        <span> {{__('جدول کاربران')}}</span>
+                        <span> {{__('مدیریت کاربران')}}</span>
                     </a>
                     </span>
                 </li>
@@ -229,14 +239,16 @@
                                 <x-input-label :value="__('تعیین دسترسی ها:')"/>
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                                     @foreach($permissions as $permission)
-                                        <label class="flex items-center space-x-2 space-x-reverse">
-                                            <input type="checkbox"
-                                                   name="permissions[]"
-                                                   value="{{ $permission->name }}"
-                                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                @checked(in_array($permission->name, old('permissions', $user->permissions->pluck('name')->toArray())))>
-                                            <span class="text-sm">{{ $permission->name }}</span>
-                                        </label>
+                                        @if(in_array($permission->name, $rolePermissionsMap[optional($user->roles->first())->id] ?? []))
+                                            <label class="flex items-center space-x-2 space-x-reverse">
+                                                <input type="checkbox"
+                                                       name="permissions[]"
+                                                       value="{{ $permission->name }}"
+                                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    @checked(in_array($permission->name, old('permissions', $user->permissions->pluck('name')->toArray())))>
+                                                <span class="text-sm">{{ $permission->name }}</span>
+                                            </label>
+                                        @endif
                                     @endforeach
                                 </div>
                             </div>

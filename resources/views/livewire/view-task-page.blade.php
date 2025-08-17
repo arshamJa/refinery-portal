@@ -1,4 +1,4 @@
-@php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use App\Enums\UserRole;use Illuminate\Support\Str; @endphp
+@php use App\Enums\MeetingStatus;use App\Enums\TaskStatus;use App\Enums\UserPermission;use App\Enums\UserRole;use Illuminate\Support\Str; @endphp
 <div>
     <nav class="flex justify-between mb-4 mt-16">
         <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
@@ -74,9 +74,6 @@
             <div><strong>{{ __('موضوع جلسه: ') }}</strong><span>{{ $this->meetings->title }}</span></div>
             <div class="col-span-2 print:col-span-2"><strong>{{ __('حاضرین: ') }}</strong>
                 <span>
-{{--                    @foreach ($this->participants as $participant)--}}
-                    {{--                        {{ $participant['full_name'] }}{{ !$loop->last ? ' -' : '' }}--}}
-                    {{--                    @endforeach--}}
                     @foreach ($this->participants as $participant)
                         @if ($participant['replacing'])
                             {{ $participant['replacing'] }}  <span class="text-gray-600 text-sm">(حاضر به‌جای {{ $participant['full_name'] }})</span>
@@ -119,43 +116,6 @@
                     <div class=" space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                {{--                                <x-input-label for="holders" class="mb-2"--}}
-                                {{--                                               :value="__('اقدام کننده')"/>--}}
-                                {{--                                <div class="custom-select">--}}
-                                {{--                                    <div class="select-box">--}}
-                                {{--                                        <input type="text" class="tags_input" multiple name="holders" hidden>--}}
-                                {{--                                        <div class="selected-options"></div>--}}
-                                {{--                                        <div class="arrow">--}}
-                                {{--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
-                                {{--                                                 stroke-width="1.5"--}}
-                                {{--                                                 stroke="currentColor" class="size-4">--}}
-                                {{--                                                <path stroke-linecap="round" stroke-linejoin="round"--}}
-                                {{--                                                      d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/>--}}
-                                {{--                                            </svg>--}}
-                                {{--                                        </div>--}}
-                                {{--                                    </div>--}}
-                                {{--                                    <div class="options">--}}
-                                {{--                                        <div class="option-search-tags">--}}
-                                {{--                                            <input type="text" class="search-tags" placeholder="جست و جو ...">--}}
-                                {{--                                            <button type="button" class="clear">--}}
-                                {{--                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"--}}
-                                {{--                                                     stroke-width="1.5"--}}
-                                {{--                                                     stroke="currentColor" class="size-4">--}}
-                                {{--                                                    <path stroke-linecap="round" stroke-linejoin="round"--}}
-                                {{--                                                          d="M6 18 18 6M6 6l12 12"/>--}}
-                                {{--                                                </svg>--}}
-                                {{--                                            </button>--}}
-                                {{--                                        </div>--}}
-                                {{--                                        <div class="option all-tags" data-value="All">{{__('انتخاب همه')}}</div>--}}
-                                {{--                                        @foreach($this->employees as $employee)--}}
-                                {{--                                            <div class="option" data-value="{{$employee->user_id}}">--}}
-                                {{--                                                {{ $employee->user->user_info->full_name }}--}}
-                                {{--                                            </div>--}}
-                                {{--                                        @endforeach--}}
-                                {{--                                        <div class="no-result-message" style="display:none;">No result match</div>--}}
-                                {{--                                    </div>--}}
-                                {{--                                </div>--}}
-                                {{--                                <x-input-error :messages="$errors->get('holders')" class="my-2"/>--}}
                                 <div id="participants_dropdown" data-users='@json($this->participants)'
                                      class="relative w-full col-span-2"
                                      style="direction: rtl;">
@@ -321,10 +281,6 @@
                                         <x-input-label :value="__('اقدام‌کننده')" class="mb-2"/>
                                         <x-select-input wire:model.defer="employee_id">
                                             <option value="">{{ __('انتخاب کنید') }}</option>
-                                            {{--                                            @foreach($this->employees as $employee)--}}
-                                            {{--                                                <option--}}
-                                            {{--                                                    value="{{ $employee->user_id }}">{{ $employee->user->user_info->full_name }}</option>--}}
-                                            {{--                                            @endforeach--}}
                                             @foreach ($this->participants as $participant)
                                                 <option
                                                     value="{{ $participant['user_id'] }}">
@@ -451,7 +407,7 @@
                             </div>
                         </form>
                     </x-modal>
-                    @can('lock-task', $this->meetings)
+                    @can('has-permission', UserPermission::SCRIPTORIUM_PERMISSIONS)
                         <x-edit-button wire:click="openLockTaskModal">
                             {{ __('بستن صورتجلسه') }}
                         </x-edit-button>
@@ -955,7 +911,6 @@
         {{--          Modal for scriptorium to finish the meeting --}}
         @if($this->meetings->status === MeetingStatus::IS_IN_PROGRESS)
             @if ($meeting)
-                {{--        @can('scriptoriumTask')--}}
                 <x-modal name="final-check" :closable="false">
                     <form wire:submit="finishMeeting" class="text-sm text-gray-800">
                         <!-- Header -->
@@ -987,12 +942,10 @@
                         </div>
                     </form>
                 </x-modal>
-                {{--        @endcan--}}
             @endif
         @endif
         <x-modal name="edit-by-scriptorium" :closable="false">
             @if ($selectedTaskUser)
-                {{--                @can('participantTask', $selectedTaskUser)--}}
                 <form wire:submit="editForm" class="text-sm text-gray-800">
                     <!-- Header -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
@@ -1076,7 +1029,6 @@
 
                     </div>
                 </form>
-                {{--                @endcan--}}
             @endif
         </x-modal>
 

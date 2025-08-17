@@ -15,20 +15,16 @@ class BlogController extends Controller
 
     public function create()
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::NEWS_PERMISSIONS);
         return view('blog.create');
     }
 
     public function store(StoreBlogRequest $request)
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::NEWS_PERMISSIONS);
         $validated = $request->validated();
         $blog = Blog::create([
-            'user_id' => auth()->user()->id,
+            'user_id' => auth()->id(),
             'title'   => $validated['title'],
             'body'    => $validated['body']
         ]);
@@ -55,9 +51,7 @@ class BlogController extends Controller
 
     public function edit(string $id)
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::NEWS_PERMISSIONS);
         $blog = Blog::with('images')->findOrFail($id);
         return view('blog.edit', [
             'blog' => $blog,
@@ -66,9 +60,7 @@ class BlogController extends Controller
 
     public function update(StoreBlogRequest $request, string $id)
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::NEWS_PERMISSIONS);
         $validated = $request->validated();
         $blog = Blog::find($id);
         $blog->title = $validated['title'];
@@ -96,9 +88,7 @@ class BlogController extends Controller
 
     public function deleteImage(string $id)
     {
-         Gate::authorize('has-permission-and-role', [
-            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::NEWS_PERMISSIONS);
         $image = BlogImage::findOrFail($id);
         $old_image_path = public_path('storage/' . $image->image);
         if (file_exists($old_image_path)) {
@@ -110,9 +100,7 @@ class BlogController extends Controller
 
     public function destroy(string $id)
     {
-         Gate::authorize('has-permission-and-role', [
-            UserPermission::NEWS_PERMISSIONS->value, UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::NEWS_PERMISSIONS);
         $blog = Blog::with('images')->findOrFail($id);
         foreach ($blog->images as $image) {
             $filePath = public_path('storage/' . $image->image);

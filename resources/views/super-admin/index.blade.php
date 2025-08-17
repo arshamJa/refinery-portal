@@ -1,5 +1,6 @@
+@php use App\Enums\UserRole; @endphp
 <x-app-layout>
-    @can('super-admin-only')
+    @can('has-role',UserRole::SUPER_ADMIN)
         <div class="py-10 mt-4 px-4 sm:px-6 lg:px-8" dir="ltr">
             <h2 class="text-2xl font-bold mb-8 text-gray-800">Samael Panel</h2>
 

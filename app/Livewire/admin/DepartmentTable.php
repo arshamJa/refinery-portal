@@ -2,6 +2,7 @@
 
 namespace App\Livewire\admin;
 
+use App\Enums\UserPermission;
 use App\Models\Department;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Validator;
@@ -57,8 +58,10 @@ class DepartmentTable extends Component
 
     public function createNewDepartment()
     {
+        $this->authorize('has-permission' , UserPermission::DEPARTMENT_TABLE);
+        $departmentSanitized = trim(strip_tags($this->department));
         $validated = Validator::make(
-            ['department' => $this->department],
+            ['department' => $departmentSanitized],
             [
                 'department' => ['required', 'min:5', 'max:255', 'unique:departments,department_name']
             ],
@@ -79,8 +82,10 @@ class DepartmentTable extends Component
     /**
      * @throws AuthorizationException
      */
-    public function updateDep($id)
+    public function updateDep()
     {
+        $this->authorize('has-permission' , UserPermission::DEPARTMENT_TABLE);
+        $this->department = trim(strip_tags($this->department));
         $validated = $this->validate(
             [
                 'department' => ['bail', 'required', 'min:5', 'max:255', 'unique:departments,department_name'],
@@ -92,7 +97,8 @@ class DepartmentTable extends Component
                 'department.unique' => 'این دپارتمان قبلا ثبت شده است.',
             ]
         );
-        Department::where('id', $id)->update(['department_name' => $validated['department']]);
+        Department::where('id', $this->departmentId)
+            ->update(['department_name' => $validated['department']]);
         $this->close();
         session()->flash('status', 'دپارتمان با موفقیت آپدیت شد');
     }

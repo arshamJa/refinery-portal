@@ -1,6 +1,6 @@
 <div>
 
-    @can('admin-role')
+    @can('has-permission' , \App\Enums\UserPermission::ORGANIZATION_TABLE)
         <x-breadcrumb>
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"

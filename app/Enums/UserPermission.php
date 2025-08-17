@@ -12,4 +12,10 @@ enum UserPermission: string
     case VIEW_PHONE_LISTS = 'نمایش دفترچه تلفن';
     case VIEW_MEETING_DASHBOARD = 'نمایش داشبورد جلسات';
     case VIEW_BLOG = 'نمایش اخبار و اطلاعیه';
+    case ORGANIZATION_TABLE = 'جدول سامانه';
+    case DEPARTMENT_TABLE = 'جدول دپارتمان';
+    case CREATE_NEW_USER = 'ساخت کاربر جدید';
+    case  USERS_TABLE = 'مدیریت کاربران';
+    case ORGANIZATION_DEPARTMENT_MANAGE = 'مدیریت سامانه و دپارتمان';
+
 }

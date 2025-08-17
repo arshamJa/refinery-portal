@@ -93,20 +93,26 @@ class TaskUserExport implements FromCollection, WithHeadings, WithTitle
             });
         }
 
+        $statusMap = [
+            \App\Enums\TaskStatus::SENT_TO_SCRIPTORIUM->value => 'ارسال شده',
+            \App\Enums\TaskStatus::PENDING->value => 'در انتظار',
+        ];
 
-        return $query->get()->map(function ($taskUser, $index) {
+        return $query->get()->map(function ($taskUser, $index) use ($statusMap) {
             return [
-                'ردیف' => $index + 1,
-                'موضوع جلسه' => $taskUser->task->meeting->title ?? 'N/A',
-                'دبیر جلسه' => $taskUser->task->meeting->scriptorium->user_info->full_name ?? 'N/A',
-                'اقدام کننده' => $taskUser->user->user_info->full_name ?? 'N/A',
+                'ردیف'            => $index + 1,
+                'موضوع جلسه'      => $taskUser->task->meeting->title ?? 'N/A',
+                'دبیر جلسه'       => $taskUser->task->meeting->scriptorium->user_info->full_name ?? 'N/A',
+                'اقدام کننده'     => $taskUser->user->user_info->full_name ?? 'N/A',
                 'تاریخ انجام اقدام' => $taskUser->sent_date ?? '---',
                 'تاریخ مهلت اقدام' => $taskUser->time_out ?? '---',
+                'وضعیت'           => $statusMap[$taskUser->task_status] ?? '---',
             ];
         });
     }
     public function headings(): array
     {
+
         return [
             'ردیف',
             'موضوع جلسه',
@@ -114,6 +120,7 @@ class TaskUserExport implements FromCollection, WithHeadings, WithTitle
             'اقدام کننده',
             'تاریخ انجام اقدام',
             'تاریخ مهلت اقدام',
+            'وضعیت'
         ];
     }
     public function title(): string

@@ -19,7 +19,6 @@ class PhoneListController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $showAllColumns = $user->hasRole(UserRole::SUPER_ADMIN->value) || $user->hasRole(UserRole::ADMIN->value);
         $search = $request->input('search');
         $source = $request->input('source', 'all');
 
@@ -117,38 +116,20 @@ class PhoneListController extends Controller
         // 6. Return view
         return view('phoneList.index', [
             'combinedData' => $pagedCombined,
-            'showAllColumns' => $showAllColumns,
             'originalUsersCount' => $originalUsersCount,
             'filteredUsersCount' => $combined->count(),
             'selectedSource' => $source,
         ]);
     }
 
-
     public function createResident()
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
         return view('phoneList.create-resident');
     }
-    public function createOperator()
-    {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
-        $departments = Department::select('id', 'department_name')->get();
-        return view('phoneList.create-operator', compact('departments'));
-    }
-
     public function storeResident(Request $request)
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
         $input = $request->all();
         $phones = $this->cleanPhones($input);
         $input = array_merge($input, $phones);
@@ -156,74 +137,16 @@ class PhoneListController extends Controller
         ResidentPhones::create($validated);
         return redirect()->route('phone-list.index')->with('status', 'شماره عموم با موفقیت افزوده شد.');
     }
-    public function storeOperator(Request $request)
-    {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
-        $input = $request->all();
-        $phones = $this->cleanPhones($input);
-        $input = array_merge($input, $phones);
-        $validated = validator($input, $this->validationRulesForOperator())->validate();
-        OperatorPhones::create($validated);
-
-        return redirect()->route('phone-list.index')->with('status', 'شماره کارمند با موفقیت افزوده شد.');
-    }
-
-    public function editOperator(string $id)
-    {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
-        $record = OperatorPhones::with('department:id,department_name')
-            ->select('id', 'department_id', 'n_code', 'p_code', 'position', 'full_name', 'work_phone', 'house_phone', 'phone')
-            ->findOrFail($id);
-        $departments = Department::select('id', 'department_name')->orderBy('department_name')->get();
-        return view('phoneList.edit-operator', compact('record', 'departments'));
-    }
     public function editResident(string $id)
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
         $record = ResidentPhones::select('id', 'full_name', 'work_phone', 'house_phone', 'phone', 'position', 'n_code', 'p_code')
             ->findOrFail($id);
         return view('phoneList.edit-resident', compact('record'));
     }
-
-
-    public function updateOperator(Request $request, string $id)
-    {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
-
-        $input = $request->all();
-        $phones = $this->cleanPhones($input);
-        $input = array_merge($input, $phones);
-        $validated = validator($input, $this->validationRulesForOperator())->validate();
-        $record = OperatorPhones::findOrFail($id);
-        $record->update([
-            'full_name' => $validated['full_name'],
-            'department_id' => $validated['departmentId'],
-            'n_code' => $validated['n_code'],
-            'p_code' => $validated['p_code'],
-            'position' => $validated['position'],
-            'phone' => $validated['phone'],
-            'house_phone' => $validated['house_phone'],
-            'work_phone' => $validated['work_phone'],
-        ]);
-        return to_route('phone-list.index')->with('status', 'اطلاعات با موفقیت آپدیت شد');
-    }
     public function updateResident(Request $request, string $id)
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value, UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
         $input = $request->all();
         $phones = $this->cleanPhones($input);
         $input = array_merge($input, $phones);
@@ -242,13 +165,58 @@ class PhoneListController extends Controller
     }
 
 
+    public function createOperator()
+    {
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
+        $departments = Department::select('id', 'department_name')->get();
+        return view('phoneList.create-operator', compact('departments'));
+    }
+    public function storeOperator(Request $request)
+    {
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
+        $input = $request->all();
+        $phones = $this->cleanPhones($input);
+        $input = array_merge($input, $phones);
+        $validated = validator($input, $this->validationRulesForOperator())->validate();
+        OperatorPhones::create($validated);
+
+        return redirect()->route('phone-list.index')->with('status', 'شماره کارمند با موفقیت افزوده شد.');
+    }
+    public function editOperator(string $id)
+    {
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
+        $record = OperatorPhones::with('department:id,department_name')
+            ->select('id', 'department_id', 'n_code', 'p_code', 'position', 'full_name', 'work_phone', 'house_phone', 'phone')
+            ->findOrFail($id);
+        $departments = Department::select('id', 'department_name')->orderBy('department_name')->get();
+        return view('phoneList.edit-operator', compact('record', 'departments'));
+    }
+    public function updateOperator(Request $request, string $id)
+    {
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
+        $input = $request->all();
+        $phones = $this->cleanPhones($input);
+        $input = array_merge($input, $phones);
+        $validated = validator($input, $this->validationRulesForOperator())->validate();
+        $record = OperatorPhones::findOrFail($id);
+        $record->update([
+            'full_name' => $validated['full_name'],
+            'department_id' => $validated['departmentId'],
+            'n_code' => $validated['n_code'],
+            'p_code' => $validated['p_code'],
+            'position' => $validated['position'],
+            'phone' => $validated['phone'],
+            'house_phone' => $validated['house_phone'],
+            'work_phone' => $validated['work_phone'],
+        ]);
+        return to_route('phone-list.index')->with('status', 'اطلاعات با موفقیت آپدیت شد');
+    }
+
+
 
     public function destroy(string $source, string $id)
     {
-        Gate::authorize('has-permission-and-role', [
-            UserPermission::PHONE_PERMISSIONS->value,
-            UserRole::ADMIN->value,
-        ]);
+        Gate::authorize('has-permission', UserPermission::PHONE_PERMISSIONS);
         if ($source === 'operator_phones') {
             $record = OperatorPhones::findOrFail($id);
         } elseif ($source === 'resident_phones') {

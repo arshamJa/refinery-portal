@@ -1,9 +1,9 @@
 @php use App\Enums\UserRole; @endphp
 <x-app-layout>
-
-    <x-sessionMessage name="status"/>
     @can('profile-page')
-        <nav class="flex justify-between mb-4 mt-20">
+        <x-sessionMessage name="status"/>
+
+        <nav class="flex justify-between mb-4 mt-16">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
                     <a href="{{route('dashboard')}}"
@@ -21,7 +21,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
                 </svg>
                 <li>
-                    <a href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
+                    <a href="{{route('profile')}}"
                        class="inline-flex items-center px-2 py-1.5 font-normal rounded cursor-default active-breadcrumb focus:outline-none">
                         <span>{{__('پروفایل')}}</span>
                     </a>
@@ -87,20 +87,11 @@
                 <!-- Static Info Section -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700 dark:text-gray-300">
                     <p>
-                        <span class="font-medium">{{ __('نقش :') }}</span>
-                        @if (auth()->user()->hasRole('super_admin'))
-                            {{ __('Samael') }}
-                        @elseif (auth()->user()->hasRole('ادمین'))
-                            {{ __('ادمین') }}
-                        @elseif (auth()->user()->hasRole(UserRole::OPERATOR->value))
-                            {{ UserRole::OPERATOR->value }}
-                        @elseif (auth()->user()->hasRole(UserRole::USER->value))
-                            {{ UserRole::USER->value }}
-                        @endif
+                        <span class="font-medium">{{ __('نقش :') }} {{ auth()->user()->getTranslatedRole() }}</span>
                     </p>
                     <p>
                         <span class="font-medium">{{ __('دپارتمان :') }}</span>
-                        {{ $department }}
+                        {{auth()->user()->user_info->department->department_name ?? ''}}
                     </p>
                     <p>
                         <span class="font-medium">{{ __('سمت :') }}</span>

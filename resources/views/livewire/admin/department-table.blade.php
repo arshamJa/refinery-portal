@@ -1,6 +1,6 @@
-@php use App\Models\Department; @endphp
+@php use App\Enums\UserPermission; @endphp
 <div>
-    @can('admin-role')
+    @can('has-permission' , UserPermission::DEPARTMENT_TABLE)
         <x-breadcrumb>
             <li class="flex items-center h-full">
                 <a href="{{route('dashboard')}}"
@@ -49,7 +49,6 @@
             </span>
             </li>
         </x-breadcrumb>
-
         <x-modal name="create" maxWidth="2xl" :closable="false">
             <form wire:submit="createNewDepartment">
                 <!-- Header -->
@@ -92,12 +91,9 @@
                 </div>
             </form>
         </x-modal>
-
-
-
         <x-modal name="update" maxWidth="2xl" :closable="false">
             @if($departmentId)
-                <form wire:submit.prevent="updateDep({{ $departmentId }})">
+                <form wire:submit.prevent="updateDep">
                     <!-- Header -->
                     <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                         <h2 class="text-2xl font-bold text-gray-800">{{ __('ویرایش دپارتمان') }}</h2>
@@ -109,7 +105,6 @@
                             </svg>
                         </a>
                     </div>
-
                     <!-- Body -->
                     <div class="px-6 py-4 space-y-6 text-sm text-gray-800 dark:text-gray-200" dir="rtl">
                         <div>
@@ -119,7 +114,6 @@
                             <x-input-error :messages="$errors->get('department')" class="my-2"/>
                         </div>
                     </div>
-
                     <!-- Footer -->
                     <div class="flex justify-between px-6 py-4 bg-gray-100 border-t border-gray-200">
                         <x-primary-button type="submit" wire:loading.attr="disabled" wire:target="updateDep">
@@ -135,8 +129,6 @@
                 </form>
             @endif
         </x-modal>
-
-
         <x-modal name="delete" maxWidth="2xl" :closable="false">
             @if($departmentId)
                 <form method="POST" action="{{ route('department.destroy', $departmentId) }}">
@@ -186,11 +178,9 @@
                 </form>
             @endif
         </x-modal>
-
         <x-modal name="import" maxWidth="2xl" :closable="false">
             <form action="/department_import" method="POST" enctype="multipart/form-data">
                 @csrf
-
                 <!-- Header -->
                 <div class="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-gray-200">
                     <h2 class="text-2xl font-bold text-gray-800">{{ __('درون‌ریزی فایل دپارتمان') }}</h2>
@@ -226,8 +216,6 @@
                 </div>
             </form>
         </x-modal>
-
-
         <form wire:submit="filterDepartments"
               class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-white border-b border-gray-200 rounded-t-xl">
             <div class="grid gap-4 px-3 w-full sm:px-0 lg:grid-cols-6 items-end">
@@ -303,7 +291,6 @@
         <div class="mt-2">
             {{ $this->departments->withQueryString()->links(data:['scrollTo'=>false]) }}
         </div>
-
     @endcan
 
 </div>

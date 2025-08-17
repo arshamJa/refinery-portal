@@ -1,4 +1,4 @@
-@php use App\Enums\UserPermission;use App\Enums\UserRole;use App\Models\MeetingUser; @endphp
+@php use App\Enums\UserPermission;use App\Models\MeetingUser; @endphp
 @php use App\Enums\MeetingUserStatus;use App\Models\User; @endphp
 <div>
 
@@ -47,7 +47,7 @@
 
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        @can('has-permission-and-role', [UserPermission::SCRIPTORIUM_PERMISSIONS,UserRole::ADMIN])
+        @can('has-permission',UserPermission::SCRIPTORIUM_PERMISSIONS)
             <a href="{{ route('meeting.create') }}"
                class="bg-[#FCF7F8] hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 text-black shadow-lg flex gap-3 items-center justify-start transition-all duration-300 ease-in-out p-4 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -133,9 +133,7 @@
         <x-table.table>
             <x-slot name="head">
                 <x-table.row class="border-b whitespace-nowrap border-gray-200 dark:border-gray-700">
-                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده', 'متن',
-// 'وضعیت جلسه'
- 'اقدامات','وضعیت بایگانی'] as $th)
+                    @foreach (['نوع پیام','تاریخ دریافت پیام', 'فرستنده', 'متن','اقدامات','وضعیت بایگانی'] as $th)
                         <x-table.heading
                             class="px-6 py-3 {{ !$loop->first ? 'border-r border-gray-200 dark:border-gray-700' : '' }}">
                             {{ __($th) }}
@@ -165,12 +163,6 @@
                         <x-table.cell class="whitespace-normal break-words max-w-xs">
                             {{ $notification->getNotificationMessage() }}
                         </x-table.cell>
-                        {{--                                                    <x-table.cell class="whitespace-nowrap">--}}
-                        {{--                                                         <span--}}
-                        {{--                                                             class="{{$notification->notifiable->status->badgeColor() }} text-sm font-medium px-3 py-1 rounded-lg">--}}
-                        {{--                                                            {{ $notification->notifiable->status->label() }}--}}
-                        {{--                                                        </span>--}}
-                        {{--                                                    </x-table.cell>--}}
                         <x-table.cell class="whitespace-nowrap">
                             @if ($notification->type === 'MeetingInvitation' || $notification->type === 'MeetingGuestInvitation' || $notification->type === 'MeetingBossInvitation' || $notification->type === 'ReplacementForMeeting')
                                 {{-- Handle meeting invitation responses --}}
@@ -225,11 +217,6 @@
                         </x-table.cell>
                         <x-table.cell class="whitespace-nowrap">
                             <div>
-{{--                                @if ($notification->isReadByRecipient())--}}
-{{--                                    <span class="text-gray-500">{{ __('خوانده شده') }}</span>--}}
-{{--                                @else--}}
-{{--                                    <span class="text-red-500 font-bold">{{ __('خوانده نشده') }}</span>--}}
-{{--                                @endif--}}
                                 @if (! $notification->trashed())
                                     <form method="POST" action="{{ route('notifications.archive', $notification->id) }}">
                                         @csrf
@@ -238,12 +225,6 @@
                                         </x-cancel-button>
                                     </form>
                                 @else
-{{--                                    <form method="POST" action="{{ route('notifications.restore', $notification->id) }}">--}}
-{{--                                        @csrf--}}
-{{--                                        <x-cancel-button type="submit">--}}
-{{--                                            {{ __('بازیابی') }}--}}
-{{--                                        </x-cancel-button>--}}
-{{--                                    </form>--}}
                                     <span class="text-gray-500 text-sm">{{ __('بایگانی شده') }}</span>
                                 @endif
                             </div>

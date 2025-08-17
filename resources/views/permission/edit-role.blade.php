@@ -1,5 +1,6 @@
 <x-app-layout>
-    <div>
+    @can('has-role',UserRole::SUPER_ADMIN)
+
         <nav class="flex justify-between mb-4 mt-20">
             <ol class="inline-flex items-center mb-3 space-x-1 text-xs text-neutral-500 [&_.active-breadcrumb]:text-neutral-600 [&_.active-breadcrumb]:font-medium sm:mb-0">
                 <li class="flex items-center h-full">
@@ -35,7 +36,6 @@
                 </li>
             </ol>
         </nav>
-
         <div class="max-w-3xl p-4 bg-white shadow-lg rounded-2xl space-y-8">
             <form action="{{route('roles.update',$role->id)}}" method="POST" class="space-y-6">
                 @csrf
@@ -53,16 +53,16 @@
                 <!-- Permissions Checkbox Grid -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-2">{{__('سطوح دسترسی')}}</label>
-{{--                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">--}}
-                        @foreach($permissions as $permission)
-                            <input type="checkbox"
-                                   {{ $role->permissions()->where('permissions.id', $permission->id)->exists() ? 'checked' : '' }}
-                                   name="permissions[{{ $permission->id }}]"
-                                   value="{{ $permission->id }}">
-                            {{ $permission->name }}
-                            <br>
-                        @endforeach
-{{--                    </div>--}}
+                    {{--                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">--}}
+                    @foreach($permissions as $permission)
+                        <input type="checkbox"
+                               {{ $role->permissions()->where('permissions.id', $permission->id)->exists() ? 'checked' : '' }}
+                               name="permissions[{{ $permission->id }}]"
+                               value="{{ $permission->id }}">
+                        {{ $permission->name }}
+                        <br>
+                    @endforeach
+                    {{--                    </div>--}}
                     <x-input-error :messages="$errors->get('permissions')" class="mt-2 text-red-500 text-sm"/>
                 </div>
 
@@ -80,7 +80,6 @@
             </form>
         </div>
 
-
-    </div>
+    @endcan
 </x-app-layout>
 

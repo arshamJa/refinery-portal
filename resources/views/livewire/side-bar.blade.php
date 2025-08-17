@@ -323,7 +323,7 @@
 
             <!-- Profile -->
             <li class="mb-2">
-                <x-link.responsive-link href="{{Illuminate\Support\Facades\URL::signedRoute('profile')}}"
+                <x-link.responsive-link href="{{route('profile')}}"
                                         :active="request()->is('profile')" class="flex items-center gap-x-2">
                     <span><x-icon.profile-icon/></span>
                     <span x-show="expanded"> {{__('پروفایل')}}</span>
@@ -561,7 +561,7 @@
                         <span><x-icon.report-icon fill="white"/></span>
                         <span x-show="expanded" class="flex items-center justify-between w-full gap-x-2">
                             <span>{{ __('گزارش جلسات و اقدامات') }}</span>
-                                        <!-- Rotating Arrow -->
+                            <!-- Rotating Arrow -->
                             <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': reportDropdown}"
                                  class="h-4 w-4 transition-transform"
                                  viewBox="0 0 20 20" fill="currentColor">
@@ -622,38 +622,48 @@
 
                     <!-- Dropdown when sidebar is expanded -->
                     <div x-show="settingDropdown && expanded" x-transition class="mt-1 space-y-1 pr-3">
-                        <x-link.responsive-link href="{{route('organizations')}}"
-                                                :active="request()->is('organizations')"
-                                                class="flex items-center gap-x-2 text-xs">
-                            {{ __('جدول سامانه') }}
-                        </x-link.responsive-link>
-                        <x-link.responsive-link href="{{route('departments.index')}}"
-                                                :active="request()->is('departments')"
-                                                class="flex items-center gap-x-2 text-xs">
-                            {{ __('جدول دپارتمان') }}
-                        </x-link.responsive-link>
-                        <x-link.responsive-link href="{{route('users.create')}}"
-                                                :active="request()->is('users/create')"
-                                                class="flex items-center gap-x-2 text-xs">
-                            {{ __('ساخت کاربر جدید') }}
-                        </x-link.responsive-link>
-                        <x-link.responsive-link href="{{route('users.index')}}"
-                                                :active="request()->is('users/table')"
-                                                class="flex items-center gap-x-2 text-xs">
-                            {{ __('مدیریت کاربران') }}
-                        </x-link.responsive-link>
-                        <x-link.responsive-link href="{{route('organization.department.manage')}}"
-                                                :active="request()->is('department/organization/manage')"
-                                                class="flex items-center gap-x-2 text-xs">
-                            {{ __('مدیریت سامانه/دپارتمان') }}
-                        </x-link.responsive-link>
-                        @if(auth()->user()->hasRole(UserRole::SUPER_ADMIN->value))
+                        @can('has-permission' , UserPermission::ORGANIZATION_TABLE)
+                            <x-link.responsive-link href="{{route('organizations')}}"
+                                                    :active="request()->is('organizations')"
+                                                    class="flex items-center gap-x-2 text-xs">
+                                {{ __('جدول سامانه') }}
+                            </x-link.responsive-link>
+                        @endcan
+                        @can('has-permission' , UserPermission::DEPARTMENT_TABLE)
+                            <x-link.responsive-link href="{{route('departments.index')}}"
+                                                    :active="request()->is('departments')"
+                                                    class="flex items-center gap-x-2 text-xs">
+                                {{ __('جدول دپارتمان') }}
+                            </x-link.responsive-link>
+                        @endcan
+                        @can('has-permission', UserPermission::CREATE_NEW_USER)
+                                <x-link.responsive-link href="{{route('users.create')}}"
+                                                        :active="request()->is('users/create')"
+                                                        class="flex items-center gap-x-2 text-xs">
+                                    {{ __('ساخت کاربر جدید') }}
+                                </x-link.responsive-link>
+                            @endcan
+                        @can('has-permission', UserPermission::USERS_TABLE)
+                                <x-link.responsive-link href="{{route('users.index')}}"
+                                                        :active="request()->is('users/table')"
+                                                        class="flex items-center gap-x-2 text-xs">
+                                    {{ __('مدیریت کاربران') }}
+                                </x-link.responsive-link>
+                            @endcan
+                        @can('has-permission', UserPermission::ORGANIZATION_DEPARTMENT_MANAGE)
+                                <x-link.responsive-link href="{{route('organization.department.manage')}}"
+                                                        :active="request()->is('department/organization/manage')"
+                                                        class="flex items-center gap-x-2 text-xs">
+                                    {{ __('مدیریت سامانه/دپارتمان') }}
+                                </x-link.responsive-link>
+                            @endcan
+                            @can('super-admin-only')
                             <x-link.responsive-link href="{{route('role.permission.table')}}"
                                                     :active="request()->is('roles/permissions')"
                                                     class="flex items-center gap-x-2 text-xs">
                                 {{ __('مدیریت نقش و دسترسی') }}
                             </x-link.responsive-link>
-                        @endif
+                        @endcan
                     </div>
 
                     <!-- Dropdown when sidebar is collapsed -->

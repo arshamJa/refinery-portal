@@ -51,7 +51,7 @@
         </li>
     </x-breadcrumb>
 
-    @can('has-permission-and-role', [UserPermission::NEWS_PERMISSIONS,UserRole::ADMIN])
+    @can('has-permission',UserPermission::NEWS_PERMISSIONS)
 
         <div class="p-4 mb-2 sm:p-8 bg-white dark:bg-gray-800 drop-shadow-xl sm:rounded-lg">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b pb-2">

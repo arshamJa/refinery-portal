@@ -2,6 +2,7 @@
 
 namespace App\Livewire\admin;
 
+use App\Enums\UserPermission;
 use App\Models\Organization;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -66,23 +67,15 @@ class OrganizationTable extends Component
      */
     public function createOrg()
     {
+        $this->authorize('has-permission' , UserPermission::ORGANIZATION_TABLE);
+        $organization_name = trim(strip_tags($this->organization));
         $validator = Validator::make(
-            [
-                'organization' => $this->organization,
-                'url' => $this->url,
-                'image' => $this->image,
-            ],
-            [
-                'organization' => ['bail', 'required', 'max:250'],
-                'url' => ['bail', 'required', 'starts_with:www.'],
-                'image' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
-            ],
-            [
-                'organization.required' => 'نام سازمان اجباری است.',
-                'url.required' => 'آدرس وب‌سایت اجباری است.',
-                'url.starts_with' => 'آدرس باید با www. شروع شود.',
-                'image.mimes' => 'فرمت تصویر باید jpg, jpeg, png یا webp باشد.',
-                'image.max' => 'حجم تصویر نباید بیشتر از 1MB باشد.',
+            ['organization' => $organization_name, 'url' => $this->url, 'image' => $this->image,],
+            ['organization' => ['bail', 'required', 'max:250'],
+                'url' => ['bail', 'required', 'starts_with:www.'], 'image' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],],
+            ['organization.required' => 'نام سازمان اجباری است.',
+                'url.required' => 'آدرس وب‌سایت اجباری است.', 'url.starts_with' => 'آدرس باید با www. شروع شود.',
+                'image.mimes' => 'فرمت تصویر باید jpg, jpeg, png یا webp باشد.', 'image.max' => 'حجم تصویر نباید بیشتر از 1MB باشد.',
             ]
         );
 
@@ -107,10 +100,11 @@ class OrganizationTable extends Component
      */
     public function updateOrg()
     {
+        $this->authorize('has-permission' , UserPermission::DEPARTMENT_TABLE);
         $organization = Organization::findOrFail($this->organizationId);
-
+        $organization_name = trim(strip_tags($this->organization));
         $validator = Validator::make(
-            ['organization' => $this->organization, 'url' => $this->url, 'image' => $this->image,
+            ['organization' => $organization_name, 'url' => $this->url, 'image' => $this->image,
             ],
             ['organization' => ['bail', 'required', 'max:250'], 'url' => ['bail', 'required', 'starts_with:www.'],
                 'image' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
@@ -121,8 +115,6 @@ class OrganizationTable extends Component
             ]
         );
         $validated = $validator->validate();
-
-
         // Handle image upload
         if ($validated['image']) {
             if (!empty($organization->image)) {

@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
         ]);
         \App\Models\Blog::factory(10)->create();
+        \App\Models\Meeting::factory(10)->create();
     }
 }

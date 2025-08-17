@@ -50,10 +50,6 @@ class AppServiceProvider extends ServiceProvider
             return null; // Let others fall through to normal logic
         });
 
-        Gate::define('super-admin-only', function (User $user) {
-            return $user->hasRole(UserRole::SUPER_ADMIN->value);
-        });
-
 
 //        Gate::define('users-info', function (User $user){
 //            return $user->hasRole(UserRole::ADMIN->value);
@@ -93,20 +89,24 @@ class AppServiceProvider extends ServiceProvider
 
 
 
-        Gate::define('admin-role',function (User $user){
-           return $user->hasRole(UserRole::ADMIN->value);
-        });
-
-        Gate::define('lock-task', function (User $user) {
-            return $user->permissions->contains('name', UserPermission::SCRIPTORIUM_PERMISSIONS->value);
-        });
-
-
 //        // Gate for only the bosses to see the refinery report
 //        Gate::define('refinery-report', function (User $user) {
 //            return $user->permissions->contains('name', UserPermission::TASK_REPORT_TABLE->value);
 //        });
 
+        // it is used in meeting-dashboard blade
+        Gate::define('view-task-page', function (User $user, Meeting $meeting) {
+            // SUPER_ADMIN can see all
+            if ($user->hasRole(\App\Enums\UserRole::SUPER_ADMIN->value)) {
+                return true;
+            }
+            // Scriptorium of the meeting
+            if ($meeting->scriptorium_id === $user->id) {
+                return true;
+            }
+            // Participant in the meeting
+            return $meeting->meetingUsers()->where('user_id', $user->id)->exists();
+        });
 
         // Gate for the scriptorium to handle only his meeting
         Gate::define('handle-own-meeting', function (User $user, Meeting $meeting) {
